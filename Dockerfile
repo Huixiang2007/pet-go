@@ -1,5 +1,5 @@
 # === 第一阶段：构建阶段（仅用于打包，最终不保留）===
-#FROM registry.cn-hangzhou.aliyuncs.com/aliyun/node:22-alpine
+# FROM registry.cn-hangzhou.aliyuncs.com/aliyun/node:22-alpine
 FROM crpi-jparwx1rfzb928mh.cn-beijing.personal.cr.aliyuncs.com/pt-life-1/node:22-alpine
 WORKDIR /app
 COPY package*.json ./

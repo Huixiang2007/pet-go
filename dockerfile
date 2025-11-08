@@ -14,6 +14,7 @@ RUN npm run build  # 生成dist目录
 FROM node:22-alpine
 RUN npm install -g serve
 WORKDIR /app
+
  # 仅复制构建好的dist目录
 COPY --from=builder /app/dist ./dist 
 EXPOSE 3000

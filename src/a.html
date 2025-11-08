@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宠物温馨家园 - 专业的宠物寄养服务平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #FF9E80;
+            --secondary: #80CBC4;
+            --accent: #CE93D8;
+            --light: #FFF8E1;
+            --dark: #5D4037;
+            --text: #424242;
+            --success: #66BB6A;
+        }
+        
+        body {
+            background-color: #f9f5f0;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 导航栏样式 */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 25px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+        
+        .auth-buttons button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .login {
+            background: transparent;
+            color: var(--text);
+            margin-right: 10px;
+        }
+        
+        .signup {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .auth-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* 英雄区域样式 */
+        .hero {
+            background: linear-gradient(135deg, var(--light) 0%, #E1F5FE 100%);
+            padding: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .hero-text {
+            flex: 1;
+            max-width: 500px;
+        }
+        
+        .hero h1 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: var(--text);
+        }
+        
+        .search-box {
+            display: flex;
+            max-width: 500px;
+            background: white;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+        }
+        
+        .search-box button {
+            padding: 15px 25px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        
+        .search-box button:hover {
+            background: #FF8A65;
+        }
+        
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .hero-image img {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        /* 地图区域样式 */
+        .map-section {
+            padding: 60px 0;
+            background: white;
+        }
+        
+        .section-title {
+            margin-bottom: 30px;
+        }
+        
+        .section-title h2 {
+            font-size: 2.2rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+        
+        .section-title p {
+            color: var(--text);
+            max-width: 600px;
+        }
+        
+        .map-container {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .map-filters {
+            flex: 0 0 300px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            height: fit-content;
+        }
+        
+        .filter-group {
+            margin-bottom: 25px;
+        }
+        
+        .filter-group h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+            font-size: 1.2rem;
+        }
+        
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .filter-option {
+            padding: 8px 15px;
+            background: #f5f5f5;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-option.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .filter-option:hover {
+            background: #e0e0e0;
+        }
+        
+        .filter-option.active:hover {
+            background: #FF8A65;
+        }
+        
+        #map {
+            flex: 1;
+            height: 500px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* 寄养家庭列表样式 */
+        .foster-homes {
+            padding: 60px 0;
+            background: var(--light);
+        }
+        
+        .homes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .sort-options select {
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            font-size: 1rem;
+        }
+        
+        .homes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .home-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .home-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .home-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .home-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        
+        .home-card:hover .home-image img {
+            transform: scale(1.05);
+        }
+        
+        .home-content {
+            padding: 20px;
+        }
+        
+        .home-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .home-title {
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .home-location {
+            color: #757575;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .home-location i {
+            margin-right: 5px;
+        }
+        
+        .home-rating {
+            display: flex;
+            align-items: center;
+            background: var(--light);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .home-rating i {
+            color: #FFC107;
+            margin-right: 5px;
+        }
+        
+        .home-details {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .home-detail {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #616161;
+        }
+        
+        .home-detail i {
+            margin-right: 5px;
+            color: var(--primary);
+        }
+        
+        .home-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .home-price span {
+            font-size: 0.9rem;
+            font-weight: normal;
+            color: #757575;
+        }
+        
+        .home-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        /* 日历预览样式 */
+        .calendar-preview {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .calendar-title {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            color: #757575;
+        }
+        
+        .calendar-days {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .calendar-day {
+            flex: 1;
+            height: 25px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .day-available {
+            background: var(--success);
+            color: white;
+        }
+        
+        .day-unavailable {
+            background: #f5f5f5;
+            color: #bdbdbd;
+        }
+        
+        .day-today {
+            border: 2px solid var(--primary);
+        }
+        
+        /* 特色服务样式 */
+        .features {
+            padding: 60px 0;
+            background: white;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 30px 20px;
+            border-radius: 15px;
+            background: var(--light);
+            transition: transform 0.3s;
+        }
+        
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: var(--primary);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .feature h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        /* CTA区域样式 */
+        .cta {
+            padding: 80px 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--secondary) 0%, #B2DFDB 100%);
+            color: white;
+        }
+        
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .cta p {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: white;
+            color: var(--secondary);
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* 页脚样式 */
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: #E0E0E0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        .social-links {
+            display: flex;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            margin-right: 10px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #BDBDBD;
+            font-size: 0.9rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 15px 0;
+            }
+            
+            .nav-links {
+                margin: 20px 0;
+            }
+            
+            .hero-content {
+                flex-direction: column;
+            }
+            
+            .hero-text {
+                margin-bottom: 30px;
+            }
+            
+            .map-container {
+                flex-direction: column;
+            }
+            
+            .map-filters {
+                flex: none;
+            }
+            
+            .homes-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <i class="fas fa-paw"></i>
+                    <span>宠物温馨家园</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#" class="active">首页</a></li>
+                    <li><a href="#">寄养服务</a></li>
+                    <li><a href="#">宠物商城</a></li>
+                    <li><a href="#">宠物旅游</a></li>
+                    <li><a href="#">宠物社区</a></li>
+                    <li><a href="#">成为寄养家庭</a></li>
+                </ul>
+                <div class="auth-buttons">
+                    <button class="login">登录</button>
+                    <button class="signup">注册</button>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1>为您的爱宠找到临时的温馨家园</h1>
+                    <p>专业的宠物寄养服务，让您的外出无后顾之忧。经过严格审核的寄养家庭，提供24小时贴心照顾。</p>
+                    <div class="search-box">
+                        <input type="text" placeholder="输入地址或区域搜索寄养家庭...">
+                        <button><i class="fas fa-search"></i> 搜索</button>
+                    </div>
+                    <div class="quick-filters">
+                        <span>快速筛选：</span>
+                        <span class="filter-option active">全部</span>
+                        <span class="filter-option">可接猫咪</span>
+                        <span class="filter-option">可接狗狗</span>
+                        <span class="filter-option">可接其他宠物</span>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="宠物寄养">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 地图区域 -->
+    <section class="map-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>附近寄养家庭</h2>
+                <p>在地图上查看您附近的寄养家庭，快速找到最适合的寄养服务</p>
+            </div>
+            <div class="map-container">
+                <div class="map-filters">
+                    <div class="filter-group">
+                        <h3>宠物类型</h3>
+                        <div class="filter-options">
+                            <div class="filter-option active">全部</div>
+                            <div class="filter-option">狗狗</div>
+                            <div class="filter-option">猫咪</div>
+                            <div class="filter-option">其他宠物</div>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h3>寄养类型</h3>
+                        <div class="filter-options">
+                            <div class="filter-option active">全部</div>
+                            <div class="filter-option">家庭寄养</div>
+                            <div class="filter-option">专业机构</div>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h3>价格范围</h3>
+                        <div class="filter-options">
+                            <div class="filter-option active">全部</div>
+                            <div class="filter-option">¥50以下</div>
+                            <div class="filter-option">¥50-100</div>
+                            <div class="filter-option">¥100以上</div>
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h3>评分</h3>
+                        <div class="filter-options">
+                            <div class="filter-option active">全部</div>
+                            <div class="filter-option">4.5+</div>
+                            <div class="filter-option">4.0+</div>
+                            <div class="filter-option">3.5+</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                        <i class="fas fa-filter"></i> 应用筛选
+                    </button>
+                </div>
+                <div id="map"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 寄养家庭列表 -->
+    <section class="foster-homes">
+        <div class="container">
+            <div class="homes-header">
+                <div class="section-title">
+                    <h2>推荐寄养家庭</h2>
+                    <p>精心挑选的优质寄养家庭，为您的爱宠提供温馨照顾</p>
+                </div>
+                <div class="sort-options">
+                    <select>
+                        <option>综合排序</option>
+                        <option>距离最近</option>
+                        <option>评分最高</option>
+                        <option>价格最低</option>
+                        <option>接单量最多</option>
+                    </select>
+                </div>
+            </div>
+            <div class="homes-grid">
+                <!-- 寄养家庭卡片 1 -->
+                <div class="home-card">
+                    <div class="home-image">
+                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="寄养家庭环境">
+                    </div>
+                    <div class="home-content">
+                        <div class="home-header">
+                            <div>
+                                <h3 class="home-title">爱心宠物之家</h3>
+                                <div class="home-location">
+                                    <i class="fas fa-map-marker-alt"></i> 新乡市红旗区 · 距离1.2km
+                                </div>
+                            </div>
+                            <div class="home-rating">
+                                <i class="fas fa-star"></i> 4.9
+                            </div>
+                        </div>
+                        <div class="home-details">
+                            <div class="home-detail">
+                                <i class="fas fa-home"></i> 家庭寄养
+                            </div>
+                            <div class="home-detail">
+                                <i class="fas fa-paw"></i> 可接狗狗/猫咪
+                            </div>
+                            <div class="home-detail">
+                                <i class="fas fa-calendar-check"></i> 接单128
+                            </div>
+                        </div>
+                        <div class="home-price">
+                            ¥68 <span>/天</span>
+                        </div>
+                        <div class="calendar-preview">
+                            <div class="calendar-title">近期可预订</div>
+                            <div class="calendar-days">
+                                <div class="calendar-day day-available">15</div>
+                                <div class="calendar-day day-available">16</div>
+                                <div class="calendar-day day-today day-available">17</div>
+                                <div class="calendar-day day-available">18</div>
+                                <div class="calendar-day day-unavailable">19</div>
+                                <div class="calendar-day day-available">20</div>
+                                <div class="calendar-day day-available">21</div>
+                            </div>
+                        </div>
+                        <div class="home-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i> 立即预订
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 寄养家庭卡片 2 -->
+                <div class="home-card">
+                    <div class="home-image">
+                        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="寄养家庭环境">
+                    </div>
+                    <div class="home-content">
+                        <div class="home-header">
+                            <div>
+                                <h3 class="home-title">专业宠物酒店</h3>
+                                <div class="home-location">
+                                    <i class="fas fa-map-marker-alt"></i> 新乡市卫滨区 · 距离2.5km
+                                </div>
+                            </div>
+                            <div class="home-rating">
+                                <i class="fas fa-star"></i> 4.7
+                            </div>
+                        </div>
+                        <div class="home-details">
+                            <div class="home-detail">
+                                <i class="fas fa-building"></i> 专业机构
+                            </div>
+                            <div class="home-detail">
+                                <i class="fas fa-paw"></i> 可接狗狗
+                            </div>
+                            <div class="home-detail">
+                                <i class="fas fa-calendar-check"></i> 接单356
+                            </div>
+                        </div>
+                        <div class="home-price">
+                            ¥98 <span>/天</span>
+                        </div>
+                        <div class="calendar-preview">
+                            <div class="calendar-title">近期可预订</div>
+                            <div class="calendar-days">
+                                <div class="calendar-day day-available">15</div>
+                                <div class="calendar-day day-available">16</div>
+                                <div class="calendar-day day-today day-available">17</div>
+                                <div class="calendar-day day-available">18</div>
+                                <div class="calendar-day day-available">19</div>
+                                <div class="calendar-day day-available">20</div>
+                                <div class="calendar-day day-available">21</div>
+                            </div>
+                        </div>
+                        <div class="home-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i> 立即预订
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 寄养家庭卡片 3 -->
+                <div class="home-card">
+                    <div class="home-image">
+                        <img src="https://images.unsplash.com/photo-1596276020095-3e1c5c1b37e2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80" alt="寄养家庭环境">
+                    </div>
+                    <div class="home-content">
+                        <div class="home-header">
+                            <div>
+                                <h3 class="home-title">猫咪专属空间</h3>
+                                <div class="home-location">
+                                    <i class="fas fa-map-marker-alt"></i> 新乡市牧野区 · 距离3.8km
+                                </div>
+                            </div>
+                            <div class="home-rating">
+                                <i class="fas fa-star"></i> 4.8
+                            </div>
+                        </div>
+                        <div class="home-details">
+                            <div class="home-detail">
+                                <i class="fas fa-home"></i> 家庭寄养
+                            </div>
+                            <div class="home-detail">
+                                <i class="fas fa-paw"></i> 仅接猫咪
+                            </div>
+                            <div class="home-detail">
+                                <i class="fas fa-calendar-check"></i> 接单89
+                            </div>
+                        </div>
+                        <div class="home-price">
+                            ¥55 <span>/天</span>
+                        </div>
+                        <div class="calendar-preview">
+                            <div class="calendar-title">近期可预订</div>
+                            <div class="calendar-days">
+                                <div class="calendar-day day-available">15</div>
+                                <div class="calendar-day day-available">16</div>
+                                <div class="calendar-day day-today day-available">17</div>
+                                <div class="calendar-day day-unavailable">18</div>
+                                <div class="calendar-day day-unavailable">19</div>
+                                <div class="calendar-day day-available">20</div>
+                                <div class="calendar-day day-available">21</div>
+                            </div>
+                        </div>
+                        <div class="home-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i> 立即预订
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 特色服务 -->
+    <section class="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>我们的特色服务</h2>
+                <p>专业、安全、贴心的服务，让每一位宠物主人都能放心</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>安全可靠</h3>
+                    <p>所有寄养家庭均经过严格审核，实名认证，确保宠物安全</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h3>每日更新</h3>
+                    <p>寄养期间每日拍照/视频更新，让您随时了解宠物状况</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h3>便捷查找</h3>
+                    <p>智能地图定位，快速找到附近的寄养服务</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <h3>实时沟通</h3>
+                    <p>寄养期间随时与寄养人沟通，接收宠物近况更新</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA区域 -->
+    <section class="cta">
+        <div class="container">
+            <h2>准备好为您的爱宠寻找寄养家庭了吗？</h2>
+            <p>立即搜索附近的寄养服务，或注册成为寄养家庭分享您的爱心</p>
+            <a href="#" class="cta-button">开始寻找寄养</a>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>宠物温馨家园</h3>
+                    <p>致力于为宠物和主人提供最优质的服务体验，让每一只宠物都能享受到家的温暖。</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-qq"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>快速链接</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">首页</a></li>
+                        <li><a href="#">关于我们</a></li>
+                        <li><a href="#">服务项目</a></li>
+                        <li><a href="#">价格方案</a></li>
+                        <li><a href="#">联系我们</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>服务项目</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">宠物寄养</a></li>
+                        <li><a href="#">宠物商城</a></li>
+                        <li><a href="#">宠物旅游</a></li>
+                        <li><a href="#">宠物社区</a></li>
+                        <li><a href="#">宠物健康</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>联系我们</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 河南省新乡市红旗区XX街道</li>
+                        <li><i class="fas fa-phone"></i> 400-123-4567</li>
+                        <li><i class="fas fa-envelope"></i> contact@petparadise.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 宠物温馨家园 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // 初始化地图
+        document.addEventListener('DOMContentLoaded', function() {
+            // 简单的地图初始化
+            const map = L.map('map').setView([35.303, 113.876], 12);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // 添加一些示例标记
+            const locations = [
+                { lat: 35.303, lng: 113.876, title: "爱心宠物之家" },
+                { lat: 35.298, lng: 113.882, title: "专业宠物酒店" },
+                { lat: 35.315, lng: 113.865, title: "猫咪专属空间" },
+                { lat: 35.290, lng: 113.890, title: "狗狗乐园" },
+                { lat: 35.305, lng: 113.895, title: "宠物度假村" }
+            ];
+            
+            locations.forEach(loc => {
+                L.marker([loc.lat, loc.lng])
+                    .addTo(map)
+                    .bindPopup(`<b>${loc.title}</b><br>点击查看详情`);
+            });
+            
+            // 筛选选项交互
+            const filterOptions = document.querySelectorAll('.filter-option');
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // 移除同组其他选项的active类
+                    const parent = this.parentElement;
+                    const siblings = parent.querySelectorAll('.filter-option');
+                    siblings.forEach(sibling => {
+                        sibling.classList.remove('active');
+                    });
+                    
+                    // 为当前选项添加active类
+                    this.classList.add('active');
+                });
+            });
+            
+            // 收藏按钮交互
+            const favoriteButtons = document.querySelectorAll('.btn-outline');
+            favoriteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('far')) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        this.style.color = '#e91e63';
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        this.style.color = '';
+                    }
+                });
+            });
+            
+            // 注册按钮点击效果
+            const signupBtn = document.querySelector('.signup');
+            signupBtn.addEventListener('click', function() {
+                alert('欢迎注册宠物温馨家园！即将跳转到注册页面...');
+            });
+        });
+    </script>
+</body>
+</html>

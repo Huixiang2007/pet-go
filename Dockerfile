@@ -1,5 +1,5 @@
 # === 第一阶段：构建阶段（仅用于打包，最终不保留）===
-FROM node:22-alpine AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/aliyun/node:22-alpine
 WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./

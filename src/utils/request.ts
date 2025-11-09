@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { Method, AxiosRequestConfig } from 'axios'
 const service = axios.create({
-  baseURL: 'http://localhost:5173',
+  baseURL: '/api',
   timeout: 5000,
 })
 //请求拦截器

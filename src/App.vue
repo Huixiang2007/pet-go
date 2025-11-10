@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import MapContainer from './components/MapContainer.vue'
-import MyVc from './components/MyVc.vue'
-import ElementPlus from './components/ElementPlus.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <MapContainer />
-  <MyVc />
-  <ElementPlus />
+
+  <RouterView />
 </template>
 
 <style>

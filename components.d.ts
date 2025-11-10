@@ -13,6 +13,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCol: typeof import('element-plus/es')['ElCol']
+    ElDrawer: typeof import('element-plus/es')['ElDrawer']
     ElementPlus: typeof import('./src/components/ElementPlus.vue')['default']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
@@ -26,6 +27,7 @@ declare module 'vue' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     MapContainer: typeof import('./src/components/MapContainer.vue')['default']
     MyVc: typeof import('./src/components/MyVc.vue')['default']
+    Nav: typeof import('./src/components/nav.vue')['default']
     NavBar: typeof import('./src/components/NavBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

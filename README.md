@@ -1,48 +1,63 @@
-# .
+# PetGo -宠物之家
 
-This template should help get you started developing with Vue 3 in Vite.
+基于 Vue3 + TypeScript + Element Plus + Tailwind CSS 开发的宠物综合服务平台，聚焦 “宠物寄养”“宠物电商”“宠物旅游” 三大核心板块，提供响应式交互体验与高效的宠物服务管理功能。
 
-## Recommended IDE Setup
+# 快速开始
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+环境要求
+Node.js ≥ 16.x
+npm ≥ 7.x 或 pnpm ≥ 6.x
+浏览器支持：Chrome ≥ 88、Edge ≥ 88、Safari ≥ 15、Firefox ≥ 85
 
-## Recommended Browser Setup
+# 安装与运行
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+bash
 
-## Type Support for `.vue` Imports in TS
+# 克隆仓库
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+git clone https://codeup.aliyun.com/6906a8a3876b90de1aac0b9e/pet-go-web.git
 
-## Customize configuration
+# 进入项目目录
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+cd pet-go-web
 
-## Project Setup
+# 安装依赖（推荐pnpm，速度更快）
 
-```sh
 npm install
-```
 
-### Compile and Hot-Reload for Development
+# 或 pnpm install
 
-```sh
+# 或 yarn install
+
+# 本地开发环境（默认端口：3000）
+
 npm run dev
-```
 
-### Type-Check, Compile and Minify for Production
+# 构建生产环境（输出到dist目录）
 
-```sh
 npm run build
-```
 
-### Lint with [ESLint](https://eslint.org/)
+# 预览生产构建结果
 
-```sh
-npm run lint
-```
+npm run preview
+
+# 技术栈
+
+核心框架：Vue3 + TypeScript
+UI 组件库：Element Plus
+样式解决方案：Tailwind CSS
+构建工具：Vite
+图标支持：Element Plus Icons
+
+# 提交规范
+
+1. Type（提交类型）
+   feat：新功能（如：feat (mall): 新增宠物商品列表组件）
+   fix：修复 bug（如：fix (form): 修复宠物信息提交验证失效问题）
+   docs：文档更新（如：docs (readme): 补充分支命名规范）
+   style：代码格式调整（不影响功能，如：style (navbar): 优化导航栏样式）
+   refactor：代码重构（不新增功能也不修复 bug，如：refactor (pet-card): 重构宠物卡片组件逻辑）
+   test：添加 / 修改测试用例（如：test (pet-form): 补充表单验证测试）
+   chore：构建流程 / 依赖管理调整（如：chore (deps): 更新 Element Plus 到 2.4.0 版本）
+2. Scope（影响范围）
+   可选，指定提交影响的模块，如：navbar、pet-form、mall、travel 等

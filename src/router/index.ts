@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PetShopView from '@/views/PetShopView.vue'
 import PetCenter from '@/views/PetCenter.vue'
+import PetLogin from '@/views/login.vue'
 const routes = [
   {
     path: '/shop',
@@ -12,6 +13,11 @@ const routes = [
     name: 'petCenter',
     component: PetCenter,
   },
+  {
+    path: '/login',
+    name: 'petLogin',
+    component: PetLogin,
+  }
 ]
 
 const router = createRouter({

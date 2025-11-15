@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import PetLogin from '@/views/login.vue'
+
 const routes = [
   {
     path: '/shop',
@@ -29,7 +31,13 @@ const routes = [
   path: '/productDetail',
   name: 'productsDetail',
   component: () => import('@/views/Petshop/ProductDetail.vue')
-}
+},
+  {
+    path: '/login',
+    name: 'petLogin',
+    component: PetLogin,
+  }
+
 ]
 
 const router = createRouter({

@@ -1,17 +1,35 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import PetShopView from '@/views/PetShopView.vue'
-import PetCenter from '@/views/PetCenter.vue'
 const routes = [
   {
     path: '/shop',
     name: 'shop',
-    component: PetShopView,
+    component: import('@/views/Petshop/PetShopView.vue'),
   },
   {
     path: '/petCenter',
     name: 'petCenter',
-    component: PetCenter,
+    component: import('@/views/PetCenter.vue'),
   },
+    {
+    path: '/petCart',
+    name: 'petCart',
+    component: import('@/views/Petshop/PetShopCar.vue') ,
+    },
+    {
+      path:'/order',
+      name:'order',
+      component: () => import('@/views/Petshop/OrderCheckout.vue')
+    },
+{
+  path: '/products/:category?',
+  name: 'products',
+  component: () => import('@/views/Petshop/ProductList.vue')
+},
+{
+  path: '/productDetail',
+  name: 'productsDetail',
+  component: () => import('@/views/Petshop/ProductDetail.vue')
+}
 ]
 
 const router = createRouter({

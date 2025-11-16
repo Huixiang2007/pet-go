@@ -1,116 +1,83 @@
 <template>
-  <div class="bg-white shadow-sm nav">
-    <!-- 顶部信息栏 -->
-    <div
-      class="nav-top container mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-3"
-    >
-      <div class="flex items-center">
-        <img src="https://picsum.photos/id/237/80/80" alt="PetGo Logo" class="h-12 w-12" />
-        <span
-          class="ml-2 text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-500"
-          >PetGo</span
-        >
-      </div>
-      <div class="flex items-center gap-6 text-sm text-gray-600">
-        <div class="flex items-center gap-2">
-          <!-- <el-icon class="text-green-600"><Phone /></el-icon> -->
-          <span>优宠托管</span>
+  <div class="bg-white border-b border-gray-200">
+    <div class="container mx-auto px-4">
+      <!-- 导航容器（固定高度，避免过高） -->
+      <div class="flex items-center justify-center h-14">
+        <!-- 左侧导航 -->
+        <div class="flex items-center space-x-5">
+          <div v-for="item in navLeftItems" :key="item.text" class="nav-item relative px-1 py-2 cursor-pointer text-sm">
+            {{ item.text }}
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <!-- <el-icon class="text-green-600"><Location /></el-icon> -->
-          <span>宠品甄选</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <!-- <el-icon class="text-green-600"><Message /></el-icon> -->
-          <span>宠行天下</span>
-        </div>
-      </div>
-      <el-button class="bg-green-500 hover:bg-green-600 text-white rounded-full">
-        Donate
-      </el-button>
-    </div>
 
-    <!-- 主导航栏 -->
-    <div class="nav-bottom bg-yellow-400">
-      <div class="nav-bottom-container container mx-auto px-4">
-        <nav class="nav-bottom-text flex flex-wrap items-center justify-between py-3">
-          <div class="flex items-center space-x-6">
-            <a href="#" class="text-gray-800 font-semibold border-b-2 border-gray-800 pb-1"
-              >我的宠物</a
-            >
-            <a
-              href="#"
-              class="text-gray-700 hover:text-gray-800 transition-colors pb-1 hover:border-b-2 hover:border-gray-800"
-              >寄养订单</a
-            >
-            <a
-              href="#"
-              class="text-gray-700 hover:text-gray-800 transition-colors pb-1 hover:border-b-2 hover:border-gray-800"
-              >商品订单</a
-            >
-            <a
-              href="#"
-              class="text-gray-700 hover:text-gray-800 transition-colors pb-1 hover:border-b-2 hover:border-gray-800"
-              >购物车</a
-            >
-            <a
-              href="#"
-              class="text-gray-700 hover:text-gray-800 transition-colors pb-1 hover:border-b-2 hover:border-gray-800"
-              >旅游足迹</a
-            >
-            <a
-              href="#"
-              class="text-gray-700 hover:text-gray-800 transition-colors pb-1 hover:border-b-2 hover:border-gray-800"
-              >我的消息</a
-            >
-            <a
-              href="#"
-              class="text-gray-700 hover:text-gray-800 transition-colors pb-1 hover:border-b-2 hover:border-gray-800"
-              >个人中心</a
-            >
+        <!-- 中间Logo（缩小尺寸，避免遮挡） -->
+        <div class="py-10 mx-5">
+          <div class="flex items-center justify-center">
+            <div class="text-purple-800 text-lg mr-1">🐾</div>
+            <h1 class="text-purple-900 font-bold text-sm">PetGo</h1>
           </div>
-          <div class="flex items-center gap-4">
-            <el-icon class="text-gray-700 hover:text-gray-800 cursor-pointer"
-              ><ShoppingCart
-            /></el-icon>
-            <el-icon class="text-gray-700 hover:text-gray-800 cursor-pointer"><Search /></el-icon>
+        </div>
+
+        <!-- 右侧导航 -->
+        <div class="flex items-center space-x-5">
+          <div v-for="item in navRightItems" :key="item.text" class="nav-item relative px-1 py-2 cursor-pointer text-sm"
+            :class="{ active: item.text === '我的宠物' }">
+            {{ item.text }}
           </div>
-        </nav>
+          <el-button type="warning" plain size="default" class="ml-1">登录</el-button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Phone, Location, Message, ShoppingCart, Search } from '@element-plus/icons-vue'
+import { ElButton } from 'element-plus'
+
+const navRightItems = [
+  { text: '购物车' },
+  { text: '旅游足迹' },
+  { text: '我的消息' },
+  { text: '加入我们' }
+
+]
+const navLeftItems = [
+  { text: '优宠托管' },
+  { text: '宠品甄选' },
+  { text: '宠行天下' },
+  { text: '我的宠物' },
+  { text: '我的订单' },
+
+
+]
 </script>
 
 <style scoped>
-/* 可选：调整图标大小 */
-/* :deep(.el-icon) {
-  font-size: 18px;
-} */
-.nav {
+.nav-item {
+  color: #333;
   position: relative;
+  white-space: nowrap;
 }
-.nav-top {
-  padding: 10px 0;
-  height: 62px;
-}
-.nav-bottom {
-  padding: 3px 0;
-  width: 80%;
+
+.nav-item::after {
+  content: '';
   position: absolute;
-  top: 73%;
-  right: 0;
-  z-index: 100;
-  border-radius: 36px 0 0 36px;
-  font-size: 16px;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #f5a623;
+  transition: width 0.3s ease-in-out;
 }
-.nav-bottom-container {
-  padding-left: 5%;
+
+.nav-item.active::after,
+.nav-item:hover::after {
+  width: 100%;
 }
-.nav-bottom-text {
-  padding: 5px 0;
+
+.el-button {
+  padding: 0 10px;
+  height: 24px;
+  line-height: 24px;
 }
 </style>

@@ -69,7 +69,7 @@
           <h2 class="text-lg font-semibold mb-4">优惠券</h2>
 
           <div class="space-y-3">
-            <!-- 循环渲染优惠券（使用Vue语法） -->
+            <!-- 循环渲染优惠券 -->
             <div
               v-for="coupon in coupons"
               :key="coupon.id"

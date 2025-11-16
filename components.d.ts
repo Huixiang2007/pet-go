@@ -29,6 +29,7 @@ declare module 'vue' {
     MyVc: typeof import('./src/components/MyVc.vue')['default']
     Nav: typeof import('./src/components/nav.vue')['default']
     NavBar: typeof import('./src/components/NavBar.vue')['default']
+    OrderCard: typeof import('./src/components/OrderCard.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShopCategoryNav: typeof import('./src/components/ShopCategoryNav.vue')['default']

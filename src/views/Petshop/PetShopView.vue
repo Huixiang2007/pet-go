@@ -334,6 +334,7 @@ const scrollToTop = () => {
   })
 }
 
+
 onMounted(() => {
   carouselInterval.value = window.setInterval(() => {
     currentSlide.value = (currentSlide.value + 1) % carouselItems.value.length

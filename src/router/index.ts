@@ -43,6 +43,16 @@ const routes = [
   name: 'OrderList ',
   component: () =>import('@/views/Petshop/OrderList.vue')
 },
+{
+  path: '/PackageInfo',
+  name: 'PackageInfo',
+  component: () => import('@/views/Petshop/PackageInfo.vue')
+},
+{
+  path: '/Search',
+  name: 'Search',
+  component: () => import('@/views/Petshop/SearchProduct.vue')
+},
   {
     path: '/login',
     name: 'petLogin',

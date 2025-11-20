@@ -1,21 +1,12 @@
 <template>
   <NavBar />
   <header class="bg-white shadow-md top-[85px] left-0 right-0 z-50 " :class="{ shadow: isScrolledPast50 }">
-        <div class="container flex items-center flex-col pt-[35px] py-4">
-      <!-- 使用新的分类导航组件 -->
+
       <ShopCategoryNav
         v-model="currentCategory"
         @categoryChange="handleCategoryChange"
       />
-       <!-- 搜索框 -->
-        <div class="hidden md:flex justify-center items-center flex-1 max-w-md mx-8">
-          <div class="relative w-full">
-            <input type="text" placeholder="搜索宠物用品..."
-                  class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-200 focus:outline-none focus:ring-2  focus:border-[#FF7043]">
-            <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-          </div>
-        </div>
-    </div>
+
   </header>
 <div class="min-h-screen pt-1 bg-yellow-50">
   <div class="pet-shop-container">

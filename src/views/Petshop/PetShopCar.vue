@@ -55,7 +55,7 @@
             <!-- 单价 -->
             <div class="col-span-2 text-center">¥{{ item.price.toFixed(2) }}</div>
 
-            <!-- 数量调整 -->
+            <!-- 数量 -->
             <div class="col-span-2 flex justify-center">
               <div class="flex items-center border rounded">
                 <button
@@ -97,7 +97,6 @@
           </div>
         </div>
 
-        <!-- 底部操作栏 -->
         <div class="flex flex-col md:flex-row justify-between items-center py-4 px-6 bg-gray-50">
           <div class="flex items-center mb-4 md:mb-0">
             <input
@@ -128,7 +127,7 @@
         </div>
       </div>
 
-      <!-- 推荐商品 -->
+      <!-- 推荐 -->
       <div v-if="cartItems.length > 0" class="mt-12">
         <h3 class="text-xl font-bold mb-6">为您推荐</h3>
         <div class="grid grid-cols-4 gap-6">

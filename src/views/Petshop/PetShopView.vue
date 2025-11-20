@@ -52,7 +52,7 @@
     </div>
 
 
-    <!-- 功能模块区域 -->
+    <!-- 功能 -->
     <div class="features grid grid-cols-3 gap-3 mt-6">
       <div class="feature-card bg-red-50 rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
       <div class="flex justify-center items-center flex-row ml-[-123px] mt-[-27px] mb-[-35px]">
@@ -79,7 +79,7 @@
         <p class="text-sm text-gray-500 mt-1">你想要的，都在这里</p>
       </div>
     </div>
-<!-- 优惠卷区域 -->
+<!-- 优惠卷 -->
   <div class="bg-gradient-to-r from-[#FFD1DC] to-[#FFF3E0] rounded-xl p-6 shadow-md mb-8 mt-3">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center">
@@ -152,7 +152,7 @@
       </div>
     </div>
   </div>
-    <!-- 商品展示区域 -->
+    <!-- 商品 -->
     <div class="products mt-8">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold text-gray-800">  <i class="fa fa-star text-[#FF7043] mr-2"></i>热门商品</h2>
@@ -304,7 +304,7 @@ const showBackToTop = ref(false)
 const isScrolledPast50 = ref(false)
 
 
-// 监听滚动
+// 滚动
 watch(scrollY, (newval) => {
   showBackToTop.value = newval > 300
   isScrolledPast50.value = newval > 50
@@ -334,7 +334,6 @@ const scrollToTop = () => {
   })
 }
 
-// 生命周期管理
 onMounted(() => {
   carouselInterval.value = window.setInterval(() => {
     currentSlide.value = (currentSlide.value + 1) % carouselItems.value.length

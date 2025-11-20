@@ -25,10 +25,12 @@ declare module 'vue' {
     ElRow: typeof import('element-plus/es')['ElRow']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    Login: typeof import('./src/components/Login.vue')['default']
     MapContainer: typeof import('./src/components/MapContainer.vue')['default']
     MyVc: typeof import('./src/components/MyVc.vue')['default']
     Nav: typeof import('./src/components/nav.vue')['default']
     NavBar: typeof import('./src/components/NavBar.vue')['default']
+    Register: typeof import('./src/components/Register.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

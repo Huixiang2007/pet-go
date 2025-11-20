@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PetShopView from '@/views/PetShopView.vue'
 import PetCenter from '@/views/PetCenter.vue'
-import PetLogin from '@/views/login.vue'
 const routes = [
   {
     path: '/shop',
@@ -14,10 +13,26 @@ const routes = [
     component: PetCenter,
   },
   {
-    path: '/login',
+    path: '/Login',
     name: 'petLogin',
-    component: PetLogin,
-  }
+    component: () => import('@/views/Login.vue'),
+    meta: { title: '欢迎登录 PetGo' }
+  },
+  {
+    path:'/Register',
+    name:'register',
+    component: () => import('@/views/Register.vue'),
+    meta: { title: '欢迎注册 PetGo' ,keepAlive: true
+    }
+  },
+  {
+    path:'/Protocal',
+    name:'protocal',
+    component: () => import('@/views/Protocal.vue'),
+    meta: { title: '用户协议' }
+  },
+   
+   
 ]
 
 const router = createRouter({

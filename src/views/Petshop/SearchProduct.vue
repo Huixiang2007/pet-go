@@ -2,8 +2,7 @@
   <div class="w-full">
   <NavBar />
   <header class="bg-white shadow-md top-[85px] left-0 right-0 z-50 " :class="{ shadow: isScrolledPast50 }">
-      <ShopCategoryNav
-      />
+      <ShopCategoryNav/>
 
   </header>
 <main class="flex flex-col items-center bg-[#fefcea] min-h-screen">
@@ -206,7 +205,7 @@ const showBrandModal = ref(false)
 const selectedRegion = ref('')
 const selectedCity = ref('')
 
-// 品牌选择状态
+// 品牌选择
 const brandSearch = ref('')
 const selectedBrands = ref<string[]>([])
 

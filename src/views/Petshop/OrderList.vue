@@ -170,7 +170,6 @@ import OrderCard, { Order } from '@/views/Petshop/OrderCard.vue';
 import Coupons from '@/views/Petshop/MyCoupons.vue';
 import Comments from '@/views/Petshop/MyComments.vue';
 import { ref, computed } from 'vue';
-// 引入订单卡片组件（后面有实现）
 
 // 筛选状态
 const activeStatus = ref('all');
@@ -276,11 +275,9 @@ const orders = ref<Order[]>([
   }
 ]);
 const filteredOrders = computed(() => {
-  // 如果是全部订单，直接返回所有订单
   if (activeStatus.value === 'all') {
     return orders.value;
   }
-  // 根据statusType过滤订单
   return orders.value.filter(order => order.statusType === activeStatus.value);
 });
 </script>

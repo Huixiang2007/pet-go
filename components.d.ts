@@ -66,6 +66,7 @@ declare module 'vue' {
     PetCard: typeof import('./src/components/PetCard.vue')['default']
     PetDetail: typeof import('./src/components/PetDetail.vue')['default']
     PetInfo: typeof import('./src/components/PetInfo.vue')['default']
+    RecordTable: typeof import('./src/components/RecordTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     ShopCategoryNav: typeof import('./src/components/ShopCategoryNav.vue')['default']

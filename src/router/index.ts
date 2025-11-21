@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PetLogin from '@/views/login.vue'
 
+import PetShopView from '@/views/PetShopView.vue'
+import PetCenter from '@/views/PetCenter.vue'
 const routes = [
   // 电商的首页
   {
@@ -54,11 +56,25 @@ const routes = [
   component: () => import('@/views/Petshop/SearchProduct.vue')
 },
   {
-    path: '/login',
+    path: '/Login',
     name: 'petLogin',
     component: PetLogin,
-  }
-
+  },
+  {
+    path:'/Register',
+    name:'register',
+    component: () => import('@/views/Register.vue'),
+    meta: { title: '欢迎注册 PetGo' ,keepAlive: true
+    }
+  },
+  {
+    path:'/Protocal',
+    name:'protocal',
+    component: () => import('@/views/Protocal.vue'),
+    meta: { title: '用户协议' }
+  },
+   
+   
 ]
 
 const router = createRouter({

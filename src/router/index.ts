@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PetLogin from '@/views/login.vue'
-
+import Home from '@/views/Home.vue';
+import PetDetail from '@/views/PetDetail.vue';
+import AddPet from '@/views/AddPet.vue';
 const routes = [
   // 电商的首页
   {
@@ -47,6 +49,22 @@ const routes = [
     path: '/login',
     name: 'petLogin',
     component: PetLogin,
+  },
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/pet/:id',
+    name: 'PetDetail',
+    component: PetDetail,
+    props: true
+  },
+  {
+    path: '/add-pet',
+    name: 'AddPet',
+    component: AddPet
   }
 
 ]

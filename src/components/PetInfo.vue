@@ -1,192 +1,170 @@
 <template>
-    <div class="pet-profile-app">
+    <div class="pet-profile-app min-h-screen bg-[#f9f5f0] text-[#5a5a5a] font-sans">
+        <!-- 顶部导航 -->
+        <el-header class="bg-[#ff9eaa] shadow-md py-4 px-6">
+            <div class="flex justify-between items-center">
+                <div class="text-white text-2xl font-bold text-shadow-md">宠物档案管理</div>
 
+                <div class="flex items-center gap-4">
+                    <el-select v-model="currentPetIndex" @change="handlePetChange" class="w-40" placeholder="选择宠物">
+                        <el-option v-for="(pet, idx) in pets" :key="idx" :label="pet.nickname" :value="idx" />
+                    </el-select>
 
-        <!-- 宠物档案主内容区 -->
-        <main class="pet-profile-container">
-            <div class="pet-profile-screen" v-for="(pet, index) in pets" :key="index"
-                :class="{ active: currentPetIndex === index }">
+                    <el-button type="success" icon="Plus" @click="addNewPet"
+                        class="rounded-full bg-[#4cd964] hover:bg-[#37c850] text-white">
+                        添加宠物
+                    </el-button>
+                </div>
+            </div>
+        </el-header>
+
+        <!-- 主内容区 -->
+        <el-main class="p-6 bg-[#f9f5f0] min-h-[calc(100vh-130px)]">
+            <div class="pet-profile-screen transition-all duration-500 ease-in-out" v-for="(pet, index) in pets"
+                :key="index" :class="{
+                    'opacity-100 translate-x-0 z-10': currentPetIndex === index,
+                    'opacity-0 translate-x-full absolute top-0 left-0': currentPetIndex !== index
+                }">
                 <!-- 宠物基本信息卡片 -->
-                <section class="pet-basic-info">
-                    <div class="pet-avatar-container">
-                        <div class="avatar-frame">
-                            <img :src="pet.avatar || defaultAvatar" :alt="pet.nickname" class="pet-avatar">
-                        </div>
-                        <div class="pet-badges">
-                            <span class="badge" :class="pet.gender === 'male' ? 'male' : 'female'">
-                                {{ pet.gender === 'male' ? '♂ 公' : '♀ 母' }}
-                            </span>
-                            <span class="badge neutered" :class="pet.neutered ? 'yes' : 'no'">
-                                {{ pet.neutered ? '已绝育' : '未绝育' }}
-                            </span>
-                        </div>
-                    </div>
+                <el-card class="mb-6 rounded-2xl shadow-md border-none bg-white overflow-hidden">
+                    <div class="flex flex-wrap gap-6 p-6">
+                        <!-- 头像部分 -->
+                        <div class="flex flex-col items-center gap-4">
+                            <div class="w-48 h-48 rounded-full border-4 border-[#fce0e6] overflow-hidden shadow-lg">
+                                <img :src="pet.avatar || defaultAvatar" :alt="pet.nickname"
+                                    class="w-full h-full object-cover">
+                            </div>
 
-                    <div class="pet-details">
-                        <h1 class="pet-name">{{ pet.nickname }}</h1>
-                        <div class="pet-main-info">
-                            <div class="info-item">
-                                <span class="label">品种</span>
-                                <span class="value">{{ pet.breed }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">生日</span>
-                                <span class="value">{{ formatDate(pet.birthday) }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">体重</span>
-                                <span class="value">{{ pet.weight }} kg</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="label">健康状态</span>
-                                <span class="value">{{ pet.healthStatus }}</span>
+                            <div class="flex gap-2">
+                                <el-tag :type="pet.gender === 'male' ? 'info' : 'danger'"
+                                    class="text-white font-bold px-4 py-1">
+                                    {{ pet.gender === 'male' ? '♂ 公' : '♀ 母' }}
+                                </el-tag>
+                                <el-tag :type="pet.neutered ? 'success' : 'warning'" class="font-bold px-4 py-1">
+                                    {{ pet.neutered ? '已绝育' : '未绝育' }}
+                                </el-tag>
                             </div>
                         </div>
 
-                        <div class="pet-personality">
-                            <span class="section-title">性格标签</span>
-                            <div class="personality-tags">
-                                <span class="tag" v-for="tag in pet.personalityTags" :key="tag">
-                                    {{ tag }}
-                                </span>
+                        <!-- 详情部分 -->
+                        <div class="flex-1 min-w-[300px]">
+                            <h1 class="text-[#ff6b8b] text-3xl font-bold mb-6 text-shadow-sm">
+                                {{ pet.nickname }}
+                            </h1>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                                <el-card class="bg-[#f8f4f0] border-none">
+                                    <div class="text-sm text-gray-500 mb-1">品种</div>
+                                    <div class="font-bold">{{ pet.breed }}</div>
+                                </el-card>
+                                <el-card class="bg-[#f8f4f0] border-none">
+                                    <div class="text-sm text-gray-500 mb-1">生日</div>
+                                    <div class="font-bold">{{ formatDate(pet.birthday) }}</div>
+                                </el-card>
+                                <el-card class="bg-[#f8f4f0] border-none">
+                                    <div class="text-sm text-gray-500 mb-1">体重</div>
+                                    <div class="font-bold">{{ pet.weight }} kg</div>
+                                </el-card>
+                                <el-card class="bg-[#f8f4f0] border-none">
+                                    <div class="text-sm text-gray-500 mb-1">健康状态</div>
+                                    <div class="font-bold">{{ pet.healthStatus }}</div>
+                                </el-card>
+                            </div>
+
+                            <div>
+                                <div class="font-bold text-lg mb-3">性格标签</div>
+                                <div class="flex flex-wrap gap-2">
+                                    <el-tag v-for="tag in pet.personalityTags" :key="tag"
+                                        class="bg-[#e3f2fd] text-[#2196f3] border-none font-bold px-4 py-1">
+                                        {{ tag }}
+                                    </el-tag>
+                                    <el-button size="small" icon="Plus"
+                                        class="bg-transparent text-[#2196f3] hover:bg-[#e3f2fd]"
+                                        @click="addPersonalityTag(index)">
+                                        添加标签
+                                    </el-button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </section>
+                </el-card>
 
                 <!-- 健康记录部分 -->
-                <section class="health-records">
-                    <div class="records-tabs">
-                        <button class="tab-btn" :class="{ active: activeRecordTab === 'vaccine' }"
-                            @click="activeRecordTab = 'vaccine'">
-                            💉 疫苗记录
-                        </button>
-                        <button class="tab-btn" :class="{ active: activeRecordTab === 'deworming' }"
-                            @click="activeRecordTab = 'deworming'">
-                            🧼 驱虫记录
-                        </button>
-                        <button class="tab-btn" :class="{ active: activeRecordTab === 'medical' }"
-                            @click="activeRecordTab = 'medical'">
-                            🏥 病历记录
-                        </button>
-                        <!-- <button class="tab-btn" :class="{ active: activeRecordTab === 'growth' }"
-                            @click="activeRecordTab = 'growth'">
-                            🎂 成长记录
-                        </button> -->
-                    </div>
+                <el-card class="rounded-2xl shadow-md border-none bg-white">
+                    <el-tabs v-model="activeRecordTab" class="w-full" tab-position="top">
+                        <el-tab-pane label="💉 疫苗记录" name="vaccine" class="py-4">
+                            <record-table :records="pets[currentPetIndex].healthRecords.vaccine"
+                                :columns="vaccineColumns" @add-record="addRecord('vaccine')"
+                                @edit-record="editRecord('vaccine', $event)" />
+                        </el-tab-pane>
 
-                    <div class="records-content">
-                        <!-- 疫苗记录 -->
-                        <div v-if="activeRecordTab === 'vaccine'" class="record-list">
-                            <div class="record-item header">
-                                <div class="record-field">疫苗类型</div>
-                                <div class="record-field">接种时间</div>
-                                <div class="record-field">下次提醒</div>
-                                <div class="record-field">操作</div>
-                            </div>
-                            <div class="record-item" v-for="(record, idx) in pet.healthRecords.vaccine" :key="idx">
-                                <div class="record-field">{{ record.type }}</div>
-                                <div class="record-field">{{ formatDate(record.date) }}</div>
-                                <div class="record-field">
-                                    {{ record.nextReminder ? formatDate(record.nextReminder) : '无' }}
-                                </div>
-                                <div class="record-field">
-                                    <button class="edit-btn">✏️</button>
-                                </div>
-                            </div>
-                            <button class="add-record-btn" @click="addRecord('vaccine')">
-                                + 添加疫苗记录
-                            </button>
-                        </div>
+                        <el-tab-pane label="🧼 驱虫记录" name="deworming" class="py-4">
+                            <record-table :records="pets[currentPetIndex].healthRecords.deworming"
+                                :columns="dewormingColumns" @add-record="addRecord('deworming')"
+                                @edit-record="editRecord('deworming', $event)" />
+                        </el-tab-pane>
 
-                        <!-- 驱虫记录 -->
-                        <div v-if="activeRecordTab === 'deworming'" class="record-list">
-                            <div class="record-item header">
-                                <div class="record-field">药品</div>
-                                <div class="record-field">时间</div>
-                                <div class="record-field">下次提醒</div>
-                                <div class="record-field">操作</div>
-                            </div>
-                            <div class="record-item" v-for="(record, idx) in pet.healthRecords.deworming" :key="idx">
-                                <div class="record-field">{{ record.medicine }}</div>
-                                <div class="record-field">{{ formatDate(record.date) }}</div>
-                                <div class="record-field">
-                                    {{ record.nextReminder ? formatDate(record.nextReminder) : '无' }}
-                                </div>
-                                <div class="record-field">
-                                    <button class="edit-btn">✏️</button>
-                                </div>
-                            </div>
-                            <button class="add-record-btn" @click="addRecord('deworming')">
-                                + 添加驱虫记录
-                            </button>
-                        </div>
+                        <el-tab-pane label="🏥 病历记录" name="medical" class="py-4">
+                            <record-table :records="pets[currentPetIndex].healthRecords.medical"
+                                :columns="medicalColumns" @add-record="addRecord('medical')"
+                                @edit-record="editRecord('medical', $event)" />
+                        </el-tab-pane>
 
-                        <!-- 病历记录 -->
-                        <div v-if="activeRecordTab === 'medical'" class="record-list">
-                            <div class="record-item header">
-                                <div class="record-field">医院</div>
-                                <div class="record-field">诊断</div>
-                                <div class="record-field">用药</div>
-                                <div class="record-field">操作</div>
-                            </div>
-                            <div class="record-item" v-for="(record, idx) in pet.healthRecords.medical" :key="idx">
-                                <div class="record-field">{{ record.hospital }}</div>
-                                <div class="record-field">{{ record.diagnosis }}</div>
-                                <div class="record-field">{{ record.medicine }}</div>
-                                <div class="record-field">
-                                    <button class="edit-btn">✏️</button>
-                                </div>
-                            </div>
-                            <button class="add-record-btn" @click="addRecord('medical')">
-                                + 添加病历记录
-                            </button>
-                        </div>
-
-                        <!-- 成长记录 -->
-                        <div v-if="activeRecordTab === 'growth'" class="record-list">
-                            <div class="record-item header">
-                                <div class="record-field">事件</div>
-                                <div class="record-field">日期</div>
-                                <div class="record-field">备注</div>
-                                <div class="record-field">操作</div>
-                            </div>
-                            <div class="record-item" v-for="(record, idx) in pet.healthRecords.growth" :key="idx">
-                                <div class="record-field">{{ record.event }}</div>
-                                <div class="record-field">{{ formatDate(record.date) }}</div>
-                                <div class="record-field">{{ record.notes }}</div>
-                                <div class="record-field">
-                                    <button class="edit-btn">✏️</button>
-                                </div>
-                            </div>
-                            <button class="add-record-btn" @click="addRecord('growth')">
-                                + 添加成长记录
-                            </button>
-                        </div>
-                    </div>
-                </section>
+                        <el-tab-pane label="🎂 成长记录" name="growth" class="py-4">
+                            <record-table :records="pets[currentPetIndex].healthRecords.growth" :columns="growthColumns"
+                                @add-record="addRecord('growth')" @edit-record="editRecord('growth', $event)" />
+                        </el-tab-pane>
+                    </el-tabs>
+                </el-card>
             </div>
-        </main>
+        </el-main>
 
         <!-- 底部导航 -->
-        <!-- <footer class="app-footer">
-            <div class="nav-buttons">
-                <button class="nav-btn prev" @click="navigatePet(-1)" :disabled="currentPetIndex === 0">
-                    ← 上一个宠物
-                </button>
-                <button class="nav-btn next" @click="navigatePet(1)" :disabled="currentPetIndex === pets.length - 1">
-                    下一个宠物 →
-                </button>
-            </div>
-            <div class="pet-count">
+        <el-footer class="bg-white shadow-inner py-3 px-6 flex justify-between items-center h-16">
+            <el-button @click="navigatePet(-1)" :disabled="currentPetIndex === 0" icon="ArrowLeft"
+                class="rounded-full bg-[#f0f7ff] text-[#0288d1] hover:bg-[#e1f5fe]">
+                上一个宠物
+            </el-button>
+
+            <div class="font-bold text-gray-500">
                 宠物 {{ currentPetIndex + 1 }} / {{ pets.length }}
             </div>
-        </footer> -->
+
+            <el-button @click="navigatePet(1)" :disabled="currentPetIndex === pets.length - 1" icon="ArrowRight"
+                class="rounded-full bg-[#e8f5e9] text-[#2e7d32] hover:bg-[#c8e6c9]">
+                下一个宠物
+            </el-button>
+        </el-footer>
+
+        <!-- 添加标签对话框 -->
+        <el-dialog v-model="tagDialogVisible" title="添加性格标签" :width="300">
+            <el-input v-model="newTagValue" placeholder="请输入标签内容" @keyup.enter="confirmAddTag" />
+            <template #footer>
+                <el-button @click="tagDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="confirmAddTag">确认</el-button>
+            </template>
+        </el-dialog>
+
+        <!-- 编辑记录对话框 -->
+        <el-dialog v-model="recordDialogVisible" :title="`${isEditMode ? '编辑' : '添加'}${getRecordTypeName()}`"
+            :width="500">
+            <el-form :model="formData" :rules="formRules" ref="recordFormRef" label-width="100px">
+                <el-form-item v-for="(field, key) in currentRecordFields" :key="key" :label="field.label" :prop="key">
+                    <el-input v-model="formData[key]" :placeholder="`请输入${field.label}`" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <el-button @click="recordDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="confirmRecord">确认</el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed, nextTick } from 'vue';
+import type { ElForm } from 'element-plus';
+import RecordTable from './RecordTable.vue'; // 引入记录表格组件
 
 // 类型定义
 interface HealthRecords {
@@ -226,12 +204,18 @@ interface Pet {
     healthRecords: HealthRecords;
 }
 
+// 表格列定义类型
+interface TableColumn {
+    prop: string;
+    label: string;
+}
+
 // 初始数据
 const defaultAvatar = 'https://picsum.photos/seed/pet1/200/200';
 
 const pets = reactive<Pet[]>([
     {
-        nickname: ' Lucky',
+        nickname: 'Lucky',
         breed: '金毛寻回犬',
         birthday: '2020-05-15',
         gender: 'male',
@@ -287,6 +271,79 @@ const pets = reactive<Pet[]>([
 // 状态管理
 const currentPetIndex = ref(0);
 const activeRecordTab = ref<'vaccine' | 'deworming' | 'medical' | 'growth'>('vaccine');
+const tagDialogVisible = ref(false);
+const newTagValue = ref('');
+const recordDialogVisible = ref(false);
+const isEditMode = ref(false);
+const currentEditIndex = ref(-1);
+const currentEditType = ref<'vaccine' | 'deworming' | 'medical' | 'growth'>('vaccine');
+const recordFormRef = ref<InstanceType<typeof ElForm>>();
+
+// 表格列定义
+const vaccineColumns: TableColumn[] = [
+    { prop: 'type', label: '疫苗类型' },
+    { prop: 'date', label: '接种时间' },
+    { prop: 'nextReminder', label: '下次提醒' }
+];
+
+const dewormingColumns: TableColumn[] = [
+    { prop: 'medicine', label: '药品' },
+    { prop: 'date', label: '时间' },
+    { prop: 'nextReminder', label: '下次提醒' }
+];
+
+const medicalColumns: TableColumn[] = [
+    { prop: 'hospital', label: '医院' },
+    { prop: 'diagnosis', label: '诊断' },
+    { prop: 'medicine', label: '用药' }
+];
+
+const growthColumns: TableColumn[] = [
+    { prop: 'event', label: '事件' },
+    { prop: 'date', label: '日期' },
+    { prop: 'notes', label: '备注' }
+];
+
+// 记录表单字段配置
+const recordFields = {
+    vaccine: {
+        type: { label: '疫苗类型', required: true },
+        date: { label: '接种时间', required: true },
+        nextReminder: { label: '下次提醒', required: false }
+    },
+    deworming: {
+        medicine: { label: '药品', required: true },
+        date: { label: '时间', required: true },
+        nextReminder: { label: '下次提醒', required: false }
+    },
+    medical: {
+        hospital: { label: '医院', required: true },
+        diagnosis: { label: '诊断', required: true },
+        medicine: { label: '用药', required: true },
+        date: { label: '日期', required: false }
+    },
+    growth: {
+        event: { label: '事件', required: true },
+        date: { label: '日期', required: true },
+        notes: { label: '备注', required: false }
+    }
+};
+
+// 表单数据和规则
+const formData = ref<Record<string, string>>({});
+const formRules = computed(() => {
+    const rules: Record<string, any> = {};
+    Object.entries(currentRecordFields.value).forEach(([key, field]) => {
+        if (field.required) {
+            rules[key] = [{ required: true, message: `请输入${field.label}`, trigger: 'blur' }];
+        }
+    });
+    return rules;
+});
+
+const currentRecordFields = computed(() => {
+    return recordFields[currentEditType.value];
+});
 
 // 方法
 const formatDate = (dateString: string) => {
@@ -295,7 +352,6 @@ const formatDate = (dateString: string) => {
 };
 
 const handlePetChange = () => {
-    // 切换宠物时重置记录标签
     activeRecordTab.value = 'vaccine';
 };
 
@@ -329,429 +385,104 @@ const addNewPet = () => {
     activeRecordTab.value = 'vaccine';
 };
 
-const addRecord = (type: 'vaccine' | 'deworming' | 'medical' | 'growth') => {
-    const currentPet = pets[currentPetIndex.value];
-    if (!currentPet) {
-        console.error('当前宠物不存在');
-        return;
-    }
-    const today = new Date().toISOString().split('T')[0];
+const addPersonalityTag = (petIndex: number) => {
+    newTagValue.value = '';
+    tagDialogVisible.value = true;
+};
 
-    switch (type) {
-        case 'vaccine':
-            currentPet.healthRecords.vaccine.push({
-                type: '新疫苗',
-                date: today!
-            });
-            break;
-        case 'deworming':
-            currentPet.healthRecords.deworming.push({
-                medicine: '新药品',
-                date: today!
-            });
-            break;
-        case 'medical':
-            currentPet.healthRecords.medical.push({
-                hospital: '未知医院',
-                diagnosis: '无',
-                medicine: '无',
-                date: today
-            });
-            break;
-        case 'growth':
-            currentPet.healthRecords.growth.push({
-                event: '新事件',
-                date: today!
-            });
-            break;
+const confirmAddTag = () => {
+    if (!newTagValue.value.trim()) return;
+
+    const pet = pets[currentPetIndex.value];
+    if (pet) {
+        if (!pet.personalityTags.includes(newTagValue.value)) {
+            pet.personalityTags.push(newTagValue.value);
+        }
+        tagDialogVisible.value = false;
+        newTagValue.value = '';
     }
+};
+
+const addRecord = (type: 'vaccine' | 'deworming' | 'medical' | 'growth') => {
+    isEditMode.value = false;
+    currentEditType.value = type;
+    currentEditIndex.value = -1;
+    recordDialogVisible.value = true;
+
+    // 初始化表单数据
+    formData.value = {};
+    Object.keys(recordFields[type]).forEach(key => {
+        formData.value[key] = key === 'date' ? new Date().toISOString().split('T')[0]! : '';
+    });
+
+    // 重置表单验证
+    nextTick(() => {
+        recordFormRef.value?.clearValidate();
+    });
+};
+
+const editRecord = (type: 'vaccine' | 'deworming' | 'medical' | 'growth', index: number) => {
+    isEditMode.value = true;
+    currentEditType.value = type;
+    currentEditIndex.value = index;
+    recordDialogVisible.value = true;
+
+    // 填充表单数据
+    const record = pets[currentPetIndex.value].healthRecords[type][index];
+    formData.value = { ...record };
+
+    // 重置表单验证
+    nextTick(() => {
+        recordFormRef.value?.clearValidate();
+    });
+};
+
+const confirmRecord = () => {
+    recordFormRef.value?.validate(async (valid) => {
+        if (valid) {
+            const currentPet = pets[currentPetIndex.value];
+
+            if (isEditMode.value && currentEditIndex.value !== -1) {
+                // 编辑记录
+                currentPet.healthRecords[currentEditType.value][currentEditIndex.value] = {
+                    ...formData.value
+                };
+            } else {
+                // 添加新记录
+                currentPet.healthRecords[currentEditType.value].push({
+                    ...formData.value
+                });
+            }
+
+            recordDialogVisible.value = false;
+            // 重置表单
+            formData.value = {};
+        }
+    });
+};
+
+const getRecordTypeName = () => {
+    const typeNames = {
+        vaccine: '疫苗记录',
+        deworming: '驱虫记录',
+        medical: '病历记录',
+        growth: '成长记录'
+    };
+    return typeNames[currentEditType.value];
 };
 </script>
 
 <style scoped>
-/* 全局样式 */
-.pet-profile-app {
-    font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', sans-serif;
-    color: #5a5a5a;
-    background-color: #f9f5f0;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-/* 顶部导航 */
-.app-header {
-    background-color: #ff9eaa;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: relative;
-    z-index: 10;
-}
-
-.logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
+.text-shadow-md {
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.pet-selector {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
-
-select {
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    border: none;
-    background-color: white;
-    font-size: 1rem;
-    color: #5a5a5a;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.add-pet-btn {
-    background-color: #4cd964;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 0.5rem 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.add-pet-btn:hover {
-    background-color: #37c850;
-    transform: translateY(-2px);
-}
-
-/* 主内容区 */
-.pet-profile-container {
-    height: calc(100vh - 130px);
-    position: relative;
-    overflow: hidden;
-}
-
-.pet-profile-screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    padding: 1.5rem;
-    overflow-y: auto;
-    transition: transform 0.5s ease;
-    transform: translateX(100%);
-    opacity: 0;
-}
-
-.pet-profile-screen.active {
-    transform: translateX(0);
-    opacity: 1;
-    z-index: 1;
-}
-
-/* 宠物基本信息 */
-.pet-basic-info {
-    display: flex;
-    gap: 2rem;
-    background-color: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    flex-wrap: wrap;
-}
-
-.pet-avatar-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
-
-.avatar-frame {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    border: 8px solid #fce0e6;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.pet-avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.pet-badges {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.badge {
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    color: white;
-}
-
-.badge.male {
-    background-color: #64b5f6;
-}
-
-.badge.female {
-    background-color: #ff80ab;
-}
-
-.badge.neutered.yes {
-    background-color: #4cd964;
-}
-
-.badge.neutered.no {
-    background-color: #ff9500;
-}
-
-.pet-details {
-    flex: 1;
-    min-width: 300px;
-}
-
-.pet-name {
-    color: #ff6b8b;
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
+.text-shadow-sm {
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.pet-main-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.info-item {
-    background-color: #f8f4f0;
-    padding: 0.8rem;
-    border-radius: 12px;
-}
-
-.label {
-    display: block;
-    font-size: 0.9rem;
-    color: #888;
-    margin-bottom: 0.3rem;
-}
-
-.value {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #5a5a5a;
-}
-
-.pet-personality {
-    margin-top: 1rem;
-}
-
-.section-title {
-    font-weight: bold;
-    margin-bottom: 0.8rem;
-    display: block;
-    color: #5a5a5a;
-    font-size: 1.1rem;
-}
-
-.personality-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem;
-}
-
-.tag {
-    background-color: #e3f2fd;
-    color: #2196f3;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-/* 健康记录 */
-.health-records {
-    background-color: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-}
-
-.records-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-}
-
-.tab-btn {
-    background-color: #f0f0f0;
-    border: none;
-    border-radius: 20px;
-    padding: 0.8rem 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-}
-
-.tab-btn.active {
-    background-color: #b3e5fc;
-    color: #0288d1;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.record-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
-}
-
-.record-item {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    padding: 1rem;
-    border-radius: 12px;
-    align-items: center;
-}
-
-.record-item.header {
-    background-color: #f0f7ff;
-    font-weight: bold;
-    color: #0277bd;
-}
-
-.record-item:not(.header) {
-    background-color: #fafafa;
-    border: 1px solid #f0f0f0;
-}
-
-.record-field {
-    word-break: break-word;
-}
-
-.edit-btn {
-    background: none;
-    border: none;
-    color: #ff9500;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: transform 0.2s ease;
-}
-
-.edit-btn:hover {
-    transform: scale(1.2);
-}
-
-.add-record-btn {
-    margin-top: 1rem;
-    background-color: #b2ebf2;
-    color: #00897b;
-    border: none;
-    border-radius: 20px;
-    padding: 0.8rem 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: fit-content;
-}
-
-.add-record-btn:hover {
-    background-color: #80deea;
-    transform: translateY(-2px);
-}
-
-/* 底部导航 */
-.app-footer {
-    background-color: white;
-    padding: 1rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
-    height: 60px;
-}
-
-.nav-buttons {
-    display: flex;
-    gap: 1rem;
-}
-
-.nav-btn {
-    padding: 0.5rem 1.2rem;
-    border-radius: 20px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.nav-btn.prev {
-    background-color: #f0f7ff;
-    color: #0288d1;
-}
-
-.nav-btn.next {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-}
-
-.nav-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.nav-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.pet-count {
-    font-weight: bold;
-    color: #888;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-    .pet-basic-info {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .record-item {
-        grid-template-columns: 1fr 1fr;
-        gap: 0.5rem;
-    }
-
-    .record-item.header .record-field:nth-child(n+3),
-    .record-item:not(.header) .record-field:nth-child(n+3) {
-        grid-column: span 2;
-    }
-
-    .pet-name {
-        text-align: center;
-    }
+.pet-profile-screen {
+    width: 100%;
+    min-height: 100%;
 }
 </style>

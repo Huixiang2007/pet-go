@@ -1,61 +1,90 @@
 <template>
-    <div class="pet-profile-container">
-        <div class="pet-profile-screen " v-for="pet in pets" :key="pet.id">
-            <div class="profile-left">
+    <div class="pet-profile-container m-0 p-0">
+        <div class="pet-profile-screen mt-10 w-screen h-screen p-10 bg-red-100 overflow-hidden" v-for="pet in pets"
+            :key="pet.id">
+            <div class="profile-top h-full ">
                 <!-- 宠物基本信息 -->
-                <section class="flex">
+                <section class="bg-white rounded-3xl flex  gap-10 p-9">
                     <!-- 头像部分 -->
-                    <div>
+                    <div class="flex flex-col gap-7">
                         <div>
-                            <img :src="pet.avatar || defaultAvatar" alt="pet.name" class="rounded-full"></img>
+                            <img :src="pet.avatar || defaultAvatar" alt="pet.name"
+                                class="w-[170px] h-[170px] rounded-full"></img>
                         </div>
-                        <div>
-                            <span @click="changeGender(pet.id)">{{ pet.gender === 1 ? '公' : '母' }}</span>
-                            <el-switch v-model="pet.sterilization" class="ml-2" inline-prompt style="--el-switch-on-color: #13ce66; 
-                        " active-text="已绝育" inactive-text="未绝育" />
+                        <div class="flex justify-center gap-4">
+                            <span class="bg-sky-400 py-1 px-3 rounded-full text-white font-semibold cursor-pointer"
+                                @click="changeGender(pet.id)">{{
+                                    pet.gender
+                                        === 1 ? '公'
+                                        :
+                                        '母'
+                                }}</span>
+                            <span class="bg-green-400 py-1 px-3 rounded-full text-white font-semibold cursor-pointer"
+                                @click="changeSterilizationStatus(pet.id)">{{
+                                    pet.sterilization
+                                        === 1 ? '已绝育'
+                                        :
+                                        '未绝育'
+                                }}</span>
                         </div>
                     </div>
 
                     <!-- 详情部分 -->
-                    <div>
-                        <div>{{ pet.name }}</div>
-                        <div>
-                            <el-space wrap>
-                                <el-card class="box-card" style="width: 250px">
-                                    <div>品种</div>
-                                    <div>{{ pet.breed }}</div>
-                                </el-card>
-                                <el-card class="box-card" style="width: 250px">
-                                    <div>生日</div>
-                                    <div>{{ pet.birthday }}</div>
-                                </el-card>
-                                <el-card class="box-card" style="width: 250px">
-                                    <div>体重</div>
-                                    <div>{{ pet.weight }}</div>
-                                </el-card>
-                                <el-card class="box-card" style="width: 250px">
-                                    <div>健康状态</div>
-                                    <div>{{ pet.healthStatus }}</div>
-                                </el-card>
-                            </el-space>
-                        </div>
-                        <div>
-                            <div>
-                                <span>性格</span>
+                    <div class="flex-1">
+                        <div class="text-4xl text-red-400 mb-4">{{ pet.name }}</div>
+
+                        <div class="info-cards">
+                            <div class="info-box-card">
+                                <span class="info-card-title">品种</span>
+                                <span class="info-card-value">{{ pet.breed }}</span>
+                            </div>
+                            <div class="info-box-card">
+                                <span class="info-card-title">生日</span>
+                                <span class="info-card-value">{{ pet.birthday }}</span>
+                            </div>
+                            <div class="info-box-card">
+                                <span class="info-card-title">体重</span>
+                                <span class="info-card-value">{{ pet.weight }}</span>
+                            </div>
+                            <div class="info-box-card">
+                                <span class="info-card-title">健康状态</span>
+                                <span class="info-card-value">{{ pet.healthStatus }}</span>
 
                             </div>
-                            <el-tag v-for="tag in pet.characterTags" :key="tag" closable :disable-transitions="false"
-                                @close="handleCloseTag(pet.id, tag)">
-                                {{ tag }}
-                            </el-tag>
-                            <el-input v-if="tagInputVisible" ref="InputRef" v-model="tagInputValue" class="w-20"
-                                size="default" @keyup.enter="handleInputConfirm(pet.id)"
-                                @blur="handleInputConfirm(pet.id)" />
-                            <el-button v-else class="button-new-tag" size="default" @click="showAddTagInput">
-                                点击添加
-                            </el-button>
                         </div>
+                        <div class="info-character">
+                            <div class="character-title">
+                                <span>性格标签</span>
+                            </div>
+                            <div class="flex gap-4 flex-wrap">
+                                <el-tag v-for="tag in pet.characterTags" :key="tag" closable
+                                    :disable-transitions="false" @close="handleCloseTag(pet.id, tag)" style=" background-color: #e3f2fd;
+    color: #2196f3;
+    padding: 0.5rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    display:inline-block;
+    height:auto;
+    /* margin-right: 0.9rem; */
+    margin-bottom:0.9rem;
+    ">
+                                    {{ tag }}
+                                </el-tag>
+                                <el-input v-if="tagInputVisible[pet.id]" v-model="tagInputValue" class="w-20"
+                                    size="default" @keyup.enter="handleInputConfirm(pet.id)"
+                                    @blur="handleInputConfirm(pet.id)" style="width:200px;height: 33px" />
+                                <el-button v-else class="button-new-tag" size="default"
+                                    @click="showAddTagInput(pet.id)">
+                                    点击添加
+                                </el-button>
+                            </div>
+
+                        </div>
+
                     </div>
+
                 </section>
                 <!-- 健康记录部分 -->
                 <section>
@@ -134,11 +163,12 @@
 </template>
 <script setup lang="ts">
 import { ref, reactive, nextTick } from 'vue';
-import type { InputInstance, TabsPaneContext } from 'element-plus'
+import type { Ref } from 'vue';
+import type { InputInstance, TabsPaneContext } from 'element-plus';
 enum PetGender {
     Male = 1,
     Female = 0,
-}
+};
 enum SterilizationStatus {
     Neutered = 1, // 已绝育
     NotNeutered = 0, // 未绝育
@@ -198,17 +228,16 @@ interface Pet {
 }
 const defaultAvatar = 'https://picsum.photos/seed/pet1/200/200';
 const getImageUrl = (name: string) => {
-    // 注意：路径是相对于当前文件的相对路径（假设当前组件在 src/components 下）
     return new URL(`../assets/${name}`, import.meta.url).href
 }
 const pets = reactive<Pet[]>([
     {
         "id": 12,
         "userId": 5,
-        "name": "哈哈哈",
+        "name": "皮皮",
         "type": "猫",
-        "breed": "英短",
-        "avatar": "https://picsum.photos/seed/golden/200/200",
+        "breed": "英国长毛猫",
+        "avatar": getImageUrl('image4.jpg'),
         "gender": 1,
         "birthday": "2012-03-23",
         "age": "13",
@@ -291,9 +320,9 @@ const pets = reactive<Pet[]>([
     {
         "id": 13,
         "userId": 5,
-        "name": "哈哈哈",
+        "name": "球球",
         "type": "猫",
-        "breed": "英短",
+        "breed": "蓝白",
         "avatar": "https://picsum.photos/seed/ragdoll/200/200",
         "gender": 1,
         "birthday": "2012-03-23",
@@ -351,6 +380,15 @@ function changeGender(id: number) {
         console.warn("没有找到该宠物")
     }
 }
+function changeSterilizationStatus(id: number) {
+    const pet = getPetById(id)
+    if (pet) {
+        pet.sterilization = pet.sterilization === 1 ? 0 : 1
+
+    } else {
+        console.warn("没有找到该宠物")
+    }
+}
 // 删除一个性格标签
 const handleCloseTag = (id: number, tag: string) => {
     const pet = getPetById(id)
@@ -359,20 +397,26 @@ const handleCloseTag = (id: number, tag: string) => {
 }
 // 显示添加性格输入框
 const tagInputValue = ref('')//输入框绑定的值（新增标签里面的内容）
-const tagInputVisible = ref(false)
-const InputRef = ref<InputInstance>()//获取 el-input 组件实例的 ref
-const showAddTagInput = () => {
-    tagInputVisible.value = true
+const tagInputVisible = ref<Record<number, boolean>>({});
+const InputRef = ref<Record<number, InputInstance | null>>({});//获取 el-input 组件实例的 ref
+const showAddTagInput = (id: number) => {
+    tagInputVisible.value[id] = true
     //确保输入框渲染后再聚焦
     nextTick(() => {
-        InputRef.value?.focus()
+        const currentInput = InputRef.value[id]
+        const inputElement = currentInput?.$el?.querySelector<HTMLInputElement>('.el-input__inner');
+        if (inputElement) {
+            inputElement.focus();
+        } else {
+            console.error('未找到 .el-input__inner 元素');
+        }
     })
 }
 //确认输入标签
 const handleInputConfirm = (id: number) => {
     //过滤空值
     if (!tagInputValue.value.trim()) {
-        tagInputVisible.value = false
+        tagInputVisible.value[id] = false
         tagInputValue.value = ''
         return;
     }
@@ -386,7 +430,7 @@ const handleInputConfirm = (id: number) => {
         }
 
     }
-    tagInputVisible.value = false
+    tagInputVisible.value[id] = false
     tagInputValue.value = ''
 }
 //表格切换
@@ -399,13 +443,6 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
 
 </script>
 <style scoped>
-.pet-profile-container {
-    width: 100%;
-    height: 500px;
-    /* background-color: red; */
-
-}
-
 .demo-tabs>.el-tabs__content {
     padding: 32px;
     color: #6b778c;
@@ -430,5 +467,37 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
     border-radius: 4px;
     background: var(--el-color-danger-light-9);
     color: var(--el-color-danger);
+}
+
+.info-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.info-box-card {
+    width: 15.6rem;
+    border-radius: 12px;
+    padding: 1.2rem;
+    background-color: #f8f4f0;
+}
+
+.info-card-title {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+    color: grey;
+}
+
+.info-card-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #5a5a5a;
+}
+
+.character-title {
+    margin: 0.8rem 0;
+    color: #5a5a5a;
+    font-size: 1.1rem;
 }
 </style>

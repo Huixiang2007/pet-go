@@ -72,6 +72,7 @@ interface Fragment {
 // 配置
 const getImageUrl = (name: string) => {
     // 注意：路径是相对于当前文件的相对路径（假设当前组件在 src/components 下）
+    // @ts-ignore - Cursor 的 TypeScript 检查误报，Vite 环境中 import.meta.url 是支持的
     return new URL(`../assets/${name}`, import.meta.url).href
 }
 const config = reactive<CarouselConfig>({
@@ -241,10 +242,10 @@ const fragmentImage = (img: HTMLImageElement, callback?: () => void): void => {
 
 const startAutoplay = (): void => {
     if (autoplayInterval.value) {
-        clearInterval(autoplayInterval.value)
+        window.clearInterval(autoplayInterval.value)
     }
 
-    autoplayInterval.value = setInterval(() => {
+    autoplayInterval.value = window.setInterval(() => {
         if (!isTransitioning.value) {
             goToNextSlide()
         }
@@ -253,7 +254,7 @@ const startAutoplay = (): void => {
 
 const stopAutoplay = (): void => {
     if (autoplayInterval.value) {
-        clearInterval(autoplayInterval.value)
+        window.clearInterval(autoplayInterval.value)
         autoplayInterval.value = null
     }
 }
@@ -293,7 +294,7 @@ watch(() => config.autoplay, (newVal) => {
     --image-height: 60%;
 }
 
-/* 基础样式 */
+/* 
 body {
     height: 100vh;
     display: flex;
@@ -303,31 +304,29 @@ body {
     overflow: hidden;
     background-color: var(--dark);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
+} */
 
 .container {
-    width: 80%;
-    height: 600px;
-    margin: auto;
+    width: 74%;
+    height: calc(100vh - 7.4rem);
+    margin: 2.825rem auto;
+    margin-top: 4rem;
 }
 
-/* 轮播图容器 */
 .carousel-container {
     position: relative;
-    border-radius: 0.75rem;
+    border-radius: 0.8rem;
     overflow: hidden;
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
     height: 100%;
 }
 
-/* 轮播图片区域 */
 .carousel {
     position: relative;
     width: 100%;
     aspect-ratio: 16/9;
 }
 
-/* 轮播图 */
 .slide {
     position: absolute;
     inset: 0;
@@ -368,7 +367,7 @@ body {
 }
 
 .nav-btn:hover {
-    background: rgba(76, 110, 245, 0.8);
+    background: rgba(232, 168, 193, 0.8);
     transform: translateY(-50%) scale(1.1);
 }
 
@@ -380,7 +379,6 @@ body {
     right: 1rem;
 }
 
-/* 指示器 */
 .indicators {
     position: absolute;
     bottom: 1rem;
@@ -405,10 +403,9 @@ body {
 .dot.active {
     width: 2rem;
     border-radius: 0.375rem;
-    background: #4c6ef5;
+    background: rgba(232, 168, 193, 0.8);
 }
 
-/* 碎片 */
 .fragment {
     position: absolute;
     pointer-events: none;

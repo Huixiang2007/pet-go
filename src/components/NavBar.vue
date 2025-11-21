@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white border-b border-gray-200">
+  <div class="fixed z-10 w-full h-16">
     <div class="container mx-auto px-4">
       <!-- 导航容器（固定高度，避免过高） -->
       <div class="flex items-center justify-center h-14">

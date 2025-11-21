@@ -4,7 +4,7 @@
     <FragmentCarousel />
     <PetInfo />
 
-    <!-- <Info /> -->
+    <Info />
 
   </div>
 </template>
@@ -13,5 +13,5 @@
 import FragmentCarousel from '@/components/FragmentCarousel.vue'
 import NavBar from '@/components/NavBar.vue'
 import PetInfo from '@/components/PetInfo.vue'
-// import Info from '@/components/Info.vue'
+import Info from '@/components/Info.vue'
 </script>

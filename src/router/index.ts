@@ -1,19 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PetLogin from '@/views/login.vue'
-import Home from '@/views/Home.vue'
-import PetDetail from '@/views/PetDetail.vue'
-import AddPet from '@/views/AddPet.vue'
+
 const routes = [
   // 电商的首页
   {
     path: '/shop',
     name: 'shop',
     component: import('@/views/Petshop/PetShopView.vue'),
-  },
-  {
-    path: '/petCenter',
-    name: 'petCenter',
-    component: import('@/views/PetCenter.vue'),
   },
   // 宠物购物车
   {
@@ -63,20 +56,15 @@ const routes = [
     component: PetLogin,
   },
   {
-    path: '/',
-    name: 'Home',
-    component: Home,
+    path: '/MyPet',
+    name: 'MyPet',
+    component: () => import('@/views/MyPet.vue'),
   },
-  {
-    path: '/pet/:id',
-    name: 'PetDetail',
-    component: PetDetail,
-    props: true,
-  },
+
   {
     path: '/add-pet',
     name: 'AddPet',
-    component: AddPet,
+    component: () => import('@/views/AddPet.vue'),
   },
   {
     path: '/Register',

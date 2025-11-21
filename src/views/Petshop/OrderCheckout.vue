@@ -3,7 +3,7 @@
    <NavBar />
    <div class="min-h-screen bg-yellow-50">
     <div class="bg-white py-4 border-b border-gray-200 mt-8">
-    <div class="container mx-auto px-4">
+    <div class="order-container mx-auto px-4">
       <div class="flex items-center justify-between max-w-3xl mx-auto">
         <div class="flex flex-col items-center">
           <div class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2">
@@ -32,7 +32,7 @@
       </div>
     </div>
   </div>
-   <main class="container mx-auto px-4 py-8 flex flex-row justify-center">
+   <main class="order-container mx-auto px-4 py-8 flex flex-row justify-center">
     <div class="flex flex-col items-between w-[60%]">
       <!-- 左侧订单信息 -->
       <div class="mr-4">
@@ -40,7 +40,7 @@
         <section class="bg-white rounded-xl p-6 card-shadow">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-lg font-semibold">收货地址</h2>
-            <button class="text-[#f3ce48] hover:text-[#f3ce48]/80 text-sm flex items-center transition-base">
+            <button class="text-[#f3ce48] hover:text-[#f3ce48]/80 text-sm flex items-center transition-base" @click="openAddAddressModal">
               <i class="fa fa-plus-circle mr-1"></i> 新增地址
             </button>
           </div>
@@ -57,8 +57,8 @@
               <div class="font-medium mb-2">{{value.name}}</div>
               <div class="text-sm text-gray-600 mb-1">138****6789</div>
               <div class="text-sm text-gray-600">北京市朝阳区建国路88号 现代城5号楼2307室</div>
-                <button class="text-xs text-gray-400 mt-2 mr-1 border-[1px] w-12 h-5 border-gray-200 rounded-2xl hover:text-[#f3ce48] hover:border-[#f3ce48]">编辑</button>
-                <button class="text-xs text-gray-400 mt-2 border-[1px] w-12 h-5 border-gray-200 rounded-2xl hover:text-red-500 hover:border-red-500">删除</button>
+                <button class="text-xs text-gray-400 mt-2 mr-1 border-[1px] w-12 h-5 border-gray-200 rounded-2xl hover:text-[#f3ce48] hover:border-[#f3ce48]" @click="openEditAddressModal(value)">编辑</button>
+                <button class="text-xs text-gray-400 mt-2 border-[1px] w-12 h-5 border-gray-200 rounded-2xl hover:text-red-500 hover:border-red-500" @click="deleteAddress(value.id)">删除</button>
             </div>
             </div>
 
@@ -288,69 +288,336 @@
       </div>
       </div>
   </div>
+ <!-- 添加地址弹窗 -->
+  <div v-if="addressModalVisible" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[5000] transition-opacity duration-300">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 transform scale-100 transition-transform duration-300">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-900">{{ isEditing ? '编辑收货地址' : '新增收货地址' }}</h2>
+          <button class="text-gray-500 hover:text-gray-700 transition-colors" @click="closeAddressModal">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <form @submit.prevent="saveAddress" class="space-y-4">
+          <!-- 收货人 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">收货人</label>
+            <input
+              v-model="addressForm.name"
+              type="text"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f3ce48] focus:border-[#f3ce48] transition-colors"
+              placeholder="请输入收货人姓名"
+              required
+            >
+          </div>
+
+          <!-- 手机号码 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">手机号码</label>
+            <input
+              v-model="addressForm.phone"
+              type="tel"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f3ce48] focus:border-[#f3ce48] transition-colors"
+              placeholder="请输入手机号码"
+              pattern="^1[3-9]\d{9}$"
+              required
+            >
+          </div>
+
+          <!-- 所在地区 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">所在地区</label>
+            <div class="grid grid-cols-3 gap-2">
+              <select v-model="addressForm.province" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f3ce48] focus:border-[#f3ce48] transition-colors">
+                <option value="">选择省份</option>
+                <option value="北京市">北京市</option>
+                <option value="上海市">上海市</option>
+                <option value="广东省">广东省</option>
+                <option value="江苏省">江苏省</option>
+                <option value="浙江省">浙江省</option>
+              </select>
+              <select v-model="addressForm.city" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f3ce48] focus:border-[#f3ce48] transition-colors">
+                <option value="">选择城市</option>
+                <option value="北京市">北京市</option>
+                <option value="上海市">上海市</option>
+                <option value="广州市">广州市</option>
+                <option value="深圳市">深圳市</option>
+                <option value="南京市">南京市</option>
+              </select>
+              <select v-model="addressForm.district" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f3ce48] focus:border-[#f3ce48] transition-colors">
+                <option value="">选择区县</option>
+                <option value="朝阳区">朝阳区</option>
+                <option value="海淀区">海淀区</option>
+                <option value="徐汇区">徐汇区</option>
+                <option value="黄浦区">黄浦区</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 详细地址 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">详细地址</label>
+            <textarea
+              v-model="addressForm.addressDetail"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f3ce48] focus:border-[#f3ce48] transition-colors"
+              rows="3"
+              placeholder="请输入详细地址信息"
+              required
+            ></textarea>
+          </div>
+
+          <!-- 设为默认地址 -->
+          <div class="flex items-center">
+            <input
+              v-model="addressForm.isDefault"
+              type="checkbox"
+              class="h-4 w-4 text-[#f3ce48] focus:ring-[#f3ce48] border-gray-300 rounded"
+            >
+            <label class="ml-2 block text-sm text-gray-700">设为默认收货地址</label>
+          </div>
+
+          <!-- 提交按钮 -->
+          <div class="pt-4 flex gap-3">
+            <button type="button" @click="closeAddressModal" class="w-1/2 py-2 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+              取消
+            </button>
+            <button type="submit" class="w-1/2 py-2 px-4 bg-[#f3ce48] text-gray-900 font-medium rounded-lg hover:bg-[#f3ce48]/90 transition-colors">
+              {{ isEditing ? '保存修改' : '新增地址' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
+
+// 弹窗状态
 const popupVisible = ref(false)
+const addressModalVisible = ref(false)
+const isEditing = ref(false)
 const selectedPayType = ref<string>('')
 const countdown = ref<number>(69)
 const countdownTimer = ref<number | null>(null)
-//优惠卷
-const  coupons=ref([
-        {
-          id: 1,
-          discount: '满199减30',
-          validity: '2023-12-31',
-          isSelected: true  // 默认选中第一张
-        },
-        {
-          id: 2,
-          discount: '满99减10',
-          validity: '2023-12-15',
-          isSelected: false
-        },
-        {
-          id: 3,
-          discount: '满299减50',
-          validity: '2023-12-20',
-          isSelected: false
-        }
-      ])
+
+// 优惠券数据
+const coupons = ref([
+  {
+    id: 1,
+    discount: '满199减30',
+    validity: '2023-12-31',
+    isSelected: true
+  },
+  {
+    id: 2,
+    discount: '满99减10',
+    validity: '2023-12-15',
+    isSelected: false
+  },
+  {
+    id: 3,
+    discount: '满299减50',
+    validity: '2023-12-20',
+    isSelected: false
+  }
+])
+
+// 地址数据
+interface Address {
+  id: number
+  name: string
+  phone: string
+  address: string
+  addressDetail?: string
+  isDefault: boolean
+  province?: string
+  city?: string
+  district?: string
+}
+
+const address = ref<Address[]>([
+  {
+    id: 1,
+    name: '张三',
+    phone: '138****6789',
+    address: '北京市朝阳区建国路88号',
+    addressDetail: '现代城5号楼2307室',
+    isDefault: true,
+    province: '北京市',
+    city: '北京市',
+    district: '朝阳区'
+  },
+  {
+    id: 2,
+    name: '李四',
+    phone: '139****5678',
+    address: '上海市浦东新区陆家嘴',
+    addressDetail: '金融中心1号楼808室',
+    isDefault: false,
+    province: '上海市',
+    city: '上海市',
+    district: '浦东新区'
+  },
+  {
+    id: 3,
+    name: '王五',
+    phone: '137****4321',
+    address: '广州市天河区天河路',
+    addressDetail: '天河城3楼',
+    isDefault: false,
+    province: '广东省',
+    city: '广州市',
+    district: '天河区'
+  }
+])
+
+// 地址表单数据
+const addressForm = reactive({
+  id: 0,
+  name: '',
+  phone: '',
+  province: '',
+  city: '',
+  district: '',
+  addressDetail: '',
+  isDefault: false
+})
+
+// 优惠券选择
 function selectCoupon(selectedId: number) {
   coupons.value.forEach(coupon => {
     coupon.isSelected = coupon.id === selectedId
   })
-  console.log()
 }
-//地址的选择
-const address=ref([
-  {
-    id:1,
-    name:'张三',
-    phone:'12345678901',
-    address:'中国上海徐汇区',
-    isDefault:true,
-  },
-  {
-    id:2,
-    name:'张三',
-    phone:'12345678901',
-    address:'中国上海徐汇区',
-    isDefault:false
-  },
-    {
-    id:3,
-    name:'张三',
-    phone:'12345678901',
-    address:'中国上海徐汇区',
-    isDefault:false
-  }
-])
-const setDefault = (id:number) => {
+
+// 设置默认地址
+const setDefault = (id: number) => {
   address.value.forEach(item => {
     item.isDefault = item.id === id
   })
 }
+
+// 打开新增地址弹窗
+function openAddAddressModal() {
+  isEditing.value = false
+  addressModalVisible.value = true
+  // 重置表单
+  Object.assign(addressForm, {
+    id: 0,
+    name: '',
+    phone: '',
+    province: '',
+    city: '',
+    district: '',
+    addressDetail: '',
+    isDefault: address.value.length === 0 // 如果没有地址，默认设为默认地址
+  })
+  addressModalVisible.value = true
+}
+
+// 打开编辑地址弹窗
+function openEditAddressModal(selected: Address) {
+  isEditing.value = true
+  // 填充表单数据
+  Object.assign(addressForm, {
+    id: selected.id,
+    name: selected.name,
+    phone: selected.phone,
+    province: selected.province || '',
+    city: selected.city || '',
+    district: selected.district || '',
+    addressDetail: selected.addressDetail || '',
+    isDefault: selected.isDefault
+  })
+  addressModalVisible.value = true
+}
+
+// 关闭地址弹窗
+function closeAddressModal() {
+  addressModalVisible.value = false
+}
+
+// 保存地址
+function saveAddress() {
+  // 验证表单
+  if (!addressForm.name || !addressForm.phone || !addressForm.province || !addressForm.city || !addressForm.district || !addressForm.addressDetail) {
+    alert('请填写完整信息')
+    return
+  }
+
+  // 格式化地址
+  const fullAddress = `${addressForm.province}${addressForm.city}${addressForm.district}`
+
+  if (isEditing.value) {
+    // 编辑现有地址
+    const index = address.value.findIndex(item => item.id === addressForm.id)
+    if (index !== -1 && address.value[index]) {
+      address.value[index] = {
+        ...address.value[index],
+        name: addressForm.name,
+        phone: addressForm.phone,
+        address: fullAddress,
+        addressDetail: addressForm.addressDetail,
+        province: addressForm.province,
+        city: addressForm.city,
+        district: addressForm.district
+      }
+
+      // 如果设为默认地址，更新其他地址
+      if (addressForm.isDefault) {
+        address.value.forEach(item => {
+          item.isDefault = item.id === addressForm.id
+        })
+      }
+    }
+  } else {
+    // 添加新地址
+    const newId = Math.max(...address.value.map(item => item.id), 0) + 1
+    const newAddress: Address = {
+      id: newId,
+      name: addressForm.name,
+      phone: addressForm.phone,
+      address: fullAddress,
+      addressDetail: addressForm.addressDetail,
+      isDefault: addressForm.isDefault,
+      province: addressForm.province,
+      city: addressForm.city,
+      district: addressForm.district
+    }
+
+    // 如果设为默认地址，更新其他地址
+    if (addressForm.isDefault) {
+      address.value.forEach(item => {
+        item.isDefault = false
+      })
+    }
+
+    address.value.push(newAddress)
+  }
+
+  // 关闭弹窗
+  closeAddressModal()
+
+  // 显示成功提示
+  alert(isEditing.value ? '地址修改成功' : '地址添加成功')
+}
+
+// 删除地址
+function deleteAddress(id: number) {
+  if (confirm('确定要删除这个地址吗？')) {
+    const index = address.value.findIndex(item => item.id === id)
+    if (index !== -1 && address.value[index]  ) {
+      const isDefaultAddress = address.value[index].isDefault
+      address.value.splice(index, 1)
+      if (isDefaultAddress && address.value.length > 0 && address.value[0]) {
+        address.value[0].isDefault = true
+      }
+    }
+  }
+}
+
 //支付的选择
  function handleSelectPay(type:string) {
       selectedPayType.value = type
@@ -381,7 +648,11 @@ const setDefault = (id:number) => {
     }
     </script>
 <style scoped>
-.container {
+input,textarea,button{
+  outline: none;
+  cursor: pointer;
+}
+.order-container {
   max-width: 1200px;
   width: 1300px;
 }

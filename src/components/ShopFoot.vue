@@ -1,6 +1,6 @@
 <template>
      <footer class="bg-[#333333] text-white py-8">
-    <div class="container mx-auto px-4">
+    <div class="mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
           <div class="flex items-center mb-4">
@@ -16,7 +16,6 @@
             <li><a href="#" class="hover:text-[#FF7043] transition-colors">首页</a></li>
             <li><a href="#" class="hover:text-[#FF7043] transition-colors">全部商品</a></li>
             <li><a href="#" class="hover:text-[#FF7043] transition-colors">优惠活动</a></li>
-            <li><a href="#" class="hover:text-[#FF7043] transition-colors">养宠知识</a></li>
           </ul>
         </div>
 

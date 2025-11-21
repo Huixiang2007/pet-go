@@ -3,7 +3,7 @@
   <NavBar />
   <div class="text-gray-800">
     <!-- 主内容区 -->
-    <main class="container mx-auto px-4">
+    <main class="mx-auto px-4">
       <!-- 页面标题 -->
       <div class="mb-8 mt-[20px]">
         <h1 class="text-xl font-bold flex items-center">
@@ -170,7 +170,6 @@ import OrderCard, { Order } from '@/views/Petshop/OrderCard.vue';
 import Coupons from '@/views/Petshop/MyCoupons.vue';
 import Comments from '@/views/Petshop/MyComments.vue';
 import { ref, computed } from 'vue';
-// 引入订单卡片组件（后面有实现）
 
 // 筛选状态
 const activeStatus = ref('all');
@@ -184,6 +183,9 @@ const statusFilters = [
   { label: '待付款', value: 'pending' },
   { label: '待发货', value: 'shipping' },
   { label: '待收货', value: 'receiving' },
+  { label: '已发货', value: 'completed' },
+  { label: '已收货', value: 'received' },
+  { label: '退货中', value: 'returning' },
 ];
 const orders = ref<Order[]>([
   {
@@ -200,6 +202,7 @@ const orders = ref<Order[]>([
     quantity: 1,
     total: 89
   },
+
     {
     id: '20240610001',
     date: '2024-06-10 14:30',
@@ -213,15 +216,68 @@ const orders = ref<Order[]>([
     price: 89,
     quantity: 1,
     total: 89
+  },
+  {
+    id: '20240610002',
+      date: '2024-06-10 14:30',
+      status: '待收货',
+      statusType: 'receiving',
+      product: {
+        name: '天然无谷狗粮 1.5kg',
+        image: 'https://picsum.photos/id/237/200/200',
+        spec: '口味：鸡肉味 | 适用年龄：成年犬'
+      },
+      price: 89,
+      quantity: 1,
+      total: 89
+  },
+  {
+    id: '20240610003',
+      date: '2024-06-10 14:30',
+      status: '已收货',
+      statusType: 'completed',
+      product: {
+        name: '天然无谷狗粮 1.5kg',
+        image: 'https://picsum.photos/id/237/200/200',
+        spec: '口味：鸡肉味 | 适用年龄：成年犬'
+      },
+      price: 89,
+      quantity: 1,
+      total: 89
+  },
+  {
+    id: '20240610002',
+      date: '2024-06-10 14:30',
+      status: '待收货',
+      statusType: 'received',
+      product: {
+        name: '天然无谷狗粮 1.5kg',
+        image: 'https://picsum.photos/id/237/200/200',
+        spec: '口味：鸡肉味 | 适用年龄：成年犬'
+      },
+      price: 89,
+      quantity: 1,
+      total: 89
+  },
+  {
+    id: '20240610004',
+      date: '2024-06-10 14:30',
+      status: '待收货',
+      statusType: 'returning',
+      product: {
+        name: '天然无谷狗粮 1.5kg',
+        image: 'https://picsum.photos/id/237/200/200',
+        spec: '口味：鸡肉味 | 适用年龄：成年犬'
+      },
+      price: 89,
+      quantity: 1,
+      total: 89
   }
 ]);
 const filteredOrders = computed(() => {
-  // 如果是全部订单，直接返回所有订单
   if (activeStatus.value === 'all') {
     return orders.value;
   }
-
-  // 否则根据statusType过滤订单
   return orders.value.filter(order => order.statusType === activeStatus.value);
 });
 </script>

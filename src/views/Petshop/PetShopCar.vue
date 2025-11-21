@@ -1,7 +1,7 @@
 <template>
-    <NavBar />
+  <NavBar />
   <div class="min-h-screen bg-yellow-50">
-    <main class="container mx-auto px-4 py-8">
+    <main class="mx-auto px-4 py-8">
       <h2 class="text-2xl font-bold mb-6 flex items-center">
         <i class="fa fa-shopping-cart text-[#FF7043] mr-2"></i>
         我的购物车
@@ -55,7 +55,7 @@
             <!-- 单价 -->
             <div class="col-span-2 text-center">¥{{ item.price.toFixed(2) }}</div>
 
-            <!-- 数量调整 -->
+            <!-- 数量 -->
             <div class="col-span-2 flex justify-center">
               <div class="flex items-center border rounded">
                 <button
@@ -97,7 +97,6 @@
           </div>
         </div>
 
-        <!-- 底部操作栏 -->
         <div class="flex flex-col md:flex-row justify-between items-center py-4 px-6 bg-gray-50">
           <div class="flex items-center mb-4 md:mb-0">
             <input
@@ -128,7 +127,7 @@
         </div>
       </div>
 
-      <!-- 推荐商品 -->
+      <!-- 推荐 -->
       <div v-if="cartItems.length > 0" class="mt-12">
         <h3 class="text-xl font-bold mb-6">为您推荐</h3>
         <div class="grid grid-cols-4 gap-6">
@@ -152,6 +151,7 @@
 </template>
 
 <script setup lang="ts">
+import NavBar from '@/components/NavBar.vue';
 import { ref, computed, watch } from 'vue';
 console.log('PetShopCar component loaded');
 interface Product {
@@ -309,7 +309,6 @@ const addToCart = (product: Product) => {
 </script>
 
 <style scoped>
-/* 数量输入框样式修正 */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;

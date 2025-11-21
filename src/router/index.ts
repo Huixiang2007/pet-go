@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import PetLogin from '@/views/login.vue'
 
-import PetShopView from '@/views/PetShopView.vue'
-import PetCenter from '@/views/PetCenter.vue'
 const routes = [
   // 电商的首页
   {
@@ -73,8 +71,8 @@ const routes = [
     component: () => import('@/views/Protocal.vue'),
     meta: { title: '用户协议' }
   },
-   
-   
+
+
 ]
 
 const router = createRouter({

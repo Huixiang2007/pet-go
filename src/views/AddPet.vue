@@ -116,16 +116,16 @@ import { useRouter } from 'vue-router';
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import { ArrowLeft, Plus } from '@element-plus/icons-vue';
 // import type { PetFormData } from '../types/pet';
- interface PetFormDaata {
-  nickname: string;
-  breed: string;
-  birthday: string;
-  gender: 'male' | 'female';
-  weight: number;
-  avatar: string;
-  personalityTags: string[];
-  neutered: boolean;
-  healthStatus: string;
+interface PetFormData {
+    nickname: string;
+    breed: string;
+    birthday: string;
+    gender: 'male' | 'female';
+    weight: number;
+    avatar: string;
+    personalityTags: string[];
+    neutered: boolean;
+    healthStatus: string;
 }
 const router = useRouter();
 const formRef = ref<FormInstance>();

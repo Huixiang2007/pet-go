@@ -8,6 +8,7 @@
       @subCategoryChange="handleSubCategoryChange"
     />
   </header>
+  <div class="min-h-screen pt-1 bg-yellow-50">
   <div class="flex justify-center items-center">
     <div class="product-list-container ">
       <div class="flex justify-between items-center mb-4">
@@ -54,8 +55,8 @@
         <p class="text-gray-600">暂无商品</p>
       </div>
     </div>
-  </div>
-  <ShopFoot />
+  </div></div>
+    <ShopFoot />
 </template>
 
 <script setup lang="ts">
@@ -289,7 +290,6 @@ const currentSubCategoryName = computed(() => {
   return ''
 })
 
-// 根据URL参数获取过滤后的商品
 const getFilteredProducts = (category: string) => {
   const baseProducts = mockProducts[category] || []
 
@@ -315,23 +315,17 @@ watch(() => [route.params.category, window.location.search], () => {
   }, 300)
 }, { immediate: true, deep: true })
 
-// 处理商品点击
 const handleProductClick = (product: Product) => {
   console.log('点击商品:', product)
-  // 这里可以添加跳转到商品详情页的逻辑
 }
 
 // 添加到购物车
 const addToCart = (product: Product) => {
   console.log('添加到购物车:', product)
-  // 这里可以添加添加到购物车的逻辑
 }
 </script>
 
 <style scoped>
-.container{
-  max-width: 100%
-}
 .product-list-container {
   padding: 20px 40px;
 }

@@ -1,7 +1,7 @@
 <template>
-    <NavBar />
+  <NavBar />
   <div class="min-h-screen bg-yellow-50">
-    <main class="container mx-auto px-4 py-8">
+    <main class="mx-auto px-4 py-8">
       <h2 class="text-2xl font-bold mb-6 flex items-center">
         <i class="fa fa-shopping-cart text-[#FF7043] mr-2"></i>
         我的购物车
@@ -151,6 +151,7 @@
 </template>
 
 <script setup lang="ts">
+import NavBar from '@/components/NavBar.vue';
 import { ref, computed, watch } from 'vue';
 console.log('PetShopCar component loaded');
 interface Product {
@@ -308,7 +309,6 @@ const addToCart = (product: Product) => {
 </script>
 
 <style scoped>
-/* 数量输入框样式修正 */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;

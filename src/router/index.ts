@@ -43,11 +43,13 @@ const routes = [
   name: 'OrderList ',
   component: () =>import('@/views/Petshop/OrderList.vue')
 },
+//物流信息
 {
   path: '/PackageInfo',
   name: 'PackageInfo',
   component: () => import('@/views/Petshop/PackageInfo.vue')
 },
+//  搜索
 {
   path: '/Search',
   name: 'Search',

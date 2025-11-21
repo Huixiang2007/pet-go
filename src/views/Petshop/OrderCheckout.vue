@@ -3,7 +3,7 @@
    <NavBar />
    <div class="min-h-screen bg-yellow-50">
     <div class="bg-white py-4 border-b border-gray-200 mt-8">
-    <div class="container mx-auto px-4">
+    <div class="order-container mx-auto px-4">
       <div class="flex items-center justify-between max-w-3xl mx-auto">
         <div class="flex flex-col items-center">
           <div class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2">
@@ -32,7 +32,7 @@
       </div>
     </div>
   </div>
-   <main class="container mx-auto px-4 py-8 flex flex-row justify-center">
+   <main class="order-container mx-auto px-4 py-8 flex flex-row justify-center">
     <div class="flex flex-col items-between w-[60%]">
       <!-- 左侧订单信息 -->
       <div class="mr-4">
@@ -652,7 +652,7 @@ input,textarea,button{
   outline: none;
   cursor: pointer;
 }
-.container {
+.order-container {
   max-width: 1200px;
   width: 1300px;
 }

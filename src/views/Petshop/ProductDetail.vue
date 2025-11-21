@@ -1,13 +1,13 @@
 <template>
-  <main class="container mx-auto px-4 py-8">
+  <main class=" mx-auto px-4 py-8 bg-white ">
     <div class="flex items-center ml-[56px]">
       <img src="https://picsum.photos/id/237/80/80" alt="PetGo Logo" class="h-12 w-12" />
       <span class="ml-2 text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-500">PetGo</span>
       <!-- 搜索框 -->
       <div class="hidden md:flex justify-center items-center flex-1 max-w-md mx-8">
         <div class="relative w-full">
-          <input type="text" placeholder="搜索宠物用品..." class="w-full py-2 pl-10 pr-4 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:border-[#FF7043]">
-          <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+          <input type="text" placeholder="搜索宠物用品..." class="w-full py-2 pl-10 pr-4 rounded-full border border-[#f5a623]">
+          <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#f5a623]"></i>
         </div>
       </div>
     </div>
@@ -17,7 +17,7 @@
         <!-- 左侧缩略 -->
        <div class="lg:col-span-2">
     <div class="flex gap-4">
-      <!-- 缩略图列（包含图片和视频缩略） -->
+      <!-- 缩略图列表 -->
       <div class="hidden md:flex flex-col gap-3 w-20">
         <div
           v-for="(item, i) in mediaList"
@@ -39,7 +39,7 @@
         </div>
       </div>
 
-      <!-- 主内容区 -->
+      <!-- 主内容 -->
       <div class="flex-1 rounded-lg overflow-hidden bg-gray-100 relative">
         <img
           ref="mainImage"
@@ -74,7 +74,7 @@
             </div>
           </div>
 
-          <!-- 详情选项卡 & 内容 -->
+          <!-- 详情-->
           <div class="border-t border-gray-200 mt-4">
             <div class="flex gap-2 px-6 py-3 overflow-x-auto">
               <button
@@ -379,11 +379,11 @@ const selectedSpecs = ref<Record<string, string>>({})
 
 // 计算当前选中的SKU
 const selectedSku = computed(() => {
-  //收集用户选择的具体规格 ID，得到一个数组。
+  //收集用户选择的具体规格 ID，得到一个数组
   const specKeys = product.value.specs.map(spec => selectedSpecs.value[spec.id])
   //用于过滤掉未选择的规格
   const selectedCount = specKeys.filter(Boolean).length
-  //如果已选数量 ≠ 总规格类型数量（比如有 2 种规格但只选了 1 种），则返回默认值
+  //如果已选数量 不等于 总规格类型数量,返回原来的价格
   if (selectedCount !== product.value.specs.length) {
     return { price: product.value.originalPrice, stock: 0 }
   }
@@ -428,7 +428,6 @@ watch(selectedSku, (newSku) => {
   grid-template-columns: 1fr 1fr 300px;
 }
 
-/* 解决固定定位导致的样式问题 */
 :deep(.lg\:sticky) {
   align-self: start;
 }

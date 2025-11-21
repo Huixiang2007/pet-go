@@ -3,7 +3,7 @@
   <NavBar />
   <div class="text-gray-800">
     <!-- 主内容区 -->
-    <main class="container mx-auto px-4">
+    <main class="mx-auto px-4">
       <!-- 页面标题 -->
       <div class="mb-8 mt-[20px]">
         <h1 class="text-xl font-bold flex items-center">

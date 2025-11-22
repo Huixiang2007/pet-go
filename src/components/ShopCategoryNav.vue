@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-row justify-center items-center mt-[40px]">
+  <div class="flex flex-row justify-center items-center pt-[70px]">
     <!-- 主分类 -->
     <div class="grid grid-cols-7 gap-x-4 gap-y-2">
       <div

@@ -1,5 +1,5 @@
 <template>
-  
+
   <div class="demo-login forPicture"  >
     <transition name="box-animation">
     <form class="layui-form demo-login-container" v-if="isLogin">
@@ -101,7 +101,7 @@
     </form>
      </transition>
   </div>
- 
+
 </template>
 
 <script setup lang="ts">
@@ -192,7 +192,7 @@ const toRegister = () => {
   router.push('/Register')
 }
 const toForgotPassword = () => {
-  router.push('/Forget') 
+  router.push('/Forget')
 }
 
 // const handleLogin = async(formData: LoginForm) => {
@@ -202,30 +202,30 @@ const toForgotPassword = () => {
 //     const response = await axios.post('/api/user/login/account', {
 //       account: formData.username,
 //       password: formData.password,
-     
+
 //     })
-    
+
 //     // 登录成功处理
 //     const { token, user } = response.data
-    
+
 //     // 存储token到localStorage
 //     localStorage.setItem('authToken', token)
-    
+
 //     // 显示成功消息
 //    console.log(user)
-    
-    
+
+
 //   } catch (error: any) {
 //     // 登录失败处理
 //     let errorMsg = '登录失败，请稍后重试'
-    
+
 //     if (error.response && error.response.data) {
 //       errorMsg = error.response.data.message || errorMsg
 //     }
-    
+
 //     errorMessage.value = errorMsg
 //    console.log(errorMsg)
-    
+
 //     // 刷新验证码未做
 //   } finally {
 //     loading.value = false
@@ -234,7 +234,7 @@ const toForgotPassword = () => {
 
 </script>
 
-<style>
+<style scoped>
 body{
   overflow: hidden;
 }
@@ -282,7 +282,7 @@ body{
   border: none;
   border-radius: var(--radii);
   color: var(--btn-bg-color);
- 
+
 }
 
 .btn-donate:hover {
@@ -419,7 +419,7 @@ body{
 }
 
 span {
-  
+
   cursor: pointer;
 }
 .agreement-item {

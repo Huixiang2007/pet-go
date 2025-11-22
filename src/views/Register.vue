@@ -1,6 +1,8 @@
 <template>
-  <div class="demo-goLogin demo-login">
-    <form class="layui-form demo-login-container">
+
+  <div class="demo-goLogin demo-login" >
+    <transition name="box-animation">
+    <form class="layui-form demo-login-container" v-if="isRegister">
       <div class="container">
         <img src="../assets/img/logo.png" alt="这是图标" class="logo" />
 
@@ -23,7 +25,7 @@
             <div class="layui-col-xs7">
               <div class="layui-input-wrap">
                 <div class="layui-input-prefix">
-                  <i class="layui-icon layui-icon-cellphone"></i>
+                  <i class="layui-icon layui-icon-email"></i>
                 </div>
                 <input
                   type="text"
@@ -31,9 +33,9 @@
                   v-model="form.phone"
                   @input="handleInput('phone', $event.target.value)"
                   value=""
-                  lay-verify="required|phone"
-                  placeholder="手机号"
-                  lay-reqtext="请填写手机号"
+                  lay-verify="required|QQemail"
+                  placeholder="邮箱号"
+                  lay-reqtext="请填写QQ邮箱号码"
                   autocomplete="off"
                   class="layui-input"
                   id="reg-cellphone"
@@ -122,7 +124,7 @@
               name="nickname"
               value=""
               lay-verify="required"
-              placeholder="昵称"
+              placeholder="账号"
               v-model="form.name"
               @input="handleInput('name', $event.target.value)"
               autocomplete="off"
@@ -159,34 +161,25 @@
             注册
           </button>
         </div>
-        <div class="layui-form-item demo-reg-other">
-          <label>社交账号注册</label>
-          <span style="padding: 0 1px 0 6px">
-            <a href="javascript:;"
-              ><i class="layui-icon layui-icon-login-qq" style="color: #3492ed"></i
-            ></a>
-            <a href="javascript:;"
-              ><i class="layui-icon layui-icon-login-wechat" style="color: #4daf29"></i
-            ></a>
-            <a href="javascript:;"
-              ><i class="layui-icon layui-icon-login-weibo" style="color: #cf1900"></i
-            ></a>
-          </span>
-          或
+        <div class="layui-form-item demo-reg-other fontSet">
+         
           <span @click="toLogin" class="goLogin">登录已有帐号</span>
         </div>
       </div>
     </form>
+    </transition>
   </div>
+
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useRegisterStore } from '@/stores/register'
+import { useRegisterStore } from '../stores/register'
 const registerStore = useRegisterStore()
 const router = useRouter()
 const route = useRoute()
+const isRegister = ref(false)
 const form = registerStore.form
 // 静态文本（非响应式，适合不需要修改的数据）
 const titleRegisterChars = '欢迎注册 PetGo'.split('')
@@ -253,12 +246,19 @@ onMounted(() => {
   // 确保 Layui 已加载
 
   if (window.layui) {
-    layui.use(['form', 'layer', 'util'], function (form, layer, util) {
-      var $ = layui.$
+    isRegister.value=true
+    window.layui.use(['form', 'layer', 'util'], function (form, layer, util) {
+      var $ = window.layui.$
 
       form.config.verifyOnBlur = true
       // 自定义验证规则
       form.verify({
+         QQemail: function(value: string) {
+           const qqEmailReg = /^[1-9]\d+@qq\.com$/
+            if (!qqEmailReg.test(value)) {
+              return '请输入正确的QQ邮箱格式'
+            }
+          },
         // 确认密码
         password: [
           /^(?=.*[A-Za-z])(?=.*\d).{8,}$/, // 正则表达式
@@ -371,7 +371,39 @@ const toProtocal = () => {
 }
 </script>
 
-<style>
+<style> 
+.demo-goLogin{
+background-image: url('../assets/img/background2.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow: hidden;
+}
+
+.fontSet {
+  text-align: right;
+}
+.box-animation-enter-from,
+.box-animation-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.box-animation-enter-active,
+.box-animation-leave-active {
+  transition: opacity 0.3s, transform 0.3s;
+  overflow: hidden;
+}
+
+.box-animation-enter-to,
+.box-animation-leave-from {
+  opacity: 1;
+  transform: translateX(0);
+}
+::v-deep .layui-input {
+  height: 40px; /* 可以根据需要调整高度值，默认通常是 38px 左右 */
+  line-height: 40px; /* 保持行高与高度一致，使文字垂直居中 */
+  font-size: 15px; /* 可选：适当调整字体大小配合高度 */
+}
 .layui-btn-primary {
   border-color: none !important;
   color: #f8f8f8;
@@ -382,7 +414,7 @@ const toProtocal = () => {
 }
 
 .demo-login-container {
-  width: 320px;
+  width: 427px;
   margin: 21px auto 0;
 }
 .demo-login-other .layui-icon {
@@ -410,11 +442,8 @@ const toProtocal = () => {
   top: 2px;
   font-size: 26px;
 }
-body {
-  background-image: url('../assets/img/background1.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-}
+
+
 .demo-login-container {
   width: 400px; /* 表单宽度 */
   padding: 30px;
@@ -475,23 +504,21 @@ body {
 }
 
 .char {
-  /* 每个字符的初始状态：透明且微小缩放 */
   opacity: 0;
-  transform: scale(0.8);
-  /* 动画：100ms 延迟后，0.3s 过渡到显示状态 */
-  animation: fadeIn 0.3s ease-out forwards;
-  /* 保持字符间距（避免动画时跳动） */
+  transform: translateY(20px) scale(0.9);
+  animation: charPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   display: inline-block;
-  min-width: 0.5em; /* 对空格等字符生效，避免挤压 */
+  min-width: 0.5em;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-/* 动画关键帧：从隐藏到显示 */
-@keyframes fadeIn {
+@keyframes charPop {
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
 }
+
 span {
   cursor: pointer;
 }
@@ -613,5 +640,8 @@ span {
 
 .goLogin:hover::after {
   width: 100%; /* 下划线宽度从 0 过渡到 100%（从左到右展开） */
+}
+body{
+  overflow: hidden;
 }
 </style>

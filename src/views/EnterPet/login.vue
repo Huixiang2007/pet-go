@@ -1,107 +1,112 @@
 <template>
-  
-  <div class="demo-login forPicture"  >
+  <div class="demo-login forPicture">
     <transition name="box-animation">
-    <form class="layui-form demo-login-container" v-if="isLogin">
-      <div class="container">
-        <img src="../assets/img/logo.png" alt="这是图标" class="logo" />
+      <form class="layui-form demo-login-container" v-if="isLogin">
+        <div class="container">
+          <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
 
-        <div class="title">
-          <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
-          <span
-            v-for="(char, index) in titleLoginChars"
-            :key="index"
-            :style="{ animationDelay: `${index * 100}ms` }"
-            class="char"
-          >
-            {{ char }}
-          </span>
-        </div>
-      </div>
-
-      <div class="myCenter">
-        <div class="layui-form-item">
-          <div class="layui-input-wrap">
-            <div class="layui-input-prefix">
-               <i class="layui-icon" :class="isAccount ? 'layui-icon-username' : 'layui-icon-email'"></i>
-            </div>
-            <input
-              type="text"
-              name="loginId"
-              value=""
-              lay-verify="required|verifyType"
-              :placeholder="isAccount ? '账号' : 'QQ邮箱'"
-              :lay-reqtext="isAccount? '请输入账号' : '请输入QQ邮箱'"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="clear"
-            />
+          <div class="title">
+            <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
+            <span
+              v-for="(char, index) in titleLoginChars"
+              :key="index"
+              :style="{ animationDelay: `${index * 100}ms` }"
+              class="char"
+            >
+              {{ char }}
+            </span>
           </div>
         </div>
-        <div class="layui-form-item">
-          <div class="layui-input-wrap">
-            <div class="layui-input-prefix">
-              <i class="layui-icon layui-icon-password"></i>
+
+        <div class="myCenter">
+          <div class="layui-form-item">
+            <div class="layui-input-wrap">
+              <div class="layui-input-prefix">
+                <i
+                  class="layui-icon"
+                  :class="isAccount ? 'layui-icon-username' : 'layui-icon-email'"
+                ></i>
+              </div>
+              <input
+                type="text"
+                name="loginId"
+                value=""
+                lay-verify="required|verifyType"
+                :placeholder="isAccount ? '账号' : 'QQ邮箱'"
+                :lay-reqtext="isAccount ? '请输入账号' : '请输入QQ邮箱'"
+                autocomplete="off"
+                class="layui-input"
+                lay-affix="clear"
+              />
             </div>
-            <input
-              type="password"
-              name="password"
-              value=""
-              lay-verify="required|password"
-              placeholder="密   码"
-              lay-reqtext="请填写密码"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="eye"
-            />
           </div>
-        </div>
-        <div class="layui-form-item">
-          <div class="layui-row">
-            <div class="layui-col-xs7">
-              <div class="layui-input-wrap">
-                <div class="layui-input-prefix">
-                  <i class="layui-icon layui-icon-vercode"></i>
+          <div class="layui-form-item">
+            <div class="layui-input-wrap">
+              <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-password"></i>
+              </div>
+              <input
+                type="password"
+                name="password"
+                value=""
+                lay-verify="required|password"
+                placeholder="密   码"
+                lay-reqtext="请填写密码"
+                autocomplete="off"
+                class="layui-input"
+                lay-affix="eye"
+              />
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <div class="layui-row">
+              <div class="layui-col-xs7">
+                <div class="layui-input-wrap">
+                  <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-vercode"></i>
+                  </div>
+                  <input
+                    type="text"
+                    name="captcha"
+                    value=""
+                    lay-verify="required"
+                    placeholder="验证码"
+                    lay-reqtext="请填写验证码"
+                    autocomplete="off"
+                    class="layui-input"
+                    lay-affix="clear"
+                  />
                 </div>
-                <input
-                  type="text"
-                  name="captcha"
-                  value=""
-                  lay-verify="required"
-                  placeholder="验证码"
-                  lay-reqtext="请填写验证码"
-                  autocomplete="off"
-                  class="layui-input"
-                  lay-affix="clear"
-                />
               </div>
-            </div>
-            <div class="layui-col-xs5">
-              <div style="margin-left: 10px">
-                <img
-                  src="https://www.oschina.net/action/user/captcha"
-                  onclick="this.src='https://www.oschina.net/action/user/captcha?t='+ new Date().getTime();"
-                />
+              <div class="layui-col-xs5">
+                <div style="margin-left: 10px">
+                  <img
+                    src="https://www.oschina.net/action/user/captcha"
+                    onclick="this.src='https://www.oschina.net/action/user/captcha?t='+ new Date().getTime();"
+                  />
+                </div>
               </div>
             </div>
           </div>
+          <div class="layui-form-item">
+            <input type="checkbox" name="remember" lay-skin="primary" title="记住密码" />
+            <span @click="toForgotPassword" style="float: right; margin-top: 7px; color: #333"
+              >忘记密码？</span
+            >
+          </div>
+          <div class="layui-form-item">
+            <button class="layui-btn btn-donate" lay-submit lay-filter="demo-login">登录</button>
+          </div>
+          <div class="layui-form-item demo-login-other" style="text-align: right">
+            <span @click="changeLoginType" class="register">
+              {{ isAccount ? '使用QQ邮箱登录' : '使用账号登录' }}</span
+            >
+            或 <span @click="toRegister" class="register">注册帐号</span>
+          </div>
         </div>
-        <div class="layui-form-item">
-          <input type="checkbox" name="remember" lay-skin="primary" title="记住密码" />
-          <span @click="toForgotPassword" style="float: right; margin-top: 7px;color:#333;">忘记密码？</span>
-        </div>
-        <div class="layui-form-item">
-          <button class="layui-btn btn-donate" lay-submit lay-filter="demo-login">登录</button>
-        </div>
-        <div class="layui-form-item demo-login-other" style="text-align: right; ">
-          <span  @click="changeLoginType" class="register" > {{ isAccount ? '使用QQ邮箱登录' : '使用账号登录' }}</span>
-          或 <span @click="toRegister" class="register">注册帐号</span>
-        </div>
-      </div>
-    </form>
-     </transition>
+      </form>
+    </transition>
   </div>
- 
 </template>
 
 <script setup lang="ts">
@@ -110,7 +115,6 @@ import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import axios from 'axios'
 const isAccount = ref(true)
-
 
 // 定义登录表单数据类型
 interface LoginForm {
@@ -131,7 +135,7 @@ const changeLoginType = () => {
   isAccount.value = !isAccount.value
   const loginInput = document.querySelector('input[name="loginId"]')
   if (loginInput) {
-    (loginInput as HTMLInputElement).value = ''
+    ;(loginInput as HTMLInputElement).value = ''
   }
 }
 let hideErrorTimer: number | null = null
@@ -140,8 +144,8 @@ onMounted(() => {
   if (window.layui) {
     isLogin.value = true
     window.layui.use(['form', 'layer'], (form: any, layer: any) => {
-     form.verify({
-          verifyType: function(value: string) {
+      form.verify({
+        verifyType: function (value: string) {
           if (isAccount.value) {
             // 账号验证规则：6-20位字母、数字、下划线，首位不能为数字
             const accountReg = /^[a-zA-Z_][a-zA-Z0-9_]{5,19}$/
@@ -156,13 +160,14 @@ onMounted(() => {
             }
           }
         },
-          password: function(value: string) {
-    // 密码验证规则：8-20位，包含大小写字母、数字和特殊字符
-    const passwordReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/;
-    if (!passwordReg.test(value)) {
-      return '密码需8-20位，包含大小写字母、数字和特殊字符';
-    }
-  }
+        password: function (value: string) {
+          // 密码验证规则：8-20位，包含大小写字母、数字和特殊字符
+          const passwordReg =
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/
+          if (!passwordReg.test(value)) {
+            return '密码需8-20位，包含大小写字母、数字和特殊字符'
+          }
+        },
       })
 
       form.on('submit(demo-login)', (data: any) => {
@@ -192,7 +197,7 @@ const toRegister = () => {
   router.push('/Register')
 }
 const toForgotPassword = () => {
-  router.push('/Forget') 
+  router.push('/Forget')
 }
 
 // const handleLogin = async(formData: LoginForm) => {
@@ -202,61 +207,42 @@ const toForgotPassword = () => {
 //     const response = await axios.post('/api/user/login/account', {
 //       account: formData.username,
 //       password: formData.password,
-     
+
 //     })
-    
+
 //     // 登录成功处理
 //     const { token, user } = response.data
-    
+
 //     // 存储token到localStorage
 //     localStorage.setItem('authToken', token)
-    
+
 //     // 显示成功消息
 //    console.log(user)
-    
-    
+
 //   } catch (error: any) {
 //     // 登录失败处理
 //     let errorMsg = '登录失败，请稍后重试'
-    
+
 //     if (error.response && error.response.data) {
 //       errorMsg = error.response.data.message || errorMsg
 //     }
-    
+
 //     errorMessage.value = errorMsg
 //    console.log(errorMsg)
-    
+
 //     // 刷新验证码未做
 //   } finally {
 //     loading.value = false
 //   }
 // }
-
 </script>
 
-<style>
-body{
+<style scoped>
+body {
   overflow: hidden;
 }
-.layui-form-checkbox[lay-skin=primary]>div {
+.layui-form-checkbox[lay-skin='primary'] > div {
   margin-top: 0.5px !important;
-}
-.box-animation-enter-from,
-.box-animation-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.box-animation-enter-active,
-.box-animation-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
-  overflow: hidden;
-}
-
-.box-animation-enter-to,
-.box-animation-leave-from {
-  opacity: 1;
-  transform: translateX(0);
 }
 
 .btn-donate {
@@ -282,7 +268,6 @@ body{
   border: none;
   border-radius: var(--radii);
   color: var(--btn-bg-color);
- 
 }
 
 .btn-donate:hover {
@@ -338,10 +323,10 @@ body{
 }
 
 .forPicture {
-    background-image: url('../assets/img/background1.png');
-    background-repeat: no-repeat;
+  background-image: url('../../assets/img/background6.png');
+  background-repeat: no-repeat;
   background-size: cover;
-    overflow: hidden;
+  overflow: hidden;
 }
 .demo-login-container {
   width: 400px; /* 表单宽度 */
@@ -408,7 +393,7 @@ body{
   animation: charPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   display: inline-block;
   min-width: 0.5em;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes charPop {
@@ -419,7 +404,6 @@ body{
 }
 
 span {
-  
   cursor: pointer;
 }
 .agreement-item {

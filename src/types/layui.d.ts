@@ -1,4 +1,5 @@
 // 声明 window 上的 layui 全局变量
+export {}
 declare interface Window {
   layui: any;
 }

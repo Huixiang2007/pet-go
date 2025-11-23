@@ -1,181 +1,178 @@
 <template>
-
-  <div class="demo-goLogin demo-login" >
+  <div class="demo-goLogin demo-login">
     <transition name="box-animation">
-    <form class="layui-form demo-login-container" v-if="isRegister">
-      <div class="container">
-        <img src="../assets/img/logo.png" alt="这是图标" class="logo" />
+      <form class="layui-form demo-login-container" v-if="isRegister">
+        <div class="container">
+          <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
 
-        <div class="title">
-          <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
-          <span
-            v-for="(char, index) in titleRegisterChars"
-            :key="index"
-            :style="{ animationDelay: `${index * 100}ms` }"
-            class="char"
-          >
-            {{ char }}
-          </span>
+          <div class="title">
+            <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
+            <span
+              v-for="(char, index) in titleRegisterChars"
+              :key="index"
+              :style="{ animationDelay: `${index * 100}ms` }"
+              class="char"
+            >
+              {{ char }}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div class="demo-reg-container">
-        <div class="layui-form-item">
-          <div class="layui-row">
-            <div class="layui-col-xs7">
-              <div class="layui-input-wrap">
-                <div class="layui-input-prefix">
-                  <i class="layui-icon layui-icon-email"></i>
+        <div class="demo-reg-container">
+          <div class="layui-form-item">
+            <div class="layui-row">
+              <div class="layui-col-xs7">
+                <div class="layui-input-wrap">
+                  <div class="layui-input-prefix">
+                    <i class="layui-icon layui-icon-email"></i>
+                  </div>
+                  <input
+                    type="text"
+                    name="cellphone"
+                    v-model="form.phone"
+                    @input="handleInput('phone', $event.target.value)"
+                    value=""
+                    lay-verify="required|QQemail"
+                    placeholder="邮箱号"
+                    lay-reqtext="请填写QQ邮箱号码"
+                    autocomplete="off"
+                    class="layui-input"
+                    id="reg-cellphone"
+                  />
                 </div>
-                <input
-                  type="text"
-                  name="cellphone"
-                  v-model="form.phone"
-                  @input="handleInput('phone', $event.target.value)"
-                  value=""
-                  lay-verify="required|QQemail"
-                  placeholder="邮箱号"
-                  lay-reqtext="请填写QQ邮箱号码"
-                  autocomplete="off"
-                  class="layui-input"
-                  id="reg-cellphone"
-                />
               </div>
-            </div>
-            <div class="layui-col-xs5">
-              <div style="margin-left: 11px">
-                <button
-                  type="button"
-                  class="layui-btn layui-btn-fluid layui-btn-primary"
-                  lay-on="reg-get-vercode"
-                >
-                  获取验证码
-                </button>
+              <div class="layui-col-xs5">
+                <div style="margin-left: 11px">
+                  <button
+                    type="button"
+                    class="layui-btn layui-btn-fluid layui-btn-primary"
+                    lay-on="reg-get-vercode"
+                  >
+                    获取验证码
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div class="layui-form-item">
-          <div class="layui-input-wrap">
-            <div class="layui-input-prefix">
-              <i class="layui-icon layui-icon-vercode"></i>
+          <div class="layui-form-item">
+            <div class="layui-input-wrap">
+              <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-vercode"></i>
+              </div>
+              <input
+                type="text"
+                name="vercode"
+                value=""
+                v-model="form.vercode"
+                @input="handleInput('vercode', $event.target.value)"
+                lay-verify="required"
+                placeholder="验证码"
+                lay-reqtext="请填写验证码"
+                autocomplete="off"
+                class="layui-input"
+              />
             </div>
-            <input
-              type="text"
-              name="vercode"
-              value=""
-              v-model="form.vercode"
-              @input="handleInput('vercode', $event.target.value)"
-              lay-verify="required"
-              placeholder="验证码"
-              lay-reqtext="请填写验证码"
-              autocomplete="off"
-              class="layui-input"
-            />
           </div>
-        </div>
-        <div class="layui-form-item">
-          <div class="layui-input-wrap">
-            <div class="layui-input-prefix">
-              <i class="layui-icon layui-icon-password"></i>
+          <div class="layui-form-item">
+            <div class="layui-input-wrap">
+              <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-password"></i>
+              </div>
+              <input
+                type="password"
+                name="password"
+                value=""
+                lay-verify="required|password"
+                v-model="form.password"
+                @input="handleInput('password', $event.target.value)"
+                placeholder="密码"
+                autocomplete="off"
+                class="layui-input"
+                id="reg-password"
+                lay-affix="eye"
+              />
             </div>
-            <input
-              type="password"
-              name="password"
-              value=""
-              lay-verify="required|password"
-              v-model="form.password"
-              @input="handleInput('password', $event.target.value)"
-              placeholder="密码"
-              autocomplete="off"
-              class="layui-input"
-              id="reg-password"
-              lay-affix="eye"
-            />
           </div>
-        </div>
-        <div class="layui-form-item">
-          <div class="layui-input-wrap">
-            <div class="layui-input-prefix">
-              <i class="layui-icon layui-icon-password"></i>
+          <div class="layui-form-item">
+            <div class="layui-input-wrap">
+              <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-password"></i>
+              </div>
+              <input
+                type="password"
+                name="confirmPassword"
+                value=""
+                lay-verify="required|confirmPassword"
+                v-model="form.confirm"
+                @input="handleInput('confirm', $event.target.value)"
+                placeholder="确认密码"
+                autocomplete="off"
+                class="layui-input"
+                lay-affix="eye"
+                id="confirm-password"
+              />
             </div>
-            <input
-              type="password"
-              name="confirmPassword"
-              value=""
-              lay-verify="required|confirmPassword"
-              v-model="form.confirm"
-              @input="handleInput('confirm', $event.target.value)"
-              placeholder="确认密码"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="eye"
-              id="confirm-password"
-            />
           </div>
-        </div>
-        <div class="layui-form-item">
-          <div class="layui-input-wrap">
-            <div class="layui-input-prefix">
-              <i class="layui-icon layui-icon-username"></i>
+          <div class="layui-form-item">
+            <div class="layui-input-wrap">
+              <div class="layui-input-prefix">
+                <i class="layui-icon layui-icon-username"></i>
+              </div>
+              <input
+                type="text"
+                name="nickname"
+                value=""
+                lay-verify="required"
+                placeholder="账号"
+                v-model="form.name"
+                @input="handleInput('name', $event.target.value)"
+                autocomplete="off"
+                class="layui-input"
+                lay-affix="clear"
+              />
             </div>
-            <input
-              type="text"
-              name="nickname"
-              value=""
-              lay-verify="required"
-              placeholder="账号"
-              v-model="form.name"
-              @input="handleInput('name', $event.target.value)"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="clear"
-            />
+          </div>
+          <div class="layui-form-item">
+            <div class="agreement-item">
+              <input
+                v-model="isAgreed"
+                @change="handleCheck"
+                type="checkbox"
+                id="agree"
+                class="agreement-checkbox"
+                style="display: block"
+              />
+              <label class="agreement-label">
+                我已阅读并同意<span class="agreement-link" @click="toProtocal">用户服务协议</span>
+              </label>
+            </div>
+            <p v-if="showError" class="error-message">
+              <span class="error-icon">⚠</span>请阅读并同意服务条款和隐私政策
+            </p>
+          </div>
+          <div class="layui-form-item">
+            <button
+              class="layui-btn layui-btn-fluid"
+              lay-submit
+              lay-filter="demo-reg"
+              @click="handleRegister"
+            >
+              注册
+            </button>
+          </div>
+          <div class="layui-form-item demo-reg-other fontSet">
+            <span @click="toLogin" class="goLogin">登录已有帐号</span>
           </div>
         </div>
-        <div class="layui-form-item">
-          <div class="agreement-item">
-            <input
-              v-model="isAgreed"
-              @change="handleCheck"
-              type="checkbox"
-              id="agree"
-              class="agreement-checkbox"
-              style="display: block"
-            />
-            <label class="agreement-label">
-              我已阅读并同意<span class="agreement-link" @click="toProtocal">用户服务协议</span>
-            </label>
-          </div>
-          <p v-if="showError" class="error-message">
-            <span class="error-icon">⚠</span>请阅读并同意服务条款和隐私政策
-          </p>
-        </div>
-        <div class="layui-form-item">
-          <button
-            class="layui-btn layui-btn-fluid"
-            lay-submit
-            lay-filter="demo-reg"
-            @click="handleRegister"
-          >
-            注册
-          </button>
-        </div>
-        <div class="layui-form-item demo-reg-other fontSet">
-         
-          <span @click="toLogin" class="goLogin">登录已有帐号</span>
-        </div>
-      </div>
-    </form>
+      </form>
     </transition>
   </div>
-
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useRegisterStore } from '../stores/register'
+import { useRegisterStore } from '../../stores/register'
 const registerStore = useRegisterStore()
 const router = useRouter()
 const route = useRoute()
@@ -183,7 +180,11 @@ const isRegister = ref(false)
 const form = registerStore.form
 // 静态文本（非响应式，适合不需要修改的数据）
 const titleRegisterChars = '欢迎注册 PetGo'.split('')
-
+declare global {
+  interface Window {
+    layui: any
+  }
+}
 // 响应式状态管理
 const isAgreed = ref(false) // 协议勾选状态
 const showError = ref(false) // 错误提示显示状态
@@ -246,19 +247,19 @@ onMounted(() => {
   // 确保 Layui 已加载
 
   if (window.layui) {
-    isRegister.value=true
+    isRegister.value = true
     window.layui.use(['form', 'layer', 'util'], function (form, layer, util) {
       var $ = window.layui.$
 
       form.config.verifyOnBlur = true
       // 自定义验证规则
       form.verify({
-         QQemail: function(value: string) {
-           const qqEmailReg = /^[1-9]\d+@qq\.com$/
-            if (!qqEmailReg.test(value)) {
-              return '请输入正确的QQ邮箱格式'
-            }
-          },
+        QQemail: function (value: string) {
+          const qqEmailReg = /^[1-9]\d+@qq\.com$/
+          if (!qqEmailReg.test(value)) {
+            return '请输入正确的QQ邮箱格式'
+          }
+        },
         // 确认密码
         password: [
           /^(?=.*[A-Za-z])(?=.*\d).{8,}$/, // 正则表达式
@@ -371,9 +372,9 @@ const toProtocal = () => {
 }
 </script>
 
-<style> 
-.demo-goLogin{
-background-image: url('../assets/img/background2.png');
+<style scoped>
+.demo-goLogin {
+  background-image: url('../../assets/img/background2.png');
   background-repeat: no-repeat;
   background-size: cover;
   overflow: hidden;
@@ -382,23 +383,7 @@ background-image: url('../assets/img/background2.png');
 .fontSet {
   text-align: right;
 }
-.box-animation-enter-from,
-.box-animation-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
 
-.box-animation-enter-active,
-.box-animation-leave-active {
-  transition: opacity 0.3s, transform 0.3s;
-  overflow: hidden;
-}
-
-.box-animation-enter-to,
-.box-animation-leave-from {
-  opacity: 1;
-  transform: translateX(0);
-}
 ::v-deep .layui-input {
   height: 40px; /* 可以根据需要调整高度值，默认通常是 38px 左右 */
   line-height: 40px; /* 保持行高与高度一致，使文字垂直居中 */
@@ -442,7 +427,6 @@ background-image: url('../assets/img/background2.png');
   top: 2px;
   font-size: 26px;
 }
-
 
 .demo-login-container {
   width: 400px; /* 表单宽度 */
@@ -509,7 +493,7 @@ background-image: url('../assets/img/background2.png');
   animation: charPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   display: inline-block;
   min-width: 0.5em;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 @keyframes charPop {
@@ -641,7 +625,7 @@ span {
 .goLogin:hover::after {
   width: 100%; /* 下划线宽度从 0 过渡到 100%（从左到右展开） */
 }
-body{
+body {
   overflow: hidden;
 }
 </style>

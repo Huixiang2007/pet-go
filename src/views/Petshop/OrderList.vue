@@ -1,7 +1,7 @@
 <template>
   <div class="bg-[#fefcea] min-h-screen">
   <NavBar />
-  <div class="text-gray-800">
+  <div class="text-gray-800 pt-[45px]">
     <!-- 主内容区 -->
     <main class="mx-auto px-4">
       <!-- 页面标题 -->
@@ -79,16 +79,6 @@
                 >
                 <i class="fa fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
               </div>
-              <div class="flex gap-3">
-                <button class="text-gray-600 hover:text-orange-500 transition-colors flex items-center gap-1.5">
-                  <i class="fa fa-filter"></i>
-                  <span class="hidden sm:inline">筛选</span>
-                </button>
-                <button class="text-gray-600 hover:text-orange-500 transition-colors flex items-center gap-1.5">
-                  <i class="fa fa-sort"></i>
-                  <span class="hidden sm:inline">排序</span>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -103,7 +93,7 @@
               去逛逛
             </button>
           </div>
-          <!-- 订单列表（有数据时） -->
+          <!-- 订单列表 -->
         <div v-else class="space-y-4">
       <OrderCard v-for="value in filteredOrders" :key="value.id" :order="value" />
       </div></div>
@@ -132,7 +122,7 @@
           </h2>
           <a href="#" class="text-[#FF7043] text-sm hover:underline">查看全部</a>
         </div>
-        <!-- 引入评论管理组件 -->
+        <!-- 引入评论组件 -->
         <div class="bg-white rounded-xl shadow-sm p-5">
           <Comments />
         </div>

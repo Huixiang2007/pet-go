@@ -1,17 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-
 const routes = [
   {
     path: '/',
     name: 'fosterCare',
     component: import('@/views/FosterCare.vue'),
   },
-  {
-    path: '/ddd',
-    name: 'andsnn',
-    component: import('@/views/AndSnn.vue'),
-  },
+
   {
     path: '/homedetail',
     name: 'homedetail',
@@ -68,9 +63,8 @@ const routes = [
   {
     path: '/Login',
     name: 'petLogin',
-    component: ()=> import('@/views/EnterPet/Login.vue'),
-    meta: { title: '欢迎登录 PetGo'},
-
+    component: () => import('@/views/EnterPet/login.vue'),
+    meta: { title: '欢迎登录 PetGo' },
   },
   {
     path: '/MyPet',
@@ -96,13 +90,11 @@ const routes = [
     meta: { title: '用户协议' },
   },
   {
-    path:'/Forget',
-    name:'forget',
+    path: '/Forget',
+    name: 'forget',
     component: () => import('@/views/EnterPet/ForgetPassword.vue'),
-    meta: { title: '找回密码' }
+    meta: { title: '找回密码' },
   },
-   
-   
 ]
 
 const router = createRouter({
@@ -114,9 +106,9 @@ const router = createRouter({
  */
 router.beforeEach((to, from, next) => {
   if (to.meta.title) {
-    document.title = to.meta.title as string;
+    document.title = to.meta.title as string
   }
-  next();
-});
+  next()
+})
 
 export default router

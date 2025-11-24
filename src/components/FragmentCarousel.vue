@@ -319,6 +319,7 @@ body {
     overflow: hidden;
     box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
     height: 100%;
+    width: 100%;
 }
 
 .carousel {

@@ -2,6 +2,21 @@ import { createRouter, createWebHistory } from 'vue-router'
 import PetLogin from '@/views/login.vue'
 
 const routes = [
+  {
+    path: '/',
+    name: 'fosterCare',
+    component: import('@/views/FosterCare.vue'),
+  },
+  {
+    path: '/ddd',
+    name: 'andsnn',
+    component: import('@/views/AndSnn.vue'),
+  },
+  {
+    path: '/homedetail',
+    name: 'homedetail',
+    component: import('@/views/HomeDetail.vue'),
+  },
   // 电商的首页
   {
     path: '/shop',

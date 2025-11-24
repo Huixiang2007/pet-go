@@ -6,12 +6,8 @@
 
         <div class="title">
           <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
-          <span
-            v-for="(char, index) in titleLoginChars"
-            :key="index"
-            :style="{ animationDelay: `${index * 100}ms` }"
-            class="char"
-          >
+          <span v-for="(char, index) in titleLoginChars" :key="index" :style="{ animationDelay: `${index * 100}ms` }"
+            class="char">
             {{ char }}
           </span>
         </div>
@@ -23,17 +19,8 @@
             <div class="layui-input-prefix">
               <i class="layui-icon layui-icon-username"></i>
             </div>
-            <input
-              type="text"
-              name="username"
-              value=""
-              lay-verify="required"
-              placeholder="用户名"
-              lay-reqtext="请填写用户名"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="clear"
-            />
+            <input type="text" name="username" value="" lay-verify="required" placeholder="用户名" lay-reqtext="请填写用户名"
+              autocomplete="off" class="layui-input" lay-affix="clear" />
           </div>
         </div>
         <div class="layui-form-item">
@@ -41,17 +28,8 @@
             <div class="layui-input-prefix">
               <i class="layui-icon layui-icon-password"></i>
             </div>
-            <input
-              type="password"
-              name="password"
-              value=""
-              lay-verify="required"
-              placeholder="密   码"
-              lay-reqtext="请填写密码"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="eye"
-            />
+            <input type="password" name="password" value="" lay-verify="required" placeholder="密   码"
+              lay-reqtext="请填写密码" autocomplete="off" class="layui-input" lay-affix="eye" />
           </div>
         </div>
         <div class="layui-form-item">
@@ -61,25 +39,14 @@
                 <div class="layui-input-prefix">
                   <i class="layui-icon layui-icon-vercode"></i>
                 </div>
-                <input
-                  type="text"
-                  name="captcha"
-                  value=""
-                  lay-verify="required"
-                  placeholder="验证码"
-                  lay-reqtext="请填写验证码"
-                  autocomplete="off"
-                  class="layui-input"
-                  lay-affix="clear"
-                />
+                <input type="text" name="captcha" value="" lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码"
+                  autocomplete="off" class="layui-input" lay-affix="clear" />
               </div>
             </div>
             <div class="layui-col-xs5">
               <div style="margin-left: 10px">
-                <img
-                  src="https://www.oschina.net/action/user/captcha"
-                  onclick="this.src='https://www.oschina.net/action/user/captcha?t='+ new Date().getTime();"
-                />
+                <img src="https://www.oschina.net/action/user/captcha"
+                  onclick="this.src='https://www.oschina.net/action/user/captcha?t='+ new Date().getTime();" />
               </div>
             </div>
           </div>
@@ -94,15 +61,9 @@
         <div class="layui-form-item demo-login-other">
           <label>社交账号登录</label>
           <span style="padding: 0 2px 0 6px">
-            <a href="javascript:;"
-              ><i class="layui-icon layui-icon-login-qq" style="color: #3492ed"></i
-            ></a>
-            <a href="javascript:;"
-              ><i class="layui-icon layui-icon-login-wechat" style="color: #4daf29"></i
-            ></a>
-            <a href="javascript:;"
-              ><i class="layui-icon layui-icon-login-weibo" style="color: #cf1900"></i
-            ></a>
+            <a href="javascript:;"><i class="layui-icon layui-icon-login-qq" style="color: #3492ed"></i></a>
+            <a href="javascript:;"><i class="layui-icon layui-icon-login-wechat" style="color: #4daf29"></i></a>
+            <a href="javascript:;"><i class="layui-icon layui-icon-login-weibo" style="color: #cf1900"></i></a>
           </span>
           或 <span @click="toRegister" class="register">注册帐号</span>
         </div>
@@ -167,11 +128,12 @@ const toRegister = () => {
 }
 </script>
 
-<style>
+<style scoped>
 .demo-login-container {
   width: 320px;
   margin: 21px auto 0;
 }
+
 .demo-login-other .layui-icon {
   position: relative;
   display: inline-block;
@@ -183,13 +145,17 @@ const toRegister = () => {
 .demo-login {
   min-height: 100vh;
   display: flex;
-  justify-content: center; /* 水平居中 */
-  align-items: center; /* 垂直居中 */
+  justify-content: center;
+  /* 水平居中 */
+  align-items: center;
+  /* 垂直居中 */
 }
+
 .demo-reg-container {
   width: 320px;
   margin: 21px auto 0;
 }
+
 .demo-reg-other .layui-icon {
   position: relative;
   display: inline-block;
@@ -197,59 +163,79 @@ const toRegister = () => {
   top: 2px;
   font-size: 26px;
 }
+
 body {
   background-image: url('../assets/img/background1.png');
   background-repeat: no-repeat;
   background-size: cover;
 }
+
 .demo-login-container {
-  width: 400px; /* 表单宽度 */
+  width: 400px;
+  /* 表单宽度 */
   padding: 30px;
-  background-color: rgba(951, 588, 235, 0.6); /* 半透明白色背景 */
+  background-color: rgba(951, 588, 235, 0.6);
+  /* 半透明白色背景 */
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 阴影增强层次感 */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* 阴影增强层次感 */
 }
+
 .container {
-  display: flex; /* 开启 Flex 布局 */
-  align-items: center; /* 垂直居中对齐（可选，让文字和图片在同一水平线上） */
-  gap: 10px; /* 子元素之间的间距（可选） */
-  margin: 20px; /* 顶部外边距 */
+  display: flex;
+  /* 开启 Flex 布局 */
+  align-items: center;
+  /* 垂直居中对齐（可选，让文字和图片在同一水平线上） */
+  gap: 10px;
+  /* 子元素之间的间距（可选） */
+  margin: 20px;
+  /* 顶部外边距 */
 }
 
 /* 可选：调整文字和图片样式 */
 .container span {
   display: inline-block;
-  margin: 0; /* 清除 p 标签默认的上下外边距，避免错位 */
-  font-size: 24px; /* 示例：调整文字大小 */
+  margin: 0;
+  /* 清除 p 标签默认的上下外边距，避免错位 */
+  font-size: 24px;
+  /* 示例：调整文字大小 */
 }
 
 .logo {
   margin-left: 20px;
-  width: 60px; /* 示例：设置图片宽度 */
-  height: auto; /* 保持图片比例 */
+  width: 60px;
+  /* 示例：设置图片宽度 */
+  height: auto;
+  /* 保持图片比例 */
 }
 
 .layui-btn {
   background-color: rgb(253, 152, 96);
 }
+
 .layui-input:focus {
   border-color: rgb(253, 152, 96) !important;
   box-shadow: 0 0 3px 1px rgba(253, 152, 96, 0.3) !important;
 }
+
 .layui-checkbox:hover .layui-checkbox {
   border-color: rgb(253, 152, 96);
 }
+
 .layui-form-checked[lay-skin='primary'] i {
   background-color: rgb(253, 152, 96);
   border-color: rgb(253, 152, 96) !important;
   color: #fff;
 }
+
 .layui-form-checkbox[lay-skin='primary']:hover i {
   border-color: rgb(253, 152, 96);
 }
+
 .layui-form-checkbox[lay-skin='primary'] {
   border-color: rgb(253, 152, 96);
 }
+
 .layui-btn-primary:hover {
   border-color: rgb(253, 152, 96);
   color: #333;
@@ -269,7 +255,8 @@ body {
   animation: fadeIn 0.3s ease-out forwards;
   /* 保持字符间距（避免动画时跳动） */
   display: inline-block;
-  min-width: 0.5em; /* 对空格等字符生效，避免挤压 */
+  min-width: 0.5em;
+  /* 对空格等字符生效，避免挤压 */
 }
 
 /* 动画关键帧：从隐藏到显示 */
@@ -279,9 +266,11 @@ body {
     transform: scale(1);
   }
 }
+
 span {
   cursor: pointer;
 }
+
 .agreement-item {
   display: flex;
   align-items: center;
@@ -316,26 +305,31 @@ span {
 }
 
 /* 未勾选状态按钮样式 */
-.agreement-checkbox:not(:checked) + .agreement-label + .register-btn {
+.agreement-checkbox:not(:checked)+.agreement-label+.register-btn {
   background-color: #cccccc;
   cursor: not-allowed;
 }
 
-.agreement-checkbox:not(:checked) + .agreement-label + .register-btn:hover {
+.agreement-checkbox:not(:checked)+.agreement-label+.register-btn:hover {
   background-color: #cccccc;
 }
+
 .error-message {
   /* 间距控制：与上方元素保持距离 */
-  margin-top: 0.5rem; /* mt-2的等价实现 */
+  margin-top: 0.5rem;
+  /* mt-2的等价实现 */
 
   /* 文本样式 */
-  font-size: 0.75rem; /* text-xs的等价实现 */
-  color: #ef4444; /* text-red-500的等价实现 */
+  font-size: 0.75rem;
+  /* text-xs的等价实现 */
+  color: #ef4444;
+  /* text-red-500的等价实现 */
 
   /* 布局控制 */
   display: flex;
   align-items: center;
-  line-height: 1; /* 紧凑显示 */
+  line-height: 1;
+  /* 紧凑显示 */
 }
 
 /* 错误图标样式 */
@@ -359,12 +353,16 @@ span {
 
 /* 定义脉冲动画 */
 @keyframes pulse {
+
   0%,
   100% {
-    opacity: 1; /* 完全显示 */
+    opacity: 1;
+    /* 完全显示 */
   }
+
   50% {
-    opacity: 0.5; /* 半透明 */
+    opacity: 0.5;
+    /* 半透明 */
   }
 }
 
@@ -372,13 +370,19 @@ span {
 .error-message.hidden {
   display: none;
 }
+
 /* 注册账号文字样式 */
 .register {
-  position: relative; /* 用于定位下划线伪元素 */
-  cursor: pointer; /* 鼠标悬停时显示手型（提示可点击） */
-  color: #333; /* 默认文字颜色 */
-  padding-bottom: 2px; /* 预留下划线的空间（避免文字跳动） */
-  transition: color 0.3s ease; /* 文字颜色过渡（可选） */
+  position: relative;
+  /* 用于定位下划线伪元素 */
+  cursor: pointer;
+  /* 鼠标悬停时显示手型（提示可点击） */
+  color: #333;
+  /* 默认文字颜色 */
+  padding-bottom: 2px;
+  /* 预留下划线的空间（避免文字跳动） */
+  transition: color 0.3s ease;
+  /* 文字颜色过渡（可选） */
 }
 
 /* 下划线伪元素（初始隐藏状态） */
@@ -387,18 +391,24 @@ span {
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 0; /* 初始宽度为 0（不显示） */
-  height: 2px; /* 下划线高度 */
-  background-color: #1677ff; /* 蓝色下划线（可自定义色值） */
-  transition: width 0.4s ease; /* 宽度过渡动画：0.4秒缓慢展开 */
+  width: 0;
+  /* 初始宽度为 0（不显示） */
+  height: 2px;
+  /* 下划线高度 */
+  background-color: #1677ff;
+  /* 蓝色下划线（可自定义色值） */
+  transition: width 0.4s ease;
+  /* 宽度过渡动画：0.4秒缓慢展开 */
 }
 
 /* 鼠标 hover 时的效果 */
 .register:hover {
-  color: #1677ff; /* 文字同步变蓝（可选，增强交互感） */
+  color: #1677ff;
+  /* 文字同步变蓝（可选，增强交互感） */
 }
 
 .register:hover::after {
-  width: 100%; /* 下划线宽度从 0 过渡到 100%（从左到右展开） */
+  width: 100%;
+  /* 下划线宽度从 0 过渡到 100%（从左到右展开） */
 }
 </style>

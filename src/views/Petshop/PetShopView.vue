@@ -288,7 +288,6 @@ import { ref, onMounted, onBeforeUnmount, watch, onUnmounted } from 'vue'
 
 const currentCategory = ref('all');
 
-// 原有的轮播图数据
 const carouselItems = ref([
   { image: '/img/宠物1.jpg', title: '双11促销' },
   { image: '/img/宠物2.jpg', title: '新品上市' },
@@ -309,11 +308,9 @@ watch(scrollY, (newval) => {
   showBackToTop.value = newval > 300
   isScrolledPast50.value = newval > 50
 })
-// 处理分类变化
 const handleCategoryChange = (newCategory: string) => {
   currentCategory.value = newCategory
 }
-// 轮播图方法
 const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % carouselItems.value.length
 }

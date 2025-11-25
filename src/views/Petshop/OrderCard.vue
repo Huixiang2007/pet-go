@@ -58,9 +58,9 @@
           <button class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
             取消订单
           </button>
-          <button class="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
+          <router-link to="order/?id={{ order.id }}" class="px-4 py-2 bg-orange-500 text-white rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors">
             立即付款
-          </button>
+          </router-link>
         </template>
 
         <!-- 待发货状态-->
@@ -75,9 +75,10 @@
 
         <!-- 待收货状态 -->
         <template v-else-if="order.statusType === 'receiving'">
-          <button class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
+          <router-link to="PackageInfo/?id={{ order.id }}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
             查看物流
-          </button>
+          </router-link>
+
           <button class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
             申请退款
           </button>
@@ -88,9 +89,9 @@
 
         <!-- 已发货状态 -->
         <template v-else-if="order.statusType === 'completed'">
-          <button class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
+          <router-link to="PackageInfo/?id={{ order.id }}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
             查看物流
-          </button>
+          </router-link>
           <button class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors" @click="aftersaleStatus = true">
             申请售后
           </button>
@@ -98,22 +99,22 @@
 
         <!-- 已收货状态 -->
         <template v-else-if="order.statusType === 'received'">
-          <button class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
+          <router-link to="PackageInfo/?id={{ order.id }}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
             查看物流
-          </button>
+          </router-link>
           <button class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors" @click="aftersaleStatus = true">
             申请售后
           </button>
-          <button class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
+          <button class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors" @click="commentStatus = true">
             评价商品
           </button>
         </template>
 
         <!-- 退货中状态 -->
         <template v-else-if="order.statusType === 'returning'">
-          <button class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
+          <router-link to="PackageInfo/?id={{ order.id }}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
             查看进度
-          </button>
+          </router-link>
           <button class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
             联系客服
           </button>
@@ -134,7 +135,7 @@
       <form id="aftersale-form" class="p-6">
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-medium mb-1">订单编号</label>
-          <input type="text" value={{order.id}}  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" disabled>
+          <input type="text" value={{20230987}}  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" disabled>
         </div>
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-medium mb-1">商品名称</label>
@@ -155,11 +156,11 @@
           <!-- 退款的价格 -->
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-medium mb-1">退款金额</label>
-          <input type="text" value={{order.total}} class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" disabled>
+          <input type="text" value={{998.00}} class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" disabled>
         </div>
 
 
-        <!-- 问题描述 -->
+        <!-- 问题 -->
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-medium mb-1">问题描述</label>
           <textarea rows="3" placeholder="请详细描述您的问题..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
@@ -195,7 +196,35 @@
       </form>
     </div>
   </div>
-
+    <!-- 评价的弹窗 -->
+  <div v-if="commentStatus==true"
+   class="fixed inset-0 overflow-y-auto z-[200] flex items-center justify-center bg-black/50" style="margin-top: -4px;">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 transform scale-95 transition-transform duration-300">
+      <div class="flex justify-between items-center p-6 border-b border-gray-100">
+        <h3 class="text-xl font-bold text-gray-800">申请售后</h3>
+        <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+          <i class="fa fa-times text-xl" @click="aftersaleStatus = false"></i>
+        </button>
+      </div>
+      <form id="aftersale-form" class="p-6">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-1">订单编号</label>
+          <input type="text" value={{20230987}}  class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" disabled>
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-1">商品名称</label>
+          <input type="text" value="天然无谷狗粮 1.5kg" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" disabled>
+        </div>
+            <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-1">评价</label>
+      <textarea name="" id="" cols="30" rows="10" placeholder="请输入评价内容..." class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"></textarea>
+        </div>
+        <button type="submit" class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors">
+          提交评价
+        </button>
+      </form>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -203,6 +232,8 @@ import { defineProps } from 'vue';
 import { ref } from 'vue';
 // 售后状态
 const aftersaleStatus = ref(false);
+// 评价状态
+const commentStatus = ref(false);
 
 export interface Order {
   id: string;

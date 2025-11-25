@@ -60,6 +60,60 @@ const routes = [
     name: 'Search',
     component: () => import('@/views/Petshop/SearchProduct.vue'),
   },
+    // 店铺
+  {
+    path: '/Store' ,
+    name: 'Store',
+    component: () => import('@/views/Petshop/ShopStore.vue'),
+  },
+    // 注册店铺
+  {
+    path: '/StoreRegister' ,
+    name: 'StoreRegister',
+    component: () => import('@/views/Petshop/SellerRegisition.vue'),
+  },
+    // 订单管理
+  {
+    path: '/SellerOrderManager' ,
+    name: 'SellerOrderManager',
+    component: () => import('@/views/Petshop/SellerOrderMana.vue'),
+  },
+      // 用户管理
+  {
+    path: '/SellerUserManager' ,
+    name: 'SellerUserManager',
+    component: () => import('@/views/Petshop/SellerUserMana.vue'),
+  },
+        // 优惠卷管理
+  {
+    path: '/CouponManagement' ,
+    name: 'CouponManagement',
+    component: () => import('@/views/Petshop/CouponManagement.vue'),
+  },
+          // 商品管理
+  {
+    path: '/SellerItemManager' ,
+    name: 'SellerItemManager',
+    component: () => import('@/views/Petshop/SellerItemMana.vue'),
+  },
+            // 店铺设置
+  {
+    path: '/ShopSetting' ,
+    name: '/ShopSetting',
+    component: () => import('@/views/Petshop/ShopSetting.vue'),
+  },
+  {
+    path: '/AddProduct',
+    name: 'addProduct',
+    component: () => import('@/views/Petshop/AddProduct.vue'),
+    meta: { title: '欢迎注册 PetGo' },
+  },
+      // 人工客服
+  {
+    path: '/CustomerService' ,
+    name: 'CustomerService',
+    component: () => import('@/views/Petshop/CustomerService.vue'),
+  },
   {
     path: '/Login',
     name: 'petLogin',
@@ -83,6 +137,7 @@ const routes = [
     component: () => import('@/views/EnterPet/Register.vue'),
     meta: { title: '欢迎注册 PetGo' },
   },
+
   {
     path: '/Protocal',
     name: 'protocal',
@@ -98,7 +153,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_AURL),
   routes,
 })
 /**

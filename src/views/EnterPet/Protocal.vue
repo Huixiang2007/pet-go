@@ -3,7 +3,7 @@
     <!-- 顶部导航 -->
     <header class="header">
       <div class="header-container">
-        <div class="logo"><img src="../assets/img/logo.png" alt="宠物之家" />PetGo</div>
+        <div class="logo"><img src="../../assets/img/logo.png" alt="宠物之家" />PetGo</div>
         <div class="header-desc">专业宠物服务平台</div>
       </div>
     </header>
@@ -326,7 +326,8 @@ const goBackToRegister = () => {
 }
 
 .section-content {
-  padding-left: 28px; /* 预留符号+文字的空间 */
+  padding-left: 28px;
+  /* 预留符号+文字的空间 */
 }
 
 .section-content p {
@@ -358,6 +359,7 @@ const goBackToRegister = () => {
   display: flex;
   align-items: center;
 }
+
 .confirm-btn-container {
   display: flex;
   align-items: center;
@@ -410,10 +412,13 @@ const goBackToRegister = () => {
   background-color: #e0ad276b;
   cursor: not-allowed;
 }
+
 .back-btn {
   width: 115px;
-  color: #666; /* 深灰色文字 */
-  background-color: #f4f1ed; /* 浅灰色边框 */
+  color: #666;
+  /* 深灰色文字 */
+  background-color: #f4f1ed;
+  /* 浅灰色边框 */
   border: none;
   padding: 10px 25px;
   border-radius: 5px;
@@ -423,20 +428,26 @@ const goBackToRegister = () => {
   display: flex;
   align-items: center;
 }
+
 /* hover 状态（鼠标悬停） */
 .back-btn:hover {
-  background-color: #f5f5f5; /* 浅灰色背景 */
+  background-color: #f5f5f5;
+  /* 浅灰色背景 */
 
-  color: #333; /* 文字颜色加深 */
+  color: #333;
+  /* 文字颜色加深 */
 }
 
 /* 点击状态 */
 .back-btn:active {
-  background-color: #eee; /* 点击时背景色 */
+  background-color: #eee;
+  /* 点击时背景色 */
 }
+
 html,
 body {
   overflow: hidden;
-  height: 100%; /* 确保页面占满视口高度 */
+  height: 100%;
+  /* 确保页面占满视口高度 */
 }
 </style>

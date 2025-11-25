@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
-    path: '/',
+    path: '/fosterCare',
     name: 'fosterCare',
     component: import('@/views/FosterCare.vue'),
   },

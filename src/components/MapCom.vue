@@ -1,133 +1,135 @@
 <template>
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- 左侧筛选面板 -->
-        <div class="lg:col-span-1">
-            <div class="cute-card p-6 bg-white mb-6">
-                <h2 class="text-xl font-bold text-orange-500 mb-4">智能筛选</h2>
+    <div class="page-container">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- 左侧筛选面板 -->
+            <div class="lg:col-span-1">
+                <div class="cute-card p-5 bg-white mb-6">
+                    <h2 class="text-xl font-bold text-blue-500 mb-4">智能筛选</h2>
 
-                <!-- 区域筛选 -->
-                <div class="mb-6">
-                    <h3 class="font-semibold text-gray-700 mb-2">区域筛选</h3>
-                    <el-select v-model="filters.area" placeholder="选择区域" class="w-full">
-                        <el-option label="全城" value="all"></el-option>
-                        <el-option label="当前地图区域" value="current"></el-option>
-                        <el-option v-for="area in areaOptions" :key="area" :label="area" :value="area"></el-option>
-                    </el-select>
-                </div>
-
-                <!-- 寄养家庭类型 -->
-                <div class="mb-6">
-                    <h3 class="font-semibold text-gray-700 mb-2">寄养家庭类型</h3>
-                    <el-checkbox-group v-model="filters.fosterTypes">
-                        <el-checkbox label="个人"></el-checkbox>
-                        <el-checkbox label="机构"></el-checkbox>
-                    </el-checkbox-group>
-                </div>
-
-                <!-- 宠物类型 -->
-                <div class="mb-6">
-                    <h3 class="font-semibold text-gray-700 mb-2">宠物类型</h3>
-                    <el-checkbox-group v-model="filters.petTypes">
-                        <el-checkbox label="猫"></el-checkbox>
-                        <el-checkbox label="狗"></el-checkbox>
-                        <el-checkbox label="其他"></el-checkbox>
-                    </el-checkbox-group>
-                </div>
-
-                <!-- 价格区间 -->
-                <div class="mb-6">
-                    <h3 class="font-semibold text-gray-700 mb-2">价格区间 (元/天)</h3>
-                    <el-slider v-model="filters.priceRange" range :min="0" :max="200" :step="10"></el-slider>
-                    <div class="flex justify-between text-sm text-gray-600 mt-1">
-                        <span>{{ filters.priceRange[0] }}元</span>
-                        <span>{{ filters.priceRange[1] }}元</span>
+                    <!-- 区域筛选 -->
+                    <div class="mb-5">
+                        <h3 class="font-semibold text-gray-700 mb-2">区域筛选</h3>
+                        <el-select v-model="filters.area" placeholder="选择区域" class="w-full">
+                            <el-option label="全城" value="all"></el-option>
+                            <el-option label="当前地图区域" value="current"></el-option>
+                            <el-option v-for="area in areaOptions" :key="area" :label="area" :value="area"></el-option>
+                        </el-select>
                     </div>
-                </div>
 
-                <!-- 评分 -->
-                <div class="mb-6">
-                    <h3 class="font-semibold text-gray-700 mb-2">最低评分</h3>
-                    <el-rate v-model="filters.minRating" :colors="['#FFA500', '#FFA500', '#FFA500']"></el-rate>
-                </div>
-
-                <!-- 智能排序 -->
-                <div class="mb-6">
-                    <h3 class="font-semibold text-gray-700 mb-2">智能排序</h3>
-                    <el-select v-model="sortOption" placeholder="选择排序方式" class="w-full">
-                        <el-option label="综合排序" value="comprehensive"></el-option>
-                        <el-option label="距离最近" value="distance"></el-option>
-                        <el-option label="评分最高" value="rating"></el-option>
-                        <el-option label="价格最低" value="price"></el-option>
-                    </el-select>
-                </div>
-
-                <button class="cute-btn w-full mt-4" @click="applyFilters">应用筛选</button>
-            </div>
-
-            <!-- 当前位置卡片 -->
-            <div class="cute-card p-4 bg-white">
-                <div class="flex items-center">
-                    <div class="pet-icon bg-orange-400 mr-3">📍</div>
-                    <div>
-                        <p class="font-semibold">我的位置</p>
-                        <p class="text-sm text-gray-600">{{ currentLocation.address || '定位中...' }}</p>
+                    <!-- 寄养家庭类型 -->
+                    <div class="mb-5">
+                        <h3 class="font-semibold text-gray-700 mb-2">寄养家庭类型</h3>
+                        <el-checkbox-group v-model="filters.fosterTypes">
+                            <el-checkbox label="个人"></el-checkbox>
+                            <el-checkbox label="机构"></el-checkbox>
+                        </el-checkbox-group>
                     </div>
+
+                    <!-- 宠物类型 -->
+                    <div class="mb-5">
+                        <h3 class="font-semibold text-gray-700 mb-2">宠物类型</h3>
+                        <el-checkbox-group v-model="filters.petTypes">
+                            <el-checkbox label="猫"></el-checkbox>
+                            <el-checkbox label="狗"></el-checkbox>
+                            <el-checkbox label="其他"></el-checkbox>
+                        </el-checkbox-group>
+                    </div>
+
+                    <!-- 价格区间 -->
+                    <div class="mb-5">
+                        <h3 class="font-semibold text-gray-700 mb-2">价格区间 (元/天)</h3>
+                        <el-slider v-model="filters.priceRange" range :min="0" :max="200" :step="10"></el-slider>
+                        <div class="flex justify-between text-sm text-gray-600 mt-1">
+                            <span>{{ filters.priceRange[0] }}元</span>
+                            <span>{{ filters.priceRange[1] }}元</span>
+                        </div>
+                    </div>
+
+                    <!-- 评分 -->
+                    <div class="mb-5">
+                        <h3 class="font-semibold text-gray-700 mb-2">最低评分</h3>
+                        <el-rate v-model="filters.minRating" :colors="['#F7B500', '#F7B500', '#F7B500']"></el-rate>
+                    </div>
+
+                    <!-- 智能排序 -->
+                    <div class="mb-5">
+                        <h3 class="font-semibold text-gray-700 mb-2">智能排序</h3>
+                        <el-select v-model="sortOption" placeholder="选择排序方式" class="w-full">
+                            <el-option label="综合排序" value="comprehensive"></el-option>
+                            <el-option label="距离最近" value="distance"></el-option>
+                            <el-option label="评分最高" value="rating"></el-option>
+                            <el-option label="价格最低" value="price"></el-option>
+                        </el-select>
+                    </div>
+
+                    <button class="cute-btn w-full mt-4" @click="applyFilters">应用筛选</button>
                 </div>
-                <button class="cute-btn w-full mt-3" @click="locateMe">
-                    <i class="el-icon-location"></i> 重新定位
-                </button>
+
+                <!-- 当前位置卡片 -->
+                <!-- <div class="cute-card p-4 bg-white">
+                    <div class="flex items-center">
+                        <div class="pet-icon bg-blue-400 mr-3">📍</div>
+                        <div>
+                            <p class="font-semibold">我的位置</p>
+                            <p class="text-sm text-gray-600">{{ currentLocation.address || '定位中...' }}</p>
+                        </div>
+                    </div>
+                    <button class="cute-btn w-full mt-3" @click="locateMe">
+                        <i class="el-icon-location"></i> 重新定位
+                    </button>
+                </div> -->
             </div>
-        </div>
 
-        <!-- 右侧地图和列表 -->
-        <div class="lg:col-span-3">
-            <!-- 地图容器 -->
-            <div class="cute-card p-4 bg-white mb-6">
-                <div class="map-container h-96" ref="mapContainer"></div>
-            </div>
+            <!-- 右侧地图和列表 -->
+            <div class="lg:col-span-3">
+                <!-- 地图容器 -->
+                <div class="cute-card p-4 bg-white mb-6">
+                    <div class="map-container h-80" ref="mapContainer"></div>
+                </div>
 
-            <!-- 寄养家庭列表 -->
-            <div class="cute-card p-6 bg-white">
-                <h2 class="text-xl font-bold text-orange-500 mb-4">附近的寄养家庭</h2>
+                <!-- 寄养家庭列表 -->
+                <div class="cute-card p-5 bg-white">
+                    <h2 class="text-xl font-bold text-blue-500 mb-4">附近的寄养家庭</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div v-for="foster in filteredFosters" :key="foster.id"
-                        class="border border-orange-200 rounded-xl p-4 hover:shadow-md transition-all duration-300">
-                        <div class="flex">
-                            <div class="w-24 h-24 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
-                                <span class="text-3xl">🏠</span>
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-bold text-lg">{{ foster.name }}</h3>
-                                    <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-sm">
-                                        {{ foster.type }}
-                                    </span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div v-for="foster in filteredFosters" :key="foster.id"
+                            class="border border-blue-100 rounded-xl p-4 hover:shadow-md transition-all duration-300 bg-blue-50/30">
+                            <div class="flex">
+                                <div class="w-20 h-20 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                                    <span class="text-2xl">🏠</span>
                                 </div>
-                                <div class="flex items-center mt-1">
-                                    <el-rate :model-value="foster.rating" disabled
-                                        :colors="['#FFA500', '#FFA500', '#FFA500']" class="mr-2"></el-rate>
-                                    <span class="text-sm text-gray-600">({{ foster.reviewCount }})</span>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <h3 class="font-bold text-lg text-gray-800">{{ foster.name }}</h3>
+                                        <span class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs">
+                                            {{ foster.type }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center mt-1">
+                                        <el-rate :model-value="foster.rating" disabled
+                                            :colors="['#F7B500', '#F7B500', '#F7B500']" class="mr-2"></el-rate>
+                                        <span class="text-sm text-gray-600">({{ foster.reviewCount }})</span>
+                                    </div>
+                                    <p class="text-gray-600 text-sm mt-1 truncate">{{ foster.address }}</p>
+                                    <div class="flex justify-between items-center mt-2">
+                                        <span class="text-blue-500 font-bold">{{ foster.price }}元/天</span>
+                                        <span class="text-xs"
+                                            :class="foster.availableSpots > 0 ? 'text-green-500' : 'text-red-500'">
+                                            {{ foster.availableSpots > 0 ? `空位: ${foster.availableSpots}` : '已满' }}
+                                        </span>
+                                    </div>
+                                    <button class="cute-btn w-full mt-3" @click="viewDetails(foster)">
+                                        查看详情
+                                    </button>
                                 </div>
-                                <p class="text-gray-600 text-sm mt-1">{{ foster.address }}</p>
-                                <div class="flex justify-between items-center mt-2">
-                                    <span class="text-orange-500 font-bold">{{ foster.price }}元/天</span>
-                                    <span class="text-sm"
-                                        :class="foster.availableSpots > 0 ? 'text-green-500' : 'text-red-500'">
-                                        {{ foster.availableSpots > 0 ? `空位: ${foster.availableSpots}` : '已满' }}
-                                    </span>
-                                </div>
-                                <button class="cute-btn w-full mt-3" @click="viewDetails(foster)">
-                                    查看详情
-                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div v-if="filteredFosters.length === 0" class="text-center py-8">
-                    <p class="text-gray-500">没有找到符合条件的寄养家庭</p>
-                    <button class="cute-btn mt-4" @click="resetFilters">重置筛选条件</button>
+                    <div v-if="filteredFosters.length === 0" class="text-center py-8">
+                        <p class="text-gray-500">没有找到符合条件的寄养家庭</p>
+                        <button class="cute-btn mt-4" @click="resetFilters">重置筛选条件</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -137,7 +139,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
-// import type { Location, FosterHome, Filters, SortOption } from '../types'
+
 export interface Location {
     lat: number | null;
     lng: number | null;
@@ -168,9 +170,9 @@ export interface Filters {
 }
 
 export type SortOption = 'comprehensive' | 'distance' | 'rating' | 'price';
+
 // 响应式引用
 const mapContainer = ref<HTMLElement>()
-
 const markers = ref<any[]>([])
 let clusters: any = null
 
@@ -180,13 +182,14 @@ const currentLocation = reactive<Location>({
     lng: null,
     address: '',
 })
-declare const AMap: any; // 声明AMap全局对象（忽略细节类型，专注功能可用）
-type AMapMap = { // 简单定义Map实例的核心方法，满足代码提示和类型检查
+
+declare const AMap: any;
+type AMapMap = {
     addControl: (control: any) => void;
     destroy: () => void;
 };
-let map: AMapMap | null = null; // 明确map类型
-// 声明window上的安全配置属性，避免类型报错
+let map: AMapMap | null = null;
+
 declare global {
     interface Window {
         _AMapSecurityConfig: {
@@ -194,6 +197,7 @@ declare global {
         };
     }
 }
+
 // 筛选条件
 const filters = reactive<Filters>({
     area: 'all',
@@ -213,7 +217,7 @@ const areaOptions = ref<string[]>(['朝阳区', '海淀区', '西城区', '东�
 const fosterHomes = ref<FosterHome[]>([
     {
         id: 1,
-        name: '橙子宠物乐园',
+        name: '蓝海宠物乐园',
         type: '机构',
         lat: 39.90923,
         lng: 116.397428,
@@ -227,7 +231,7 @@ const fosterHomes = ref<FosterHome[]>([
     },
     {
         id: 2,
-        name: '小黄的家',
+        name: '小蓝的家',
         type: '个人',
         lat: 39.91923,
         lng: 116.407428,
@@ -402,7 +406,7 @@ const updateMapMarkers = (): void => {
 
 // 创建标记点内容
 const createMarkerContent = (foster: FosterHome): string => {
-    const color = foster.type === '个人' ? '#FFA500' : '#FF6B6B'
+    const color = foster.type === '个人' ? '#4A90E2' : '#6BC4FF'
     const icon = foster.petTypes.includes('狗') ? '🐕' : foster.petTypes.includes('猫') ? '🐈' : '🐾'
 
     return `
@@ -530,55 +534,65 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 .cute-card {
-    border-radius: 20px;
-    box-shadow: 0 8px 16px rgba(255, 165, 0, 0.15);
-    border: 2px solid #ffd166;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.12);
+    border: 1px solid #e0f0ff;
     transition: all 0.3s ease;
+    background-color: white;
 }
 
 .cute-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 20px rgba(255, 165, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(74, 144, 226, 0.15);
 }
 
 .cute-btn {
-    background: linear-gradient(135deg, #ffa500, #ff9a76);
+    background: linear-gradient(135deg, #6BC4FF, #4A90E2);
     border: none;
-    border-radius: 25px;
+    border-radius: 20px;
     color: white;
-    font-weight: bold;
+    font-weight: 600;
     padding: 10px 20px;
     transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.2);
 }
 
 .cute-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(255, 165, 0, 0.4);
+    transform: scale(1.03);
+    box-shadow: 0 6px 12px rgba(74, 144, 226, 0.3);
 }
 
 .map-container {
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .pet-icon {
-    width: 40px;
-    height: 40px;
-    background-color: #ffd166;
+    width: 36px;
+    height: 36px;
+    background-color: #6BC4FF;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .cluster-marker {
-    width: 50px;
-    height: 50px;
-    background-color: #ffa500;
+    width: 45px;
+    height: 45px;
+    background-color: #4A90E2;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -586,6 +600,32 @@ onMounted(() => {
     color: white;
     font-weight: bold;
     border: 3px solid white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* 优化Element UI组件样式 */
+:deep(.el-rate__icon) {
+    font-size: 18px;
+}
+
+:deep(.el-checkbox) {
+    margin-right: 12px;
+}
+
+:deep(.el-slider__bar) {
+    background-color: #6BC4FF;
+}
+
+:deep(.el-slider__button) {
+    border-color: #4A90E2;
+}
+
+:deep(.el-select .el-input__inner) {
+    border-radius: 10px;
+}
+
+:deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+    background-color: #4A90E2;
+    border-color: #4A90E2;
 }
 </style>

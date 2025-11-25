@@ -33,6 +33,9 @@ importers:
       '@tsconfig/node22':
         specifier: ^22.0.2
         version: 22.0.2
+      '@types/amap-js-api':
+        specifier: ^1.4.16
+        version: 1.4.16
       '@types/node':
         specifier: ^22.18.11
         version: 22.19.0
@@ -734,6 +737,9 @@ packages:
 
   '@tsconfig/node22@22.0.2':
     resolution: {integrity: sha512-Kmwj4u8sDRDrMYRoN9FDEcXD8UpBSaPQQ24Gz+Gamqfm7xxn+GBR7ge/Z7pK8OXNGyUzbSwJj+TH6B+DS/epyA==, tarball: https://registry.npmmirror.com/@tsconfig/node22/-/node22-22.0.2.tgz}
+
+  '@types/amap-js-api@1.4.16':
+    resolution: {integrity: sha512-gfcEswuU4GNRdGAh74FhxfLlU6qxmVIJYPf3HV0uKucCWQ9iSr8TonDhqBvHVmmQEY60K+UAeIh0YLwKo/jpFQ==, tarball: https://registry.npmmirror.com/@types/amap-js-api/-/amap-js-api-1.4.16.tgz}
 
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==, tarball: https://registry.npmmirror.com/@types/estree/-/estree-1.0.8.tgz}
@@ -2923,6 +2929,8 @@ snapshots:
   '@sxzz/popperjs-es@2.11.7': {}
 
   '@tsconfig/node22@22.0.2': {}
+
+  '@types/amap-js-api@1.4.16': {}
 
   '@types/estree@1.0.8': {}
 

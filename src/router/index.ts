@@ -1,7 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import PetLogin from '@/views/login.vue'
 
 const routes = [
+  {
+    path: '/',
+    name: 'fosterCare',
+    component: import('@/views/FosterCare.vue'),
+  },
+
+  {
+    path: '/homedetail',
+    name: 'homedetail',
+    component: import('@/views/HomeDetail.vue'),
+  },
   // 电商的首页
   {
     path: '/shop',
@@ -53,7 +63,8 @@ const routes = [
   {
     path: '/Login',
     name: 'petLogin',
-    component: PetLogin,
+    component: () => import('@/views/EnterPet/login.vue'),
+    meta: { title: '欢迎登录 PetGo' },
   },
   {
     path: '/MyPet',
@@ -69,23 +80,21 @@ const routes = [
   {
     path: '/Register',
     name: 'register',
-    component: () => import('@/views/Register.vue'),
-    meta: { title: '欢迎注册 PetGo', keepAlive: true },
+    component: () => import('@/views/EnterPet/Register.vue'),
+    meta: { title: '欢迎注册 PetGo' },
   },
   {
     path: '/Protocal',
     name: 'protocal',
-    component: () => import('@/views/Protocal.vue'),
+    component: () => import('@/views/EnterPet/Protocal.vue'),
     meta: { title: '用户协议' },
   },
   {
-    path:'/Forget',
-    name:'forget',
-    component: () => import('@/views/ForgetPassword.vue'),
-    meta: { title: '找回密码' }
+    path: '/Forget',
+    name: 'forget',
+    component: () => import('@/views/EnterPet/ForgetPassword.vue'),
+    meta: { title: '找回密码' },
   },
-   
-   
 ]
 
 const router = createRouter({
@@ -97,9 +106,9 @@ const router = createRouter({
  */
 router.beforeEach((to, from, next) => {
   if (to.meta.title) {
-    document.title = to.meta.title as string;
+    document.title = to.meta.title as string
   }
-  next();
-});
+  next()
+})
 
 export default router

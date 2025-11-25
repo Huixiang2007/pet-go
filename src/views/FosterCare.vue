@@ -1,7 +1,7 @@
 <template>
     <div class="app">
         <NavBar />
-        <div id="map-container">
+        <div class="map-component-container">
             <MapContainer />
 
         </div>
@@ -15,16 +15,16 @@ import MapContainer from '@/components/MapCom.vue'
 import NavBar from '@/components/NavBar.vue'
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .app {
     margin: 0;
     padding: 0;
     border-top: 1px solid transparent;
-}
 
-#map-container {
-    width: 100%;
-    height: 100%;
-    margin-top: 4rem;
+    .map-component-container {
+        width: 100%;
+        height: 100%;
+        margin-top: 4rem;
+    }
 }
 </style>

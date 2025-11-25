@@ -3,7 +3,7 @@
     <!-- 顶部导航 -->
     <header class="header">
       <div class="header-container">
-        <div class="logo"><img src="../assets/img/logo.png" alt="宠物之家" />PetGo</div>
+        <div class="logo"><img src="../../assets/img/logo.png" alt="宠物之家" />PetGo</div>
         <div class="header-desc">专业宠物服务平台</div>
       </div>
     </header>

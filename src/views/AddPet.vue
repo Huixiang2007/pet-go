@@ -235,8 +235,7 @@ const goBack = () => {
 </script>
 
 <style scoped>
-.avatar-uploader {
-    :deep(.el-upload) {
+.avatar-uploader :deep(.el-upload) {
         border: 2px dashed #d9d9d9;
         border-radius: 6px;
         cursor: pointer;
@@ -244,11 +243,9 @@ const goBack = () => {
         overflow: hidden;
         transition: all 0.3s;
 
-        &:hover {
-            border-color: #409eff;
-        }
+      
     }
-}
+
 
 .avatar-uploader-icon {
     font-size: 28px;

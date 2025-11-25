@@ -12,6 +12,8 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddPet: typeof import('./src/components/AddPet.vue')['default']
+    Captcha: typeof import('./src/components/Captcha.vue')['default']
+    CaptchaLoad: typeof import('./src/components/CaptchaLoad.vue')['default']
     DailyRecords: typeof import('./src/components/DailyRecords.vue')['default']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']

@@ -80,10 +80,7 @@
               </div>
               <div class="layui-col-xs5">
                 <div style="margin-left: 10px">
-                  <img
-                    src="https://www.oschina.net/action/user/captcha"
-                    onclick="this.src='https://www.oschina.net/action/user/captcha?t='+ new Date().getTime();"
-                  />
+                    <Captcha ref="captchaRef" :width="130" :height="38" />
                 </div>
               </div>
             </div>
@@ -110,9 +107,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted,nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import type { FormInstance, FormRules } from 'element-plus'
+import  {ElMessage, type FormInstance,type FormRules, } from 'element-plus'
+import Captcha from '../../components/CaptchaLoad.vue'
+const captchaRef = ref<InstanceType<typeof Captcha> | null>(null)
 import axios from 'axios'
 const isAccount = ref(true)
 
@@ -131,6 +130,9 @@ const loading = ref(false)
 const errorMessage = ref('')
 const titleLoginChars = '欢迎登录 PetGo'.split('')
 const isLogin = ref(false)
+const encrypt = (text: string) => btoa(text)
+const decrypt = (text: string) => atob(text)
+
 const changeLoginType = () => {
   isAccount.value = !isAccount.value
   const loginInput = document.querySelector('input[name="loginId"]')
@@ -141,6 +143,49 @@ const changeLoginType = () => {
 let hideErrorTimer: number | null = null
 let layer: any
 onMounted(() => {
+     const loginInput = document.querySelector('input[name="loginId"]') as HTMLInputElement
+    const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement
+    const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
+    const captchaInput = document.querySelector('input[name="captcha"]') as HTMLInputElement
+    
+    // 清空所有输入框
+    if (loginInput) loginInput.value = ''
+    if (passwordInput) passwordInput.value = ''
+    if (captchaInput) captchaInput.value = ''
+    
+    // 重置记住密码复选框
+    if (rememberCheckbox) rememberCheckbox.checked = false
+      const encryptedLoginId = localStorage.getItem('rememberedLoginId')
+  const encryptedPassword = localStorage.getItem('rememberedPassword')
+  const rememberedLoginType = localStorage.getItem('rememberedLoginType')
+   
+    if (encryptedLoginId && encryptedPassword&& rememberedLoginType) {
+    // 设置登录类型
+   try {
+      const rememberedLoginId = decrypt(encryptedLoginId)
+      const rememberedPassword = decrypt(encryptedPassword)
+      
+     
+      isAccount.value = rememberedLoginType === 'account'
+      
+      // 填充表单字段
+      nextTick(() => {
+        const loginInput = document.querySelector('input[name="loginId"]') as HTMLInputElement
+        const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement
+        const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
+        
+        if (loginInput) loginInput.value = rememberedLoginId
+        if (passwordInput) passwordInput.value = rememberedPassword
+        if (rememberCheckbox) rememberCheckbox.checked = true
+      })
+    } catch (e) {
+      // 解密失败时清除无效数据
+      localStorage.removeItem('rememberedLoginId')
+      localStorage.removeItem('rememberedPassword')
+      localStorage.removeItem('rememberedLoginType')
+      console.log('解密记住密码数据失败，已清除无效数据')
+    }
+  }
   if (window.layui) {
     isLogin.value = true
     window.layui.use(['form', 'layer'], (form: any, layer: any) => {
@@ -171,11 +216,12 @@ onMounted(() => {
       })
 
       form.on('submit(demo-login)', (data: any) => {
-        // handleLogin(data.field)
+      
         const formData = data.field
-        layer.alert(JSON.stringify(formData, null, 2), {
-          title: '登录表单数据',
-        })
+          handleLogin(data.field)   
+        // layer.alert(JSON.stringify(formData, null, 2), {
+        //   title: '登录表单数据',
+        // })
         return false
       })
       form.render()
@@ -190,6 +236,7 @@ onUnmounted(() => {
     clearTimeout(hideErrorTimer)
     hideErrorTimer = null
   }
+   loginFormRef.value = undefined
 })
 
 const router = useRouter()
@@ -200,44 +247,105 @@ const toForgotPassword = () => {
   router.push('/Forget')
 }
 
-// const handleLogin = async(formData: LoginForm) => {
-//   loading.value = true
-//   try {
-//     // 调用登录接口
-//     const response = await axios.post('/api/user/login/account', {
-//       account: formData.username,
-//       password: formData.password,
+const handleLogin = async(formData: LoginForm) => {
+  if (loading.value) return
+  loading.value = true
+   
+  try {
+     const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
+  const shouldRemember = rememberCheckbox?.checked || false
+     const captchaInput = document.querySelector('input[name="captcha"]') as HTMLInputElement
+    const captchaValue = captchaInput?.value.trim()
+      if (captchaRef.value && !captchaRef.value.validateCaptcha(captchaValue)) {
+      ElMessage.error('验证码错误，请重新输入')
+      // 刷新验证码
+      if (captchaRef.value) {
+        captchaRef.value.refreshCaptcha()
+      }
+      // 清空验证码输入框
+      if (captchaInput) {
+        captchaInput.value = ''
+      }
+      loading.value = false
+      return
+    }
+  let response: any
+    // 调用登录接口
+    if(isAccount.value){
+      response = await axios.post('/server/api/user/login/account', {},
+      {
+        params:{
+        account: formData.loginId,
+        password: formData.password,
+        }
+       
+      })
+      
+    }else{
+     response = await axios.post('/server/api/user/login/email', {},
+    {
+      params:{
+         email: formData.loginId,
+         password: formData.password,
+      }
+    })
+    }
+    const { token, userId } = response.data.data
 
-//     })
+    // 存储token到localStorage
+    localStorage.setItem('authToken', token)
+    localStorage.setItem('userId', userId) 
 
-//     // 登录成功处理
-//     const { token, user } = response.data
+  
+    
+ if (shouldRemember) {
+      localStorage.setItem('rememberedLoginId', encrypt(formData.loginId))
+      localStorage.setItem('rememberedPassword', encrypt(formData.password))
+      localStorage.setItem('rememberedLoginType', isAccount.value ? 'account' : 'email')
+    } else {
+      // 如果没有选择记住密码，则清除已存储的登录信息
+      localStorage.removeItem('rememberedLoginId')
+      localStorage.removeItem('rememberedPassword')
+      localStorage.removeItem('rememberedLoginType')
+    }
+  ElMessage.success('登录成功，欢迎进入PetGO!');
 
-//     // 存储token到localStorage
-//     localStorage.setItem('authToken', token)
+    // 显示成功消息
+   
+   router.push('/Person')
 
-//     // 显示成功消息
-//    console.log(user)
+  } catch (error: any) {
+    // 登录失败处理
+    let errorMsg = '登录失败，请稍后重试'
 
-//   } catch (error: any) {
-//     // 登录失败处理
-//     let errorMsg = '登录失败，请稍后重试'
+    if (error.response && error.response.data) {
+      errorMsg = error.response.data.message || errorMsg
+    }
 
-//     if (error.response && error.response.data) {
-//       errorMsg = error.response.data.message || errorMsg
-//     }
-
-//     errorMessage.value = errorMsg
-//    console.log(errorMsg)
-
-//     // 刷新验证码未做
-//   } finally {
-//     loading.value = false
-//   }
-// }
+    errorMessage.value = errorMsg
+   console.log(errorMsg)
+  if (captchaRef.value) {
+      captchaRef.value.refreshCaptcha()
+    }
+    // 清空验证码输入框
+    const captchaInput = document.querySelector('input[name="captcha"]') as HTMLInputElement
+    if (captchaInput) {
+      captchaInput.value = ''
+    }
+    // 刷新验证码未做
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <style scoped>
+
+::v-deep .layui-form-checked[lay-skin=primary]>i {
+    border-color: #fd9860 !important;
+    background-color: #fd9860;
+    color: #fff;
+}
 body {
   overflow: hidden;
 }
@@ -370,7 +478,7 @@ body {
   border-color: rgb(253, 152, 96) !important;
   color: #fff;
 }
-.layui-form-checkbox[lay-skin='primary']:hover i {
+::v-deep .layui-form-checkbox[lay-skin='primary']:hover i {
   border-color: rgb(253, 152, 96);
 }
 .layui-form-checkbox[lay-skin='primary'] {

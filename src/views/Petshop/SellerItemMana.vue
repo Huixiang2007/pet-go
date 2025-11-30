@@ -21,6 +21,9 @@
                 </template>
               </el-input>
               <el-button size="default" type="primary">搜索</el-button>
+                <el-button size="default" type="success" icon="Plus">
+                上新商品
+              </el-button>
             </div>
           </div>
           <el-table
@@ -55,10 +58,10 @@
             </el-table-column>
 
             <el-table-column label="操作">
-              <template #default>
+              <template  #default="scope">
                 <div class="flex gap-3">
                   <el-button size="mini" type="text" class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors">编辑</el-button>
-                  <el-button size="mini" type="text" class="text-green-600 hover:text-green-800 hover:bg-green-50 transition-colors">上架</el-button>
+                  <el-button size="mini" type="text" @click="openReplenishDialog(scope.row) " class="text-green-600 hover:text-green-800 hover:bg-green-50 transition-colors">补货</el-button>
                   <el-button size="mini" type="text" class="text-red-600 hover:text-red-800 hover:bg-red-50 transition-colors">下架</el-button>
                 </div>
               </template>
@@ -73,7 +76,7 @@
             </template>
           </el-table>
 
-    
+
           <div class="px-4 py-3 border-t border-gray-200 flex justify-between items-center mt-3">
             <div class="text-sm text-gray-500">共 {{ tableData.length }} 条记录</div>
             <el-pagination
@@ -88,35 +91,58 @@
       </div>
     </div>
   </div>
+   <!-- 补货弹窗 -->
+    <el-dialog
+      v-model="replenishDialogVisible"
+      title="商品补货"
+      width="400px"
+      :close-on-click-modal="false"
+    >
+      <el-form :model="replenishForm" :rules="replenishRules" ref="replenishFormRef" label-width="80px">
+        <el-form-item label="商品编号" prop="id">
+          <el-input v-model="replenishForm.id" disabled />
+        </el-form-item>
+        <el-form-item label="商品名称" prop="name">
+          <el-input v-model="replenishForm.name" disabled />
+        </el-form-item>
+        <el-form-item label="当前库存" prop="currentStock">
+          <el-input v-model="replenishForm.currentStock" disabled />
+        </el-form-item>
+        <el-form-item label="补货数量" prop="addStock">
+          <el-input v-model.number="replenishForm.addStock" type="number" min="1" placeholder="请输入补货数量" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="replenishDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="submitReplenish">确认补货</el-button>
+      </template>
+    </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref,reactive} from 'vue'
+import { ElMessage,FormInstance,FormRules } from 'element-plus'
 
-const input = ref('')
 
-// 重新定义商品数据接口
 interface TableRow {
-  id: string;         
-  name: string;     
-  category: string;   
-  price: string;     
-  stock: string;      
-  status: string;  
+  id: string;
+  name: string;
+  category: string;
+  price: string;
+  stock: string;
+  status: string;
 }
 
-// 商品状态标签类型逻辑（适配商品状态）
 const getStatusTagType = (status: string) => {
   switch (status) {
-    case '已上架': return 'success'  
-    case '已下架': return 'danger'   
+    case '已上架': return 'success'
+    case '已下架': return 'danger'
     case '库存不足': return 'warning'
-    case '待审核': return 'info'     
+    case '待审核': return 'info'
     default: return ''
   }
 }
 
-// 商品模拟数据
 const tableData: TableRow[] = [
   {
     id: 'SP2025001',
@@ -159,6 +185,53 @@ const tableData: TableRow[] = [
     status: '待审核'
   }
 ]
+
+
+const replenishDialogVisible = ref(false)
+const replenishFormRef = ref<FormInstance>()
+// 补货表单数据
+const replenishForm = reactive({
+  id: '',
+  name: '',
+  currentStock: '',
+  addStock: 0
+})
+
+const replenishRules = reactive<FormRules>({
+  addStock: [
+    { required: true, message: '请输入补货数量', trigger: 'blur' },
+    { type: 'number', min: 1, message: '补货数量不能小于1', trigger: 'blur' }
+  ]
+})
+
+const openReplenishDialog = (row: TableRow) => {
+  replenishForm.id = row.id
+  replenishForm.name = row.name
+  replenishForm.currentStock = row.stock
+  replenishForm.addStock = 0
+  replenishDialogVisible.value = true
+}
+
+// 提交补货
+const submitReplenish = () => {
+  replenishFormRef.value?.validate((valid) => {
+    if (valid) {
+      const newStock = Number(replenishForm.currentStock) + replenishForm.addStock
+      const targetRow = tableData.find(item => item.id === replenishForm.id)
+      if (targetRow) {
+        targetRow.stock = newStock.toString()
+        if (targetRow.status === '库存不足' && newStock > 0) {
+          targetRow.status = '已上架'
+        } else if (targetRow.status === '已下架' && newStock > 0) {
+          targetRow.status = '已上架'
+        }
+      }
+      replenishDialogVisible.value = false
+      ElMessage.success('补货成功！')
+    }
+  })
+}
+
 </script>
 
 <style scoped>

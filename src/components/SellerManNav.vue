@@ -10,37 +10,47 @@
         </button>
       </div>
 
-      <a href="#user" class="flex items-center gap-3 px-4 py-3 text-sm font-medium bg-blue-50 text-blue-600 rounded-md transition-colors">
+      <router-link to="/SellerOrderManager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/SellerOrderManager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-users w-5 text-center"></i>
         <span v-if="isCollapsed">订单管理</span>
-      </a>
-      
-      <a href="#order" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+      </router-link>
+
+     <router-link to="/SellerUserManager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium  rounded-md transition-colors"
+      :class="currentRoute === '/SellerUserManager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-receipt w-5 text-center"></i>
         <span v-if="isCollapsed">用户管理</span>
-      </a>
-      
-      <a href="#product" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+      </router-link>
+
+
+
+      <router-link to="/SellerItemManager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/SellerItemManager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-boxes-stacked w-5 text-center"></i>
         <span v-if="isCollapsed">商品管理</span>
-      </a>
-      
-      <a href="#product" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
-        <i class="fa-solid fa-ticket w-5 text-center"></i> 
+      </router-link>
+
+
+
+      <router-link to="/CouponManagement" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/CouponManagement' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
+        <i class="fa-solid fa-ticket w-5 text-center"></i>
         <span v-if="isCollapsed">优惠卷管理</span>
-      </a>
+      </router-link>
 
       <div class="px-4 py-2 mt-4 text-xs text-gray-400 font-medium" v-if="isCollapsed">店铺设置</div>
-      
-      <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+
+      <router-link to="/ShopSetting" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/ShopSetting' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-gear w-5 text-center"></i>
         <span v-if="isCollapsed">店铺设置</span>
-      </a>
-      
-      <a href="#" class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+    </router-link>
+
+      <router-link to="/Analytics" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/Analytics' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-chart-line w-5 text-center"></i>
         <span v-if="isCollapsed">数据统计</span>
-      </a>
+      </router-link>
     </nav>
   </div>
 </template>
@@ -48,6 +58,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 const isCollapsed = ref(true)
+const currentRoute = ref(window.location.pathname)
 const toggleBtn = () => {
   isCollapsed.value = !isCollapsed.value
 }
@@ -64,6 +75,6 @@ a {
 }
 
 .fa-solid {
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 </style>

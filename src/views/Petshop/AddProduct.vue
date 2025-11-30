@@ -75,6 +75,8 @@
                 placeholder="0.00">
             </div>
 
+
+            <div class="form-group">
               <label for="originalPrice" class="block text-sm font-medium text-yellow-800 mb-1">原价 (¥)</label>
               <input type="number" id="originalPrice" v-model="form.originalPrice" min="0" step="0.01"
                 class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
@@ -88,9 +90,7 @@
               <input type="number" id="stock" v-model="form.stock" min="0" required
                 class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
                 placeholder="0">
-            </div>
-
-
+            </div>  </div>
 
         <div class="form-section">
           <h3 class="text-lg font-semibold mb-4 pb-2 border-b border-yellow-100 text-yellow-800">
@@ -106,6 +106,8 @@
                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 <div v-if="!form.mainImage" class="space-y-2">
                   <i class="fa fa-cloud-upload text-2xl text-yellow-400 group-hover:text-yellow-600 transition-colors"></i>
+
+
                   <p class="text-sm text-yellow-700">点击上传或拖放图片</p>
                   <p class="text-xs text-yellow-500/70">支持 JPG、PNG 格式</p>
                 </div>
@@ -121,7 +123,6 @@
 
             <div class="col-span-3">
               <label class="block text-sm font-medium text-yellow-800 mb-2">多图上传</label>
-
               <div class="grid grid-cols-3 gap-4">
                 <div v-for="(image, index) in form.images" :key="index"
                   class="relative border-2 border-dashed border-yellow-200 rounded-lg p-4 text-center hover:border-yellow-500 transition-all cursor-pointer bg-yellow-50 overflow-hidden">
@@ -131,6 +132,7 @@
                     <i class="fa fa-times text-xs"></i>
                   </button>
                 </div>
+
                 <div v-if="form.images.length < 6"
                   class="relative border-2 border-dashed border-yellow-200 rounded-lg p-4 text-center hover:border-yellow-500 transition-all cursor-pointer bg-yellow-50 group">
                   <input type="file" accept="image/*" @change="handleImageUpload"
@@ -143,8 +145,6 @@
             </div>
           </div>
         </div>
-
-
         <div class="form-section">
           <h3 class="text-lg font-semibold mb-4 pb-2 border-b border-yellow-100 text-yellow-800">
             <i class="fa fa-file-text-o mr-2 text-yellow-500"></i>商品描述
@@ -165,7 +165,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <div class="form-group">
-              <label class="block text-sm font-medium text-yellow-800 mb-2">特色标签</label>
+
               <div class="flex flex-wrap gap-3">
                 <label class="inline-flex items-center cursor-pointer group bg-yellow-50 px-3 py-1.5 rounded-full hover:bg-yellow-100 transition-colors">
                   <input type="checkbox" value="new" v-model="form.tags"
@@ -188,7 +188,6 @@
                   <span class="ml-2 text-sm text-yellow-800 group-hover:text-yellow-600 transition-colors">限量</span>
                 </label>
               </div>
-
         </div>
 
         <div class="flex justify-end space-x-4 pt-6 border-t border-yellow-100">
@@ -209,6 +208,7 @@
             type="primary"
             @click="handleSubmit"
             class="bg-amber-600 text-white hover:bg-yellow-700 border-none"
+
           >
             <template #icon>
               <i class="fa fa-check mr-1"></i>
@@ -221,13 +221,13 @@
     </div>
       </form>
   </div>
+
     </div>
   </main>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
-
 const form = reactive({
   productName: '',
   productCode: '',
@@ -242,7 +242,6 @@ const form = reactive({
   status: 'active',
   tags: [] as string[]
 });
-
 const showMessage = ref(false);
 const message = ref('');
 const messageType = ref<'success' | 'error'>('success');
@@ -251,7 +250,6 @@ const showToastMessage = (msg: string, type: 'success' | 'error' = 'success') =>
   message.value = msg;
   messageType.value = type;
   showMessage.value = true;
-
   setTimeout(() => {
     showMessage.value = false;
   }, 3000);
@@ -282,7 +280,6 @@ const handleReset = () => {
   }
 };
 
-// 处理主图上传
 const handleMainImageUpload = (e: Event) => {
   const target = e.target as HTMLInputElement;
   const file = target.files?.[0];
@@ -323,7 +320,6 @@ const readFileAsDataURL = (file: File, callback: (result: string) => void) => {
   reader.readAsDataURL(file);
 };
 
-// 表单验证
 const validateForm = (): boolean => {
   if (!form.productName) {
     showToastMessage('请输入商品名称', 'error');

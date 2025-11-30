@@ -108,11 +108,23 @@ const routes = [
     component: () => import('@/views/Petshop/AddProduct.vue'),
     meta: { title: '欢迎注册 PetGo' },
   },
-      // 人工客服
+        // 销售分析
+  {
+    path: '/Analytics' ,
+    name: 'Analytics',
+    component: () => import('@/views/Petshop/SalesAnalytics.vue'),
+  },
+      // 客服
   {
     path: '/CustomerService' ,
     name: 'CustomerService',
     component: () => import('@/views/Petshop/CustomerService.vue'),
+  },
+        // 添加商品
+  {
+    path: '/AddProduct' ,
+    name: 'AddProduct',
+    component: () => import('@/views/Petshop/AddProduct.vue'),
   },
   {
     path: '/Login',

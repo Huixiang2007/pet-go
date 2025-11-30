@@ -75,10 +75,9 @@
 
         <!-- 待收货状态 -->
         <template v-else-if="order.statusType === 'receiving'">
-          <router-link to="PackageInfo/?id={{ order.id }}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
+          <router-link to="/PackageInfo/?id={{order.id}}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
             查看物流
           </router-link>
-
           <button class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors">
             申请退款
           </button>
@@ -89,7 +88,7 @@
 
         <!-- 已发货状态 -->
         <template v-else-if="order.statusType === 'completed'">
-          <router-link to="PackageInfo/?id={{ order.id }}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
+          <router-link to="/PackageInfo/?id={{order.id}}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
             查看物流
           </router-link>
           <button class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors" @click="aftersaleStatus = true">
@@ -99,25 +98,28 @@
 
         <!-- 已收货状态 -->
         <template v-else-if="order.statusType === 'received'">
-          <router-link to="PackageInfo/?id={{ order.id }}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
-            查看物流
+
+            <router-link to="/CustomerService" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
+            联系客服
           </router-link>
           <button class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm font-medium hover:bg-red-600 transition-colors" @click="aftersaleStatus = true">
             申请售后
           </button>
-          <button class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors" @click="commentStatus = true">
+
+          <button class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors"
+          @click="commentStatus=true">
             评价商品
           </button>
         </template>
 
         <!-- 退货中状态 -->
         <template v-else-if="order.statusType === 'returning'">
-          <router-link to="PackageInfo/?id={{ order.id }}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
+          <router-link to="/PackageInfo/?id={{order.id}}" class="px-4 py-2 border border-gray-200 rounded-lg text-gray-700 text-sm hover:bg-gray-50 transition-colors">
             查看进度
           </router-link>
-          <button class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
+          <router-link to="/CustomerService" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm font-medium hover:bg-blue-600 transition-colors">
             联系客服
-          </button>
+          </router-link>
         </template>
       </div>
     </div>
@@ -215,9 +217,10 @@
           <label class="block text-gray-700 text-sm font-medium mb-1">商品名称</label>
           <input type="text" value="天然无谷狗粮 1.5kg" class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed" disabled>
         </div>
-            <div class="mb-4">
-          <label class="block text-gray-700 text-sm font-medium mb-1">评价</label>
-      <textarea name="" id="" cols="30" rows="10" placeholder="请输入评价内容..." class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"></textarea>
+          <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-1">评价商品</label>
+          <el-rate v-model="value" clearable />
+          <textarea rows="3" placeholder="请评价商品..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
         </div>
         <button type="submit" class="w-full bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700 transition-colors">
           提交评价
@@ -232,7 +235,7 @@ import { defineProps } from 'vue';
 import { ref } from 'vue';
 // 售后状态
 const aftersaleStatus = ref(false);
-// 评价状态
+const value = ref(0);
 const commentStatus = ref(false);
 
 export interface Order {

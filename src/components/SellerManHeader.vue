@@ -17,9 +17,9 @@
       </button>
 
       <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors cursor-pointer">
-        <img 
-          src="/img/dog.png" 
-          alt="店铺头像" 
+        <img
+          src="/img/dog.png"
+          alt="店铺头像"
           class="w-8 h-8 rounded-full border border-gray-200 object-cover"
         >
         <span class="text-sm font-medium text-gray-800">小明官方旗舰店</span>
@@ -34,13 +34,12 @@
 </template>
 
 <script lang="ts" setup>
-// 保持原有逻辑不变
 </script>
 
 <style scoped>
 @media (max-width: 640px) {
   .hidden.sm:inline {
-    display: none !important;
+    display: none;
   }
 }
 </style>

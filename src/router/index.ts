@@ -126,6 +126,7 @@ const routes = [
     name: 'AddProduct',
     component: () => import('@/views/Petshop/AddProduct.vue'),
   },
+  //登录
   {
     path: '/Login',
     name: 'petLogin',
@@ -143,6 +144,7 @@ const routes = [
     name: 'AddPet',
     component: () => import('@/views/AddPet.vue'),
   },
+  //注册
   {
     path: '/Register',
     name: 'register',
@@ -150,18 +152,28 @@ const routes = [
     meta: { title: '欢迎注册 PetGo' },
   },
 
+  //协议
   {
     path: '/Protocal',
     name: 'protocal',
     component: () => import('@/views/EnterPet/Protocal.vue'),
     meta: { title: '用户协议' },
   },
+  //找回密码
   {
     path: '/Forget',
     name: 'forget',
     component: () => import('@/views/EnterPet/ForgetPassword.vue'),
     meta: { title: '找回密码' },
   },
+  //个人中心
+  {
+    path: '/Person',
+    name: 'PersonalCenter',
+    component: () => import('@/views/PersonalCenter.vue'),
+    meta: { title: '个人中心' },
+  },
+
 ]
 
 const router = createRouter({

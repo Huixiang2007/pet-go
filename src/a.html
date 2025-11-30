@@ -1,409 +1,655 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>碎片化轮播图</title>
+    <title>优宠托管 - 地图找寄养</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://webapi.amap.com/maps?v=2.0&key=76efd4e49a820ee84255d33dffeb374f"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       :root {
-        --primary: #4c6ef5;
-        --secondary: #339af0;
-        --dark: #1a1a2e;
-        --light: #f8f9fa;
-        --image-width: 60%;
-        --image-height: 60%;
+        --primary-color: #ffa500;
+        --secondary-color: #ffd166;
+        --accent-color: #ff9a76;
+        --light-color: #fff9ec;
       }
 
-      /* 基础样式 */
       body {
-        height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-        overflow: hidden;
-        background-color: var(--dark);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Comic Sans MS', 'Marker Felt', 'Arial Rounded MT Bold', sans-serif;
+        background-color: var(--light-color);
       }
 
-      .container {
-        width: var(--image-width);
-        height: var(--image-height);
+      .cute-card {
+        border-radius: 20px;
+        box-shadow: 0 8px 16px rgba(255, 165, 0, 0.15);
+        border: 2px solid var(--secondary-color);
+        transition: all 0.3s ease;
       }
 
-      /* 轮播图容器 */
-      .carousel-container {
-        position: relative;
-        border-radius: 0.75rem;
-        overflow: hidden;
-        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+      .cute-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px rgba(255, 165, 0, 0.2);
       }
 
-      /* 轮播图片区域 */
-      .carousel {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 16/9;
-      }
-
-      /* 轮播图 */
-      .slide {
-        position: absolute;
-        inset: 0;
-        opacity: 0;
-        transition: opacity 300ms;
-      }
-
-      .slide.active {
-        opacity: 1;
-      }
-
-      .slide img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      .nav-btn {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 3rem;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(4px);
-        border-radius: 50%;
-        color: white;
-        transition: all 300ms;
-        cursor: pointer;
+      .cute-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
         border: none;
-        outline: none;
-        z-index: 10;
-        font-size: 1.5rem;
+        border-radius: 25px;
+        color: white;
+        font-weight: bold;
+        padding: 10px 20px;
+        transition: all 0.3s ease;
+      }
+
+      .cute-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(255, 165, 0, 0.4);
+      }
+
+      .map-container {
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      }
+
+      .pet-icon {
+        width: 40px;
+        height: 40px;
+        background-color: var(--secondary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
         font-weight: bold;
       }
 
-      .nav-btn:hover {
-        background: rgba(76, 110, 245, 0.8);
-        transform: translateY(-50%) scale(1.1);
-      }
-
-      .nav-btn.prev {
-        left: 1rem;
-      }
-
-      .nav-btn.next {
-        right: 1rem;
-      }
-
-      /* 指示器 */
-      .indicators {
-        position: absolute;
-        bottom: 1rem;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 0.5rem;
-        z-index: 10;
-      }
-
-      .dot {
-        width: 0.75rem;
-        height: 0.75rem;
+      .cluster-marker {
+        width: 50px;
+        height: 50px;
+        background-color: var(--primary-color);
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.8);
-        transition: all 300ms;
-        cursor: pointer;
-        border: none;
-        outline: none;
-      }
-
-      .dot.active {
-        width: 2rem;
-        border-radius: 0.375rem;
-        background: #4c6ef5;
-      }
-
-      /* 碎片 */
-      .fragment {
-        position: absolute;
-        pointer-events: none;
-        transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        z-index: 5; /* 确保碎片在原图片之上 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        border: 3px solid white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <!-- 轮播图容器 -->
-      <div class="carousel-container" id="carousel-container">
-        <!-- 轮播图片区域 -->
-        <div class="carousel" id="carousel">
-          <!-- 轮播图片通过JS动态添加 -->
+    <div id="app">
+      <!-- 导航栏位置预留 -->
+      <div
+        class="h-16 bg-gradient-to-r from-orange-400 to-orange-300 flex items-center justify-between px-6"
+      >
+        <div class="text-white font-bold text-xl flex items-center">
+          <span class="mr-2">🐾</span> 优宠托管
         </div>
-        <!-- 导航按钮 -->
-        <button class="nav-btn prev" id="prev-btn">
-          <span>‹</span>
-        </button>
-        <button class="nav-btn next" id="next-btn">
-          <span>›</span>
-        </button>
-        <!-- 指示器 -->
-        <div class="indicators" id="indicators">
-          <!-- 指示器通过JS动态添加 -->
+        <div class="text-white">
+          <!-- 导航菜单预留 -->
+        </div>
+      </div>
+
+      <div class="container mx-auto px-4 py-6">
+        <!-- 页面标题 -->
+        <div class="mb-8 text-center">
+          <h1 class="text-4xl font-bold text-orange-500 mb-2">寻找附近的宠物寄养</h1>
+          <p class="text-gray-600 text-lg">为您的爱宠找到温暖临时的家</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <!-- 左侧筛选面板 -->
+          <div class="lg:col-span-1">
+            <div class="cute-card p-6 bg-white mb-6">
+              <h2 class="text-xl font-bold text-orange-500 mb-4">智能筛选</h2>
+
+              <!-- 区域筛选 -->
+              <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-2">区域筛选</h3>
+                <el-select v-model="filters.area" placeholder="选择区域" class="w-full">
+                  <el-option label="全城" value="all"></el-option>
+                  <el-option label="当前地图区域" value="current"></el-option>
+                  <el-option
+                    v-for="area in areaOptions"
+                    :key="area"
+                    :label="area"
+                    :value="area"
+                  ></el-option>
+                </el-select>
+              </div>
+
+              <!-- 寄养家庭类型 -->
+              <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-2">寄养家庭类型</h3>
+                <el-checkbox-group v-model="filters.fosterTypes">
+                  <el-checkbox label="个人"></el-checkbox>
+                  <el-checkbox label="机构"></el-checkbox>
+                </el-checkbox-group>
+              </div>
+
+              <!-- 宠物类型 -->
+              <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-2">宠物类型</h3>
+                <el-checkbox-group v-model="filters.petTypes">
+                  <el-checkbox label="猫"></el-checkbox>
+                  <el-checkbox label="狗"></el-checkbox>
+                  <el-checkbox label="其他"></el-checkbox>
+                </el-checkbox-group>
+              </div>
+
+              <!-- 价格区间 -->
+              <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-2">价格区间 (元/天)</h3>
+                <el-slider
+                  v-model="filters.priceRange"
+                  range
+                  :min="0"
+                  :max="200"
+                  :step="10"
+                ></el-slider>
+                <div class="flex justify-between text-sm text-gray-600 mt-1">
+                  <span>{{ filters.priceRange[0] }}元</span>
+                  <span>{{ filters.priceRange[1] }}元</span>
+                </div>
+              </div>
+
+              <!-- 评分 -->
+              <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-2">最低评分</h3>
+                <el-rate
+                  v-model="filters.minRating"
+                  :colors="['#FFA500', '#FFA500', '#FFA500']"
+                ></el-rate>
+              </div>
+
+              <!-- 智能排序 -->
+              <div class="mb-6">
+                <h3 class="font-semibold text-gray-700 mb-2">智能排序</h3>
+                <el-select v-model="sortOption" placeholder="选择排序方式" class="w-full">
+                  <el-option label="综合排序" value="comprehensive"></el-option>
+                  <el-option label="距离最近" value="distance"></el-option>
+                  <el-option label="评分最高" value="rating"></el-option>
+                  <el-option label="价格最低" value="price"></el-option>
+                </el-select>
+              </div>
+
+              <button class="cute-btn w-full mt-4" @click="applyFilters">应用筛选</button>
+            </div>
+
+            <!-- 当前位置卡片 -->
+            <div class="cute-card p-4 bg-white">
+              <div class="flex items-center">
+                <div class="pet-icon bg-orange-400 mr-3">📍</div>
+                <div>
+                  <p class="font-semibold">我的位置</p>
+                  <p class="text-sm text-gray-600">{{ currentLocation.address || '定位中...' }}</p>
+                </div>
+              </div>
+              <button class="cute-btn w-full mt-3" @click="locateMe">
+                <i class="el-icon-location"></i> 重新定位
+              </button>
+            </div>
+          </div>
+
+          <!-- 右侧地图和列表 -->
+          <div class="lg:col-span-3">
+            <!-- 地图容器 -->
+            <div class="cute-card p-4 bg-white mb-6">
+              <div class="map-container h-96" id="map-container"></div>
+            </div>
+
+            <!-- 寄养家庭列表 -->
+            <div class="cute-card p-6 bg-white">
+              <h2 class="text-xl font-bold text-orange-500 mb-4">附近的寄养家庭</h2>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                  v-for="foster in filteredFosters"
+                  :key="foster.id"
+                  class="border border-orange-200 rounded-xl p-4 hover:shadow-md transition-all duration-300"
+                >
+                  <div class="flex">
+                    <div
+                      class="w-24 h-24 bg-orange-100 rounded-lg flex items-center justify-center mr-4"
+                    >
+                      <span class="text-3xl">🏠</span>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex justify-between items-start">
+                        <h3 class="font-bold text-lg">{{ foster.name }}</h3>
+                        <span class="bg-orange-100 text-orange-600 px-2 py-1 rounded-full text-sm">
+                          {{ foster.type }}
+                        </span>
+                      </div>
+                      <div class="flex items-center mt-1">
+                        <el-rate
+                          v-model="foster.rating"
+                          disabled
+                          :colors="['#FFA500', '#FFA500', '#FFA500']"
+                          class="mr-2"
+                        ></el-rate>
+                        <span class="text-sm text-gray-600">({{ foster.reviewCount }})</span>
+                      </div>
+                      <p class="text-gray-600 text-sm mt-1">{{ foster.address }}</p>
+                      <div class="flex justify-between items-center mt-2">
+                        <span class="text-orange-500 font-bold">{{ foster.price }}元/天</span>
+                        <span
+                          class="text-sm"
+                          :class="foster.availableSpots > 0 ? 'text-green-500' : 'text-red-500'"
+                        >
+                          {{ foster.availableSpots > 0 ? `空位: ${foster.availableSpots}` : '已满'
+                          }}
+                        </span>
+                      </div>
+                      <button class="cute-btn w-full mt-3" @click="viewDetails(foster)">
+                        查看详情
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="filteredFosters.length === 0" class="text-center py-8">
+                <p class="text-gray-500">没有找到符合条件的寄养家庭</p>
+                <button class="cute-btn mt-4" @click="resetFilters">重置筛选条件</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
     <script>
-      const carouselConfig = {
-        images: [
-          {
-            src: 'https://picsum.photos/800/450?random=1',
-            alt: '图片一',
-          },
-          {
-            src: 'https://picsum.photos/800/450?random=2',
-            alt: '图片二',
-          },
-          {
-            src: 'https://picsum.photos/800/450?random=3',
-            alt: '图片三',
-          },
-          {
-            src: 'https://picsum.photos/800/450?random=4',
-            alt: '图片四',
-          },
-          {
-            src: 'https://picsum.photos/800/450?random=5',
-            alt: '图片五',
-          },
-        ],
-        fragmentConfig: {
-          rows: 10, // 碎片行数
-          cols: 15, // 碎片列数
-          maxDisplacement: 100, // 碎片最大位移距离
-          maxRotation: 180, // 碎片最大旋转角度
-          minScale: 0.2, // 碎片最小缩放比例
-        },
-        autoplay: true, // 是否自动播放
-        autoplaySpeed: 3000, // 自动播放速度（毫秒）
-        transitionDuration: 1000, // 过渡动画持续时间
-      }
+      const { createApp, ref, reactive, computed, onMounted } = Vue
+      const { ElMessage } = ElementPlus
 
-      // DOM元素
-      const carouselContainer = document.getElementById('carousel')
-      const prevBtn = document.getElementById('prev-btn')
-      const nextBtn = document.getElementById('next-btn')
-      const indicators = document.getElementById('indicators')
+      createApp({
+        setup() {
+          // 地图实例
+          let map = null
+          let markers = []
+          let clusters = null
 
-      // 状态变量
-      let currentSlide = 0
-      let autoplayInterval
-      let isPlaying = carouselConfig.autoplay
-      let autoplaySpeed = carouselConfig.autoplaySpeed
-      let isTransitioning = false // 过渡状态锁
+          // 当前定位信息
+          const currentLocation = reactive({
+            lat: null,
+            lng: null,
+            address: '',
+          })
 
-      // 初始化轮播图
-      function initCarousel() {
-        // 创建轮播图片
-        carouselConfig.images.forEach((image, index) => {
-          const slide = document.createElement('div')
-          slide.className = `slide ${index === 0 ? 'active' : ''}`
-          slide.dataset.index = index
+          // 筛选条件
+          const filters = reactive({
+            area: 'all',
+            fosterTypes: ['个人', '机构'],
+            petTypes: ['猫', '狗', '其他'],
+            priceRange: [0, 200],
+            minRating: 0,
+          })
 
-          const img = document.createElement('img')
-          img.src = image.src
-          img.alt = image.alt
-          slide.appendChild(img)
-          carouselContainer.appendChild(slide)
+          // 排序选项
+          const sortOption = ref('comprehensive')
 
-          // 创建指示器
-          const dot = document.createElement('button')
-          dot.className = `dot ${index === 0 ? 'active' : ''}`
-          dot.dataset.index = index
-          dot.addEventListener('click', () => goToSlide(index))
-          indicators.appendChild(dot)
-        })
+          // 区域选项
+          const areaOptions = ref(['朝阳区', '海淀区', '西城区', '东城区', '丰台区', '石景山区'])
 
-        // 设置自动播放
-        if (isPlaying) {
-          startAutoplay()
-        }
+          // 模拟寄养家庭数据
+          const fosterHomes = ref([
+            {
+              id: 1,
+              name: '橙子宠物乐园',
+              type: '机构',
+              lat: 39.90923,
+              lng: 116.397428,
+              address: '北京市东城区王府井大街',
+              rating: 4.8,
+              reviewCount: 128,
+              price: 120,
+              availableSpots: 3,
+              petTypes: ['猫', '狗'],
+              tags: ['环境优美', '专业护理'],
+            },
+            {
+              id: 2,
+              name: '小黄的家',
+              type: '个人',
+              lat: 39.91923,
+              lng: 116.407428,
+              address: '北京市朝阳区三里屯',
+              rating: 4.5,
+              reviewCount: 76,
+              price: 80,
+              availableSpots: 2,
+              petTypes: ['猫'],
+              tags: ['温馨家庭', '爱猫人士'],
+            },
+            {
+              id: 3,
+              name: '汪汪托管中心',
+              type: '机构',
+              lat: 39.89923,
+              lng: 116.387428,
+              address: '北京市西城区金融街',
+              rating: 4.9,
+              reviewCount: 203,
+              price: 150,
+              availableSpots: 0,
+              petTypes: ['狗'],
+              tags: ['专业训练', '大型犬友好'],
+            },
+            {
+              id: 4,
+              name: '喵星人驿站',
+              type: '个人',
+              lat: 39.92923,
+              lng: 116.417428,
+              address: '北京市海淀区中关村',
+              rating: 4.7,
+              reviewCount: 94,
+              price: 70,
+              availableSpots: 1,
+              petTypes: ['猫', '其他'],
+              tags: ['独立空间', '经验丰富'],
+            },
+          ])
 
-        // 绑定事件
-        prevBtn.addEventListener('click', () => {
-          if (!isTransitioning) goToPrevSlide()
-        })
+          // 筛选后的寄养家庭
+          const filteredFosters = computed(() => {
+            let result = [...fosterHomes.value]
 
-        nextBtn.addEventListener('click', () => {
-          if (!isTransitioning) goToNextSlide()
-        })
-      }
+            // 按寄养类型筛选
+            if (filters.fosterTypes.length > 0) {
+              result = result.filter((foster) => filters.fosterTypes.includes(foster.type))
+            }
 
-      // 切换到指定轮播图
-      function goToSlide(index) {
-        if (index === currentSlide || isTransitioning) return
+            // 按宠物类型筛选
+            if (filters.petTypes.length > 0) {
+              result = result.filter((foster) =>
+                foster.petTypes.some((petType) => filters.petTypes.includes(petType)),
+              )
+            }
 
-        isTransitioning = true // 锁定过渡状态
+            // 按价格区间筛选
+            result = result.filter(
+              (foster) =>
+                foster.price >= filters.priceRange[0] && foster.price <= filters.priceRange[1],
+            )
 
-        const slides = document.querySelectorAll('.slide')
-        const currentSlideEl = slides[currentSlide]
-        const newSlideEl = slides[index]
+            // 按评分筛选
+            result = result.filter((foster) => foster.rating >= filters.minRating)
 
-        // 更新指示器
-        document.querySelectorAll('.dot').forEach((dot, i) => {
-          dot.classList.toggle('active', i === index)
-        })
+            // 排序
+            if (sortOption.value === 'distance') {
+              // 按距离排序 - 这里简化处理，实际需要计算与当前位置的距离
+              result.sort((a, b) => {
+                const distA = Math.sqrt(
+                  Math.pow(a.lat - currentLocation.lat, 2) +
+                    Math.pow(a.lng - currentLocation.lng, 2),
+                )
+                const distB = Math.sqrt(
+                  Math.pow(b.lat - currentLocation.lat, 2) +
+                    Math.pow(b.lng - currentLocation.lng, 2),
+                )
+                return distA - distB
+              })
+            } else if (sortOption.value === 'rating') {
+              result.sort((a, b) => b.rating - a.rating)
+            } else if (sortOption.value === 'price') {
+              result.sort((a, b) => a.price - b.price)
+            } else {
+              // 综合排序 - 距离、评分、价格的权重计算
+              result.sort((a, b) => {
+                // 简化版综合排序算法
+                const scoreA =
+                  (5 - calculateDistance(a)) * 0.4 + a.rating * 0.4 + ((200 - a.price) / 200) * 0.2
+                const scoreB =
+                  (5 - calculateDistance(b)) * 0.4 + b.rating * 0.4 + ((200 - b.price) / 200) * 0.2
+                return scoreB - scoreA
+              })
+            }
 
-        // 立即隐藏当前图片，显示新图片
-        currentSlideEl.classList.remove('active')
-        newSlideEl.classList.add('active')
-        currentSlide = index
+            return result
+          })
 
-        // 对刚刚隐藏的图片进行碎片化动画
-        fragmentImage(currentSlideEl.querySelector('img'), () => {
-          // 动画完成后的回调
-          // 重置自动播放计时器
-          if (isPlaying) {
-            resetAutoplay()
+          // 计算距离的辅助函数
+          const calculateDistance = (foster) => {
+            if (!currentLocation.lat || !currentLocation.lng) return 5 // 默认最大距离
+
+            // 简化版距离计算，实际应用中应使用更精确的算法
+            const latDiff = Math.abs(foster.lat - currentLocation.lat)
+            const lngDiff = Math.abs(foster.lng - currentLocation.lng)
+            return Math.sqrt(latDiff * latDiff + lngDiff * lngDiff) * 100
           }
 
-          // 解除锁定
-          isTransitioning = false
-        })
-      }
+          // 初始化地图
+          const initMap = () => {
+            // 创建地图实例
+            map = new AMap.Map('map-container', {
+              zoom: 12,
+              center: [116.397428, 39.90923], // 默认中心点(北京)
+              mapStyle: 'amap://styles/fresh', // 使用清新风格的地图样式
+            })
 
-      // 切换到上一张
-      function goToPrevSlide() {
-        const newIndex =
-          (currentSlide - 1 + carouselConfig.images.length) % carouselConfig.images.length
-        goToSlide(newIndex)
-      }
+            // 添加缩放控件
+            map.addControl(new AMap.Zoom())
 
-      // 切换到下一张
-      function goToNextSlide() {
-        const newIndex = (currentSlide + 1) % carouselConfig.images.length
-        goToSlide(newIndex)
-      }
+            // 添加比例尺控件
+            map.addControl(new AMap.Scale())
 
-      // 图片碎片化函数
-      function fragmentImage(img, callback) {
-        if (!img.complete) {
-          if (callback) callback()
-          return
-        }
+            // 添加工具条控件
+            map.addControl(new AMap.ToolBar())
 
-        // 移除之前的碎片
-        const existingFragments = carouselContainer.querySelectorAll('.fragment')
-        existingFragments.forEach((frag) => frag.remove())
+            // 初始化标记点
+            updateMapMarkers()
+          }
 
-        // 获取图片尺寸和容器尺寸
-        const imgWidth = img.naturalWidth
-        const imgHeight = img.naturalHeight
-        const containerWidth = carouselContainer.offsetWidth
-        const containerHeight = carouselContainer.offsetHeight
+          // 更新地图标记点
+          const updateMapMarkers = () => {
+            // 清除现有标记
+            if (markers.length > 0) {
+              map.remove(markers)
+              markers = []
+            }
 
-        // 计算容器和图片的宽高比
-        const containerRatio = containerWidth / containerHeight
-        const imgRatio = imgWidth / imgHeight
+            // 为每个寄养家庭添加标记
+            filteredFosters.value.forEach((foster) => {
+              const marker = new AMap.Marker({
+                position: [foster.lng, foster.lat],
+                content: createMarkerContent(foster),
+                offset: new AMap.Pixel(-20, -40),
+              })
 
-        // 计算实际显示的图片尺寸(考虑object-cover的影响)
-        let displayWidth, displayHeight
-        if (imgRatio > containerRatio) {
-          // 图片比容器宽，高度填满容器，宽度超出
-          displayHeight = containerHeight
-          displayWidth = displayHeight * imgRatio
-        } else {
-          // 图片比容器高，宽度填满容器，高度超出
-          displayWidth = containerWidth
-          displayHeight = displayWidth / imgRatio
-        }
+              // 添加点击事件
+              marker.on('click', () => {
+                showFosterInfo(foster)
+              })
 
-        // 计算图片在容器中的偏移(居中显示)
-        const offsetX = (displayWidth - containerWidth) / 2
-        const offsetY = (displayHeight - containerHeight) / 2
+              markers.push(marker)
+            })
 
-        // 设置碎片参数
-        const { rows, cols, maxDisplacement, maxRotation, minScale } = carouselConfig.fragmentConfig
-        const fragmentWidth = displayWidth / cols
-        const fragmentHeight = displayHeight / rows
+            // 将标记添加到地图
+            map.add(markers)
 
-        // 创建碎片 - 这些碎片将替代原图片显示
-        for (let i = 0; i < rows; i++) {
-          for (let j = 0; j < cols; j++) {
-            const fragment = document.createElement('div')
-            fragment.className = 'fragment'
+            // 如果标记点太多，使用聚合标记
+            if (filteredFosters.value.length > 10) {
+              // 清除之前的聚合
+              if (clusters) {
+                map.remove(clusters)
+              }
 
-            // 设置碎片的位置和大小
-            fragment.style.left = `${j * fragmentWidth - offsetX}px`
-            fragment.style.top = `${i * fragmentHeight - offsetY}px`
-            fragment.style.width = `${fragmentWidth}px`
-            fragment.style.height = `${fragmentHeight}px`
+              // 创建聚合标记
+              clusters = new AMap.MarkerClusterer(map, markers, {
+                gridSize: 80,
+                maxZoom: 16,
+                renderCluster: (count, markers) => {
+                  return `<div class="cluster-marker">${count}</div>`
+                },
+              })
+            }
 
-            // 使用背景图定位来显示原图的相应部分
-            fragment.style.backgroundImage = `url(${img.src})`
-            fragment.style.backgroundSize = `${displayWidth}px ${displayHeight}px`
-            fragment.style.backgroundPosition = `-${j * fragmentWidth}px -${i * fragmentHeight}px`
+            // 调整地图视野以包含所有标记
+            if (filteredFosters.value.length > 0) {
+              map.setFitView()
+            }
+          }
 
-            // 设置初始样式 - 碎片开始时完全可见
-            fragment.style.opacity = '1'
-            fragment.style.transform = 'translate(0,0) rotate(0) scale(1)'
+          // 创建标记点内容
+          const createMarkerContent = (foster) => {
+            const color = foster.type === '个人' ? '#FFA500' : '#FF6B6B'
+            return `
+            <div class="pet-icon" style="background-color: ${color};">
+              ${foster.petTypes.includes('狗') ? '🐕' : foster.petTypes.includes('猫') ? '🐈' : '🐾'}
+            </div>
+          `
+          }
 
-            // 添加到容器
-            carouselContainer.appendChild(fragment)
+          // 显示寄养家庭信息
+          const showFosterInfo = (foster) => {
+            // 在实际应用中，这里可以显示信息窗口
+            ElMessage({
+              message: `查看 ${foster.name} 的详情`,
+              type: 'info',
+              duration: 2000,
+            })
 
-            // 延迟启动每个碎片的动画，创建错开效果
-            setTimeout(
-              () => {
-                // 计算随机位移、旋转和不透明度
-                const randomX = (Math.random() - 0.5) * maxDisplacement
-                const randomY = (Math.random() - 0.5) * maxDisplacement
-                const randomRotation = (Math.random() - 0.5) * maxRotation
-                const randomScale = minScale + Math.random() * (1 - minScale)
+            // 这里可以打开详情弹窗或跳转到详情页
+            viewDetails(foster)
+          }
 
-                // 应用碎片动画 - 碎片会飞散并消失
-                fragment.style.transform = `translate(${randomX}px,${randomY}px) rotate(${randomRotation}deg) scale(${randomScale})`
-                fragment.style.opacity = '0'
+          // 定位功能
+          const locateMe = () => {
+            if (!navigator.geolocation) {
+              ElMessage.error('您的浏览器不支持地理定位')
+              return
+            }
+
+            ElMessage.info('正在获取您的位置...')
+
+            navigator.geolocation.getCurrentPosition(
+              // 成功回调
+              async (position) => {
+                const lat = position.coords.latitude
+                const lng = position.coords.longitude
+
+                currentLocation.lat = lat
+                currentLocation.lng = lng
+
+                // 使用高德逆地理编码获取地址
+                try {
+                  const geocoder = new AMap.Geocoder()
+                  geocoder.getAddress([lng, lat], (status, result) => {
+                    if (status === 'complete' && result.regeocode) {
+                      currentLocation.address = result.regeocode.formattedAddress
+                    } else {
+                      currentLocation.address = '位置获取成功'
+                    }
+
+                    // 移动地图中心到当前位置
+                    map.setCenter([lng, lat])
+                    map.setZoom(15)
+
+                    // 添加当前位置标记
+                    const locationMarker = new AMap.Marker({
+                      position: [lng, lat],
+                      content: '<div class="pet-icon" style="background-color: #4CAF50;">📍</div>',
+                      offset: new AMap.Pixel(-20, -40),
+                    })
+
+                    map.add(locationMarker)
+
+                    ElMessage.success('位置获取成功')
+                  })
+                } catch (error) {
+                  console.error('逆地理编码失败:', error)
+                  currentLocation.address = '位置获取成功'
+                  ElMessage.success('位置获取成功')
+                }
               },
-              (i * cols + j) * 10,
-            ) // 每个碎片有10ms的延迟，创建波浪效果
+              // 失败回调
+              (error) => {
+                console.error('定位失败:', error)
+                let errorMsg = '位置获取失败'
+
+                switch (error.code) {
+                  case error.PERMISSION_DENIED:
+                    errorMsg = '用户拒绝提供位置信息'
+                    break
+                  case error.POSITION_UNAVAILABLE:
+                    errorMsg = '位置信息不可用'
+                    break
+                  case error.TIMEOUT:
+                    errorMsg = '获取位置信息超时'
+                    break
+                }
+
+                ElMessage.error(errorMsg)
+              },
+              // 选项
+              {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000,
+              },
+            )
           }
-        }
 
-        // 动画结束后移除碎片并执行回调
-        const totalDuration = carouselConfig.transitionDuration + rows * cols * 10
-        setTimeout(() => {
-          const fragments = carouselContainer.querySelectorAll('.fragment')
-          fragments.forEach((frag) => frag.remove())
-          if (callback) callback()
-        }, totalDuration)
-      }
+          // 应用筛选
+          const applyFilters = () => {
+            updateMapMarkers()
+            ElMessage.success('筛选条件已应用')
+          }
 
-      // 开始自动播放
-      function startAutoplay() {
-        autoplayInterval = setInterval(() => {
-          if (!isTransitioning) goToNextSlide()
-        }, autoplaySpeed)
-      }
+          // 重置筛选
+          const resetFilters = () => {
+            filters.area = 'all'
+            filters.fosterTypes = ['个人', '机构']
+            filters.petTypes = ['猫', '狗', '其他']
+            filters.priceRange = [0, 200]
+            filters.minRating = 0
+            sortOption.value = 'comprehensive'
 
-      // 停止自动播放
-      function stopAutoplay() {
-        clearInterval(autoplayInterval)
-      }
+            updateMapMarkers()
+            ElMessage.success('筛选条件已重置')
+          }
 
-      // 重置自动播放计时器
-      function resetAutoplay() {
-        if (isPlaying) {
-          clearInterval(autoplayInterval)
-          startAutoplay()
-        }
-      }
+          // 查看详情
+          const viewDetails = (foster) => {
+            ElMessage({
+              message: `查看 ${foster.name} 的详细信息`,
+              type: 'success',
+              duration: 2000,
+            })
+            // 在实际应用中，这里应该跳转到详情页或打开详情弹窗
+          }
 
-      // 初始化
-      initCarousel()
+          // 组件挂载后初始化地图
+          onMounted(() => {
+            initMap()
+            // 尝试获取当前位置
+            setTimeout(locateMe, 1000)
+          })
+
+          return {
+            currentLocation,
+            filters,
+            sortOption,
+            areaOptions,
+            fosterHomes,
+            filteredFosters,
+            locateMe,
+            applyFilters,
+            resetFilters,
+            viewDetails,
+          }
+        },
+      })
+        .use(ElementPlus)
+        .mount('#app')
     </script>
   </body>
 </html>

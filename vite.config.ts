@@ -8,7 +8,6 @@ import { resolve } from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -26,16 +25,17 @@ export default defineConfig({
   resolve: {
     alias: {
       // '@': fileURLToPath(new URL('./src', import.meta.url))
-      '@': resolve(__dirname, 'src'),
+      '@': resolve(__dirname, './src'),
     },
   },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://8.131.100.56:8085',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
+ server: {
+  proxy: {
+    '/server': {
+      target: 'http://8.131.100.56:8085',
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/server/, ''), 
     },
+    // https: {},
   },
+}
 })

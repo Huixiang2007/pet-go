@@ -66,14 +66,13 @@ import { useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
-// 定义子分类接口
 interface SubCategory {
   id: string
   name: string
   path: string
 }
 
-// 处理分类变化
+// 分类变化
 const handleCategoryChange = (category: { path?: string; id?: string }) => {
   if (category.path) {
     router.push(category.path)
@@ -82,14 +81,12 @@ const handleCategoryChange = (category: { path?: string; id?: string }) => {
   }
 }
 
-// 处理子分类变化
 const handleSubCategoryChange = (mainId: string, subCategory: SubCategory) => {
   if (subCategory.path) {
     router.push(subCategory.path)
   }
 }
 
-// 定义商品数据结构
 interface Product {
   id: string | number
   name: string
@@ -100,11 +97,10 @@ interface Product {
   description?: string
 }
 
-// 加载状态
+// 加载
 const loading = ref(false)
 const products = ref<Product[]>([])
 
-// 模拟商品数据 - 为所有14个大类和子分类提供数据
 const mockProducts: Record<string, Product[]> = {
   all: [
     { id: 1, name: '均衡营养狗粮', price: 29, image: '/img/宠物3.jpg', category: 'all', description: '营养均衡，适合各种犬种' },
@@ -178,7 +174,7 @@ const mockProducts: Record<string, Product[]> = {
   ]
 }
 
-// 子分类名称映射
+// 子分类名称
 const subCategoryNames: Record<string, Record<string, string>> = {
   sale: {
     limited: '限时折扣',

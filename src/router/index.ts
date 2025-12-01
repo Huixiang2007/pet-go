@@ -16,13 +16,13 @@ const routes = [
   {
     path: '/shop',
     name: 'shop',
-    component: import('@/views/Petshop/PetShopView.vue'),
+    component: () => import('@/views/Petshop/PetShopView.vue'),
   },
   // 宠物购物车
   {
     path: '/petCart',
     name: 'petCart',
-    component: import('@/views/Petshop/PetShopCar.vue'),
+    component: () => import('@/views/Petshop/PetShopCar.vue'),
   },
   //订单结算
   {

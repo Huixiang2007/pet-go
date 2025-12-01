@@ -1,6 +1,6 @@
 <template>
   <NavBar />
-  <div class="min-h-screen bg-yellow-50">
+  <div class="min-h-screen bg-yellow-50 pt-[50px]">
     <main class="mx-auto px-4 py-8">
       <h2 class="text-2xl font-bold mb-6 flex items-center">
         <i class="fa fa-shopping-cart text-[#FF7043] mr-2"></i>

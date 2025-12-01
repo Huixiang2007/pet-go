@@ -265,14 +265,11 @@ interface Province {
   city: City[]
 }
 
-
-
 interface City {
   id: number
   name: string
   district: string[]
 }
-
 
 
 

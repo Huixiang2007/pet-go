@@ -158,104 +158,40 @@
         <h2 class="text-xl font-bold text-gray-800">  <i class="fa fa-star text-[#FF7043] mr-2"></i>热门商品</h2>
       </div>
       <div class="grid grid-cols-4 gap-4">
-         <div class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-          <img src="/img/宠物3.jpg" alt="狗粮" class="w-full h-64 object-cover bg-gray-50 ">
-          <div class="p-3">
-            <h3 class="font-medium">均衡营养</h3>
-            <div class="mt-2 flex justify-between items-center">
-              <span class="text-[#FF7043] font-bold">¥29</span>
-              <button class="w-8 h-8 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
-                <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-          <img src="/img/宠物3.jpg" alt="狗粮" class="w-full h-64 object-cover bg-gray-50 ">
-          <div class="p-3">
-            <h3 class="font-medium">均衡营养</h3>
-              <div class="mt-2 flex justify-between items-center">
-              <span class="text-[#FF7043] font-bold">¥29</span>
-              <button class="w-8 h-8 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
-                <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-          <div class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-          <img src="/img/宠物3.jpg" alt="狗粮" class="w-full h-64 object-cover bg-gray-50 ">
-          <div class="p-3">
-            <h3 class="font-medium">均衡营养</h3>
-             <div class="mt-2 flex justify-between items-center">
-              <span class="text-[#FF7043] font-bold">¥29</span>
-              <button class="w-8 h-8 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
-                <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-         <div class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-          <img src="/img/宠物3.jpg" alt="狗粮" class="w-full h-64 object-cover bg-gray-50 ">
-          <div class="p-3">
-            <h3 class="font-medium">均衡营养</h3>
-              <div class="mt-2 flex justify-between items-center">
-              <span class="text-[#FF7043] font-bold">¥29</span>
-              <button class="w-8 h-8 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
-                <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-            <div class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-          <img src="/img/宠物3.jpg" alt="狗粮" class="w-full h-64 object-cover bg-gray-50 ">
-          <div class="p-3">
-            <h3 class="font-medium">均衡营养</h3>
-            <div class="mt-2 flex justify-between items-center">
-              <span class="text-[#FF7043] font-bold">¥29</span>
-              <button class="w-8 h-8 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
-                <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-         <div class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-          <img src="/img/宠物3.jpg" alt="狗粮" class="w-full h-64 object-cover bg-gray-50 ">
-          <div class="p-3">
-            <h3 class="font-medium">均衡营养</h3>
-             <div class="mt-2 flex justify-between items-center">
-              <span class="text-[#FF7043] font-bold">¥29</span>
-              <button class="w-8 h-8 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
-                <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-          <img src="/img/宠物3.jpg" alt="狗粮" class="w-full h-64 object-cover bg-gray-50 ">
-          <div class="p-3">
-            <h3 class="font-medium">均衡营养</h3>
-             <div class="mt-2 flex justify-between items-center">
-              <span class="text-[#FF7043] font-bold">¥29</span>
-              <button class="w-8 h-8 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
-                <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-          <div class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
-          <img src="/img/宠物3.jpg" alt="狗粮" class="w-full h-64 object-cover bg-gray-50 ">
-          <div class="p-3">
-            <h3 class="font-medium">均衡营养</h3>
-              <div class="mt-2 flex justify-between items-center">
-              <span class="text-[#FF7043] font-bold">¥29</span>
-              <button class="w-8 h-8 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
-                <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
-              </button>
-            </div>
-          </div>
-        </div>
+          <div v-for="product in products" :key="product.id" class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
+  <div class="w-full h-64 bg-gray-50 overflow-hidden">
+    <img
+      :src="product.mainImage"
+      :alt="product.title"
+      class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+    >
+  </div>
+
+  <div class="p-4">
+    <div class="mb-2">
+      <h3 class="font-medium text-gray-800 line-clamp-1">{{ product.title }}</h3>
+      <p class="text-xs text-gray-500 mt-1">品牌：{{ product.brandName }}</p>
+    </div>
+
+    <div class="flex items-center text-xs text-gray-400 mb-3">
+      <span>{{ product.shopName }}</span>
+      <span class="mx-2">|</span>
+      <span>销量：{{ product.sales }}+</span>
+    </div>
+    <div class="flex justify-between items-center">
+      <div>
+        <span class="text-[#FF7043] font-bold text-lg">¥{{ product.currentPrice }}</span>
+        <span class="text-xs text-gray-400 ml-2">{{ product.warrantyTip }}</span>
+      </div>
+      <button class="w-9 h-9 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
+        <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
+      </button>
+    </div>
+  </div>
+</div>
 </div>
       </div>
+      <!-- <div class="text-red-500 text-xl font-bold text-center mt-8">加载中...</div> -->
   </div></div>
 <!-- 弹窗 -->
       <div v-if="popupVisible" class="popup-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -271,7 +207,6 @@
         </div>
       </div>
     </div>
-    <ShopFoot />
     <!-- 返回顶部按钮 -->
    <img
     v-show="showBackToTop"
@@ -285,6 +220,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, onUnmounted } from 'vue'
+import axios from 'axios'
+
 
 const currentCategory = ref('all');
 
@@ -302,15 +239,83 @@ const scrollY = ref(0)
 const showBackToTop = ref(false)
 const isScrolledPast50 = ref(false)
 
+interface Products {
+  id: string
+  mainImage: string
+  brandName: string
+  shopName: string
+  sales: number
+  currentPrice: number
+  originalPrice: number
+  warrantyTip: string
+  title: string
+}
+const products=ref<Products[]>([])
+const page=ref(1)
+const pageSize=ref(12)  //每页有10挑
+const isLoading=ref(false)  //是否正在加载数据
+const hasmore=ref(true)  //是否还有更多数据
 
+const getProducts = () => {
+if(!isLoading.value && hasmore.value){
+    isLoading.value=true;
+axios.request({
+  url: '/server/api/shop/product/list',
+  method: 'POST',
+  data: {
+    page: 1,
+    pageSize: 12
+  }
+})
+.then(response => {
+  console.log(response.data)
+  const newProducts=response.data.data.list
+  products.value=[...products.value,...newProducts]
+if(newProducts.length<pageSize.value){
+  hasmore.value=false;
+  console.log('没有更多数据了')
+}else{
+  page.value++;
+}
+})
+.catch(error => {
+  console.error('获取商品数据失败:', error)
+})
+.finally(() => {
+    isLoading.value = false;
+    console.log('加载完成，重置加载状态')
+  })
+}
+}
 // 滚动
 watch(scrollY, (newval) => {
   showBackToTop.value = newval > 300
   isScrolledPast50.value = newval > 50
 })
+const handleScroll = () => {
+  scrollY.value = window.scrollY
+  const scrollTop = window.scrollY
+  const clientHeight = document.documentElement.clientHeight
+  const scrollHeight = document.documentElement.scrollHeight
+  console.log('滚动位置:', scrollTop + clientHeight, '/', scrollHeight)
+
+  // 调整触发加载的阈值
+  if (scrollTop + clientHeight >= scrollHeight) {
+    console.log('触发加载更多')
+    getProducts()
+  }
+}
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
 const handleCategoryChange = (newCategory: string) => {
   currentCategory.value = newCategory
 }
+// 轮播图
 const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % carouselItems.value.length
 }
@@ -319,24 +324,13 @@ const prevSlide = () => {
   currentSlide.value = (currentSlide.value - 1 + carouselItems.value.length) % carouselItems.value.length
 }
 
-const handleScroll = () => {
-  scrollY.value = window.scrollY
-}
-
-// 返回顶部
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth'
-  })
-}
-
 
 onMounted(() => {
   carouselInterval.value = window.setInterval(() => {
     currentSlide.value = (currentSlide.value + 1) % carouselItems.value.length
   }, 3000)
   window.addEventListener('scroll', handleScroll, { passive: true })
+  getProducts()
 })
 
 onUnmounted(() => {

@@ -129,7 +129,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-
+console.log(111)
 // 定义更详细的商品数据结构
 interface Product {
   id: string | number
@@ -143,7 +143,6 @@ interface Product {
   isNew?: boolean
   description?: string
 }
-
 const products = ref<Product[]>([
   {
     id: 1,
@@ -278,6 +277,8 @@ const products = ref<Product[]>([
     isNew: true
   }
 ])
+
+
 </script>
 
 <style scoped>

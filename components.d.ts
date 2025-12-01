@@ -12,9 +12,12 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddPet: typeof import('./src/components/AddPet.vue')['default']
+    AddressSelect: typeof import('./src/components/AddressSelect.vue')['default']
     Captcha: typeof import('./src/components/Captcha.vue')['default']
     CaptchaLoad: typeof import('./src/components/CaptchaLoad.vue')['default']
+    ConfirmCode: typeof import('./src/components/ConfirmCode.vue')['default']
     DailyRecords: typeof import('./src/components/DailyRecords.vue')['default']
+    DashBoard: typeof import('./src/components/dashBoard.vue')['default']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
     ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
@@ -23,6 +26,7 @@ declare module 'vue' {
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCarousel: typeof import('element-plus/es')['ElCarousel']
     ElCarouselItem: typeof import('element-plus/es')['ElCarouselItem']
+    ElCascader: typeof import('element-plus/es')['ElCascader']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']
     ElCheckboxGroup: typeof import('element-plus/es')['ElCheckboxGroup']
     ElCol: typeof import('element-plus/es')['ElCol']
@@ -40,6 +44,7 @@ declare module 'vue' {
     ElInputNumber: typeof import('element-plus/es')['ElInputNumber']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElOption: typeof import('element-plus/es')['ElOption']
+    ElPagination: typeof import('element-plus/es')['ElPagination']
     ElRadio: typeof import('element-plus/es')['ElRadio']
     ElRadioButton: typeof import('element-plus/es')['ElRadioButton']
     ElRadioGroup: typeof import('element-plus/es')['ElRadioGroup']

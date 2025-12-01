@@ -8,7 +8,6 @@
         v-if="step === 1"
         @submit.prevent="handleFirstFormSubmit"
       >
-        <!-- 表单内容保持不变 -->
         <div class="container">
           <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
           <div class="title">
@@ -96,7 +95,6 @@
         @submit.prevent="handleSecondFormSubmit"
         v-if="step === 2"
       >
-        <!-- 表单内容保持不变 -->
         <div class="container">
           <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
           <div class="title">
@@ -186,7 +184,9 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import request from '../../utils/request'
+import { el } from 'element-plus/es/locale'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 declare global {
   interface Window {
@@ -194,13 +194,7 @@ declare global {
   }
 }
 
-// 响应式变量控制面板切换状态
 const isRightPanelActive = ref(true)
-
-// 切换面板方法
-// const togglePanel = (active: boolean) => {
-//   isRightPanelActive.value = active
-// }
 
 // 状态管理
 const step = ref(1)
@@ -223,8 +217,8 @@ const formData = ref({
 
 const togglePanel = () => {
   step.value = 1
-  isRightPanelActive.value = true // 切换回身份认证面板的样式
-  errorMessage.value = '' // 清除错误信息
+  isRightPanelActive.value = true
+  errorMessage.value = ''
 }
 // 路由实例
 const router = useRouter()
@@ -246,7 +240,9 @@ const handleSecondFormSubmit = () => {
 }
 
 // 发送验证码
+
 const sendCaptcha = async () => {
+  if (countdown.value > 0) return
   const qqEmailReg = /^[1-9]\d+@qq\.com$/
   if (!qqEmailReg.test(formData.value.email)) {
     errorMessage.value = '请输入正确的QQ邮箱格式'
@@ -254,32 +250,48 @@ const sendCaptcha = async () => {
   }
 
   try {
-    await axios.post('/api/user/send-captcha', {
-      email: formData.value.email,
-    })
-
-    countdown.value = 60
-    timer.value = window.setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) {
-        clearInterval(timer.value as number)
+    const response = await request(
+      '/server/api/user/sendCode',
+      'POST',
+      {
+        email: formData.value.email,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+    console.log('发送验证码:', response)
+    if (response.code === 0) {
+      ElMessage.success('验证码已发送至您的邮箱')
+      // 开始倒计时
+      countdown.value = 60
+      if (timer.value) {
+        clearInterval(timer.value)
       }
-    }, 1000)
+      timer.value = window.setInterval(() => {
+        countdown.value--
+        if (countdown.value <= 0) {
+          clearInterval(timer.value as number)
+          timer.value = null
+        }
+      }, 1000)
+    } else {
+      ElMessage.error(response.msg || '发送验证码失败，请稍后重试')
+    }
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || '发送验证码失败，请重试'
+    console.error('发送验证码失败:', error)
   }
 }
 
 // 验证邮箱和验证码
 const verifyEmail = async () => {
   try {
-    // await axios.post('/api/user/verify-email', {
-    //   email: formData.value.email,
-    //   captcha: formData.value.captcha
-    // })
     layer.msg('验证成功，请重置密码', { icon: 1 })
     step.value = 2
-    isRightPanelActive.value = false // 切换到重置密码时显示左侧
+    isRightPanelActive.value = false
     errorMessage.value = ''
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || '验证失败，请检查信息'

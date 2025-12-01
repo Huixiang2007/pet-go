@@ -80,7 +80,7 @@
               </div>
               <div class="layui-col-xs5">
                 <div style="margin-left: 10px">
-                    <Captcha ref="captchaRef" :width="130" :height="38" />
+                  <Captcha ref="captchaRef" :width="130" :height="38" />
                 </div>
               </div>
             </div>
@@ -107,9 +107,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted,nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import  {ElMessage, type FormInstance,type FormRules, } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import Captcha from '../../components/CaptchaLoad.vue'
 const captchaRef = ref<InstanceType<typeof Captcha> | null>(null)
 import axios from 'axios'
@@ -127,7 +127,7 @@ declare global {
 }
 const loginFormRef = ref<FormInstance>()
 const loading = ref(false)
-const errorMessage = ref('')
+// const errorMessage = ref('')
 const titleLoginChars = '欢迎登录 PetGo'.split('')
 const isLogin = ref(false)
 const encrypt = (text: string) => btoa(text)
@@ -143,42 +143,43 @@ const changeLoginType = () => {
 let hideErrorTimer: number | null = null
 let layer: any
 onMounted(() => {
-     const loginInput = document.querySelector('input[name="loginId"]') as HTMLInputElement
-    const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement
-    const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
-    const captchaInput = document.querySelector('input[name="captcha"]') as HTMLInputElement
-    
-    // 清空所有输入框
-    if (loginInput) loginInput.value = ''
-    if (passwordInput) passwordInput.value = ''
-    if (captchaInput) captchaInput.value = ''
-    
-    // 重置记住密码复选框
-    if (rememberCheckbox) rememberCheckbox.checked = false
-      const encryptedLoginId = localStorage.getItem('rememberedLoginId')
+  const loginInput = document.querySelector('input[name="loginId"]') as HTMLInputElement
+  const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement
+  const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
+  const captchaInput = document.querySelector('input[name="captcha"]') as HTMLInputElement
+
+  // 清空所有输入框
+  if (loginInput) loginInput.value = ''
+  if (passwordInput) passwordInput.value = ''
+  if (captchaInput) captchaInput.value = ''
+
+  // 重置记住密码复选框
+  if (rememberCheckbox) rememberCheckbox.checked = false
+  const encryptedLoginId = localStorage.getItem('rememberedLoginId')
   const encryptedPassword = localStorage.getItem('rememberedPassword')
   const rememberedLoginType = localStorage.getItem('rememberedLoginType')
-   
-    if (encryptedLoginId && encryptedPassword&& rememberedLoginType) {
+
+  if (encryptedLoginId && encryptedPassword && rememberedLoginType) {
     // 设置登录类型
-   try {
+    try {
       const rememberedLoginId = decrypt(encryptedLoginId)
       const rememberedPassword = decrypt(encryptedPassword)
-      
-     
+
       isAccount.value = rememberedLoginType === 'account'
-      
+
       // 填充表单字段
       nextTick(() => {
         const loginInput = document.querySelector('input[name="loginId"]') as HTMLInputElement
         const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement
-        const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
-        
+        const rememberCheckbox = document.querySelector(
+          'input[name="remember"]',
+        ) as HTMLInputElement
+
         if (loginInput) loginInput.value = rememberedLoginId
         if (passwordInput) passwordInput.value = rememberedPassword
         if (rememberCheckbox) rememberCheckbox.checked = true
       })
-    } catch (e) {
+    } catch (error) {
       // 解密失败时清除无效数据
       localStorage.removeItem('rememberedLoginId')
       localStorage.removeItem('rememberedPassword')
@@ -216,12 +217,9 @@ onMounted(() => {
       })
 
       form.on('submit(demo-login)', (data: any) => {
-      
-        const formData = data.field
-          handleLogin(data.field)   
-        // layer.alert(JSON.stringify(formData, null, 2), {
-        //   title: '登录表单数据',
-        // })
+    
+        handleLogin(data.field)
+       
         return false
       })
       form.render()
@@ -236,7 +234,7 @@ onUnmounted(() => {
     clearTimeout(hideErrorTimer)
     hideErrorTimer = null
   }
-   loginFormRef.value = undefined
+  loginFormRef.value = undefined
 })
 
 const router = useRouter()
@@ -247,16 +245,16 @@ const toForgotPassword = () => {
   router.push('/Forget')
 }
 
-const handleLogin = async(formData: LoginForm) => {
+const handleLogin = async (formData: LoginForm) => {
   if (loading.value) return
   loading.value = true
-   
+
   try {
-     const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
-  const shouldRemember = rememberCheckbox?.checked || false
-     const captchaInput = document.querySelector('input[name="captcha"]') as HTMLInputElement
+    const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
+    const shouldRemember = rememberCheckbox?.checked || false
+    const captchaInput = document.querySelector('input[name="captcha"]') as HTMLInputElement
     const captchaValue = captchaInput?.value.trim()
-      if (captchaRef.value && !captchaRef.value.validateCaptcha(captchaValue)) {
+    if (captchaRef.value && !captchaRef.value.validateCaptcha(captchaValue)) {
       ElMessage.error('验证码错误，请重新输入')
       // 刷新验证码
       if (captchaRef.value) {
@@ -269,36 +267,40 @@ const handleLogin = async(formData: LoginForm) => {
       loading.value = false
       return
     }
-  let response: any
+    let response: any
     // 调用登录接口
-    if(isAccount.value){
-      response = await axios.post('/server/api/user/login/account', {},
-      {
-        params:{
-        account: formData.loginId,
-        password: formData.password,
-        }
-       
-      })
-      
-    }else{
-     response = await axios.post('/server/api/user/login/email', {},
-    {
-      params:{
-         email: formData.loginId,
-         password: formData.password,
-      }
-    })
+    if (isAccount.value) {
+      response = await axios.post(
+        '/server/api/user/login/account',
+        {},
+        {
+          params: {
+            account: formData.loginId,
+            password: formData.password,
+          },
+        },
+      )
+    } else {
+      response = await axios.post(
+        '/server/api/user/login/email',
+        {},
+        {
+          params: {
+            email: formData.loginId,
+            password: formData.password,
+          },
+        },
+      )
     }
+  
+     if (response.data.code === 0){
     const { token, userId } = response.data.data
 
     // 存储token到localStorage
     localStorage.setItem('authToken', token)
-    localStorage.setItem('userId', userId) 
+    localStorage.setItem('userId', userId)
 
-  
-    
- if (shouldRemember) {
+    if (shouldRemember) {
       localStorage.setItem('rememberedLoginId', encrypt(formData.loginId))
       localStorage.setItem('rememberedPassword', encrypt(formData.password))
       localStorage.setItem('rememberedLoginType', isAccount.value ? 'account' : 'email')
@@ -308,23 +310,28 @@ const handleLogin = async(formData: LoginForm) => {
       localStorage.removeItem('rememberedPassword')
       localStorage.removeItem('rememberedLoginType')
     }
-  ElMessage.success('登录成功，欢迎进入PetGO!');
-
-    // 显示成功消息
+    ElMessage.success('登录成功，欢迎进入PetGO!')
+    router.push('/Person')
+  } else{const errorMsg = response.data.msg
+      ElMessage.error(errorMsg)
+      
+      // 刷新验证码
+      if (captchaRef.value) {
+        captchaRef.value.refreshCaptcha()
+      }
+      // 清空验证码输入框
    
-   router.push('/Person')
 
-  } catch (error: any) {
+      if (captchaInput) {
+        captchaInput.value = ''
+      }}
+  }
+  catch (error: any) {
     // 登录失败处理
     let errorMsg = '登录失败，请稍后重试'
-
-    if (error.response && error.response.data) {
-      errorMsg = error.response.data.message || errorMsg
-    }
-
-    errorMessage.value = errorMsg
-   console.log(errorMsg)
-  if (captchaRef.value) {
+   ElMessage.error(errorMsg)
+    // errorMessage.value = errorMsg
+    if (captchaRef.value) {
       captchaRef.value.refreshCaptcha()
     }
     // 清空验证码输入框
@@ -332,7 +339,7 @@ const handleLogin = async(formData: LoginForm) => {
     if (captchaInput) {
       captchaInput.value = ''
     }
-    // 刷新验证码未做
+    
   } finally {
     loading.value = false
   }
@@ -340,11 +347,10 @@ const handleLogin = async(formData: LoginForm) => {
 </script>
 
 <style scoped>
-
-::v-deep .layui-form-checked[lay-skin=primary]>i {
-    border-color: #fd9860 !important;
-    background-color: #fd9860;
-    color: #fff;
+::v-deep .layui-form-checked[lay-skin='primary'] > i {
+  border-color: #fd9860 !important;
+  background-color: #fd9860;
+  color: #fff;
 }
 body {
   overflow: hidden;

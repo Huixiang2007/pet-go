@@ -1,10 +1,9 @@
 <template>
   <div class="bg-[#fefcea] min-h-screen">
   <NavBar />
-  <div class="text-gray-800 pt-[45px]">
-    <!-- 主内容区 -->
+  <div class="text-gray-800 pt-[50px]">
+
     <main class="mx-auto px-4">
-      <!-- 页面标题 -->
       <div class="mb-8 mt-[20px]">
         <h1 class="text-xl font-bold flex items-center">
           <i class="fa fa-shopping-bag text-orange-500 mr-3"></i>
@@ -13,10 +12,8 @@
       </div>
 
       <div class="flex flex-col lg:flex-row gap-6">
-        <!-- 左侧筛选栏 -->
         <aside class="lg:w-64 shrink-0">
           <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md">
-            <!-- 筛选菜单 -->
             <div class="p-5" @click="activeTab = 'orders'">
               <h3 class="text-lg font-semibold text-gray-800 pb-3 border-b border-gray-100 mb-4">订单状态</h3>
               <ul class="space-y-1">
@@ -36,7 +33,7 @@
               </ul>
             </div>
 
-            <!-- 侧边导航 -->
+
             <div class="border-t border-gray-100">
               <nav class="p-2">
                 <a href="/petCart"
@@ -65,9 +62,7 @@
           </div>
         </aside>
 
-        <!-- 右侧订单内容区 -->
         <main class="flex-1">
-          <!-- 工具栏 -->
            <div v-if="activeTab === 'orders'">
           <div class="bg-white rounded-xl shadow-sm p-4 md:p-5 mb-6 transition-all hover:shadow-md">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -82,7 +77,6 @@
             </div>
           </div>
 
-          <!-- 订单列表（空状态优化） -->
           <div v-if="orders.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
             <div class="w-32 h-32 mx-auto mb-4 opacity-30">
               <img src="https://picsum.photos/id/225/200/200" alt="暂无订单" class="w-full h-full object-contain">
@@ -93,12 +87,10 @@
               去逛逛
             </button>
           </div>
-          <!-- 订单列表 -->
         <div v-else class="space-y-4">
       <OrderCard v-for="value in filteredOrders" :key="value.id" :order="value" />
       </div></div>
 
-      <!-- 在订单列表下方、分页上方添加优惠券部分 -->
       <div class="mt-8 mb-8" v-else-if="activeTab === 'coupons'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold text-gray-800">
@@ -107,13 +99,12 @@
           </h2>
           <a href="#" class="text-[#FF7043] text-sm hover:underline">查看全部</a>
         </div>
-        <!-- 引入优惠券组件 -->
         <div class=" rounded-xl shadow-sm p-5">
           <Coupons />
         </div>
       </div>
 
-      <!-- 在订单列表下方、分页下方添加评论管理部分 -->
+
       <div class="mt-8 mb-8" v-else-if="activeTab === 'comments'">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold text-gray-800">
@@ -122,14 +113,14 @@
           </h2>
           <a href="#" class="text-[#FF7043] text-sm hover:underline">查看全部</a>
         </div>
-        <!-- 引入评论组件 -->
+
         <div class="bg-white rounded-xl shadow-sm p-5">
           <Comments />
         </div>
       </div>
 
 
-          <!-- 分页 -->
+
           <div class="flex justify-center mt-8">
             <nav class="inline-flex items-center bg-white rounded-lg shadow-sm overflow-hidden">
               <button class="w-10 h-10 flex items-center justify-center text-gray-400 border-r border-gray-100 disabled:cursor-not-allowed" disabled>

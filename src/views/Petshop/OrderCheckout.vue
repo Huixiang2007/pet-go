@@ -34,7 +34,6 @@
   </div>
    <main class="order-container mx-auto px-4 py-8 flex flex-row justify-center">
     <div class="flex flex-col items-between w-[60%]">
-      <!-- 左侧订单信息 -->
       <div class="mr-4">
         <!-- 收货地址 -->
         <section class="bg-white rounded-xl p-6 card-shadow">
@@ -108,7 +107,7 @@
                 </section>
               </div>
 
-      <!-- 右侧订单摘要 -->
+
       <div class="shadow-gary-300 rounded-xl pt-6 ">
         <div class="bg-white rounded-xl p-6 top-24">
           <h2 class="text-lg font-semibold mb-6">订单摘要</h2>
@@ -399,7 +398,6 @@ const popupVisible = ref(false)
 const addressModalVisible = ref(false)
 const isEditing = ref(false)
 const selectedPayType = ref<string>('')
-const countdown = ref<number>(69)
 const countdownTimer = ref<number | null>(null)
 
 // 优惠券数据
@@ -503,7 +501,6 @@ const setDefault = (id: number) => {
 function openAddAddressModal() {
   isEditing.value = false
   addressModalVisible.value = true
-  // 重置表单
   Object.assign(addressForm, {
     id: 0,
     name: '',
@@ -512,7 +509,7 @@ function openAddAddressModal() {
     city: '',
     district: '',
     addressDetail: '',
-    isDefault: address.value.length === 0 // 如果没有地址，默认设为默认地址
+    isDefault: address.value.length === 0
   })
   addressModalVisible.value = true
 }
@@ -520,7 +517,6 @@ function openAddAddressModal() {
 // 打开编辑地址弹窗
 function openEditAddressModal(selected: Address) {
   isEditing.value = true
-  // 填充表单数据
   Object.assign(addressForm, {
     id: selected.id,
     name: selected.name,
@@ -541,13 +537,11 @@ function closeAddressModal() {
 
 // 保存地址
 function saveAddress() {
-  // 验证表单
   if (!addressForm.name || !addressForm.phone || !addressForm.province || !addressForm.city || !addressForm.district || !addressForm.addressDetail) {
     alert('请填写完整信息')
     return
   }
 
-  // 格式化地址
   const fullAddress = `${addressForm.province}${addressForm.city}${addressForm.district}`
 
   if (isEditing.value) {
@@ -565,7 +559,6 @@ function saveAddress() {
         district: addressForm.district
       }
 
-      // 如果设为默认地址，更新其他地址
       if (addressForm.isDefault) {
         address.value.forEach(item => {
           item.isDefault = item.id === addressForm.id
@@ -573,7 +566,6 @@ function saveAddress() {
       }
     }
   } else {
-    // 添加新地址
     const newId = Math.max(...address.value.map(item => item.id), 0) + 1
     const newAddress: Address = {
       id: newId,
@@ -597,10 +589,7 @@ function saveAddress() {
     address.value.push(newAddress)
   }
 
-  // 关闭弹窗
   closeAddressModal()
-
-  // 显示成功提示
   alert(isEditing.value ? '地址修改成功' : '地址添加成功')
 }
 
@@ -630,21 +619,6 @@ function deleteAddress(id: number) {
     clearInterval(countdownTimer.value)
     countdownTimer.value = null
   }
-      let time = 69;
-      countdown.value = time;
-
-      countdownTimer.value = setInterval(() => {
-        time--;
-        countdown.value = time;
-        if (time <= 0) {
-        if (countdownTimer.value !== null) {
-        clearInterval(countdownTimer.value)
-        countdownTimer.value = null
-      }
-          alert('二维码已过期，请重新选择支付方式');
-          popupVisible.value = false;
-        }
-      }, 1000);
     }
     </script>
 <style scoped>

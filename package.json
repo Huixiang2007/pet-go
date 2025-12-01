@@ -19,8 +19,8 @@
     "@amap/amap-jsapi-loader": "^1.0.1",
     "@element-plus/icons-vue": "^2.3.2",
     "axios": "^1.13.2",
-    "echarts": "^6.0.0",
-    "element-plus": "^2.11.7",
+    "china-division": "^2.7.0",
+    "element-plus": "^2.11.8",
     "pinia": "^3.0.3",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
@@ -29,6 +29,7 @@
     "@tsconfig/node22": "^22.0.2",
     "@types/amap-js-api": "^1.4.16",
     "@types/node": "^22.18.11",
+    "@types/qs": "^6.14.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",

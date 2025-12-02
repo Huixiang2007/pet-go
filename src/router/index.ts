@@ -1,16 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
+const FosterCare = () => import('@/views/FosterCare.vue')
 const routes = [
   {
     path: '/fosterCare',
     name: 'fosterCare',
-    component: import('@/views/FosterCare.vue'),
+    component: FosterCare,
   },
 
   {
-    path: '/homedetail',
-    name: 'homedetail',
-    component: import('@/views/HomeDetail.vue'),
+    path: '/fosterdetail/:id',
+    name: 'fosterDetail',
+    component: import('@/views/FosterDetail.vue'),
+  },
+  {
+    path: '/fosterBook/:fosterId/:packageId',
+    name: 'fosterBook',
+    component: import('@/views/FosterBook.vue'),
   },
   // 电商的首页
   {

@@ -610,7 +610,7 @@ const router = useRouter();
 const viewDetails = (foster: any) => {
     ElMessage.success(`查看 ${foster.name} 的详情`);
     // 实际项目中跳转到详情页
-    router.push({ name: 'fosteretail', params: { id: foster.id } });
+    router.push({ name: 'fosterDetail', params: { id: foster.id } });
 }
 
 // 组件挂载时初始化地图

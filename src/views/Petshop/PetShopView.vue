@@ -158,7 +158,9 @@
         <h2 class="text-xl font-bold text-gray-800">  <i class="fa fa-star text-[#FF7043] mr-2"></i>热门商品</h2>
       </div>
       <div class="grid grid-cols-4 gap-4">
-          <div v-for="product in products" :key="product.id" class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow">
+          <div v-for="product in products" :key="product.id"
+           class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow"
+           @click="productsDeatil(product.id)">
   <div class="w-full h-64 bg-gray-50 overflow-hidden">
     <img
       :src="product.mainImage"
@@ -221,9 +223,13 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, onUnmounted } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 
 const currentCategory = ref('all');
+const token= localStorage.getItem('token')
+console.log("获取到的token:"+token)
 
 const carouselItems = ref([
   { image: '/img/宠物1.jpg', title: '双11促销' },
@@ -255,7 +261,6 @@ const page=ref(1)
 const pageSize=ref(12)  //每页有10挑
 const isLoading=ref(false)  //是否正在加载数据
 const hasmore=ref(true)  //是否还有更多数据
-
 const getProducts = () => {
 if(!isLoading.value && hasmore.value){
     isLoading.value=true;
@@ -287,6 +292,11 @@ if(newProducts.length<pageSize.value){
   })
 }
 }
+const productsDeatil=(id:string)=>{
+  router.push({
+  path:`/productDetail/${id}`
+  })
+}
 // 滚动
 watch(scrollY, (newval) => {
   showBackToTop.value = newval > 300
@@ -297,9 +307,7 @@ const handleScroll = () => {
   const scrollTop = window.scrollY
   const clientHeight = document.documentElement.clientHeight
   const scrollHeight = document.documentElement.scrollHeight
-  console.log('滚动位置:', scrollTop + clientHeight, '/', scrollHeight)
 
-  // 调整触发加载的阈值
   if (scrollTop + clientHeight >= scrollHeight) {
     console.log('触发加载更多')
     getProducts()

@@ -43,7 +43,7 @@ const routes = [
   },
   //  商品详情
   {
-    path: '/productDetail',
+    path: '/productDetail/:id',
     name: 'productsDetail',
     component: () => import('@/views/Petshop/ProductDetail.vue'),
   },

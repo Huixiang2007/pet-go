@@ -37,10 +37,10 @@
                 required
               >
                 <option value="" class="text-gray-400">请选择店铺类型</option>
-                <option value="1">个人店</option>
-                <option value="2">企业店</option>
-                <option value="3">旗舰店</option>
-                <option value="4">专卖店</option>
+                <option value="个人店">个人店</option>
+                <option value="企业店">企业店</option>
+                <option value="旗舰店">旗舰店</option>
+                <option value="专卖店">专卖店</option>
               </select>
             </div>
           </div>
@@ -53,11 +53,15 @@
               </label>
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
                 <label for="shop-avatar-file" class="cursor-pointer flex flex-col items-center justify-center">
+                  <div v-if="imagepreviews.shopAvatar" class="mb-2">
+                    <img :src="imagepreviews.shopAvatar" class="max-w-full max-h-40 object-contain rounded" alt="商铺头像预览" />
+                  </div>
+                  <div v-if="!imagepreviews.shopAvatar">
                   <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                   <span class="text-gray-600">点击上传商铺头像</span>
-                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
+                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p></div>
                 </label>
-                <input type="file" class="hidden" id="shop-avatar-file" accept="image/*" required />
+                <input type="file" class="hidden" id="shop-avatar-file" accept="image/*" required  @change="handleFileChange($event, 'shopAvatar')" />
               </div>
             </div>
 
@@ -68,11 +72,15 @@
             <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
 
               <label for="business-license-file" class="cursor-pointer flex flex-col items-center justify-center">
+                  <div v-if="imagepreviews.businessLicense" class="mb-2">
+                    <img :src="imagepreviews.businessLicense" class="max-w-full max-h-40 object-contain rounded" alt="商铺头像预览" />
+                  </div>
+                  <div v-if="!imagepreviews.businessLicense" >
                 <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                 <span class="text-gray-600">点击上传营业执照</span>
-                <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
+                <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p></div>
               </label>
-              <input type="file" class="hidden" id="business-license-file" accept="image/*" required />
+              <input type="file" class="hidden" id="business-license-file" accept="image/*" required  @change="handleFileChange($event, 'businessLicense')" />
             </div>
           </div>
           </div>
@@ -87,11 +95,15 @@
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
 
                 <label for="id-card-front-file" class="cursor-pointer flex flex-col items-center justify-center">
+                  <div v-if="imagepreviews.idCardFront" class="mb-2">
+                    <img :src="imagepreviews.idCardFront" class="max-w-full max-h-40 object-contain rounded" alt="商铺头像预览" />
+                  </div>
+                  <div v-if="!imagepreviews.idCardFront" >
                   <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                   <span class="text-gray-600">点击上传身份证正面</span>
-                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
+                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p></div>
                 </label>
-                <input type="file" class="hidden" id="id-card-front-file" accept="image/*" required />
+                <input type="file" class="hidden" id="id-card-front-file" accept="image/*" required  @change="handleFileChange($event, 'idCardFront')" />
               </div>
             </div>
             <div class="space-y-2">
@@ -101,11 +113,15 @@
               <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
 
                 <label for="id-card-back-file" class="cursor-pointer flex flex-col items-center justify-center">
+                  <div v-if="imagepreviews.idCardBack" class="mb-2">
+                    <img :src="imagepreviews.idCardBack" class="max-w-full max-h-40 object-contain rounded" alt="商铺头像预览" />
+                  </div>
+                  <div v-if="!imagepreviews.idCardBack" >
                   <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                   <span class="text-gray-600">点击上传身份证反面</span>
-                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
+                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p></div>
                 </label>
-                <input type="file" class="hidden" id="id-card-back-file"  accept="image/*" required />
+                <input type="file" class="hidden" id="id-card-back-file"  accept="image/*" required  @change="handleFileChange($event, 'idCardBack')" />
               </div>
             </div>
           </div>
@@ -175,7 +191,7 @@
               @change="handleProvinceChange"
              class="block w-full px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                <option value="">请选择</option>
-             <option v-for="value in provinceList" :key="value.id" :value="value.id">{{ value.name }}</option>
+             <option v-for="value in provinceList" :key="value.id" :value="value.name">{{ value.name }}</option>
             </select>
             </div>
 
@@ -192,7 +208,7 @@
                 required
               >
                 <option value="">请选择</option>
-                <option v-for="city in cityList" :key="city.id" :value="city.id">{{ city.name }}</option>
+                <option v-for="city in cityList" :key="city.id" :value="city.name">{{ city.name }}</option>
               </select>
             </div>
             <div class="space-y-2">
@@ -247,6 +263,7 @@
           <button
             class="w-full py-3 bg-[#f77e21] text-white font-medium rounded-lg hover:bg-[#e67010] active:bg-[#d56300] transition-all shadow-md hover:shadow-lg"
             type="submit"
+            @click.prevent="submitshop()"
           >
             提交注册信息
           </button>
@@ -258,6 +275,7 @@
 
 <script lang="ts" setup>
 import { ref} from 'vue'
+import axios from 'axios'
 
 interface Province {
   id: number
@@ -270,7 +288,107 @@ interface City {
   name: string
   district: string[]
 }
+interface ImagePreviews {
+  shopAvatar: string;
+  businessLicense: string;
+  idCardFront: string;
+  idCardBack: string;
+}
+const imagepreviews = ref<ImagePreviews>({
+  shopAvatar: '',
+  businessLicense: '',
+  idCardFront: '',
+  idCardBack: ''
+});
+const handleFileChange = (event: Event, type: keyof ImagePreviews) => {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files[0]) {
+    const file = input.files[0]
 
+    if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+      alert('请上传JPG或PNG格式的图片')
+      input.value = ''
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('文件大小不能超过5MB')
+      input.value = ''
+      return
+    }
+   const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>,) => {
+      if (e.target && e.target.result) {
+        imagepreviews.value[type] = e.target.result as string;
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+const token= localStorage.getItem('token')
+console.log("获取到的token:"+token)
+
+
+const submitshop=()=>{
+  const shopName = document.getElementById('shop-name') as HTMLInputElement
+  const shopType = document.getElementById('shop-type') as HTMLSelectElement
+  const shopAvatar = document.getElementById('shop-avatar-file') as HTMLInputElement
+  const businessLicense = document.getElementById('business-license-file') as HTMLInputElement
+  const idCardFront = document.getElementById('id-card-front-file') as HTMLInputElement
+  const idCardBack = document.getElementById('id-card-back-file') as HTMLInputElement
+  const contactName = document.getElementById('contact-name') as HTMLInputElement
+  const contactPhone = document.getElementById('contact-phone') as HTMLInputElement
+  const contactEmail = document.getElementById('contact-email') as HTMLInputElement
+  const province = document.getElementById('province') as HTMLSelectElement
+  const city = document.getElementById('city') as HTMLSelectElement
+  const district = document.getElementById('district') as HTMLSelectElement
+  const address = document.getElementById('address') as HTMLInputElement
+   const shopDesc = document.getElementById('shop-desc') as HTMLTextAreaElement
+   const userId = localStorage.getItem('userId')
+   console.log(userId)
+   const formData = new FormData()
+  formData.append('userId', userId || '');
+  formData.append('shopName', shopName.value);
+  formData.append('contactName', contactName.value);
+  formData.append('contactPhone', contactPhone.value);
+  formData.append('contactEmail', contactEmail.value);
+  formData.append('province', province.value);
+  formData.append('city', city.value);
+  formData.append('district', district.value);
+  formData.append('address', address.value);
+  formData.append('description', shopDesc.value);
+  formData.append('shopType', shopType.value);
+
+  if (shopAvatar.files && shopAvatar.files[0]) {
+    formData.append('shopAvatar', shopAvatar.files[0].name);
+  }
+  if (businessLicense.files && businessLicense.files[0]) {
+    formData.append('businessLicense', businessLicense.files[0].name);
+  }
+  if (idCardFront.files && idCardFront.files[0]) {
+    formData.append('idCardFront', idCardFront.files[0].name);
+  }
+  if (idCardBack.files && idCardBack.files[0]) {
+    formData.append('idCardBack', idCardBack.files[0].name);
+  }
+console.log('FormData内容:');
+formData.forEach((value, key) => {
+  console.log(`${key}:`, value);
+});
+  axios.request({
+    url: '/server/api/shop/shops/test',
+    method: 'POST',
+    data: formData
+})
+.then(response => {
+    console.log('请求成功', response.data);
+  })
+  .catch(error => {
+      console.log('后端返回的错误详情：', error.response.data);
+      console.log('错误状态码：', error.response.status);
+  });
+
+}
 
 
 // 模拟城市数据
@@ -300,7 +418,7 @@ const districtList = ref<string[]>([])
 const handleProvinceChange = () => {
   selectedCity.value = ''
   selectedDistrict.value = ''
-  const currentProv = provinceList.find(p => p.id === Number(selectedProvince.value))
+  const currentProv = provinceList.find(p => p.name === selectedProvince.value)
   if (currentProv) {
     cityList.value = currentProv.city.map(c => ({ id: c.id, name: c.name, district: c.district }))
   } else {
@@ -310,9 +428,9 @@ const handleProvinceChange = () => {
 const handleCityChange = () => {
   selectedDistrict.value = ''
 
-  const currentProv = provinceList.find(p => p.id === Number(selectedProvince.value))
+  const currentProv = provinceList.find(p => p.name === selectedProvince.value)
   if (currentProv) {
-    const currentCity = currentProv.city.find(c => c.id === Number(selectedCity.value))
+    const currentCity = currentProv.city.find(c => c.name === selectedCity.value)
     if (currentCity) {
       districtList.value = currentCity.district
     } else {
@@ -322,7 +440,6 @@ const handleCityChange = () => {
     districtList.value = []
   }
 }
-
 </script>
 
 <style scoped>

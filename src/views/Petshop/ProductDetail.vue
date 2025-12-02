@@ -26,7 +26,7 @@
                 @click="switchMedia(i)"
               >
                 <img
-                  :src="item.thumbSrc || '/img/宠物1.jpg'"
+                  :src=" '/img/宠物1.jpg'"
                   alt="缩略图"
                   class="w-full h-full object-cover"
                 />
@@ -39,7 +39,7 @@
             <div class="flex-1 rounded-lg overflow-hidden bg-gray-100 relative">
               <img
                 ref="mainImage"
-                :src="currentMedia.src || '/img/宠物1.jpg'"
+                :src=" '/img/宠物1.jpg'"
                 alt="主图"
                 class="w-full h-[520px] object-cover transition-opacity"
                 :style="{ display: currentMedia.type === 'image' ? 'block' : 'none' }"
@@ -96,11 +96,11 @@
             <!-- 商品详情 -->
             <div v-if="activeTab === 'detail'" class="p-6 md:p-8">
               <h3 class="text-lg font-semibold mb-4">商品详情</h3>
-              <p class="text-sm text-gray-600 mb-6">{{ product.detail }}</p>
+              <p class="text-sm text-gray-600 mb-6">{{ product.detail}}</p>
               <img
                 v-for="(img, idx) in product.images?.split(',') || []"
                 :key="idx"
-                :src="img"
+                :src="'/img/宠物1.jpg'"
                 class="w-full rounded-lg mb-4"
               >
             </div>

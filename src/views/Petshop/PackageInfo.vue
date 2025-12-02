@@ -1,6 +1,5 @@
 <template>
   <div class="bg-gray-100 min-h-screen text-gray-800 font-['Microsoft_Yahei',sans-serif]">
-    <!-- 导航栏 -->
     <div class="sticky top-0 z-10 h-12 bg-[#edcf60] shadow-sm flex items-center px-5 justify-between">
       <h2 class="text-lg font-semibold text-gray-500">物流详情</h2>
       <div class="flex space-x-5">
@@ -34,13 +33,12 @@
         </div>
       </div>
 
-      <!-- 物流轨迹时间线 -->
+      <!-- 物流轨迹 -->
       <div class="bg-white rounded-lg shadow-sm p-6">
         <div class="text-base font-semibold mb-5">物流轨迹</div>
         <div class="relative pl-7">
           <div class="absolute left-2 top-0 bottom-0 w-0.5 bg-gray-100"></div>
 
-          <!-- 物流节点列表 -->
           <div
             class="relative mb-7"
             v-for="(item, index) in logisticsData"
@@ -54,7 +52,7 @@
                   : 'w-4 h-4 bg-gray-200'
               ]"
             ></div>
-            <!-- 物流节点内容 -->
+            <!-- 物流内容 -->
             <div class="flex flex-col gap-1">
               <div class="text-xs text-gray-400">{{ item.time }}</div>
               <div class="text-sm text-gray-800 leading-relaxed">{{ item.desc }}</div>
@@ -62,7 +60,6 @@
           </div>
         </div>
 
-        <!-- 操作按钮组 -->
         <div class="mt-7 flex gap-2.5 flex-wrap">
           <button
             class="px-5 py-2.5 rounded bg-[#f3ce48] text-white text-sm hover:bg-[#ef7412] transition-colors"
@@ -91,9 +88,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-// 运单基础信息：响应式数据，可从后端接口动态获取
+// 运单信息
 const waybillInfo = ref({
-  status: '已签收', // 可选状态：运输中/已揽收/派送中/已签收
+  status: '已签收',
   waybillNo: '7628941357892',
   details: {
     '快递公司': '顺丰速运',
@@ -103,7 +100,7 @@ const waybillInfo = ref({
   }
 })
 
-// 物流轨迹数据：模拟后端返回的响应式数据
+// 物流
 const logisticsData = ref([
   {
     time: '2025-11-19 18:30:25',
@@ -135,7 +132,6 @@ const logisticsData = ref([
   }
 ])
 
-// 按钮点击事件：预留业务逻辑接口
 const contactCourier = () => {
   alert('正在联系配送员，电话：139****5678')
 }

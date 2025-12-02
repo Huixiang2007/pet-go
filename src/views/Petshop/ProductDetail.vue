@@ -14,7 +14,6 @@
 
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
       <div class="product-grid grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 md:p-8">
-        <!-- 左侧缩略 -->
        <div class="lg:col-span-2">
     <div class="flex gap-4">
       <!-- 缩略图列表 -->
@@ -26,20 +25,17 @@
           :class="activeMediaIndex === i ? 'ring-2 ring-orange-400' : ''"
           @click="switchMedia(i)"
         >
-          <!-- 缩略图 -->
           <img
             :src="item.thumbSrc"
             alt="缩略图"
             class="w-full h-full object-cover"
           />
-          <!-- 视频标记（区分视频和图片） -->
           <div v-if="item.type === 'video'" class="absolute inset-0 bg-black/30 flex items-center justify-center">
             <i class="fa fa-play text-white text-sm"></i>
           </div>
         </div>
       </div>
 
-      <!-- 主内容 -->
       <div class="flex-1 rounded-lg overflow-hidden bg-gray-100 relative">
         <img
           ref="mainImage"
@@ -49,7 +45,6 @@
           :style="{ display: currentMedia.type === 'image' ? 'block' : 'none' }"
         />
 
-        <!-- 主视频 -->
         <video
           ref="videoPlayer"
           class="w-full h-[520px] object-cover"
@@ -387,7 +382,7 @@ const selectedSku = computed(() => {
   if (selectedCount !== product.value.specs.length) {
     return { price: product.value.originalPrice, stock: 0 }
   }
-  const skuKey = specKeys.join(',')//将数组拼接成字符串，作为 SKU 的唯一键
+  const skuKey = specKeys.join(',')//将数拼接成字符串，作为 SKU 的唯一键
   const skus = product.value.skus as Record<string, { price: number; stock: number }>
   return skus[skuKey] ?? { price: product.value.originalPrice, stock: 0 }
 })

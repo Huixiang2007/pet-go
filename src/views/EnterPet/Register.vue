@@ -22,35 +22,13 @@
           <div class="layui-form-item">
             <div class="layui-row">
               <div class="layui-col-xs7">
-                <div class="layui-input-wrap">
-                  <div class="layui-input-prefix">
-                    <i class="layui-icon layui-icon-email"></i>
-                  </div>
-                  <input
-                    type="text"
-                    name="cellphone"
-                    v-model="form.phone"
-                    @input="handleInput('phone', $event.target.value)"
-                    value=""
-                    lay-verify="required|QQemail"
-                    placeholder="邮箱号"
-                    lay-reqtext="请填写QQ邮箱号码"
-                    autocomplete="off"
-                    class="layui-input"
-                    id="reg-cellphone"
-                  />
-                </div>
-              </div>
-              <div class="layui-col-xs5">
-                <div style="margin-left: 11px">
-                  <button
-                    type="button"
-                    class="layui-btn layui-btn-fluid layui-btn-primary"
-                    lay-on="reg-get-vercode"
-                  >
-                    获取验证码
-                  </button>
-                </div>
+                <ConfirmCode
+                  v-model="form.email"
+                  placeholder="QQ邮箱"
+                  :is-sending="isSending"
+                  @send="SendVerificationCode"
+                  ref="ConfirmCodeRef"
+                />
               </div>
             </div>
           </div>
@@ -122,7 +100,7 @@
                 type="text"
                 name="nickname"
                 value=""
-                lay-verify="required"
+                lay-verify="required|nickname"
                 placeholder="账号"
                 v-model="form.name"
                 @input="handleInput('name', $event.target.value)"
@@ -147,12 +125,12 @@
               </label>
             </div>
             <p v-if="showError" class="error-message">
-              <span class="error-icon">⚠</span>请阅读并同意服务条款和隐私政策
+              <span class="error-icon">⚠</span>请阅读并同意用户服务协议
             </p>
           </div>
           <div class="layui-form-item">
             <button
-              class="layui-btn layui-btn-fluid"
+              class="layui-btn btn-donate"
               lay-submit
               lay-filter="demo-reg"
               @click="handleRegister"
@@ -170,16 +148,23 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useRegisterStore } from '../../stores/register'
+import ConfirmCode from '../../components/ConfirmCode.vue'
+import { start } from 'repl'
+const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> | null>(null)
 const registerStore = useRegisterStore()
 const router = useRouter()
 const route = useRoute()
 const isRegister = ref(false)
 const form = registerStore.form
-// 静态文本（非响应式，适合不需要修改的数据）
 const titleRegisterChars = '欢迎注册 PetGo'.split('')
+const countdown = ref(0)
+const timer = ref(null)
+const isSending = ref(false)
 declare global {
   interface Window {
     layui: any
@@ -188,6 +173,7 @@ declare global {
 // 响应式状态管理
 const isAgreed = ref(false) // 协议勾选状态
 const showError = ref(false) // 错误提示显示状态
+const registerActive = ref(false) // 注册按钮激活状态
 const handleInput = (key, value) => {
   // 调用Store的setField方法，更新对应字段（key必须是form中定义的：phone/vercode等）
   registerStore.setField(key, value)
@@ -218,7 +204,12 @@ const handleCheck = () => {
 /**
  * 处理注册逻辑
  */
-const handleRegister = () => {
+const handleRegister = async () => {
+  if (registerActive.value) return
+  registerActive.value = true
+  if (!form.email || !form.vercode || !form.password || !form.confirm || !form.name) {
+    return
+  }
   // 校验协议勾选状态
   if (!isAgreed.value) {
     showError.value = true
@@ -230,14 +221,78 @@ const handleRegister = () => {
     return
   }
 
-  // 执行注册逻辑（示例）
-  console.log('开始执行注册流程...')
-  // 实际场景：调用注册接口
-  // registerApi().then(res => {
-  //   console.log('注册成功', res);
-  // }).catch(err => {
-  //   console.error('注册失败', err);
-  // });
+  try {
+    console.log('wobeidianl')
+    console.log(ConfirmCodeRef.value.startCountdown())
+    // 调用注册接口
+    const response = await axios.post(
+      '/server/api/user/register',
+      {},
+      {
+        params: {
+          email: form.email,
+          code: form.vercode,
+          password: form.password,
+          account: form.name,
+        },
+      },
+    )
+    console.log(response)
+    if (response.data.code === 0) {
+      const { token, userId } = response.data.data
+
+      // 存储token到localStorage
+      localStorage.setItem('authToken', token)
+      localStorage.setItem('userId', userId)
+      ElMessage.success('注册成功')
+      // 注册成功后清空表单并跳转到登录页
+      registerStore.clearForm()
+      router.push('/Person')
+    } else {
+      ElMessage.error(response.data.msg || '注册失败')
+    }
+  } catch (error) {
+    ElMessage.error('注册失败: ' + (error as Error).message)
+  }
+}
+
+//发送验证码
+const SendVerificationCode = async (email: string) => {
+  try {
+    const qqEmailReg = /^[1-9]\d+@qq\.com$/
+    if (!qqEmailReg.test(email)) {
+      ElMessage.error('请输入正确的QQ邮箱格式')
+      return
+    }
+    if (ConfirmCodeRef.value) {
+      isSending.value = true
+    }
+    const response = await axios.post(
+      '/server/api/user/sendCode',
+      {},
+      {
+        params: { email },
+      },
+    )
+    console.log(response)
+    if (response.data.code == 0) {
+      ElMessage.success('验证码发送成功')
+      setTimeout(() => {
+        if (ConfirmCodeRef.value) {
+          ConfirmCodeRef.value.startCountdown()
+        }
+      }, 100)
+    } else {
+      ElMessage.error(response.data.msg || '验证码发送失败')
+    }
+  } catch (error) {
+    ElMessage.error('发送验证码失败: ' + (error as Error).message)
+  } finally {
+    // 重置发送状态
+    // if (ConfirmCodeRef.value) {
+    //   ConfirmCodeRef.value.isSending = false
+    // }
+  }
 }
 
 /**
@@ -260,10 +315,19 @@ onMounted(() => {
             return '请输入正确的QQ邮箱格式'
           }
         },
+        nickname: function (value: string) {
+          if (!value) {
+            return '请输入账号'
+          }
+          const nicknameReg = /^[a-zA-Z][a-zA-Z0-9]{5,19}$/
+          if (!nicknameReg.test(value)) {
+            return '账号必须是6-20位字母、数字，首位不能为数字'
+          }
+        },
         // 确认密码
         password: [
-          /^(?=.*[A-Za-z])(?=.*\d).{8,}$/, // 正则表达式
-          '密码长度不能少于8位，且必须包含字母和数字', // 验证失败提示
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/, // 正则表达式
+          '密码需8-20位，包含大小写字母、数字和特殊字符',
         ],
         confirmPassword: function (value, item) {
           var passwordValue = $('#reg-password').val()
@@ -298,7 +362,7 @@ onMounted(() => {
           const isValid = form.validate(this)
           if (!isValid) {
             // 注意：这里应该判断“验证失败”（!isValid），而非 isConfirm
-            console.log('验证失败，强制失焦')
+
             isForcedBlur = true
 
             setTimeout(() => {
@@ -316,35 +380,13 @@ onMounted(() => {
         var field = data.field // 获取表单字段值
 
         // 是否勾选同意
-        if (!field.agreement) {
-          layer.msg('您必须勾选同意用户协议才能注册')
+        if (!isAgreed.value) {
           return false
         }
+        // 调用注册接口
+        handleRegister()
 
-        // 显示填写结果，仅作演示用
-        layer.alert(JSON.stringify(field), {
-          title: '当前填写的字段值',
-        })
-
-        // 此处可执行 Ajax 等操作
-        // …
-        console.log('提交表单', data)
-        registerStore.clearForm()
         return false // 阻止默认 form 跳转
-      })
-
-      // 普通事件
-      util.on('lay-on', {
-        // 获取验证码
-        'reg-get-vercode': function (othis) {
-          var isvalid = form.validate('#reg-cellphone') // 主动触发验证，v2.7.0 新增
-          // 验证通过
-          if (isvalid) {
-            layer.msg('手机号规则验证通过')
-            // 此处可继续书写「发送验证码」等后续逻辑
-            // …
-          }
-        },
       })
     })
     const agreementCheck = route.query.isAgreed === 'true'
@@ -373,6 +415,55 @@ const toProtocal = () => {
 </script>
 
 <style scoped>
+.btn-donate {
+  --clr-font-main: hsla(0 0% 20% / 100);
+  --btn-bg-1: hsla(165, 80%, 60%, 1);
+  --btn-bg-2: hsla(217 100% 56% / 1);
+  --btn-bg-color: hsla(360 100% 100% / 1);
+  --radii: 0.5em;
+  cursor: pointer;
+  padding: 0em 1.4em;
+  min-width: 319px;
+  min-height: 44px;
+  font-size: var(--size, 1rem);
+  font-weight: 500;
+  transition: 0.8s;
+  background-size: 280% auto;
+  background-image: linear-gradient(
+    325deg,
+    var(--btn-bg-2) 0%,
+    var(--btn-bg-1) 55%,
+    var(--btn-bg-2) 90%
+  );
+  border: none;
+  border-radius: var(--radii);
+  color: var(--btn-bg-color);
+}
+
+.btn-donate:hover {
+  background-position: right top;
+}
+
+.btn-donate:is(:focus, :focus-visible, :active) {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--btn-bg-color),
+    0 0 0 6px var(--btn-bg-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-donate {
+    transition: linear;
+  }
+}
+
+.layui-col-xs5 {
+  width: 35%;
+}
+.layui-col-xs7 {
+  width: 99%;
+}
+
 .demo-goLogin {
   background-image: url('../../assets/img/background2.png');
   background-repeat: no-repeat;
@@ -385,9 +476,9 @@ const toProtocal = () => {
 }
 
 ::v-deep .layui-input {
-  height: 40px; /* 可以根据需要调整高度值，默认通常是 38px 左右 */
-  line-height: 40px; /* 保持行高与高度一致，使文字垂直居中 */
-  font-size: 15px; /* 可选：适当调整字体大小配合高度 */
+  height: 40px;
+  line-height: 40px;
+  font-size: 15px;
 }
 .layui-btn-primary {
   border-color: none !important;
@@ -413,8 +504,8 @@ const toProtocal = () => {
 .demo-login {
   min-height: 100vh;
   display: flex;
-  justify-content: center; /* 水平居中 */
-  align-items: center; /* 垂直居中 */
+  justify-content: center;
+  align-items: center;
 }
 .demo-reg-container {
   width: 320px;
@@ -429,17 +520,17 @@ const toProtocal = () => {
 }
 
 .demo-login-container {
-  width: 400px; /* 表单宽度 */
+  width: 400px;
   padding: 30px;
   background-color: rgba(951, 588, 235, 0.6); /* 半透明白色背景 */
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 阴影增强层次感 */
 }
 .container {
-  display: flex; /* 开启 Flex 布局 */
+  display: flex;
   align-items: center; /* 垂直居中对齐（可选，让文字和图片在同一水平线上） */
-  gap: 10px; /* 子元素之间的间距（可选） */
-  margin: 20px; /* 顶部外边距 */
+  gap: 10px;
+  margin: 20px;
 }
 
 /* 可选：调整文字和图片样式 */
@@ -598,11 +689,11 @@ span {
 }
 /* 注册账号文字样式 */
 .goLogin {
-  position: relative; /* 用于定位下划线伪元素 */
-  cursor: pointer; /* 鼠标悬停时显示手型（提示可点击） */
-  color: #333; /* 默认文字颜色 */
-  padding-bottom: 2px; /* 预留下划线的空间（避免文字跳动） */
-  transition: color 0.3s ease; /* 文字颜色过渡（可选） */
+  position: relative;
+  cursor: pointer;
+  color: #333;
+  padding-bottom: 2px;
+  transition: color 0.3s ease;
 }
 
 /* 下划线伪元素（初始隐藏状态） */

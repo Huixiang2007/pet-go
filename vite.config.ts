@@ -28,14 +28,14 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://8.131.100.56:8085',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
+ server: {
+  proxy: {
+    '/server': {
+      target: 'http://8.131.100.56:8085',
+      changeOrigin: true,
+      rewrite: (path) => path.replace(/^\/server/, ''), 
     },
     // https: {},
   },
+}
 })

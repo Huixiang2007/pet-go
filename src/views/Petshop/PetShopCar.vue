@@ -1,6 +1,6 @@
 <template>
   <NavBar />
-  <div class="min-h-screen bg-yellow-50">
+  <div class="min-h-screen bg-yellow-50 pt-[50px]">
     <main class="mx-auto px-4 py-8">
       <h2 class="text-2xl font-bold mb-6 flex items-center">
         <i class="fa fa-shopping-cart text-[#FF7043] mr-2"></i>
@@ -80,12 +80,11 @@
               </div>
             </div>
 
-            <!-- 小计 -->
             <div class="col-span-1 text-center text-[#FF7043] font-medium">
               ¥{{ (item.price * item.quantity).toFixed(2) }}
             </div>
 
-            <!-- 操作 -->
+
             <div class="col-span-1 text-center">
               <button
                 @click="removeItem(index)"
@@ -151,7 +150,6 @@
 </template>
 
 <script setup lang="ts">
-import NavBar from '@/components/NavBar.vue';
 import { ref, computed, watch } from 'vue';
 console.log('PetShopCar component loaded');
 interface Product {
@@ -199,7 +197,7 @@ const cartItems = ref<CartItem[]>([
   }
 ]);
 
-// 推荐商品数据
+// 推荐商品
 const recommendProducts = ref<Product[]>([
   {
     id: 101,
@@ -227,20 +225,19 @@ const recommendProducts = ref<Product[]>([
   }
 ]);
 
-// 全选状态
+
 const selectAll = ref(true);
 
-// 计算选中商品数量
+// 数量
 const selectedCount = computed(() => {
   return cartItems.value.filter(item => item.selected).reduce((sum, item) => sum + item.quantity, 0);
 });
 
-// 计算选中商品总价
+//总价
 const totalPrice = computed(() => {
   return cartItems.value.filter(item => item.selected).reduce((sum, item) => sum + (item.price * item.quantity), 0);
 });
 
-// 监听商品选中状态变化，更新全选状态
 watch(
   () => cartItems.value.map(item => item.selected),
   (newSelected) => {
@@ -256,7 +253,7 @@ const handleSelectAll = () => {
   });
 };
 
-// 单个商品选中状态变化
+
 const handleSelectItem = () => {
   selectAll.value = cartItems.value.every(item => item.selected);
 };
@@ -285,7 +282,7 @@ const removeItem = (index: number) => {
   }
 };
 
-// 改进 addToCart 方法
+
 const addToCart = (product: Product) => {
   if (!product || !product.id) {
     console.warn('无效的商品数据');
@@ -314,7 +311,5 @@ input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-input[type="number"] {
-  -moz-appearance: textfield;
-}
+
 </style>

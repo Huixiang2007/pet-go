@@ -1,5 +1,5 @@
 <template>
-  <main class=" mx-auto px-4 py-8 bg-white ">
+  <main class="mx-auto px-4 py-8 bg-white">
     <div class="flex items-center ml-[56px]">
       <img src="https://picsum.photos/id/237/80/80" alt="PetGo Logo" class="h-12 w-12" />
       <span class="ml-2 text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-500">PetGo</span>
@@ -14,67 +14,60 @@
 
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
       <div class="product-grid grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 md:p-8">
-        <!-- 左侧缩略 -->
-       <div class="lg:col-span-2">
-    <div class="flex gap-4">
-      <!-- 缩略图列表 -->
-      <div class="hidden md:flex flex-col gap-3 w-20">
-        <div
-          v-for="(item, i) in mediaList"
-          :key="i"
-          class="thumb cursor-pointer rounded-md border overflow-hidden relative"
-          :class="activeMediaIndex === i ? 'ring-2 ring-orange-400' : ''"
-          @click="switchMedia(i)"
-        >
-          <!-- 缩略图 -->
-          <img
-            :src="item.thumbSrc"
-            alt="缩略图"
-            class="w-full h-full object-cover"
-          />
-          <!-- 视频标记（区分视频和图片） -->
-          <div v-if="item.type === 'video'" class="absolute inset-0 bg-black/30 flex items-center justify-center">
-            <i class="fa fa-play text-white text-sm"></i>
-          </div>
-        </div>
-      </div>
+        <div class="lg:col-span-2">
+          <div class="flex gap-4">
+            <!-- 缩略图列表 -->
+            <div class="hidden md:flex flex-col gap-3 w-20">
+              <div
+                v-for="(item, i) in mediaList"
+                :key="i"
+                class="thumb cursor-pointer rounded-md border overflow-hidden relative"
+                :class="activeMediaIndex === i ? 'ring-2 ring-orange-400' : ''"
+                @click="switchMedia(i)"
+              >
+                <img
+                  :src=" '/img/宠物1.jpg'"
+                  alt="缩略图"
+                  class="w-full h-full object-cover"
+                />
+                <div v-if="item.type === 'video'" class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <i class="fa fa-play text-white text-sm"></i>
+                </div>
+              </div>
+            </div>
 
-      <!-- 主内容 -->
-      <div class="flex-1 rounded-lg overflow-hidden bg-gray-100 relative">
-        <img
-          ref="mainImage"
-          :src="currentMedia.src"
-          alt="主图"
-          class="w-full h-[520px] object-cover transition-opacity"
-          :style="{ display: currentMedia.type === 'image' ? 'block' : 'none' }"
-        />
+            <div class="flex-1 rounded-lg overflow-hidden bg-gray-100 relative">
+              <img
+                ref="mainImage"
+                :src=" '/img/宠物1.jpg'"
+                alt="主图"
+                class="w-full h-[520px] object-cover transition-opacity"
+                :style="{ display: currentMedia.type === 'image' ? 'block' : 'none' }"
+              />
 
-        <!-- 主视频 -->
-        <video
-          ref="videoPlayer"
-          class="w-full h-[520px] object-cover"
-          :style="{ display: currentMedia.type === 'video' ? 'block' : 'none' }"
-          controls
-          @ended="onVideoEnded"
-        >
-          <source :src="currentMedia.src" :type="`video/${currentMedia.format}`">
-          您的浏览器不支持视频播放
-        </video>
+              <video
+                ref="videoPlayer"
+                class="w-full h-[520px] object-cover"
+                :style="{ display: currentMedia.type === 'video' ? 'block' : 'none' }"
+                controls
+                @ended="onVideoEnded"
+              >
+                <source :src="currentMedia.src" :type="`video/${currentMedia.format}`">
+                您的浏览器不支持视频播放
+              </video>
 
-
-        <button
-          @click="playVideoFromImage"
-          class="absolute bottom-6 left-6 bg-black/40 text-white px-3 py-2 rounded flex items-center gap-2 hover:bg-black/60 transition-colors"
-          :style="{ display: currentMedia.type === 'image' && hasVideo ? 'flex' : 'none' }"
-        >
-          <i class="fa fa-play-circle"></i>
-          <span class="text-sm">观看产品演示视频</span>
-        </button>
-
+              <button
+                @click="playVideoFromImage"
+                class="absolute bottom-6 left-6 bg-black/40 text-white px-3 py-2 rounded flex items-center gap-2 hover:bg-black/60 transition-colors"
+                :style="{ display: currentMedia.type === 'image' && hasVideo ? 'flex' : 'none' }"
+              >
+                <i class="fa fa-play-circle"></i>
+                <span class="text-sm">观看产品演示视频</span>
+              </button>
             </div>
           </div>
 
-          <!-- 详情-->
+          <!-- 详情 -->
           <div class="border-t border-gray-200 mt-4">
             <div class="flex gap-2 px-6 py-3 overflow-x-auto">
               <button
@@ -100,13 +93,19 @@
               </button>
             </div>
 
+            <!-- 商品详情 -->
             <div v-if="activeTab === 'detail'" class="p-6 md:p-8">
               <h3 class="text-lg font-semibold mb-4">商品详情</h3>
-              <p class="text-sm text-gray-600 mb-6">高保真音质、主动降噪、长续航，适合通勤与运动场景。</p>
-              <img src="https://picsum.photos/1200/400?random=20" class="w-full rounded-lg mb-4">
-              <img src="https://picsum.photos/1200/600?random=21" class="w-full rounded-lg mb-4">
+              <p class="text-sm text-gray-600 mb-6">{{ product.detail}}</p>
+              <img
+                v-for="(img, idx) in product.images?.split(',') || []"
+                :key="idx"
+                :src="'/img/宠物1.jpg'"
+                class="w-full rounded-lg mb-4"
+              >
             </div>
 
+            <!-- 规格参数 -->
             <div v-if="activeTab === 'spec'" class="p-6 md:p-8">
               <h2 class="text-lg font-semibold mb-4">规格参数</h2>
               <table class="spec-table w-full border-collapse">
@@ -115,107 +114,110 @@
                   <th class="border border-gray-200 p-3 text-left">参数</th>
                 </tr>
                 <tr>
-                  <td class="border border-gray-200 p-3">品牌</td>
-                  <td class="border border-gray-200 p-3">SoundPro</td>
+                  <td class="border border-gray-200 p-3">商品名称</td>
+                  <td class="border border-gray-200 p-3">{{ product.title || '-' }}</td>
                 </tr>
                 <tr>
                   <td class="border border-gray-200 p-3">型号</td>
-                  <td class="border border-gray-200 p-3">SP-NC800</td>
+                  <td class="border border-gray-200 p-3">{{ product.productSn || '-' }}</td>
                 </tr>
                 <tr>
-                  <td class="border border-gray-200 p-3">降噪深度</td>
-                  <td class="border border-gray-200 p-3">40dB</td>
+                  <td class="border border-gray-200 p-3">品牌</td>
+                  <td class="border border-gray-200 p-3">{{ product.brandName || '-' }}</td>
                 </tr>
                 <tr>
-                  <td class="border border-gray-200 p-3">续航时间</td>
-                  <td class="border border-gray-200 p-3">单次8小时，总续航30小时</td>
+                  <td class="border border-gray-200 p-3">价格</td>
+                  <td class="border border-gray-200 p-3">¥{{ selectedSku.price || product.currentPrice || 0 }}</td>
                 </tr>
                 <tr>
-                  <td class="border border-gray-200 p-3">蓝牙版本</td>
-                  <td class="border border-gray-200 p-3">Bluetooth 5.3</td>
+                  <td class="border border-gray-200 p-3">重量</td>
+                  <td class="border border-gray-200 p-3">{{ product.productWeight || 0 }}kg</td>
                 </tr>
                 <tr>
-                  <td class="border border-gray-200 p-3">防水等级</td>
-                  <td class="border border-gray-200 p-3">IPX5</td>
+                  <td class="border border-gray-200 p-3">质保</td>
+                  <td class="border border-gray-200 p-3">{{ product.warrantyTip || '-' }}</td>
                 </tr>
               </table>
             </div>
 
+            <!-- 用户评价 -->
             <div v-if="activeTab === 'review'" class="p-6 md:p-8">
               <h2 class="text-lg font-semibold mb-4">用户评价</h2>
+              <p class="text-gray-600 mb-4">共 {{ product.reviewCount || 0 }} 条评价</p>
               <div class="review-item mb-6 pb-6 border-b border-gray-100">
                 <div class="review-star text-yellow-400 mb-2">
-                  <i class="fa fa-star"></i>
-                  <i class="fa fa-star"></i>
-                  <i class="fa fa-star"></i>
-                  <i class="fa fa-star"></i>
-                  <i class="fa fa-star"></i>
+                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
                 </div>
                 <p><strong>用户：张先生</strong></p>
-                <p class="text-gray-600">降噪效果真的很不错，在地铁上几乎听不到外界声音，音质也很清晰，续航能力也很强，充一次电用了好几天，值得推荐！</p>
+                <p class="text-gray-600">监控画质很清晰，夜视效果也不错，能随时看家里的宠物，很安心！</p>
               </div>
               <div class="review-item">
                 <div class="review-star text-yellow-400 mb-2">
-                  <i class="fa fa-star"></i>
-                  <i class="fa fa-star"></i>
-                  <i class="fa fa-star"></i>
-                  <i class="fa fa-star"></i>
-                  <i class="fa fa-star-half-o"></i>
+                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i>
                 </div>
                 <p><strong>用户：李女士</strong></p>
-                <p class="text-gray-600">戴着很舒服，长时间佩戴也不会觉得耳朵疼。音质方面表现出色，降噪功能在办公室使用很合适，同事说话基本听不到，工作效率都提高了。</p>
+                <p class="text-gray-600">连接很稳定，手机端操作也简单，还能语音互动，宠物听到声音会凑过来，太可爱了~</p>
               </div>
             </div>
           </div>
         </div>
 
         <!-- 右侧信息 -->
-
         <div class="lg:block lg:col-span-1">
-       <div class=" lg:fixed h-[100vh] w-[430px] bg-white p-5 mt-[-112px] pr-4">
+          <div class="lg:fixed h-[100vh] w-[430px] py-5 pl-2 mt-[-112px] pr-[6rem] overflow-auto">
             <div>
-            <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-500">TaMall · 官方旗舰店</div>
+              <div class="flex items-center justify-between">
+                <div class="text-sm text-gray-500">{{ product.shopName }}</div>
               </div>
-              <h1 class="mt-4 text-2xl font-bold">无线降噪蓝牙耳机</h1>
+              <h1 class="mt-4 text-2xl font-bold">{{ product.title}}</h1>
 
               <div class="flex items-center gap-3 mt-3">
                 <div class="flex items-center text-yellow-400">
                   <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
                 </div>
-                <div class="text-sm text-gray-500">4.8 · 2,356评价</div>
+                <div class="text-sm text-gray-500">{{ product.productScore || 0 }} · {{ product.reviewCount || 0 }}评价</div>
               </div>
             </div>
 
+            <!-- 价格区域 -->
             <div class="bg-gray-100 p-4 rounded-lg mt-3 mb-3">
-              <div class="flex items-baseline gap-4">
+              <div class="flex flex-col items-baseline gap-4">
                 <div class="text-sm text-gray-400">活动价</div>
-                <div class="text-3xl font-bold text-orange-500">¥{{ selectedSku.price }}</div>
-                <div class="text-sm text-gray-400 line-through">¥{{ product.originalPrice }}</div>
-                <div class="ml-auto text-xs px-2 py-0.5 rounded bg-orange-50 text-orange-600">直降{{ product.originalPrice - selectedSku.price }}元</div>
+                <div class="text-3xl font-bold text-orange-500">¥{{ selectedSku.price || product.currentPrice || 0 }}</div>
+                <div class="text-sm text-gray-400 line-through">¥{{ product.marketPrice || 0 }}</div>
+                <div class="text-xs py-0.5 rounded bg-orange-50 text-orange-600">
+                  直降{{ (product.marketPrice) - (product.currentPrice ) }}元
+                </div>
               </div>
-              <div class="mt-2 text-sm text-gray-500">满299减30 · 满599减80 · <a class="text-orange-500">查看更多优惠</a></div>
+              <div class="mt-2 text-sm text-gray-500">{{'无可用优惠券' }}</div>
             </div>
 
             <!-- SKU规格选择区 -->
-            <div v-for="(spec, specIndex) in product.specs" :key="specIndex" class="mb-5">
-              <h3 class="text-sm font-medium text-gray-600 mb-2">{{ spec.name }}</h3>
-              <div class="flex gap-3 flex-wrap">
-                <button
-                  v-for="(option, optIndex) in spec.options"
-                  :key="optIndex"
-                  @click="selectSpec(spec.id, option.id)"
-                  :class="{
-                    'border-2 border-orange-400 bg-orange-50': selectedSpecs[spec.id] === option.id,
-                    'border border-gray-200 hover:border-gray-400': selectedSpecs[spec.id] !== option.id && option.available,
-                    'border border-gray-200 opacity-50 cursor-not-allowed': !option.available
-                  }"
-                  :disabled="!option.available"
-                  class="px-4 py-2 rounded-md text-sm transition-colors"
-                >
-                  {{ option.value }}
-                  <span v-if="!option.available" class="ml-1 text-xs">无货</span>
-                </button>
+            <div v-if="specGroups.length > 0">
+              <div v-for="(group, groupIndex) in specGroups" :key="groupIndex" class="mb-5">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">{{ group.name }}</h3>
+                <div class="flex gap-3 flex-wrap">
+                  <button
+                    v-for="(option, optIndex) in group.options"
+                    :key="optIndex"
+                    @click="selectSkuOption(group.name, option)"
+                    :class="{
+                      'border-2 border-orange-400 bg-orange-50': selectedOptions[group.name] === option,
+                      'border border-gray-200 hover:border-gray-400': selectedOptions[group.name] !== option
+                    }"
+                    class="px-4 py-2 rounded-md text-sm transition-colors"
+                  >
+                    {{ option }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- 已选规格显示 -->
+              <div v-if="Object.keys(selectedOptions).length > 0" class="mb-5">
+                <h3 class="text-sm font-medium text-gray-600 mb-2">已选</h3>
+                <div class="text-sm text-gray-500">
+                  <span v-for="(value, key) in selectedOptions" :key="key" class="mr-3">{{ key }}: {{ value }}</span>
+                </div>
               </div>
             </div>
 
@@ -240,7 +242,7 @@
             </div>
 
             <div class="mt-3 text-sm text-gray-500">
-              库存：<span class="text-green-600">{{ selectedSku.stock }}</span> 件
+              库存：<span class="text-green-600">{{ selectedSku.stock || 999 }}</span> 件
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100 mt-4">
@@ -261,8 +263,7 @@
             </div>
 
             <div class="text-sm text-gray-500 pt-4 border-t border-gray-100 flex flex-wrap gap-3">
-              <div class="flex items-center gap-2"><i class="fa fa-check-circle text-orange-500"></i>7天无理由</div>
-              <div class="flex items-center gap-2"><i class="fa fa-check-circle text-orange-500"></i>2年官方质保</div>
+              <div class="flex items-center gap-2"><i class="fa fa-check-circle text-orange-500"></i>{{ product.warrantyTip || '正品保障' }}</div>
             </div>
           </div>
         </div>
@@ -272,141 +273,290 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue'
-const activeTab = ref('detail')
+import axios from 'axios'
+import { ref, computed, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+interface MediaItem { //定义媒体资源
+  type: 'image' | 'video'
+  src: string
+  thumbSrc: string
+  format: string
+}
 
-const mediaList = ref([
-  {
-    type: 'video',
-    src: 'https://storage.googleapis.com/web-dev-assets/video-and-source-tags/chrome.mp4',
-    thumbSrc: 'https://picsum.photos/120/120?random=3',
-    format: 'mp4'
-  },
-  {
-    type: 'image', // 类型：图片
-    src: 'https://picsum.photos/1200/400?random=1', // 图片地址
-    thumbSrc: 'https://picsum.photos/120/120?random=1' // 缩略图地址
-  },
-  {
-    type: 'image',
-    src: 'https://picsum.photos/1200/400?random=2',
-    thumbSrc: 'https://picsum.photos/120/120?random=2'
-  },
-  {
-    type: 'image',
-    src: 'https://picsum.photos/1200/400?random=4',
-    thumbSrc: 'https://picsum.photos/120/120?random=4'
-  }
-])
+interface SkuInfo { //定义SKU信息
+  skuId: number
+  productId: number
+  skuSn: string
+  specJson: string | null
+  specText: string
+  imageUrl?: string
+  price?: number
+  stock?: number
+  volume?: number
+  weight?: number
+}
 
-// 状态管理
-const activeMediaIndex = ref(0)
-const videoPlayer = ref<HTMLVideoElement | null>(null)
+interface Product { //定义产品信息
+  shopName: string
+  title: string
+  productScore: number
+  reviewCount: number
+  currentPrice: number
+  marketPrice: number
+  detail: string
+  images: string
+  mainImage: string
+  videoUrl: string
+  productSn: string
+  brandName: string
+  productWeight: number
+  warrantyTip: string
+  skuList: SkuInfo[]
+}
 
-const currentMedia = computed(() => {
-  return mediaList.value[activeMediaIndex.value] || { type: 'image', src: '', thumbSrc: '', format: 'mp4' }
+interface SpecGroup { //定义规格组
+  name: string
+  options: string[]
+}
+
+interface SelectedSku { //定义选中的SKU信息
+  price: number
+  stock: number
+}
+
+const activeTab = ref('detail') //页面转台
+const route = useRoute()
+const id = route.params.id as string
+console.log('产品ID:', id)
+
+// 产品数据
+const product = ref<Product>({
+  shopName: "",
+  title: "",
+  productScore: 0,
+  brandName: "",
+  reviewCount: 0,
+  currentPrice: 0,
+  marketPrice: 0,
+  detail: "",
+  images: "",
+  mainImage: "",
+  videoUrl: "",
+  productSn: "",
+  productWeight: 0,
+  warrantyTip: "",
+  skuList: []
 })
 
+// 媒体
+const mediaList = ref<MediaItem[]>([
+  { type: 'image',
+   src: '',
+   thumbSrc: '',
+   format: 'jpg' }
+])
+const activeMediaIndex = ref(0) // 当前媒体索引
+const mainImage = ref<HTMLImageElement>()
+const videoPlayer = ref<HTMLVideoElement>()
+
+const selectedOptions = ref<Record<string, string>>({})  // 选中的规格选项
+const selectedSkuInfo = ref<SkuInfo | null>(null)  // 选中的SKU信息
+
+// 数量
+const qty = ref<number>(1)
+
+// 计算当前媒体
+const currentMedia = computed<MediaItem>(() => {
+  return mediaList.value[activeMediaIndex.value] || { type: 'image', src: '', thumbSrc: '', format: 'jpg' }
+})
+
+// 是否有视频
 const hasVideo = computed(() => {
   return mediaList.value.some(item => item.type === 'video')
 })
 
-// 切换媒体
-function switchMedia(index: number) {
-  if (currentMedia.value?.type === 'video') {
-    videoPlayer.value?.pause()
+// 计算规格组和选项
+const specGroups = computed<SpecGroup[]>(() => {
+  const groups: SpecGroup[] = []
+  const specMap = new Map<string, Set<string>>()
+
+  // 从所有SKU中提取规格信息
+  if (product.value.skuList && Array.isArray(product.value.skuList) && product.value.skuList.length > 0) {
+    product.value.skuList.forEach((sku: SkuInfo) => {
+      if (sku.specText) {
+        const specs = sku.specText.split(';')
+        specs.forEach((spec: string) => {
+          const [name, value] = spec.split(':')
+          if (name && value) {
+            if (!specMap.has(name)) {  //判断是否已有该规格组，没有则新建
+              specMap.set(name, new Set())
+            }
+            specMap.get(name)?.add(value)  //有的话添加到该规格组的选项集合中
+          }
+        })
+      }
+    })
   }
-  // 更新选中索引
+
+  specMap.forEach((options, name) => {
+    groups.push({
+      name,  // 规格组名称
+      options: Array.from(options) // 转换为数组
+    })
+  })
+  return groups
+})
+
+// 计算选中的SKU信息
+const selectedSku = computed<SelectedSku>(() => {
+  if (selectedSkuInfo.value) {
+    return {
+      price: selectedSkuInfo.value.price || product.value.currentPrice || 0,
+      stock: selectedSkuInfo.value.stock || 999
+    }
+  }
+  return {
+    price: product.value.currentPrice || 0,
+    stock: 999
+  }
+})
+
+// 判断是否选完规格
+const isSkuSelected = computed(() => {
+  return specGroups.value.length === 0 ||
+    Object.keys(selectedOptions.value).length === specGroups.value.length
+})
+
+const productDetail = () => {
+  axios.request({
+    url: "/server/api/shop/product/detail/" + id,
+    method: 'GET',
+    params: {
+      id: id
+    }
+  })
+  .then(res => {
+    console.log('接口返回数据:', res)
+    const productNew = res.data.data
+    product.value = productNew
+
+    const imageList = productNew.images?.split(',') || []
+    const mainImage = productNew.mainImage || imageList[0] || ""
+
+    // 初始化媒体列表
+    mediaList.value = [
+      {
+        type: 'image',
+        src: mainImage,
+        thumbSrc: mainImage,
+        format: 'jpg'
+      }
+    ]
+
+    // 添加剩余图片
+    if (imageList.length > 1) {
+      imageList.slice(1).forEach((img: string) => {
+        mediaList.value.push({
+          type: 'image',
+          src: img || "",
+          thumbSrc: img || "",
+          format: 'jpg'
+        })
+      })
+    }
+
+    // 添加视频
+    if (productNew.videoUrl && productNew.videoUrl !== "暂无商品视频url") {
+      mediaList.value.unshift({
+        type: 'video',
+        src: productNew.videoUrl,
+        thumbSrc: mainImage,
+        format: 'mp4'
+      })
+    }
+
+    // 初始化默认选中第一个SKU
+    if (productNew.skuList && Array.isArray(productNew.skuList) && productNew.skuList.length > 0) {
+      selectedSkuInfo.value = productNew.skuList[0]
+
+      if (selectedSkuInfo.value ) {
+        const specs = selectedSkuInfo.value.specText.split(';') //选中的规格组分开
+        specs.forEach((spec: string) => {    //遍历规格组
+          const [name, value] = spec.split(':')  //分割规格名和值
+          if (name && value) {
+            selectedOptions.value[name] = value
+          }
+        })
+      }
+    }
+  })
+  .catch(err => {
+    console.log('产品详情请求失败:', err)
+    console.log('错误详情:', err.response.data)
+  })
+}
+
+
+function selectSkuOption(specName: string, option: string) {
+  selectedOptions.value[specName] = option
+
+  // 根据已选选项查找匹配的SKU
+  const matchSku = findMatchingSku()
+  if (matchSku) {
+    selectedSkuInfo.value = matchSku
+  }
+}
+
+// 查找匹配的SKU
+function findMatchingSku(): SkuInfo | null {
+  if (!product.value.skuList || !Array.isArray(product.value.skuList) || product.value.skuList.length === 0) {
+    return null
+  }
+
+  return product.value.skuList.find((sku: SkuInfo) => {
+    if (!sku.specText) return false
+
+    const specs = sku.specText.split(';')
+    return specs.every((spec: string) => {
+      const [name, value] = spec.split(':')
+      if (!name || !value) return true
+      return !selectedOptions.value[name] || selectedOptions.value[name] === value
+    })
+  }) || null
+}
+
+// 媒体相关函数
+function switchMedia(index: number) {
   activeMediaIndex.value = index
-  if (mediaList.value[index]?.type === 'video') {
+  if (videoPlayer.value) {
+    videoPlayer.value.pause()
+  }
+}
+
+function playVideoFromImage() {
+  // 查找第一个视频并播放
+  const videoIndex = mediaList.value.findIndex(item => item.type === 'video')
+  if (videoIndex !== -1) {
+    activeMediaIndex.value = videoIndex
     setTimeout(() => {
-      videoPlayer.value?.play()
+      if (videoPlayer.value) {
+        videoPlayer.value.play()
+      }
     }, 100)
   }
 }
 
-// 从图片状态直接播放视频
-function playVideoFromImage() {
-  const videoIndex = mediaList.value.findIndex(item => item.type === 'video')
-  if (videoIndex !== -1) {
-    switchMedia(videoIndex)
-  }
-}
-
-// 视频播放结束时
 function onVideoEnded() {
-  activeMediaIndex.value = 0
+  // 视频播放结束后切换回第一个图片
+  const firstImageIndex = mediaList.value.findIndex(item => item.type === 'image')
+  if (firstImageIndex !== -1) {
+    activeMediaIndex.value = firstImageIndex
+  }
 }
 
-// SKU核心数据
-const product = ref({
-  name: '无线降噪蓝牙耳机',
-  originalPrice: 499,
-  specs: [
-    {
-      id: 'color',
-      name: '颜色',
-      options: [
-        { id: 'black', value: '黑色', available: true },
-        { id: 'white', value: '白色', available: true },
-        { id: 'blue', value: '蓝色', available: false },
-        { id: 'green', value: '绿色', available: true }
-      ]
-    },
-    {
-      id: 'version',
-      name: '规格',
-      options: [
-        { id: 'standard', value: '标准版', available: true },
-        { id: 'deluxe', value: '豪华版', available: true }
-      ]
-    }
-  ],
-  // SKU映射表：颜色ID,规格ID -> 价格和库存
-  skus: {
-    'black,standard': { price: 299, stock: 120 },
-    'black,deluxe': { price: 399, stock: 80 },
-    'white,standard': { price: 299, stock: 50 },
-    'white,deluxe': { price: 399, stock: 30 },
-    'blue,standard': { price: 299, stock: 0 },
-    'blue,deluxe': { price: 399, stock: 0 },
-    'green,standard': { price: 299, stock: 75 },
-    'green,deluxe': { price: 399, stock: 45 }
-  }
-})
-
-const selectedSpecs = ref<Record<string, string>>({})
-
-// 计算当前选中的SKU
-const selectedSku = computed(() => {
-  //收集用户选择的具体规格 ID，得到一个数组
-  const specKeys = product.value.specs.map(spec => selectedSpecs.value[spec.id])
-  //用于过滤掉未选择的规格
-  const selectedCount = specKeys.filter(Boolean).length
-  //如果已选数量 不等于 总规格类型数量,返回原来的价格
-  if (selectedCount !== product.value.specs.length) {
-    return { price: product.value.originalPrice, stock: 0 }
-  }
-  const skuKey = specKeys.join(',')//将数组拼接成字符串，作为 SKU 的唯一键
-  const skus = product.value.skus as Record<string, { price: number; stock: number }>
-  return skus[skuKey] ?? { price: product.value.originalPrice, stock: 0 }
-})
-
-// 判断是否已选择完整规格
-const isSkuSelected = computed(() => {
-  return Object.keys(selectedSpecs.value).length === product.value.specs.length
-})
-
-// 选择规格
-function selectSpec(specId: string, optionId: string) {
-  selectedSpecs.value[specId] = optionId
-}
-
-// 数量控制
-const qty = ref<number>(1)
-
+// 数量控制函数
 function increase() {
-  if (qty.value < selectedSku.value.stock) {
+  if (qty.value < (selectedSku.value.stock || 999)) {
     qty.value++
   }
 }
@@ -417,9 +567,15 @@ function decrease() {
   }
 }
 
-// 监听SKU变化，重置数量不超过库存
+// 监听SKU变化重置数量
 watch(selectedSku, (newSku) => {
-  qty.value = Math.min(qty.value, newSku.stock)
+  qty.value = Math.min(qty.value, newSku.stock || 999)
+})
+
+onMounted(() => {
+  if (id) {
+    productDetail()
+  }
 })
 </script>
 
@@ -430,5 +586,28 @@ watch(selectedSku, (newSku) => {
 
 :deep(.lg\:sticky) {
   align-self: start;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button.option-active {
+  border-color: #f5a623;
+  background-color: #fff8ee;
+}
+
+
+.thumb {
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+.spec-table th {
+  background-color: #f8f9fa;
+}
+
+.spec-table tr:hover {
+  background-color: #f8f9fa;
 }
 </style>

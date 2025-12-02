@@ -2,7 +2,6 @@ import axios from 'axios'
 import type { Method, AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus' // 需引入Element组件
 const service = axios.create({
-  
   timeout: 5000,
 })
 //请求拦截器
@@ -10,9 +9,8 @@ service.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken')
     if (token && config.headers) {
-     
       config.headers.Authorization = `Bearer ${token}`
-    }else{
+    } else {
       console.log('token不存在')
     }
     return config
@@ -26,8 +24,8 @@ service.interceptors.request.use(
 type Data<T = any> = {
   code: number
   msg: string
-  data: T,
-  level: null,
+  data: T
+  level: null
   ok: boolean
 }
 service.interceptors.response.use(
@@ -128,22 +126,24 @@ service.interceptors.response.use(
 //axios中的ts认为data有的，但是响应拦截器实际去掉了
 //再次对请求方法进行封装
 
-const request = <T=any>(
+const request = <T = any>(
   //参数
   url: string,
   method: Method,
   submitData: object,
-  config: AxiosRequestConfig={},
+  config: AxiosRequestConfig = {},
 ) => {
   //T, Data<T>分别表示请求数据类型（暂时用不到）和响应数据类型
-  return service.request<Data<T>, AxiosResponse<Data<T>>>({
-    url,
-    method,
-    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData,
-    ...config,
-  }).then(response => {
-    // 直接返回业务数据，简化调用方使用
-    return response.data
-  })
+  return service
+    .request<Data<T>, AxiosResponse<Data<T>>>({
+      url,
+      method,
+      [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData,
+      ...config,
+    })
+    .then((response) => {
+      // 直接返回业务数据，简化调用方使用
+      return response.data
+    })
 }
 export default request

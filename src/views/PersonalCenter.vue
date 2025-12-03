@@ -342,8 +342,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 // import axios from 'axios'
 import request from '../utils/request'
 import AddressSelect from '../components/AddressSelect.vue'
-// import { el } from 'element-plus/es/locale'
-// import { type } from 'os'
+import { type } from 'os'
 
 declare global {
   interface Window {

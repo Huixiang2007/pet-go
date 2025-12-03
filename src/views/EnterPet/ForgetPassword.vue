@@ -126,7 +126,6 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '../../utils/request'
-import { el } from 'element-plus/es/locale'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 declare global {

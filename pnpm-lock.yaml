@@ -17,9 +17,12 @@ importers:
       axios:
         specifier: ^1.13.2
         version: 1.13.2
+      china-division:
+        specifier: ^2.7.0
+        version: 2.7.0
       element-plus:
-        specifier: ^2.11.7
-        version: 2.11.7(vue@3.5.24(typescript@5.9.3))
+        specifier: ^2.11.8
+        version: 2.11.9(vue@3.5.24(typescript@5.9.3))
       pinia:
         specifier: ^3.0.3
         version: 3.0.4(typescript@5.9.3)(vue@3.5.24(typescript@5.9.3))
@@ -39,6 +42,9 @@ importers:
       '@types/node':
         specifier: ^22.18.11
         version: 22.19.0
+      '@types/qs':
+        specifier: ^6.14.0
+        version: 6.14.0
       '@vitejs/plugin-vue':
         specifier: ^6.0.1
         version: 6.0.1(vite@7.2.2(@types/node@22.19.0)(jiti@2.6.1)(sass-embedded@1.93.3)(sass@1.94.2))(vue@3.5.24(typescript@5.9.3))
@@ -759,6 +765,9 @@ packages:
   '@types/node@22.19.0':
     resolution: {integrity: sha512-xpr/lmLPQEj+TUnHmR+Ab91/glhJvsqcjB+yY0Ix9GO70H6Lb4FHH5GeqdOE5btAx7eIMwuHkp4H2MSkLcqWbA==, tarball: https://registry.npmmirror.com/@types/node/-/node-22.19.0.tgz}
 
+  '@types/qs@6.14.0':
+    resolution: {integrity: sha512-eOunJqu0K1923aExK6y8p6fsihYEn/BYuQ4g0CxAAgFc4b/ZLN4CrsRZ55srTdqoiLzU2B2evC+apEIxprEzkQ==, tarball: https://registry.npmmirror.com/@types/qs/-/qs-6.14.0.tgz}
+
   '@types/web-bluetooth@0.0.16':
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==, tarball: https://registry.npmmirror.com/@types/web-bluetooth/-/web-bluetooth-0.0.16.tgz}
 
@@ -1073,6 +1082,9 @@ packages:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==, tarball: https://registry.npmmirror.com/chalk/-/chalk-4.1.2.tgz}
     engines: {node: '>=10'}
 
+  china-division@2.7.0:
+    resolution: {integrity: sha512-4uUPAT+1WfqDh5jytq7omdCmHNk3j+k76zEG/2IqaGcYB90c2SwcixttcypdsZ3T/9tN1TTpBDoeZn+Yw/qBEA==, tarball: https://registry.npmmirror.com/china-division/-/china-division-2.7.0.tgz}
+
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==, tarball: https://registry.npmmirror.com/chokidar/-/chokidar-3.6.0.tgz}
     engines: {node: '>= 8.10.0'}
@@ -1179,8 +1191,8 @@ packages:
   electron-to-chromium@1.5.249:
     resolution: {integrity: sha512-5vcfL3BBe++qZ5kuFhD/p8WOM1N9m3nwvJPULJx+4xf2usSlZFJ0qoNYO2fOX4hi3ocuDcmDobtA+5SFr4OmBg==, tarball: https://registry.npmmirror.com/electron-to-chromium/-/electron-to-chromium-1.5.249.tgz}
 
-  element-plus@2.11.7:
-    resolution: {integrity: sha512-Bh47wuzsqaNBNDkbtlOlZER1cGcOB8GsXp/+C9b95MOrk0wvoHUV4NKKK7xMkfYNFYdYysQ752oMhnExgAL6+g==, tarball: https://registry.npmmirror.com/element-plus/-/element-plus-2.11.7.tgz}
+  element-plus@2.11.9:
+    resolution: {integrity: sha512-yTckX+fMGDGiBHVL1gpwfmjEc8P8OwuyU5ZX3f4FhMy2OdC2Y+OwQYWUXmuB+jFMukuSdnGYXYgHq6muBjSxTg==, tarball: https://registry.npmmirror.com/element-plus/-/element-plus-2.11.9.tgz}
     peerDependencies:
       vue: ^3.2.0
 
@@ -2954,6 +2966,8 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/qs@6.14.0': {}
+
   '@types/web-bluetooth@0.0.16': {}
 
   '@typescript-eslint/eslint-plugin@8.46.3(@typescript-eslint/parser@8.46.3(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.1(jiti@2.6.1))(typescript@5.9.3)':
@@ -3367,6 +3381,8 @@ snapshots:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
 
+  china-division@2.7.0: {}
+
   chokidar@3.6.0:
     dependencies:
       anymatch: 3.1.3
@@ -3455,7 +3471,7 @@ snapshots:
 
   electron-to-chromium@1.5.249: {}
 
-  element-plus@2.11.7(vue@3.5.24(typescript@5.9.3)):
+  element-plus@2.11.9(vue@3.5.24(typescript@5.9.3)):
     dependencies:
       '@ctrl/tinycolor': 3.6.1
       '@element-plus/icons-vue': 2.3.2(vue@3.5.24(typescript@5.9.3))

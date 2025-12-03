@@ -83,6 +83,8 @@ declare module 'vue' {
     Family: typeof import('./src/components/Family.vue')['default']
     FamilyEntry: typeof import('./src/components/FamilyEntry.vue')['default']
     FileUpload: typeof import('./src/components/FileUpload.vue')['default']
+    FlashSale: typeof import('./src/components/FlashSale.vue')['default']
+    FlashSaleProduct: typeof import('./src/components/FlashSaleProduct.vue')['default']
     FragmentCarousel: typeof import('./src/components/FragmentCarousel.vue')['default']
     Growth: typeof import('./src/components/growth.vue')['default']
     GrowthAlbum: typeof import('./src/components/GrowthAlbum.vue')['default']

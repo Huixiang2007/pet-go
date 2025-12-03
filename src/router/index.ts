@@ -83,7 +83,8 @@ const routes = [
     name: 'SellerOrderManager',
     component: () => import('@/views/Petshop/SellerOrderMana.vue'),
   },
-  // 用户管理
+      // 电商用户管理
+
   {
     path: '/SellerUserManager',
     name: 'SellerUserManager',
@@ -119,7 +120,12 @@ const routes = [
     name: 'Analytics',
     component: () => import('@/views/Petshop/SalesAnalytics.vue'),
   },
-  // 客服
+          // 秒杀
+  {
+    path: '/FlashSale' ,
+    name: 'FlashSale',
+    component: () => import('@/views/Petshop/FlashSale.vue'),
+  },
   {
     path: '/CustomerService',
     name: 'CustomerService',

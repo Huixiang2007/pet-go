@@ -3,41 +3,19 @@
     <!-- 顶部用户核心信息 -->
     <header class="profile-header">
       <div class="user-info">
-        <!-- <div class="avatar-container">
-          <img 
-            :src="userInfo.avatar" 
-            alt="用户头像" 
-            class="avatar"
-            @click="isUploadingAvatar = true"
-          >
-          <input 
-            type="file" 
-            ref="avatarInput" 
-            accept="image/*" 
-            class="avatar-upload"
-            @change="handleAvatarUpload"
-          >
-          <div v-if="isUploadingAvatar" class="avatar-overlay" @click.stop>
-            <i class="layui-icon layui-icon-camera"></i>
-            <span>更换头像</span>
+        <div class="layui-input-block avatar-upload">
+          <div class="avatar-preview">
+            <img :src="userInfo.avatar" alt="用户头像" class="avatar-img" />
+            <div class="avatar-upload-overlay">
+              <i class="layui-icon layui-icon-camera"></i>
+              <input type="file" accept="image/*" @change="handleAvatarUpload" class="avatar-file" />
+            </div>
           </div>
-        </div> -->
-        <!-- 头像设置区域 -->
-
-  
-  <div class="layui-input-block avatar-upload">
-    <div class="avatar-preview">
-      <img :src="userInfo.avatar" alt="用户头像" class="avatar-img" />
-      <div class="avatar-upload-overlay">
-        <i class="layui-icon layui-icon-camera"></i>
-        <input type="file" accept="image/*" @change="handleAvatarUpload" class="avatar-file" />
-      </div>
-    </div>
-  </div>
+        </div>
 
         <div class="user-details">
           <h2 class="nickname">{{ userInfo.nickname }}</h2>
-          <p class="user-id">ID: {{ userInfo.userId }}</p>
+          <p class="user-id">邮箱: {{ userInfo.email }}</p>
         </div>
       </div>
       <div class="header-actions">
@@ -51,12 +29,8 @@
       <!-- 侧边导航栏 -->
       <aside class="sidebar">
         <ul class="nav-list">
-          <li 
-            v-for="(item, index) in navItems" 
-            :key="index"
-            :class="{ active: currentTab === index }"
-            @click="currentTab = index"
-          >
+          <li v-for="(item, index) in navItems" :key="index" :class="{ active: currentTab === index }"
+            @click="currentTab = index">
             <i class="layui-icon" :class="item.icon"></i>
             <span>{{ item.name }}</span>
           </li>
@@ -66,7 +40,7 @@
       <!-- 内容展示区 -->
       <main class="content-area">
         <div class="content-header">
-          <h1>{{ navItems[currentTab].name }}</h1>
+          <h1>{{ navItems[currentTab]?.name }}</h1>
         </div>
 
         <div class="content-wrapper">
@@ -75,81 +49,50 @@
             <div class="layui-form-item">
               <label class="layui-form-label">昵称</label>
               <div class="layui-input-block">
-                <input 
-                  type="text" 
-                  name="nickname" 
-                  v-model="formData.nickname" 
-                  lay-verify="required"
-                  placeholder="请输入昵称" 
-                  class="layui-input"
-                >
+                <input type="text" name="nickname" v-model="formData.nickname" lay-verify="required" placeholder="请输入昵称"
+                  class="layui-input" />
               </div>
             </div>
 
             <div class="layui-form-item">
               <label class="layui-form-label">性别</label>
               <div class="layui-input-block">
-                <input type="radio" name="sex" value="1" v-model="formData.sex" title="男" >
-                <input type="radio" name="sex" value="2" v-model="formData.sex" title="女" >
-                <!-- <input type="radio" name="sex" value="secret" v-model="formData.sex" title="保密"> -->
-                
+                <input type="radio" name="sex" value="1" v-model="formData.sex" title="男" />
+                <input type="radio" name="sex" value="2" v-model="formData.sex" title="女" />
               </div>
             </div>
 
-              <div class="layui-form-item">
-      <label class="layui-form-label">生日</label>
-      <div class="layui-input-block">
-        <input 
-          type="date" 
-          name="birthday" 
-          v-model="formData.birthday" 
-          placeholder="请选择生日日期" 
-          class="layui-input"
-          :max="maxBirthdayDate"
-        >
-      </div>
-    </div>
-
-              <div class="layui-form-item" >
-              <label class="layui-form-label">手机号</label>
-              <div class="layui-input-block">
-                <input 
-                  type="text" 
-                  name="Phone"  
-                  v-model="formData.phone"
-                  lay-verify="required|phone"
-                  placeholder="请输入手机号" 
-                  class="layui-input"
-                >
-              </div>
-            </div>     
-
             <div class="layui-form-item">
-              <label class="layui-form-label">个性签名</label>
+              <label class="layui-form-label">生日</label>
               <div class="layui-input-block">
-                 <textarea 
-        name="signature" 
-        v-model="formData.signature" 
-        placeholder="请输入个性签名" 
-        class="layui-textarea"
-        rows="3"
-        @input="handleSignatureInput" 
-        :maxlength="maxSignatureLength" 
-      ></textarea>
-      <!-- 字数提示 -->
-      <p class="word-count">
-        {{ formData.signature.length }}/{{ maxSignatureLength }} 字
-      </p>
+                <el-date-picker v-model="formData.birthday" type="date" name="birthday" placeholder="请选择生日日期"
+                  :max-date="new Date(maxBirthdayDate)" value-format="YYYY-MM-DD" style="width: 100%"
+                  :disabled-date="disabledDate" />
               </div>
             </div>
 
-      
+            <div class="layui-form-item">
+              <label class="layui-form-label">手机</label>
+              <div class="layui-input-block">
+                <input type="text" name="Phone" v-model="formData.phone" lay-verify="required|phone"
+                  placeholder="请输入手机号" class="layui-input" />
+              </div>
+            </div>
+
+            <div class="layui-form-item">
+              <label class="layui-form-label">邮箱</label>
+              <div class="layui-input-block">
+                <input type="text" name="email" v-model="formData.email" placeholder="请输入邮箱" class="layui-input"
+                  readonly />
+              </div>
+            </div>
 
             <div class="layui-form-item">
               <div class="layui-input-block">
-                <button class="layui-btn btn-save" lay-submit lay-filter="save-base-info">保存修改</button>
-           <button class="layui-btn  delete-btn" @click="cancelEdit">取消修改</button>
-
+                <button class="layui-btn btn-save" lay-submit lay-filter="save-base-info">
+                  保存修改
+                </button>
+                <button class="layui-btn delete-btn" @click="cancelEdit">取消修改</button>
               </div>
             </div>
           </form>
@@ -158,11 +101,18 @@
           <form class="layui-form profile-form" v-if="currentTab === 1">
             <div class="verify-status" v-if="realNameStatus !== 'unverified'">
               <div class="status-icon" :class="realNameStatus === 'verified' ? 'success' : 'pending'">
-                <i class="layui-icon" :class="realNameStatus === 'verified' ? 'layui-icon-ok-circle' : 'layui-icon-clock'"></i>
+                <i class="layui-icon" :class="realNameStatus === 'verified' ? 'layui-icon-ok-circle' : 'layui-icon-clock'
+                  "></i>
               </div>
               <div class="status-text">
                 <h3>{{ realNameStatus === 'verified' ? '已实名认证' : '实名认证审核中' }}</h3>
-                <p>{{ realNameStatus === 'verified' ? '您已完成实名认证，不可修改' : '您的实名认证申请正在审核中，请耐心等待' }}</p>
+                <p>
+                  {{
+                    realNameStatus === 'verified'
+                      ? '您已完成实名认证，不可修改'
+                      : '您的实名认证申请正在审核中，请耐心等待'
+                  }}
+                </p>
               </div>
             </div>
 
@@ -170,54 +120,51 @@
               <div class="layui-form-item">
                 <label class="layui-form-label">真实姓名</label>
                 <div class="layui-input-block">
-                  <input 
-                    type="text" 
-                    name="realName" 
-                    v-model="realNameForm.realName" 
-                    lay-verify="required"
-                    placeholder="请输入真实姓名" 
-                    class="layui-input"
-                  >
+                  <input type="text" name="realName" v-model="realNameForm.realName" lay-verify="required"
+                    placeholder="请输入真实姓名" class="layui-input" />
                 </div>
               </div>
 
               <div class="layui-form-item">
                 <label class="layui-form-label">身份证号</label>
                 <div class="layui-input-block">
-                  <input 
-                    type="text" 
-                    name="idCard" 
-                    v-model="realNameForm.idCard" 
-                    lay-verify="required|idCard"
-                    placeholder="请输入身份证号" 
-                    class="layui-input"
-                  >
+                  <input type="text" name="idCard" v-model="realNameForm.idCard" lay-verify="required|idCard"
+                    placeholder="请输入身份证号" class="layui-input" />
                 </div>
               </div>
 
               <div class="layui-form-item">
                 <label class="layui-form-label">身份证照片</label>
                 <div class="layui-input-block">
-                  <button type="button" class="layui-btn" @click="selectIdCardPhoto('front')">
-                    <i class="layui-icon layui-icon-upload"></i> 上传身份证正面
+                  <button type="button" class="layui-btn" @click="selectIdCardPhoto('front')"
+                    style="background-color: #59d4c8; display: block">
+                    <i class="layui-icon layui-icon-upload"></i> 上传身份证信息面
                   </button>
-                  <p class="upload-hint" v-if="realNameForm.idCardFront">已上传正面照片</p>
+                  <div v-if="realNameForm.idCardFront" class="id-card-preview">
+                    <img :src="realNameForm.idCardFront" alt="身份证个人信息面" class="id-card-img" />
+                    <p class="preview-label">身份证信息面预览</p>
+                  </div>
                 </div>
               </div>
 
               <div class="layui-form-item">
                 <label class="layui-form-label"></label>
                 <div class="layui-input-block">
-                  <button type="button" class="layui-btn" @click="selectIdCardPhoto('back')">
-                    <i class="layui-icon layui-icon-upload"></i> 上传身份证反面
+                  <button type="button" class="layui-btn" @click="selectIdCardPhoto('back')"
+                    style="background-color: #59d4c8; display: block">
+                    <i class="layui-icon layui-icon-upload"></i> 上传身份证国徽面
                   </button>
-                  <p class="upload-hint" v-if="realNameForm.idCardBack">已上传反面照片</p>
+                  <div v-if="realNameForm.idCardBack" class="id-card-preview">
+                    <img :src="realNameForm.idCardBack" alt="身份证国徽面" class="id-card-img" />
+                    <p class="preview-label">身份证国徽面预览</p>
+                  </div>
                 </div>
               </div>
-
               <div class="layui-form-item">
                 <div class="layui-input-block">
-                  <button class="layui-btn btn-save" lay-submit lay-filter="submit-real-name">提交认证</button>
+                  <button class="layui-btn btn-save" lay-submit lay-filter="submit-real-name">
+                    提交认证
+                  </button>
                 </div>
               </div>
             </div>
@@ -228,184 +175,160 @@
             <div class="layui-form-item">
               <label class="layui-form-label">原密码</label>
               <div class="layui-input-block">
-                <input 
-                  type="password" 
-                  name="oldPassword" 
-                  v-model="passwordForm.oldPassword" 
-                  lay-verify="required|password"
-                  placeholder="请输入原密码" 
-                  class="layui-input"
-                >
+                <input type="password" name="oldPassword" v-model="passwordForm.oldPassword"
+                  lay-verify="required|password" placeholder="请输入原密码" class="layui-input" />
               </div>
             </div>
 
             <div class="layui-form-item">
               <label class="layui-form-label">新密码</label>
               <div class="layui-input-block">
-                <input 
-                  type="password" 
-                  name="newPassword" 
-                  v-model="passwordForm.newPassword" 
-                  lay-verify="required|password"
-                  placeholder="请输入新密码" 
-                  class="layui-input"
-                >
+                <input type="password" name="newPassword" v-model="passwordForm.newPassword"
+                  lay-verify="required|password" placeholder="请输入新密码" class="layui-input" />
                 <p class="password-rule">密码需8-20位，包含大小写字母、数字和特殊字符</p>
+                <p v-if="isSamePassword" class="password-same-warning" style="color: #e6a23c; margin-top: 5px">
+                  <i class="layui-icon layui-icon-tips"></i> 新密码不能与原密码相同
+                </p>
               </div>
             </div>
 
             <div class="layui-form-item">
               <label class="layui-form-label">确认密码</label>
               <div class="layui-input-block">
-                <input 
-                  type="password" 
-                  name="confirmPassword" 
-                  v-model="passwordForm.confirmPassword" 
-                  lay-verify="required|confirmPassword"
-                  placeholder="请确认新密码" 
-                  class="layui-input"
-                >
+                <input type="password" name="confirmPassword" v-model="passwordForm.confirmPassword"
+                  lay-verify="required|confirmPassword" placeholder="请确认新密码" class="layui-input" />
+              </div>
+            </div>
+            <!-- 添加邮箱和验证码 -->
+            <div class="layui-form-item">
+              <label class="layui-form-label">邮箱</label>
+              <div class="layui-input-block">
+                <input v-model="passwordForm.email" type="text" name="email" placeholder="绑定的邮箱" class="layui-input"
+                  readonly />
+              </div>
+            </div>
+
+            <div class="layui-form-item">
+              <label class="layui-form-label">验证码</label>
+              <div class="layui-input-block code-input">
+                <input type="text" name="verificationCode" lay-verify="required" v-model="passwordForm.code"
+                  placeholder="请输入邮箱验证码" class="layui-input" />
+                <button style="background-color: #fd9860" type="button" class="layui-btn"
+                  :class="{ 'layui-btn-disabled': isSendingCode }" @click="sendVerificationCode"
+                  :disabled="isSendingCode">
+                  {{ isSendingCode ? `${countDown}s后重新发送` : '获取验证码' }}
+                </button>
               </div>
             </div>
 
             <div class="layui-form-item">
               <div class="layui-input-block">
-                <button class="layui-btn btn-save" lay-submit lay-filter="change-password">确认修改</button>
+                <button class="layui-btn btn-save" lay-submit lay-filter="change-password">
+                  确认修改
+                </button>
               </div>
             </div>
           </form>
 
-<!-- 地址管理 -->
-<div v-if="currentTab === 3">
-  <button class="layui-btn btn-save" @click="() => { resetAddressForm(); showAddressForm = true }">
-    <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
-  </button>
+          <!-- 地址管理 -->
+          <div v-if="currentTab === 3">
+            <button class="layui-btn btn-save" @click="
+              () => {
+                resetAddressForm()
+                showAddressForm = true
+              }
+            ">
+              <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
+            </button>
 
-  <!-- 地址表单 -->
-  <div v-if="showAddressForm" class="address-form-container">
-    <form class="layui-form profile-form">
-      <div class="layui-form-item">
-        <label class="layui-form-label">收件人</label>
-        <div class="layui-input-block">
-          <input 
-            type="text" 
-            v-model="addressForm.recipient" 
-            placeholder="请输入收件人姓名" 
-            class="layui-input"
-          >
-        </div>
-      </div>
+            <!-- 地址表单 -->
+            <div v-if="showAddressForm" class="address-form-container">
+              <form class="layui-form profile-form">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">收件人</label>
+                  <div class="layui-input-block">
+                    <input type="text" v-model="addressForm.recipient" placeholder="请输入收件人姓名" class="layui-input" />
+                  </div>
+                </div>
 
-      <div class="layui-form-item">
-        <label class="layui-form-label">联系电话</label>
-        <div class="layui-input-block">
-          <input 
-            type="text" 
-            v-model="addressForm.phone" 
-            lay-verify="phone"
-            placeholder="请输入联系电话" 
-            class="layui-input"
-          >
-        </div>
-      </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">联系电话</label>
+                  <div class="layui-input-block">
+                    <input type="text" v-model="addressForm.phone" lay-verify="phone" placeholder="请输入联系电话"
+                      class="layui-input" />
+                  </div>
+                </div>
 
-      <div class="layui-form-item">
-        <label class="layui-form-label">所在地区</label>
-        <div class="layui-input-block">
-          <select v-model="addressForm.province" placeholder="请选择省份">
-            <option value="">请选择省份</option>
-            <option value="北京市">北京市</option>
-            <option value="上海市">上海市</option>
-            <option value="广东省">广东省</option>
-            <!-- 可根据需要添加更多省份 -->
-          </select>
-        </div>
-      </div>
+                <!-- <div class="layui-form-item">
+                  <label class="layui-form-label">所在地区</label>
+                  <div class="layui-input-block"> -->
+                <AddressSelect v-model="selectedAddress" />
 
-      <div class="layui-form-item">
-        <label class="layui-form-label">城市</label>
-        <div class="layui-input-block">
-          <select v-model="addressForm.city" placeholder="请选择城市">
-            <option value="">请选择城市</option>
-            <!-- 实际项目中可根据省份动态加载城市 -->
-          </select>
-        </div>
-      </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">详细地址</label>
+                  <div class="layui-input-block">
+                    <textarea v-model="addressForm.detail" placeholder="请输入详细地址" class="layui-textarea"
+                      rows="3"></textarea>
+                  </div>
+                </div>
 
-      <div class="layui-form-item">
-        <label class="layui-form-label">区/县</label>
-        <div class="layui-input-block">
-          <select v-model="addressForm.district" placeholder="请选择区/县">
-            <option value="">请选择区/县</option>
-            <!-- 实际项目中可根据城市动态加载区县 -->
-          </select>
-        </div>
-      </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">默认地址</label>
+                  <div class="layui-input-block">
+                    <el-switch style="height: 39px; line-height: 21px" v-model="addressForm.isDefault" active-text="是"
+                      inactive-text="否" active-color="#fd9860" />
+                  </div>
+                </div>
 
-      <div class="layui-form-item">
-        <label class="layui-form-label">详细地址</label>
-        <div class="layui-input-block">
-          <textarea 
-            v-model="addressForm.detail" 
-            placeholder="请输入详细地址" 
-            class="layui-textarea"
-            rows="3"
-          ></textarea>
-        </div>
-      </div>
+                <div class="layui-form-item">
+                  <div class="layui-input-block">
+                    <button class="layui-btn btn-save" type="button" @click="saveAddress">
+                      保存地址
+                    </button>
+                    <button class="layui-btn delete-btn" type="button" @click="resetAddressForm">
+                      取消
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
 
-      <div class="layui-form-item">
-        <label class="layui-form-label">默认地址</label>
-        <div class="layui-input-block">
-          <input 
-            type="checkbox" 
-            v-model="addressForm.isDefault" 
-            lay-skin="switch" 
-            lay-text="是|否"
-          >
-        </div>
-      </div>
+            <!-- 地址列表 -->
+            <div class="address-list" v-if="!showAddressForm && addressList.length > 0">
+              <div class="address-item" v-for="address in addressList" :key="address.id">
+                <div class="address-header">
+                  <span class="recipient">{{ address.recipient }} {{ address.phone }}</span>
+                  <span class="default-tag" v-if="address.isDefault">默认地址</span>
+                </div>
+                <div class="address-content">
+                  {{ address.province }} {{ address.city }} {{ address.district }}
+                  {{ address.detail }}
+                </div>
+                <div class="address-actions">
+                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="editAddress(address)">
+                    编辑
+                  </button>
+                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="deleteAddress(address.id)">
+                    删除
+                  </button>
+                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="setDefaultAddress(address.id)"
+                    v-if="!address.isDefault">
+                    设为默认
+                  </button>
+                </div>
+              </div>
+              <div class="pagination-container">
+                <el-pagination @current-change="handlePageChange" :current-page="addressPagination.currentPage"
+                  :page-size="addressPagination.pageSize" :total="addressPagination.total"
+                  layout="prev, pager, next, jumper, ->, total" background />
+              </div>
+            </div>
 
-      <div class="layui-form-item">
-        <div class="layui-input-block">
-          <button class="layui-btn btn-save" type="button" @click="saveAddress">保存地址</button>
-          <button class="layui-btn delete-btn" type="button" @click="resetAddressForm">取消</button>
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <!-- 地址列表 -->
-  <div class="address-list" v-if="!showAddressForm && addressList.length > 0">
-    <div class="address-item" v-for="address in addressList" :key="address.id">
-      <div class="address-header">
-        <span class="recipient">{{ address.recipient }} {{ address.phone }}</span>
-        <span class="default-tag" v-if="address.isDefault">默认地址</span>
-      </div>
-      <div class="address-content">
-        {{ address.province }} {{ address.city }} {{ address.district }} {{ address.detail }}
-      </div>
-      <div class="address-actions">
-        <button class="layui-btn layui-btn-primary layui-btn-sm" @click="editAddress(address)">编辑</button>
-        <button class="layui-btn layui-btn-primary layui-btn-sm" @click="deleteAddress(address.id)">删除</button>
-        <button 
-          class="layui-btn layui-btn-primary layui-btn-sm" 
-          @click="setDefaultAddress(address.id)"
-          v-if="!address.isDefault"
-        >
-          设为默认
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 空状态 -->
-  <div class="empty-address" v-if="!showAddressForm && addressList.length === 0">
-    <p>您还没有添加收货地址，点击"添加新地址"按钮添加</p>
-  </div>
-</div>
-      
-       
+            <!-- 空状态 -->
+            <div class="empty-address" v-if="!showAddressForm && addressList.length === 0">
+              <p>您还没有添加收货地址，点击"添加新地址"按钮添加</p>
+            </div>
+          </div>
         </div>
       </main>
     </div>
@@ -413,20 +336,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick,watch } from 'vue'
+import { ref, onMounted, nextTick, watch, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+// import axios from 'axios'
+import request from '../utils/request'
+import AddressSelect from '../components/AddressSelect.vue'
+// import { type } from 'os'
+
 declare global {
   interface Window {
     layui: any
   }
 }
+
 // 导航项
 const navItems = [
   { name: '基本信息', icon: 'layui-icon-user' },
   { name: '实名认证', icon: 'layui-icon-auz' },
   { name: '修改密码', icon: 'layui-icon-password' },
-   { name: '我的地址', icon: 'layui-icon-home' }
+  { name: '我的地址', icon: 'layui-icon-home' },
 ]
 
 // 状态管理
@@ -441,23 +370,24 @@ const maxBirthdayDate = ref('')
 
 // 用户信息
 const userInfo = ref({
-  avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
+  avatar:
+    'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
   nickname: 'PetGo用户',
-  userId: '100000',
-  sex: 'male',
-  phone:'',
-  signature: '',
-  birthday:'',
+  sex: '1',
+  phone: '',
+  birthday: '',
+  email: '',
 })
 
 // 表单数据
 const formData = ref({
-  avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
+  avatar:
+    'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
   nickname: '',
-  sex: 'male',
-  phone:'',
-  signature: '',
-   birthday: ''
+  sex: '',
+  phone: '',
+  birthday: '',
+  email: '',
 })
 // 地址数据类型定义
 interface Address {
@@ -470,6 +400,29 @@ interface Address {
   detail: string // 详细地址
   isDefault: boolean // 是否默认地址
 }
+interface Address {
+  id: string
+  recipient: string // 收件人
+  phone: string // 电话
+  province: string // 省份
+  city: string // 城市
+  district: string // 区/县
+  detail: string // 详细地址
+  isDefault: boolean // 是否默认地址
+}
+
+// 分页信息
+const addressPagination = ref({
+  currentPage: 1,
+  pageSize: 10,
+  total: 0,
+  pages: 1,
+})
+const selectedAddress = ref({
+  province: '',
+  city: '',
+  district: '',
+})
 
 // 地址表单数据
 const addressForm = ref<Partial<Address>>({
@@ -479,7 +432,7 @@ const addressForm = ref<Partial<Address>>({
   city: '',
   district: '',
   detail: '',
-  isDefault: false
+  isDefault: false,
 })
 
 // 地址列表
@@ -490,37 +443,45 @@ const editingAddressId = ref<string | null>(null)
 const showAddressForm = ref(false)
 
 const realNameStatus = ref<'unverified' | 'pending' | 'verified'>('unverified')
-const realNameForm = ref({
-  realName: '',
-  idCard: '',
-  idCardFront: '',
-  idCardBack: ''
-})
 
+const isFetching = ref(false)
 const passwordForm = ref({
   oldPassword: '',
   newPassword: '',
-  confirmPassword: ''
+  code: '',
+  email: '',
+  confirmPassword: '',
 })
-
-
+const isSamePassword = computed(() => {
+  return (
+    passwordForm.value.oldPassword &&
+    passwordForm.value.newPassword &&
+    passwordForm.value.oldPassword === passwordForm.value.newPassword
+  )
+})
+// let timer: NodeJS.Timeout | null = null
 
 const router = useRouter()
-
+const disabledDate = (time: Date) => {
+  return time.getTime() > Date.now()
+}
 // 初始化
 onMounted(() => {
-   const today = new Date()
-  // 格式化日期为YYYY-MM-DD格式
-  maxBirthdayDate.value = today.toISOString().split('T')[0]
-  // 模拟从接口获取用户信息
+  getUserInfo()
+  // const today = new Date()
+  // // 格式化日期为YYYY-MM-DD格式
+  // maxBirthdayDate.value = today.toISOString().split('T')[0]
+  passwordForm.value.email = userInfo.value.email
   setTimeout(() => {
     formData.value = { ...userInfo.value }
+    passwordForm.value.email = userInfo.value.email
     // 初始化表单验证
     if (window.layui) {
       window.layui.use(['form', 'layer'], (form: any, layer: any) => {
         form.verify({
           password: function (value: string) {
-            const passwordReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/
+            const passwordReg =
+              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/
             if (!passwordReg.test(value)) {
               return '密码需8-20位，包含大小写字母、数字和特殊字符'
             }
@@ -542,7 +503,15 @@ onMounted(() => {
             if (!phoneReg.test(value)) {
               return '请输入正确的手机号码'
             }
-          }
+          },
+          verificationCode: function (value: string) {
+            if (!value) {
+              return '请输入验证码'
+            }
+            if (value.length !== 6) {
+              return '验证码长度应为6位'
+            }
+          },
         })
 
         // 表单提交事件
@@ -557,70 +526,268 @@ onMounted(() => {
         })
 
         form.on('submit(change-password)', () => {
-          changePassword()
+          form.validate((valid: boolean) => {
+            if (valid) {
+              // 验证通过，执行实际的修改密码逻辑
+              changePassword()
+            } else {
+              // 验证失败，不执行修改密码逻辑
+              return false
+            }
+          })
           return false
         })
 
-      
-          form.render()
-        
+        form.render()
       })
     }
   }, 500)
 
-   watch(currentTab, () => {
+  watch(currentTab, () => {
     nextTick(() => {
       if (window.layui) {
         window.layui.use('form', (form: any) => {
-        
           form.render()
         })
       }
+      if (currentTab.value === 3) {
+        // 重置到第一页
+        addressPagination.value.currentPage = 1
+        getAddressList()
+      }
     })
   })
-    getAddressList()
 })
+
+onUnmounted(() => {
+  // if (timer) {
+  //   clearInterval(timer)
+  // }
+})
+//发送验证码
+const sendVerificationCode = async () => {
+  if (isSendingCode.value || countDown.value < 60) return
+
+  if (!userInfo.value.email) {
+    ElMessage.warning('未绑定邮箱，请先绑定邮箱')
+    return
+  }
+
+  try {
+    isSendingCode.value = true
+    // 模拟发送验证码接口
+    const response = await request(
+      '/server/api/user/sendCode',
+      'POST',
+      {
+        email: userInfo.value.email,
+      },
+      {
+        headers: {
+          // 明确告诉后端参数格式是 x-www-form-urlencoded
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+    console.log('发送验证码:', response)
+    if (response.code === 0) {
+      ElMessage.success('验证码已发送至您的邮箱')
+      // 开始倒计时
+      startCountDown()
+    } else {
+      ElMessage.error(response.msg || '发送验证码失败，请稍后重试')
+      isSendingCode.value = false
+    }
+  } catch (error) {
+    ElMessage.error('发送验证码失败，请稍后重试')
+    isSendingCode.value = false
+    if (countDown.value < 60) {
+      stopCountDown()
+    }
+  }
+}
+
+const handlePageChange = (page: number) => {
+  addressPagination.value.currentPage = page
+  getAddressList()
+}
+// 开始倒计时
+const startCountDown = () => {
+  countDown.value = 60
+  // timer = setInterval(() => {
+  //   countDown.value--
+  //   if (countDown.value <= 0) {
+  //     stopCountDown()
+  //   }
+  // }, 1000)
+}
+
+// 停止倒计时
+const stopCountDown = () => {
+  // if (timer) {
+  //   clearInterval(timer)
+  //   timer = null
+  // }
+  isSendingCode.value = false
+}
+
+// 获取用户信息
+const getUserInfo = async () => {
+  if (isFetching.value) return
+  isFetching.value = true
+  try {
+    // 从 localStorage 或其他地方获取 userId
+    const userId = localStorage.getItem('userId') || ''
+    const token = localStorage.getItem('authToken') || ''
+
+    if (!userId) {
+      window.layui?.layer.msg('用户未登录')
+      router.push('/login')
+    }
+    const response = await request('/server/api/user/getUserInfo/userId', 'GET', {
+      userId: userId,
+      // token: token,
+    })
+
+    if (response.code == 0) {
+      const userData = response.data.userVO
+      console.log('获取用户信息成功:', userData)
+      // 更新用户信息
+      userInfo.value = {
+        ...userInfo.value,
+        nickname: userData.username,
+        sex: userData.gender,
+        phone: userData.phone,
+        birthday: userData.birthday,
+        avatar: userData.avatar,
+        email: userData.email,
+      }
+
+      // 同步更新表单数据
+      formData.value = { ...userInfo.value }
+
+      // 重新渲染表单
+      if (window.layui) {
+        window.layui.use('form', (form: any) => {
+          form.render()
+        })
+      }
+    } else {
+      ElMessage.primary('请完善用户信息')
+    }
+  } catch (error) {
+    console.log('获取用户信息失败:', error)
+    // window.layui?.layer.msg('获取用户信息失败')
+  } finally {
+    isFetching.value = false // 请求完成后释放锁
+  }
+}
 
 // 获取地址列表
 const getAddressList = async () => {
   try {
-    // 模拟接口请求
-    const response = await axios.get('/api/user/addresses')
-    addressList.value = response.data.data || []
+    const userId = localStorage.getItem('userId') || ''
+    if (!userId) {
+      ElMessage.warning('用户未登录或会话已过期，请重新登录')
+      addressList.value = []
+      return
+    }
+    const response = await request(
+      '/server/api/user/getUserAddresses',
+      'GET',
+      {
+        pageNum: addressPagination.value.currentPage,
+        pageSize: addressPagination.value.pageSize,
+      },
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    )
+    console.log('获取地址列表成功:', response.data)
+    addressList.value = response.data.records || []
+    addressPagination.value.total = response.data.total || 0
+    addressPagination.value.pages = response.data.pages || 1
+    // 如果是第一页且没有地址，则显示添加地址表单
+    if (addressPagination.value.currentPage === 1 && addressList.value.length === 0) {
+      showAddressForm.value = true
+    }
   } catch (error) {
-    window.layui.layer.msg('获取地址失败，请稍后重试')
+    console.log('获取地址列表:', error)
+
+    ElMessage.error('获取地址失败，请稍后重试')
   }
 }
 
 // 新增/编辑地址
 const saveAddress = async () => {
   // 表单验证
-  if (!addressForm.value.recipient || !addressForm.value.phone) {
-    window.layui.layer.msg('请填写收件人和联系电话')
+  if (!addressForm.value.recipient) {
+    ElMessage.error('请填写收件人')
     return
   }
-  
-  if (!addressForm.value.province || !addressForm.value.city || !addressForm.value.district || !addressForm.value.detail) {
-    window.layui.layer.msg('请填写完整地址信息')
+
+  if (!addressForm.value.phone) {
+    ElMessage.error('请填写联系电话')
+    return
+  }
+
+  // 验证电话号码格式
+  const phoneReg = /^1[3-9]\d{9}$/
+  if (!phoneReg.test(addressForm.value.phone)) {
+    ElMessage.error('请输入正确的手机号码')
+    return
+  }
+  // 使用 AddressSelect 组件的数据
+  addressForm.value.province = selectedAddress.value.province
+  addressForm.value.city = selectedAddress.value.city
+  addressForm.value.district = selectedAddress.value.district
+  if (
+    !addressForm.value.province ||
+    !addressForm.value.city ||
+    !addressForm.value.district ||
+    !addressForm.value.detail
+  ) {
+    ElMessage.error('请填写完整地址信息')
     return
   }
 
   try {
+    const addressData = {
+      consignee: addressForm.value.recipient,
+      phone: addressForm.value.phone,
+      province: addressForm.value.province,
+      city: addressForm.value.city,
+      district: addressForm.value.district,
+      detailAddress: addressForm.value.detail,
+      isDefault: addressForm.value.isDefault ? 0 : 1,
+    }
     if (editingAddressId.value) {
       // 编辑地址
-      await axios.put(`/api/user/addresses/${editingAddressId.value}`, addressForm.value)
-      window.layui.layer.msg('地址更新成功')
+      const response = await request(
+        `/server/api/user/updateUserAddress${editingAddressId.value}`,
+        'PUT',
+        addressData,
+      )
+      console.log('编辑地址返回:', response)
+      ElMessage.success('地址更新成功')
     } else {
+      console.log('新增地址数据:', addressData)
       // 新增地址
-      await axios.post('/api/user/addresses', addressForm.value)
-      window.layui.layer.msg('地址添加成功')
+      const response = await request('/server/api/user/addUserAddress', 'POST', addressData)
+      if (response.code === 0) {
+        console.log('新增地址返回:', response)
+        ElMessage.success('地址添加成功')
+        resetAddressForm()
+        getAddressList()
+      } else {
+        console.log('新增地址失败:', response)
+      }
     }
-    
-    // 重置表单并刷新列表
-    resetAddressForm()
-    getAddressList()
   } catch (error) {
-    window.layui.layer.msg('保存地址失败，请稍后重试')
+    // ElMessage.error('保存地址失败，请稍后重试')
+    console.error('保存地址失败:', error)
   }
 }
 
@@ -629,28 +796,39 @@ const editAddress = (address: Address) => {
   addressForm.value = { ...address }
   editingAddressId.value = address.id
   showAddressForm.value = true
+
+  // 回显地址选择器数据
+  selectedAddress.value = {
+    province: address.province,
+    city: address.city,
+    district: address.district,
+  }
 }
 
 // 删除地址
 const deleteAddress = (id: string) => {
-  window.layui.layer.confirm('确定要删除这个地址吗？', {
-    title: '提示'
-  }, async (index: number) => {
-    try {
-      await axios.delete(`/api/user/addresses/${id}`)
-      window.layui.layer.close(index)
-      window.layui.layer.msg('地址已删除')
-      getAddressList()
-    } catch (error) {
-      window.layui.layer.msg('删除失败，请稍后重试')
-    }
-  })
+  window.layui.layer.confirm(
+    '确定要删除这个地址吗？',
+    {
+      title: '提示',
+    },
+    async (index: number) => {
+      try {
+        // await axios.delete(`/api/user/addresses/${id}`)
+        window.layui.layer.close(index)
+        window.layui.layer.msg('地址已删除')
+        getAddressList()
+      } catch (error) {
+        window.layui.layer.msg('删除失败，请稍后重试')
+      }
+    },
+  )
 }
 
 // 设为默认地址
 const setDefaultAddress = async (id: string) => {
   try {
-    await axios.patch(`/api/user/addresses/${id}/default`)
+    // await axios.patch(`/api/user/addresses/${id}/default`)
     window.layui.layer.msg('已设为默认地址')
     getAddressList()
   } catch (error) {
@@ -667,97 +845,186 @@ const resetAddressForm = () => {
     city: '',
     district: '',
     detail: '',
-    isDefault: false
+    isDefault: false,
   }
-  editingAddressId.value = null
+  editingAddressId.value = ''
   showAddressForm.value = false
+
+  // 重置地址选择器
+  selectedAddress.value = {
+    province: '',
+    city: '',
+    district: '',
+  }
 }
+
 // 取消编辑，恢复原始值
 const cancelEdit = () => {
   formData.value = { ...userInfo.value }
-  
+
   if (window.layui) {
     window.layui.use('form', (form: any) => {
       form.render()
     })
   }
-  
+
   window.layui.layer.msg('已恢复原始值')
 }
 
-
-
-
 // 处理签名输入
-const handleSignatureInput = () => {
-  // 如果超过最大长度则截断
-  if (formData.value.signature.length > maxSignatureLength) {
-    formData.value.signature = formData.value.signature.substring(0, maxSignatureLength)
-  }
-}
 
 // 头像上传相关
-const handleAvatarUpload = (e: Event) => {
+interface Avatar { }
+
+const handleAvatarUpload = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0]
   if (file) {
-    // 简单的文件类型和大小验证
+    // 文件类型和大小验证
     if (!file.type.startsWith('image/')) {
-      alert('请上传图片文件')
+      window.layui?.layer.msg('请上传图片文件')
       return
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert('图片大小不能超过5MB')
+      window.layui?.layer.msg('图片大小不能超过5MB')
       return
     }
-    
-    // 预览图片
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      userInfo.value.avatar = event.target?.result as string
+
+    try {
+      // 创建 FormData 对象用于上传文件
+      const avatarData = new FormData()
+      avatarData.append('avatarUrl', file) // 注意参数名是 avatarUrl
+
+      // 调用后端接口上传头像
+      const response = await request('/server/api/user/updateUserAvatar', 'POST', avatarData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      console.log('头像上传返回:', response, response.code)
+      if (response.code == 0) {
+        // 更新用户信息中的头像URL
+        userInfo.value.avatar = URL.createObjectURL(file)
+        formData.value.avatar = URL.createObjectURL(file)
+
+        ElMessage.success('头像上传成功！')
+      } else {
+        // ElMessage.error('头像上传失败！')
+      }
+    } catch (error) {
+      console.error('头像上传失败:', error)
+      // ElMessage.error('头像上传失败，请稍后重试')
     }
-    reader.readAsDataURL(file)
-    
-    // 实际项目中这里应该有上传到服务器的逻辑
   }
-}   
+}
+const realNameForm = ref({
+  realName: '',
+  idCard: '',
+  idCardFront: '',
+  idCardBack: '',
+  idCardFrontFile: null as File | null,
+  idCardBackFile: null as File | null,
+})
 
 // 选择身份证照片
 const selectIdCardPhoto = (type: 'front' | 'back') => {
-  // 模拟上传
-  setTimeout(() => {
-    if (type === 'front') {
-      realNameForm.value.idCardFront = 'uploaded'
-    } else {
-      realNameForm.value.idCardBack = 'uploaded'
-    }
-  }, 500)
-}
+  // 创建文件输入元素
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.accept = 'image/*'
+  fileInput.style.display = 'none'
 
-// 发送验证码
-
-// 保存基本信息
-const saveBaseInfo = async () => {
-  
-  try {
-    // 模拟接口请求
-    await axios.post('/server/api/user/updateUserInfo', {},
-      { 
-        params:{
-        userName:formData.value.nickname,
-        phone:formData.value.phone,
-        gender:formData.value.sex,
-        birthday:formData.value.birthday
+  fileInput.onchange = async (e: Event) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (file) {
+      // 文件类型和大小验证
+      if (!file.type.startsWith('image/')) {
+        ElMessage.error('请上传图片文件')
+        return
       }
-        })
-    userInfo.value.nickname = formData.value.nickname
-    userInfo.value.sex = formData.value.sex
-    userInfo.value.signature = formData.value.signature
-    userInfo.value.phone = formData.value.phone
-     userInfo.value.birthday = formData.value.birthday
 
-    window.layui.layer.msg('保存成功')
-  } catch (error) {
-    window.layui.layer.msg('保存失败，请稍后重试')
+      if (file.size > 5 * 1024 * 1024) {
+        ElMessage.error('图片大小不能超过5MB')
+        return
+      }
+
+      // 创建预览URL并保存文件
+      const previewUrl = URL.createObjectURL(file)
+
+      if (type === 'front') {
+        // 保存正面照片文件和预览URL
+        realNameForm.value.idCardFrontFile = file
+        realNameForm.value.idCardFront = previewUrl
+        ElMessage.success('身份证个人信息面已上传')
+      } else {
+        // 保存反面照片文件和预览URL
+        realNameForm.value.idCardBackFile = file
+        realNameForm.value.idCardBack = previewUrl
+        ElMessage.success('身份证国徽面已上传')
+      }
+    }
+  }
+
+  // 触发文件选择
+  document.body.appendChild(fileInput)
+  fileInput.click()
+  document.body.removeChild(fileInput)
+}
+// ... existing code ...
+
+const isUPing = ref(false)
+// 保存修改的基本信息
+const saveBaseInfo = async () => {
+  if (isUPing.value) return
+  isUPing.value = true
+
+  if (formData.value.nickname.length > 20) {
+    ElMessage.error('昵称长度不能超过20个字符')
+    return
+  }
+  if (formData.value.birthday) {
+    const birthdayDate = new Date(formData.value.birthday)
+    const today = new Date()
+
+    // 检查年龄是否合理（不超过150岁）
+    const ageDiff = today.getFullYear() - birthdayDate.getFullYear()
+    if (ageDiff > 150) {
+      ElMessage.error('请输入合理的生日')
+      return
+    }
+  }
+  isUPing.value = true
+
+  try {
+    const response = await request(
+      '/server/api/user/updateUserInfo',
+      'POST',
+      {
+        userName: formData.value.nickname,
+        phone: formData.value.phone,
+        gender: formData.value.sex,
+        birthday: formData.value.birthday,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+    if (response.code == 0) {
+      console.log('保存基本信息:', response)
+      ElMessage.success('保存信息成功！')
+      // 更新用户信息
+      userInfo.value.nickname = formData.value.nickname
+      userInfo.value.sex = formData.value.sex
+      userInfo.value.phone = formData.value.phone
+      userInfo.value.birthday = formData.value.birthday
+    } else {
+      ElMessage.error(response.msg || '保存失败，请稍后重试')
+    }
+  } catch (error: any) {
+    ElMessage.error(error.message || '保存失败，请稍后重试')
+  } finally {
+    isUPing.value = false
   }
 }
 
@@ -774,62 +1041,169 @@ const submitRealName = async () => {
   }
 
   try {
-    // 模拟接口请求
-    await axios.post('/api/user/verify/realname', realNameForm.value)
-    realNameStatus.value = 'pending'
-    window.layui.layer.msg('提交成功，等待审核')
+    // 创建 FormData 对象用于上传文件和文本数据
+    const formData = new FormData()
+    formData.append('realName', realNameForm.value.realName)
+    formData.append('idCard', realNameForm.value.idCard)
+    // 将正反面照片都添加到 otherFiles 数组中
+    // formData.append('otherFiles', realNameForm.value.idCardFrontFile)
+    // formData.append('otherFiles', realNameForm.value.idCardBackFile)
+    console.log('formData', formData)
+    // 调用后端接口提交实名认证信息
+    const response = await request('/server/api/user/userAuth', 'POST', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    if (response.code === 0) {
+      realNameStatus.value = 'pending'
+      ElMessage.success('提交成功，等待审核')
+    } else {
+      ElMessage.error(response.msg || '提交失败，请稍后重试')
+    }
   } catch (error) {
-    window.layui.layer.msg('提交失败，请稍后重试')
+    console.error('实名认证提交失败:', error)
+    ElMessage.error('提交失败，请稍后重试')
   }
 }
-
+const changing = ref(false)
 // 修改密码
 const changePassword = async () => {
-  if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-    window.layui.layer.msg('两次密码输入不一致')
+  if (changing.value) return
+  changing.value = true
+
+  if (
+    passwordForm.value.oldPassword &&
+    passwordForm.value.newPassword &&
+    passwordForm.value.oldPassword === passwordForm.value.newPassword
+  ) {
+    ElMessage.warning('新密码不能与原密码相同！')
     return
   }
-
+  const requestData = {
+    oldPassword: passwordForm.value.oldPassword,
+    newPassword: passwordForm.value.newPassword,
+    code: passwordForm.value.code,
+    email: passwordForm.value.email,
+  }
   try {
-    // 模拟接口请求
-    await axios.post('/api/user/password/change', passwordForm.value)
-    window.layui.layer.msg('密码修改成功，请重新登录')
-    // 清空表单
-    passwordForm.value = {
-      oldPassword: '',
-      newPassword: '',
-      confirmPassword: ''
+    const response = await request('/server/api/user/changePassword', 'POST', requestData, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })
+    console.log('修改密码返回:', response)
+    if (response.code == 0) {
+      ElMessage.success('密码修改成功，请重新登录')
+      passwordForm.value = {
+        oldPassword: '',
+        newPassword: '',
+        email: '',
+        code: '',
+        confirmPassword: '',
+      }
+
+      router.push('/login')
+    } else {
+      console.log('修改密码返回:', response)
     }
-    // 实际项目中这里应该跳转到登录页
   } catch (error) {
-    window.layui.layer.msg('密码修改失败，请检查原密码是否正确')
+    console.error('修改密码失败:', error)
+  } finally {
+    changing.value = false
   }
 }
-
-
 
 // 退出登录
 const logout = () => {
-  window.layui.layer.confirm('确定要退出登录吗？', {
-    title: '提示'
-  }, (index: number) => {
-    // 清除认证信息
-  localStorage.removeItem('authToken')
-  localStorage.removeItem('userId')
-
-  
-  // 清除记住密码相关数据
-  // localStorage.removeItem('rememberedLoginId')
-  // localStorage.removeItem('rememberedPassword')
-  // localStorage.removeItem('rememberedLoginType')
-  //   alert(localStorage.getItem('rememberedLoginId'))
-     window.layui.layer.close(index);
-    router.push('/login')
-  })
+  window.layui.layer.confirm(
+    '确定要退出登录吗？',
+    {
+      title: '提示',
+    },
+    (index: number) => {
+      // 清除认证信息
+      localStorage.removeItem('authToken')
+      localStorage.removeItem('userId')
+      window.layui.layer.close(index)
+      router.push('/login')
+    },
+  )
 }
 </script>
 
 <style scoped>
+.empty-address {
+  margin-top: 2rem;
+  text-align: center;
+  color: #999;
+  padding: 2rem 0;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.id-card-preview {
+  margin-top: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+  padding: 10px;
+  display: inline-block;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.id-card-img {
+  max-width: 300px;
+  max-height: 200px;
+  display: block;
+  margin: 0 auto;
+}
+
+.preview-label {
+  margin: 5px 0 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.el-switch.is-checked .el-switch__core {
+  color: #fd9860 !important;
+  background-color: #fd9860 !important;
+  border-color: #fd9860 !important;
+}
+
+:deep(.el-switch.is-checked .el-switch__core) {
+  color: #fd9860 !important;
+
+  background-color: #fd9860 !important;
+  border-color: #fd9860 !important;
+}
+
+.el-switch__label.is-active {
+  color: #fd9860;
+}
+
+:deep(.el-switch__label.is-active) {
+  color: #fd9860;
+}
+
+.layui-btn-disabled {
+  background-color: #f5f5f5 !important;
+  border-color: #ddd !important;
+  color: #999 !important;
+  cursor: not-allowed !important;
+}
+
+.layui-input[readonly] {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
 
 /* 地址管理样式 */
 .address-form-container {
@@ -889,41 +1263,41 @@ const logout = () => {
   background-color: #f9f9f9;
   border-radius: 8px;
 }
- .layui-form-radioed>i {
-     color: #fd9860 !important;
- }
-.layui-form-radio:hover>*, .layui-form-radioed, .layui-form-radioed>i {
-    color: #fd9860 !important;
-}
+
 .word-count {
   margin: 5px 0 0;
   color: #666;
   font-size: 0.85rem;
   text-align: right;
 }
-.delete-btn{
+
+.delete-btn {
   min-width: 120px;
   border-color: #d2d2d2;
-    background: 0 0;
-    color: #5f5f5f;
+  background: 0 0;
+  color: #5f5f5f;
 }
-.delete-btn:hover{
- border-color: #fd9860;
-    color: #fd9860;
+
+.delete-btn:hover {
+  border-color: #fd9860;
+  color: #fd9860;
 }
 
 .layui-btn-primary:hover {
-    border-color: #fd9860;
-    color: #fd9860;
+  border-color: #fd9860;
+  color: #fd9860;
 }
-.layui-input:focus, .layui-textarea:focus {
-    border-color: #fd9860 !important;
-    box-shadow: 0 0 0 3px #fd98600f;
+
+.layui-input:focus,
+.layui-textarea:focus {
+  border-color: #fd9860 !important;
+  box-shadow: 0 0 0 3px #fd98600f;
 }
 
 .avatar-file::-webkit-file-upload-button {
   visibility: hidden;
 }
+
 .avatar-file::before {
   content: '';
   display: inline-block;
@@ -931,6 +1305,7 @@ const logout = () => {
   height: 100%;
   cursor: pointer;
 }
+
 .profile-container {
   min-height: 100vh;
   background-image: url('../../assets/img/background6.png');
@@ -1020,9 +1395,6 @@ const logout = () => {
   opacity: 0;
   cursor: pointer;
 }
-
-
-
 
 .user-details {
   line-height: 1.5;
@@ -1120,6 +1492,7 @@ const logout = () => {
 /* 表单样式 */
 .profile-form {
   max-width: 600px;
+  position: relative;
 }
 
 .layui-form-item {
@@ -1130,8 +1503,6 @@ const logout = () => {
   width: 100px;
   font-weight: 500;
 }
-
-
 
 .btn-save {
   background-color: #fd9860;
@@ -1246,7 +1617,5 @@ const logout = () => {
   .layui-form-label {
     width: 80px;
   }
-
-
 }
 </style>

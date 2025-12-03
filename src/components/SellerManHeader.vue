@@ -25,10 +25,10 @@
         <span class="text-sm font-medium text-gray-800">小明官方旗舰店</span>
       </div>
 
-      <button class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+      <router-link to="/shop" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
         <i class="fas fa-sign-out-alt text-gray-700"></i>
         <span class="hidden sm:inline ml-1 text-sm text-gray-600">退出</span>
-      </button>
+      </router-link>
     </div>
   </div>
 </template>

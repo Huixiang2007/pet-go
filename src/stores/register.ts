@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 // 定义表单数据的类型接口（TypeScript 类型约束）
 interface RegisterForm {
-  phone: string
+  email: string
   vercode: string
   password: string
   confirm: string
@@ -14,10 +14,10 @@ export const useRegisterStore = defineStore('register', {
   // 状态：指定类型为 RegisterForm，初始化空值
   state: (): { form: RegisterForm } => ({
     form: {
-      phone: '',
+      email: '',
       vercode: '',
       password: '',
-      confirm: '', // 注意：这里的 confirm 字段名为 confirmPassword
+      confirm: '', 
       name: '',
     },
   }),
@@ -31,10 +31,10 @@ export const useRegisterStore = defineStore('register', {
     // 清空表单：重置为初始状态
     clearForm() {
       this.form = {
-        phone: '',
+        email: '',
         vercode: '',
         password: '',
-        confirm: '', // 注意：这里的 confirm 字段名为 confirmPassword
+        confirm: '', 
         name: '',
       }
     },

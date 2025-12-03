@@ -1,6 +1,5 @@
 <template>
   <div class="flex flex-row justify-center items-center pt-[70px]">
-    <!-- 主分类 -->
     <div class="grid grid-cols-7 gap-x-4 gap-y-2">
       <div
         v-for="category in categories"
@@ -54,12 +53,24 @@
     <!-- 搜索框 -->
     <div class="hidden md:flex justify-center items-center">
       <div class="relative w-[200px] ml-[40px]">
-        <input type="text" placeholder="搜索宠物用品..."
-              class="outline-none  w-full py-2 pl-10 pr-4 rounded-full border border-[#f5a623]">
-        <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+        <input id="search-input"
+        type="text"
+         placeholder="搜索宠物用品..."
+          @keyup.enter="searchKey"
+         class="outline-none  w-full py-2 pl-10 pr-4 rounded-full border border-[#f5a623]">
+        <i  @click="searchKey"  class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
       </div>
     </div>
-  </div>
+      <router-link to="/seller-item-manager" class="border-[1px] border-orange-400 ml-12
+  rounded-full px-5 py-2 text-orange-700 font-medium flex items-center gap-2 shadow-sm
+   hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group hidden xl:flex cursor-pointer">
+    <i class="fa fa-paw text-xl text-orange-500 animate-bounce"></i>
+    <span class="relative">
+      我的商店管理
+     <span class="absolute bottom-[-2px] transform -translate-x-1/2 w-[20px] h-0.5 bg-orange-400  transition-all duration-500 group-hover:w-full" style="left: 50%;"></span>
+    </span>
+  </router-link>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -229,7 +240,6 @@ const props = withDefaults(defineProps<Props>(), {
   ]
 })
 
-// 定义emits
 const emit = defineEmits<{
   'update:modelValue': [value: string]
   'update:subModelValue': [value: string]
@@ -241,12 +251,11 @@ const emit = defineEmits<{
 const route = useRoute()
 const router = useRouter()
 
-// 状态管理
 const activeCategory = ref(props.modelValue)
 const activeSubCategory = ref(props.subModelValue)
 const isSubOpen = ref<Record<string, boolean>>({})
 
-// 初始化：所有下拉框默认关闭
+// 所有下拉框默认关闭
 const initDropdownStates = () => {
   props.categories.forEach(cat => {
     isSubOpen.value[cat.id] = false
@@ -287,7 +296,6 @@ watch(() => route.path, (newPath) => {
 }, { immediate: true })
 
 const toggleSubCategory = (categoryId: string) => {
-  // 关闭所有其他下拉框
   Object.keys(isSubOpen.value).forEach(key => {
     if (key !== categoryId) {
       isSubOpen.value[key] = false
@@ -320,7 +328,6 @@ const handleCategoryClick = (categoryId: string) => {
 
 // 处理子分类点击
 const handleSubCategoryClick = (mainId: string, sub: SubCategory) => {
-  // 更新激活状态
   activeCategory.value = mainId
   const subKey = `${mainId}-${sub.id}`
   activeSubCategory.value = subKey
@@ -360,7 +367,19 @@ const handleClickOutside = (e: Event) => {
     })
   }
 }
-
+//搜索
+const searchKey=()=>{
+  const title=document.querySelector('#search-input') as HTMLInputElement
+  const searchValue=title.value.trim()
+   if (searchValue) {
+  router.push({
+    path: '/search',
+     query: {
+        keyword: searchValue
+      }
+  })
+}
+}
 document.addEventListener('click', handleClickOutside)
 
 onUnmounted(() => {

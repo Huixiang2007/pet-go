@@ -2,15 +2,16 @@ import axios from 'axios'
 import type { Method, AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus' // 需引入Element组件
 const service = axios.create({
-  baseURL: '/api',
   timeout: 5000,
 })
 //请求拦截器
 service.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('authToken')
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`
+    } else {
+      console.log('token不存在')
     }
     return config
   },
@@ -24,14 +25,17 @@ type Data<T = any> = {
   code: number
   msg: string
   data: T
+  level: null
+  ok: boolean
 }
 service.interceptors.response.use(
   //第一个回调：HTTP状态码为2xx时触发，请求网络层面处理成功，在这个处理业务错误
-  (response: AxiosResponse<Data>) => {
-    const { code, msg, data } = response.data
+  (response: AxiosResponse) => {
+    const { code, msg, data, level, ok } = response.data
     //业务成功
     if (code === 0) {
-      return { ...response, data: { code, msg, data } }
+      return { ...response, data: { code, msg, data, level, ok } }
+      // return { code, msg, data, level, ok  }
     }
     //业务失败，处理自定义错误码
     switch (code) {
@@ -59,7 +63,7 @@ service.interceptors.response.use(
           cancelButtonText: '取消',
           type: 'warning',
         }).then(() => {
-          localStorage.removeItem('token')
+          localStorage.removeItem('authToken')
           window.location.href = '/login' // 跳登录页
         })
         break
@@ -94,7 +98,7 @@ service.interceptors.response.use(
           ElMessage.error('请求参数错误（HTTP 400）')
           break
         case 401:
-          ElMessage.error('未授权，请登录（HTTP 401）')
+          ElMessage.error('登录失效，请重新登录')
           break
         case 404:
           ElMessage.error(`请求地址不存在：${config.url}（HTTP 404）`)
@@ -116,24 +120,30 @@ service.interceptors.response.use(
       // 其他未知错误
       ElMessage.error('请求失败，请稍后重试')
     }
+    return Promise.reject(error)
   },
 )
 //axios中的ts认为data有的，但是响应拦截器实际去掉了
 //再次对请求方法进行封装
 
-const request = <T>(
+const request = <T = any>(
   //参数
   url: string,
   method: Method,
   submitData: object,
-  config: AxiosRequestConfig,
+  config: AxiosRequestConfig = {},
 ) => {
   //T, Data<T>分别表示请求数据类型（暂时用不到）和响应数据类型
-  return service.request<T, Data<T>>({
-    url,
-    method,
-    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData,
-    ...config,
-  })
+  return service
+    .request<Data<T>, AxiosResponse<Data<T>>>({
+      url,
+      method,
+      [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData,
+      ...config,
+    })
+    .then((response) => {
+      // 直接返回业务数据，简化调用方使用
+      return response.data
+    })
 }
 export default request

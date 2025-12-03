@@ -10,15 +10,13 @@
           </el-button>
         </div>
 
-        <p class="record-description">{{ record.description }}</p>
-
         <!-- 照片 -->
         <div v-if="record.photos && record.photos.length" class="photos">
           <h5>📷 照片</h5>
           <div class="photos-grid">
             <div v-for="(photo, pIndex) in record.photos" :key="pIndex" class="photo-item"
               @click="viewPhoto(record.age, pIndex)">
-              <img :src="photo" :alt="`${record.age}的照片`" />
+              <img :src="photo.src" :alt="`${record.age}的照片`" />
             </div>
           </div>
         </div>
@@ -26,7 +24,7 @@
     </div>
 
     <!-- 没有记录时的提示 -->
-    <div v-if="pet.growthRecords.length === 0" class="empty-state">
+    <div v-if="pet.growthRecords?.length === 0" class="empty-state">
       <div class="empty-icon">📸</div>
       <h3>还没有成长记录</h3>
       <p>记录宝贝的成长历程，留下美好回忆</p>
@@ -43,6 +41,9 @@
     <el-dialog v-model="photoViewerVisible" :title="`${currentPhotoAge} - 照片`" width="60%" class="cute-dialog">
       <div class="photo-viewer">
         <img :src="currentPhoto" class="viewer-image" />
+        <div v-if="currentPhotoDescription" class="photo-description">
+          {{ currentPhotoDescription }}
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -52,12 +53,71 @@
 import { ref } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Delete, Plus } from '@element-plus/icons-vue';
+enum PetGender {
+  Male = 1,
+  Female = 0,
+};
+enum SterilizationStatus {
+  Neutered = 1, // 已绝育
+  NotNeutered = 0, // 未绝育
+}
+type DateString = `${number}-${number}-${number}`;
+interface HealthRecords {
+  // 疫苗
+  vaccine: Array<{
+    type: string,
+    date: DateString,
+    nextReminder?: DateString
+  }>;
+  // 驱虫
+  deworming: Array<{
+    medicine: string,
+    date: string,
+    nextReminder?: string
+  }>
+  //病历
+  medical: Array<{
+    hospital: string,
+    diagnosis: string,//诊断
+    medicine: string,
+    date: string
+  }>
+}
+interface Photos {
+  src: string,
+  description: string,
+  date: DateString
+}
+interface GrowthRecords {
+  age: string,
+  photos: Photos[]
+};
 
+interface Pet {
+  id: number,
+  userId: number,
+  name: string,
+  type: string,
+  breed: string,
+  avatar: string,
+  gender: PetGender,
+  birthday: DateString,
+  age: string,
+  weight: number,
+  sterilization?: SterilizationStatus,
+  healthStatus?: string,
+  description?: string,
+  specialNotes?: string,
+  characterTags?: string[],
+  healthRecords?: HealthRecords,
+  growthRecords?: GrowthRecords[]
+}
 interface Props {
   pet: Pet;
 }
 
 const props = defineProps<Props>();
+console.log(props.pet);
 const emit = defineEmits<{
   'add-record': [];
 }>();
@@ -66,14 +126,16 @@ const photoViewerVisible = ref(false);
 const currentPhotoAge = ref('');
 const currentPhotoIndex = ref(0);
 const currentPhoto = ref('');
-
+const currentPhotoDescription = ref('');
 // 查看照片
 const viewPhoto = (age: string, index: number) => {
+  if (!props.pet.growthRecords) return;
   const record = props.pet.growthRecords.find(r => r.age === age);
   if (record && record.photos[index]) {
     currentPhotoAge.value = age;
     currentPhotoIndex.value = index;
-    currentPhoto.value = record.photos[index];
+    currentPhoto.value = record.photos[index].src;
+    currentPhotoDescription.value = record.photos[index].description;
     photoViewerVisible.value = true;
   }
 };
@@ -91,7 +153,7 @@ const deleteGrowthRecord = async (index: number) => {
       }
     );
 
-    props.pet.growthRecords.splice(index, 1);
+    props.pet.growthRecords?.splice(index, 1);
     ElMessage.success('成长记录删除成功');
   } catch {
     // 用户取消删除

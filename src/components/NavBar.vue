@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed z-10 w-[100%] h-16  rounded-b-lg shadow-md m-auto flex items-center justify-center">
+    <div class="fixed z-10 w-[100%] h-16 bg-white rounded-b-lg shadow-md m-auto flex items-center justify-center">
 
         <!-- 导航容器 -->
         <div class="flex items-center justify-center h-14 w ml-10 relative">
@@ -21,12 +21,15 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 interface NavItem {
     text: string;
     color: string;
     bgColor: string;
     unicode: string;
+    path: string;
+
 }
 
 const navItems = ref<NavItem[]>([
@@ -34,57 +37,65 @@ const navItems = ref<NavItem[]>([
         text: '优宠托管',
         color: 'text-[rgb(156,156,224)]',
         bgColor: 'rgb(219,219,254)',
-        unicode: '\ue669'
+        unicode: '\ue669',
+        path: '/foster-care',
+
     },
     {
         text: '宠品甄选',
-        color: 'text-[rgb(229 163 37)]',
-        bgColor: 'rgb(249 226 182)',
-        unicode: '\ue736'
+        color: 'text-[rgb(229,163,37)]',
+        bgColor: 'rgb(249,226,182)',
+        unicode: '\ue736',
+        path: '/shop',
     },
     {
         text: '宠行天下',
-        color: 'text-[rgb(22 209 22)]',
+        color: 'text-[rgb(22,209,22)]',
         bgColor: 'rgb(223,254,223)',
-        unicode: '\ue602'
+        unicode: '\ue602',
+        path: '/travel',
     },
     {
         text: '我的宠物',
-        color: 'text-[#f9526f]',
+        color: '#f9526f',
         bgColor: 'pink',
-        unicode: '\ue6d7'
+        unicode: '\ue6d7',
+        path: '/my-pets',
     },
     {
         text: '我的订单',
-        color: 'text-[rgb(229 163 37)]',
-        bgColor: 'rgb(249 226 182)',
-        unicode: '\ue737'
-
+        color: 'text-[rgb(229,163,37)]',
+        bgColor: 'rgb(249,226,182)',
+        unicode: '\ue737',
+        path: '/order-list',
     },
     {
         text: '购物车',
         color: 'text-[rgb(100,149,237)]',
-        bgColor: 'rgb(202 234 244)',
-        unicode: '\ue655'
+        bgColor: 'rgb(202,234,244)',
+        unicode: '\ue655',
+        path: '/pet-cart',
     },
     {
         text: '旅游足迹',
         color: 'text-[rgb(255,105,180)]',
         bgColor: 'rgb(255,192,203)',
-        unicode: '\ue60a'
+        unicode: '\ue60a',
+        path: '/travel-history',
     },
     {
         text: '我的消息',
         color: 'text-[rgb(156,156,224)]',
         bgColor: 'rgb(219,219,254)',
-        unicode: '\ue65d'
-
+        unicode: '\ue65d',
+        path: '/customer-service',
     },
     {
         text: '加入我们',
         color: 'text-[rgb(123,31,162)]',
         bgColor: 'rgb(225,204,254)',
-        unicode: '\ue612'
+        unicode: '\ue612',
+        path: '/join-us',
     }
 
 ])
@@ -92,6 +103,7 @@ const navItems = ref<NavItem[]>([
 const activeIndex = ref(0);
 const activeBgColor = ref(navItems.value[0]?.bgColor);
 const isAnimating = ref(false);
+const router = useRouter();
 
 // 设置活跃项
 const setActive = (index: number, bgColor: string) => {
@@ -102,11 +114,27 @@ const setActive = (index: number, bgColor: string) => {
     setTimeout(() => {
         isAnimating.value = false;
     }, 500);
-    // 改变页面背景色（和原始效果一致）
-    document.body.style.backgroundColor = bgColor;
+    const currentItem = navItems.value[index];
+    if (currentItem) {
+        if (currentItem.path) {
+            router.push(currentItem.path);
+        }
+    }
+
 };
 watch(activeIndex, (newVal) => {
     activeBgColor.value = navItems.value[newVal]?.bgColor;
+
+});
+onMounted(() => {
+    // 获取当前路由路径
+    const currentPath = router.currentRoute.value.path;
+    // 查找当前路由对应的导航项索引
+    const currentIndex = navItems.value.findIndex(item => item.path === currentPath);
+    if (currentIndex !== -1) {
+        activeIndex.value = currentIndex;
+        activeBgColor.value = navItems.value[currentIndex]!.bgColor;
+    }
 });
 
 </script>
@@ -222,6 +250,11 @@ watch(activeIndex, (newVal) => {
 
 :deep(.item.active) {
     font-weight: bold !important;
+}
+
+:deep(.nav-container) {
+    transition: background-color 0.5s ease;
+    /* 添加背景色过渡动画 */
 }
 
 /* 确保图标和文字垂直居中 */

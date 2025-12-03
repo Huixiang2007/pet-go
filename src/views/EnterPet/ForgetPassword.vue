@@ -3,21 +3,13 @@
     <!-- 使用响应式变量控制容器类名 -->
     <div class="demo-login forPicture" :class="{ 'right-panel-active': isRightPanelActive }">
       <!-- 验证邮箱表单（原form1） -->
-      <form
-        class="layui-form demo-login-container forPicture__form forPicture--signin"
-        v-if="step === 1"
-        @submit.prevent="handleFirstFormSubmit"
-      >
-        <!-- 表单内容保持不变 -->
+      <form class="layui-form demo-login-container forPicture__form forPicture--signin" v-if="step === 1"
+        @submit.prevent="handleFirstFormSubmit">
         <div class="container">
           <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
           <div class="title">
-            <span
-              v-for="(char, index) in titleEmailChars"
-              :key="index"
-              :style="{ animationDelay: `${index * 100}ms` }"
-              class="char"
-            >
+            <span v-for="(char, index) in titleEmailChars" :key="index" :style="{ animationDelay: `${index * 100}ms` }"
+              class="char">
               {{ char }}
             </span>
           </div>
@@ -30,17 +22,8 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-email"></i>
               </div>
-              <input
-                type="text"
-                name="email"
-                v-model="formData.email"
-                lay-verify="required|email"
-                placeholder="QQ邮箱"
-                lay-reqtext="请输入QQ邮箱"
-                autocomplete="off"
-                class="layui-input"
-                lay-affix="clear"
-              />
+              <input type="text" name="email" v-model="formData.email" lay-verify="required|email" placeholder="QQ邮箱"
+                lay-reqtext="请输入QQ邮箱" autocomplete="off" class="layui-input" lay-affix="clear" />
             </div>
           </div>
 
@@ -51,27 +34,13 @@
                   <div class="layui-input-prefix">
                     <i class="layui-icon layui-icon-vercode"></i>
                   </div>
-                  <input
-                    type="text"
-                    name="captcha"
-                    v-model="formData.captcha"
-                    lay-verify="required"
-                    placeholder="验证码"
-                    lay-reqtext="请填写验证码"
-                    autocomplete="off"
-                    class="layui-input"
-                    lay-affix="clear"
-                  />
+                  <input type="text" name="captcha" v-model="formData.captcha" lay-verify="required" placeholder="验证码"
+                    lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" lay-affix="clear" />
                 </div>
               </div>
               <div class="layui-col-xs5">
-                <button
-                  type="button"
-                  class="layui-btn"
-                  :disabled="countdown > 0"
-                  @click="sendCaptcha"
-                  style="margin-left: 10px"
-                >
+                <button type="button" class="layui-btn" :disabled="countdown > 0" @click="sendCaptcha"
+                  style="margin-left: 10px">
                   {{ countdown > 0 ? `${countdown}s后重发` : '获取验证码' }}
                 </button>
               </div>
@@ -91,21 +60,13 @@
       </form>
 
       <!-- 重置密码表单（原form2） -->
-      <form
-        class="layui-form demo-login-container forPicture__form forPicture--signup"
-        @submit.prevent="handleSecondFormSubmit"
-        v-if="step === 2"
-      >
-        <!-- 表单内容保持不变 -->
+      <form class="layui-form demo-login-container forPicture__form forPicture--signup"
+        @submit.prevent="handleSecondFormSubmit" v-if="step === 2">
         <div class="container">
           <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
           <div class="title">
-            <span
-              v-for="(char, index) in titleResetChars"
-              :key="index"
-              :style="{ animationDelay: `${index * 100}ms` }"
-              class="char"
-            >
+            <span v-for="(char, index) in titleResetChars" :key="index" :style="{ animationDelay: `${index * 100}ms` }"
+              class="char">
               {{ char }}
             </span>
           </div>
@@ -116,17 +77,8 @@
             <div class="layui-input-prefix">
               <i class="layui-icon layui-icon-password"></i>
             </div>
-            <input
-              type="password"
-              name="newPassword"
-              v-model="formData.newPassword"
-              lay-verify="required|password"
-              placeholder="新密码"
-              lay-reqtext="请填写新密码"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="eye"
-            />
+            <input type="password" name="newPassword" v-model="formData.newPassword" lay-verify="required|password"
+              placeholder="新密码" lay-reqtext="请填写新密码" autocomplete="off" class="layui-input" lay-affix="eye" />
           </div>
         </div>
 
@@ -135,17 +87,9 @@
             <div class="layui-input-prefix">
               <i class="layui-icon layui-icon-password"></i>
             </div>
-            <input
-              type="password"
-              name="confirmPassword"
-              v-model="formData.confirmPassword"
-              lay-verify="required|confirmPassword"
-              placeholder="确认新密码"
-              lay-reqtext="请确认新密码"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="eye"
-            />
+            <input type="password" name="confirmPassword" v-model="formData.confirmPassword"
+              lay-verify="required|confirmPassword" placeholder="确认新密码" lay-reqtext="请确认新密码" autocomplete="off"
+              class="layui-input" lay-affix="eye" />
           </div>
         </div>
 
@@ -160,15 +104,10 @@
           </button>
         </div>
 
-        <div
-          class="layui-form-item demo-login-other"
-          style="display: flex; justify-content: space-between"
-          v-if="step === 2"
-        >
+        <div class="layui-form-item demo-login-other" style="display: flex; justify-content: space-between"
+          v-if="step === 2">
           <span @click="toLogin" class="register">返回登录</span>
-          <span @click="togglePanel" class="backEmail register" style="margin-left: auto"
-            >返回身份认证</span
-          >
+          <span @click="togglePanel" class="backEmail register" style="margin-left: auto">返回身份认证</span>
         </div>
       </form>
 
@@ -186,7 +125,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import request from '../../utils/request'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 declare global {
   interface Window {
@@ -194,13 +134,7 @@ declare global {
   }
 }
 
-// 响应式变量控制面板切换状态
 const isRightPanelActive = ref(true)
-
-// 切换面板方法
-// const togglePanel = (active: boolean) => {
-//   isRightPanelActive.value = active
-// }
 
 // 状态管理
 const step = ref(1)
@@ -223,8 +157,8 @@ const formData = ref({
 
 const togglePanel = () => {
   step.value = 1
-  isRightPanelActive.value = true // 切换回身份认证面板的样式
-  errorMessage.value = '' // 清除错误信息
+  isRightPanelActive.value = true
+  errorMessage.value = ''
 }
 // 路由实例
 const router = useRouter()
@@ -246,7 +180,9 @@ const handleSecondFormSubmit = () => {
 }
 
 // 发送验证码
+
 const sendCaptcha = async () => {
+  if (countdown.value > 0) return
   const qqEmailReg = /^[1-9]\d+@qq\.com$/
   if (!qqEmailReg.test(formData.value.email)) {
     errorMessage.value = '请输入正确的QQ邮箱格式'
@@ -254,32 +190,48 @@ const sendCaptcha = async () => {
   }
 
   try {
-    await axios.post('/api/user/send-captcha', {
-      email: formData.value.email,
-    })
-
-    countdown.value = 60
-    timer.value = window.setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) {
-        clearInterval(timer.value as number)
+    const response = await request(
+      '/server/api/user/sendCode',
+      'POST',
+      {
+        email: formData.value.email,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+    console.log('发送验证码:', response)
+    if (response.code === 0) {
+      ElMessage.success('验证码已发送至您的邮箱')
+      // 开始倒计时
+      countdown.value = 60
+      if (timer.value) {
+        clearInterval(timer.value)
       }
-    }, 1000)
+      timer.value = window.setInterval(() => {
+        countdown.value--
+        if (countdown.value <= 0) {
+          clearInterval(timer.value as number)
+          timer.value = null
+        }
+      }, 1000)
+    } else {
+      ElMessage.error(response.msg || '发送验证码失败，请稍后重试')
+    }
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || '发送验证码失败，请重试'
+    console.error('发送验证码失败:', error)
   }
 }
 
 // 验证邮箱和验证码
 const verifyEmail = async () => {
   try {
-    // await axios.post('/api/user/verify-email', {
-    //   email: formData.value.email,
-    //   captcha: formData.value.captcha
-    // })
     layer.msg('验证成功，请重置密码', { icon: 1 })
     step.value = 2
-    isRightPanelActive.value = false // 切换到重置密码时显示左侧
+    isRightPanelActive.value = false
     errorMessage.value = ''
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || '验证失败，请检查信息'
@@ -362,16 +314,20 @@ onUnmounted(() => {
 <style scoped>
 .error-message {
   /* 间距控制：与上方元素保持距离 */
-  margin-top: 0.5rem; /* mt-2的等价实现 */
+  margin-top: 0.5rem;
+  /* mt-2的等价实现 */
 
   /* 文本样式 */
-  font-size: 0.75rem; /* text-xs的等价实现 */
-  color: #ef4444; /* text-red-500的等价实现 */
+  font-size: 0.75rem;
+  /* text-xs的等价实现 */
+  color: #ef4444;
+  /* text-red-500的等价实现 */
 
   /* 布局控制 */
   display: flex;
   align-items: center;
-  line-height: 1; /* 紧凑显示 */
+  line-height: 1;
+  /* 紧凑显示 */
 }
 
 /* 错误图标样式 */
@@ -395,12 +351,16 @@ onUnmounted(() => {
 
 /* 定义脉冲动画 */
 @keyframes pulse {
+
   0%,
   100% {
-    opacity: 1; /* 完全显示 */
+    opacity: 1;
+    /* 完全显示 */
   }
+
   50% {
-    opacity: 0.5; /* 半透明 */
+    opacity: 0.5;
+    /* 半透明 */
   }
 }
 
@@ -408,8 +368,9 @@ onUnmounted(() => {
 .error-message.hidden {
   display: none;
 }
+
 /* 保持原有样式不变 */
-.layui-form-checkbox[lay-skin='primary'] > div {
+.layui-form-checkbox[lay-skin='primary']>div {
   margin-top: 0.5px !important;
 }
 
@@ -427,12 +388,10 @@ onUnmounted(() => {
   font-weight: 500;
   transition: 0.8s;
   background-size: 280% auto;
-  background-image: linear-gradient(
-    325deg,
-    var(--btn-bg-2) 0%,
-    var(--btn-bg-1) 55%,
-    var(--btn-bg-2) 90%
-  );
+  background-image: linear-gradient(325deg,
+      var(--btn-bg-2) 0%,
+      var(--btn-bg-1) 55%,
+      var(--btn-bg-2) 90%);
   border: none;
   border-radius: var(--radii);
   color: var(--btn-bg-color);
@@ -454,22 +413,28 @@ onUnmounted(() => {
     transition: linear;
   }
 }
+
 .btn-donate {
   margin-left: 9px;
 }
+
 .logo {
   margin-left: 20px;
-  height: auto; /* 保持图片比例 */
+  height: auto;
+  /* 保持图片比例 */
   width: 66px;
 }
+
 .container span {
   font-size: 27px;
 }
+
 .layui-form-item {
   width: 361px;
   margin-bottom: 30px;
   margin-left: 16px;
 }
+
 .layui-col-xs7 {
   width: 60.333333%;
 }
@@ -477,6 +442,7 @@ onUnmounted(() => {
 .layui-col-xs5 {
   width: 28.666667%;
 }
+
 .demo-login-container {
   width: 400px;
   padding: 41px;
@@ -496,12 +462,17 @@ onUnmounted(() => {
 .demo-login {
   min-height: 100vh;
   display: flex;
-  justify-content: center; /* 水平居中 */
-  align-items: center; /* 垂直居中 */
+  justify-content: center;
+  /* 水平居中 */
+  align-items: center;
+  /* 垂直居中 */
 }
+
 .container {
-  display: flex; /* 开启 Flex 布局 */
-  align-items: center; /* 垂直居中对齐（可选，让文字和图片在同一水平线上） */
+  display: flex;
+  /* 开启 Flex 布局 */
+  align-items: center;
+  /* 垂直居中对齐（可选，让文字和图片在同一水平线上） */
   gap: 10px;
   margin: 20px 20px 25px;
 }
@@ -509,12 +480,14 @@ onUnmounted(() => {
 body {
   overflow: hidden;
 }
+
 .demo-login {
   min-height: 54vh;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .likeBody {
   background-image: url('../../assets/img/background1.png');
   background-repeat: no-repeat;
@@ -528,13 +501,16 @@ body {
   height: 100vh;
   place-items: center;
 }
+
 .container {
   width: 85%;
   justify-content: center;
 }
+
 .demo-login-container {
   margin: -19px auto 0;
 }
+
 ::v-deep .forPicture {
   background-image: url('../../assets/img/background1.png');
   height: 300px !important;
@@ -644,6 +620,7 @@ body {
 }
 
 @keyframes show {
+
   0%,
   49.99% {
     opacity: 0;
@@ -656,36 +633,48 @@ body {
     z-index: 5;
   }
 }
+
 ::v-deep .layui-input {
-  height: 40px; /* 可以根据需要调整高度值，默认通常是 38px 左右 */
-  line-height: 40px; /* 保持行高与高度一致，使文字垂直居中 */
-  font-size: 15px; /* 可选：适当调整字体大小配合高度 */
+  height: 40px;
+  /* 可以根据需要调整高度值，默认通常是 38px 左右 */
+  line-height: 40px;
+  /* 保持行高与高度一致，使文字垂直居中 */
+  font-size: 15px;
+  /* 可选：适当调整字体大小配合高度 */
 }
+
 .layui-btn {
   background-color: rgb(253, 152, 96);
 }
+
 .layui-input:focus {
   border-color: rgb(253, 152, 96) !important;
   box-shadow: 0 0 3px 1px rgba(253, 152, 96, 0.3) !important;
 }
+
 .layui-checkbox:hover .layui-checkbox {
   border-color: rgb(253, 152, 96);
 }
+
 .layui-form-checked[lay-skin='primary'] i {
   background-color: rgb(253, 152, 96);
   border-color: rgb(253, 152, 96) !important;
   color: #fff;
 }
+
 .layui-form-checkbox[lay-skin='primary']:hover i {
   border-color: rgb(253, 152, 96);
 }
+
 .layui-form-checkbox[lay-skin='primary'] {
   border-color: rgb(253, 152, 96);
 }
+
 .layui-btn-primary:hover {
   border-color: rgb(253, 152, 96);
   color: #333;
 }
+
 .title {
   /* 容器样式（可选） */
   font-size: 24px;
@@ -700,6 +689,7 @@ body {
   min-width: 0.5em;
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
 @keyframes charPop {
   to {
     opacity: 1;
@@ -710,12 +700,18 @@ body {
 span {
   cursor: pointer;
 }
+
 .register {
-  position: relative; /* 用于定位下划线伪元素 */
-  cursor: pointer; /* 鼠标悬停时显示手型（提示可点击） */
-  color: #333; /* 默认文字颜色 */
-  padding-bottom: 2px; /* 预留下划线的空间（避免文字跳动） */
-  transition: color 0.3s ease; /* 文字颜色过渡（可选） */
+  position: relative;
+  /* 用于定位下划线伪元素 */
+  cursor: pointer;
+  /* 鼠标悬停时显示手型（提示可点击） */
+  color: #333;
+  /* 默认文字颜色 */
+  padding-bottom: 2px;
+  /* 预留下划线的空间（避免文字跳动） */
+  transition: color 0.3s ease;
+  /* 文字颜色过渡（可选） */
 }
 
 /* 下划线伪元素（初始隐藏状态） */
@@ -724,18 +720,24 @@ span {
   position: absolute;
   left: 0;
   bottom: 0;
-  width: 0; /* 初始宽度为 0（不显示） */
-  height: 2px; /* 下划线高度 */
-  background-color: #1677ff; /* 蓝色下划线（可自定义色值） */
-  transition: width 0.4s ease; /* 宽度过渡动画：0.4秒缓慢展开 */
+  width: 0;
+  /* 初始宽度为 0（不显示） */
+  height: 2px;
+  /* 下划线高度 */
+  background-color: #1677ff;
+  /* 蓝色下划线（可自定义色值） */
+  transition: width 0.4s ease;
+  /* 宽度过渡动画：0.4秒缓慢展开 */
 }
 
 /* 鼠标 hover 时的效果 */
 .register:hover {
-  color: #1677ff; /* 文字同步变蓝（可选，增强交互感） */
+  color: #1677ff;
+  /* 文字同步变蓝（可选，增强交互感） */
 }
 
 .register:hover::after {
-  width: 100%; /* 下划线宽度从 0 过渡到 100%（从左到右展开） */
+  width: 100%;
+  /* 下划线宽度从 0 过渡到 100%（从左到右展开） */
 }
 </style>

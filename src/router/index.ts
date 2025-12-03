@@ -25,7 +25,7 @@ const routes = [
   },
   // 宠物购物车
   {
-    path: '/petCart',
+    path: '/pet-cart',
     name: 'petCart',
     component: () => import('@/views/Petshop/PetShopCar.vue'),
   },
@@ -43,97 +43,97 @@ const routes = [
   },
   //  商品详情
   {
-    path: '/productDetail/:id',
+    path: '/product-detail/:id',
     name: 'productsDetail',
     component: () => import('@/views/Petshop/ProductDetail.vue'),
   },
   //  订单列表
   {
-    path: '/OrderList',
+    path: '/order-list',
     name: 'OrderList ',
     component: () => import('@/views/Petshop/OrderList.vue'),
   },
   //物流信息
   {
-    path: '/PackageInfo',
+    path: '/package-info',
     name: 'PackageInfo',
     component: () => import('@/views/Petshop/PackageInfo.vue'),
   },
   //  搜索
   {
-    path: '/Search',
+    path: '/search',
     name: 'Search',
     component: () => import('@/views/Petshop/SearchProduct.vue'),
   },
   // 店铺
   {
-    path: '/Store',
+    path: '/store',
     name: 'Store',
     component: () => import('@/views/Petshop/ShopStore.vue'),
   },
   // 注册店铺
   {
-    path: '/StoreRegister',
+    path: '/store-register',
     name: 'StoreRegister',
     component: () => import('@/views/Petshop/SellerRegisition.vue'),
   },
   // 订单管理
   {
-    path: '/SellerOrderManager',
+    path: '/seller-order-manager',
     name: 'SellerOrderManager',
     component: () => import('@/views/Petshop/SellerOrderMana.vue'),
   },
       // 电商用户管理
 
   {
-    path: '/SellerUserManager',
+    path: '/seller-user-manager',
     name: 'SellerUserManager',
     component: () => import('@/views/Petshop/SellerUserMana.vue'),
   },
   // 优惠卷管理
   {
-    path: '/CouponManagement',
+    path: '/coupon-management',
     name: 'CouponManagement',
     component: () => import('@/views/Petshop/CouponManagement.vue'),
   },
   // 商品管理
   {
-    path: '/SellerItemManager',
+    path: '/seller-item-manager',
     name: 'SellerItemManager',
     component: () => import('@/views/Petshop/SellerItemMana.vue'),
   },
   // 店铺设置
   {
-    path: '/ShopSetting',
+    path: '/shop-setting',
     name: '/ShopSetting',
     component: () => import('@/views/Petshop/ShopSetting.vue'),
   },
   {
-    path: '/AddProduct',
+    path: '/add-product',
     name: 'addProduct',
     component: () => import('@/views/Petshop/AddProduct.vue'),
     meta: { title: '欢迎注册 PetGo' },
   },
   // 销售分析
   {
-    path: '/Analytics',
+    path: '/analytics',
     name: 'Analytics',
     component: () => import('@/views/Petshop/SalesAnalytics.vue'),
   },
           // 秒杀
   {
-    path: '/FlashSale' ,
+    path: '/flash-sale' ,
     name: 'FlashSale',
     component: () => import('@/views/Petshop/FlashSale.vue'),
   },
   {
-    path: '/CustomerService',
+    path: '/customer-service',
     name: 'CustomerService',
     component: () => import('@/views/Petshop/CustomerService.vue'),
   },
   // 添加商品
   {
-    path: '/AddProduct',
+    path: '/add-product',
     name: 'AddProduct',
     component: () => import('@/views/Petshop/AddProduct.vue'),
   },

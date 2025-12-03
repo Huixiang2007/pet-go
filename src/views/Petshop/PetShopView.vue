@@ -314,6 +314,7 @@ const getProducts = () => {
         },
       })
       .then((response) => {
+        console.log(response)
         console.log(response.data)
         const newProducts = response.data.data.list
         products.value = [...products.value, ...newProducts]
@@ -335,22 +336,22 @@ const getProducts = () => {
 }
 const productsDeatil = (id: string) => {
   router.push({
-    path: `/productDetail/${id}`,
+    path: `/product-detail/${id}`,
   })
 }
 const FlashSale = () => {
   router.push({
-    path: '/flashSale',
+    path: '/flash-sale',
   })
 }
 const goCart = () => {
   router.push({
-    path: '/petCart',
+    path: '/pet-cart',
   })
 }
 const aiServer = () => {
   router.push({
-    path: '/CustomerService',
+    path: '/customer-service',
   })
 }
 // 滚动

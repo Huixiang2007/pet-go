@@ -12,7 +12,7 @@
         <div class="flex items-center justify-between pb-4 border-b border-gray-100">
           <div>
             <h1 class="text-md font-bold text-gray-700">搜索结果</h1>
-            <span class="text-gray-500 text-sm">找到{{products.length}}件相关商品</span>
+            <span class="text-gray-500 text-sm">找到{{ products.length }}件相关商品</span>
           </div>
 
           <div class="flex items-center justify-center px-6">
@@ -172,8 +172,7 @@
         </div>
 
         <!-- 商品列表 -->
-        <div v-if="products.length > 0"
-         class="products mt-8">
+        <div v-if="products.length > 0" class="products mt-8">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold text-gray-800">
               <i class="fa fa-star text-[#FF7043] mr-2"></i>热门商品
@@ -222,12 +221,15 @@
             </div>
           </div>
         </div>
-            <div v-else-if="!idLoading && products.length === 0" class="text-center py-16">
+        <div v-else-if="!idLoading && products.length === 0" class="text-center py-16">
           <i class="fa fa-search text-5xl text-gray-300"></i>
           <p class="mt-4 text-lg text-gray-500">抱歉，没有找到相关商品</p>
           <p class="text-gray-400 mt-2">请尝试其他关键词或筛选条件</p>
           <button
-            @click="keywords = ''; SearchProducts()"
+            @click="
+              keywords = '',
+              SearchProducts()
+            "
             class="mt-4 px-6 py-2 bg-[#f5a623] text-white rounded-md hover:bg-[#e09612]"
           >
             清空搜索条件
@@ -236,6 +238,13 @@
       </div>
     </main>
   </div>
+  <img
+    v-show="showBackToTop"
+    @click="scrollToTop"
+    class="fixed bottom-6 right-4 z-50 w-20 h-20 hover:scale-105 transition-transform"
+    aria-label="回到顶部"
+    src="/img/火箭.gif"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -322,13 +331,16 @@ const resetSearchState = () => {
   currentPage.value = 1
   hasmore.value = true
 }
-watch(() => route.query.keyword, (newValue) => {
-  keywords.value =(newValue as string) || ''
-  console.log('新的搜索关键词:', keywords.value)
-   resetSearchState()
-  SearchProducts()
-
-},{immediate: true})
+watch(
+  () => route.query.keyword,
+  (newValue) => {
+    keywords.value = (newValue as string) || ''
+    console.log('新的搜索关键词:', keywords.value)
+    resetSearchState()
+    SearchProducts()
+  },
+  { immediate: true },
+)
 //获取品牌
 const getBrands = () => {
   axios
@@ -369,37 +381,6 @@ const confirmBrands = () => {
   console.log('选择的品牌:', selectedBrands.value)
   showBrandModal.value = false
   filterBrand.value = true
-
-  if (!idLoading.value && hasmore.value) {
-    idLoading.value = true
-    axios
-      .request({
-        url: '/server/api/shop/product/filter',
-        method: 'POST',
-        data: {
-          pageNum: currentPage.value,
-          pageSize: pageSize.value,
-          title: keywords,
-          brandName: selectedBrands.value,
-        },
-      })
-      .then((res) => {
-        idLoading.value = false
-        console.log(res.data)
-        const newSearchProducts = res.data.data.list
-
-        products.value = [...products.value, ...newSearchProducts]
-        if (newSearchProducts.length < pageSize.value) {
-          hasmore.value = false
-        } else {
-          currentPage.value++
-        }
-      })
-      .catch((error) => {
-        idLoading.value = false
-        console.log(error)
-      })
-  }
 }
 
 // 监听滚动事件
@@ -420,7 +401,12 @@ const handleScroll = () => {
     SearchProducts()
   }
 }
-
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}
 // 地区选择相关方法
 const selectRegion = (region: string) => {
   selectedRegion.value = region

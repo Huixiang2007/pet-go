@@ -14,10 +14,10 @@
                     <p class="text-sm text-gray-700 truncate">{{ fileName }}</p>
                 </div>
                 <div class="preview-actions mt-2">
-                    <button type="button" class="text-xs text-purple-600 hover:text-purple-800 mr-3"
+                    <!-- <button type="button" class="text-xs text-purple-600 hover:text-purple-800 mr-3"
                         @click.stop="$refs.fileInput.click()">
                         更换
-                    </button>
+                    </button> -->
                     <button type="button" class="text-xs text-red-500 hover:text-red-700" @click.stop="removeFile">
                         删除
                     </button>
@@ -104,7 +104,7 @@ const handleDrop = (event: DragEvent) => {
     isDragOver.value = false
     const files = event.dataTransfer?.files
     if (files && files.length > 0) {
-        processFile(files[0])
+        processFile(files[0]!)
     }
 }
 
@@ -118,13 +118,13 @@ const handleFileInput = (event: Event) => {
             if (validFiles.length > 0) {
                 emit('update:modelValue', validFiles)
                 // 只预览第一个文件
-                processFile(validFiles[0])
+                processFile(validFiles[0]!)
             }
         } else {
-            if (validateFile(file)) {
-                emit('update:modelValue', file)
-                processFile(file)
-            }
+            // if (validateFile(file)) {
+            //     emit('update:modelValue', file)
+            //     processFile(file)
+            // }
         }
         input.value = '' // 重置input，允许重新选择相同文件
     }

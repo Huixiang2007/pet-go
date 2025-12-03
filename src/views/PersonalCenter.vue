@@ -81,13 +81,14 @@
               <label class="layui-form-label">生日</label>
               <div class="layui-input-block">
                 <el-date-picker
+                  class="custom-style"
                   v-model="formData.birthday"
                   type="date"
                   name="birthday"
                   placeholder="请选择生日日期"
                   :max-date="new Date(maxBirthdayDate)"
                   value-format="YYYY-MM-DD"
-                  style="width: 100%"
+                  style="width: 100%; height:37px;"
                   :disabled-date="disabledDate"
                 />
               </div>
@@ -126,7 +127,7 @@
                 <button class="layui-btn btn-save" lay-submit lay-filter="save-base-info">
                   保存修改
                 </button>
-                <button class="layui-btn delete-btn" @click="cancelEdit">取消修改</button>
+                <button class="layui-btn delete-btn"  type="button" @click="cancelEdit">取消修改</button>
               </div>
             </div>
           </form>
@@ -330,6 +331,8 @@
                 <button class="layui-btn btn-save" lay-submit lay-filter="change-password">
                   确认修改
                 </button>
+                <button class="layui-btn delete-btn" type="button"  @click="cancelWord">取消修改</button>
+
               </div>
             </div>
           </form>
@@ -356,7 +359,7 @@
                   <div class="layui-input-block">
                     <input
                       type="text"
-                      v-model="addressForm.recipient"
+                      v-model="addressForm.consignee"
                       placeholder="请输入收件人姓名"
                       class="layui-input"
                     />
@@ -385,7 +388,7 @@
                   <label class="layui-form-label">详细地址</label>
                   <div class="layui-input-block">
                     <textarea
-                      v-model="addressForm.detail"
+                      v-model="addressForm.detailAddress"
                       placeholder="请输入详细地址"
                       class="layui-textarea"
                       rows="3"
@@ -423,22 +426,22 @@
             <div class="address-list" v-if="!showAddressForm && addressList.length > 0">
               <div class="address-item" v-for="address in addressList" :key="address.id">
                 <div class="address-header">
-                  <span class="recipient">{{ address.recipient }} {{ address.phone }}</span>
-                  <span class="default-tag" v-if="address.isDefault">默认地址</span>
+                  <span class="recipient">{{ address.consignee }} {{ address.phone }}</span>
+                  <span class="default-tag" v-if="!address.isDefault">默认地址</span>
                 </div>
                 <div class="address-content">
-                  {{ address.province }} {{ address.city }} {{ address.district }}
-                  {{ address.detail }}
+                  {{ getProvinceName(address.province) }} {{ getCityName(address.city)}} {{  getDistrictName(address.district)  }}
+                  {{ address.detailAddress }}
                 </div>
                 <div class="address-actions">
                   <button
-                    class="layui-btn layui-btn-primary layui-btn-sm"
+                    class="layui-btn btn-edit layui-btn-sm"
                     @click="editAddress(address)"
                   >
                     编辑
                   </button>
                   <button
-                    class="layui-btn layui-btn-primary layui-btn-sm"
+                    class="layui-btn btn-delete layui-btn-sm"
                     @click="deleteAddress(address.id)"
                   >
                     删除
@@ -446,7 +449,7 @@
                   <button
                     class="layui-btn layui-btn-primary layui-btn-sm"
                     @click="setDefaultAddress(address.id)"
-                    v-if="!address.isDefault"
+                    v-if="address.isDefault"
                   >
                     设为默认
                   </button>
@@ -455,10 +458,12 @@
               <div class="pagination-container">
                 <el-pagination
                   @current-change="handlePageChange"
+                   @size-change="handleSizeChange"
+                  :page-sizes="[3, 5, 8, 10]"
                   :current-page="addressPagination.currentPage"
                   :page-size="addressPagination.pageSize"
                   :total="addressPagination.total"
-                  layout="prev, pager, next, jumper, ->, total"
+                  layout="sizes,prev, pager, next, jumper, ->, total"
                   background
                 />
               </div>
@@ -482,9 +487,10 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 // import axios from 'axios'
 import request from '../utils/request'
 import AddressSelect from '../components/AddressSelect.vue'
-import { el } from 'element-plus/es/locale'
 import { type } from 'os'
-
+import provincesData from 'china-division/dist/provinces.json';
+import citiesData from 'china-division/dist/cities.json';
+import districtsData from 'china-division/dist/areas.json';
 declare global {
   interface Window {
     layui: any
@@ -531,31 +537,51 @@ const formData = ref({
   email: '',
 })
 // 地址数据类型定义
+
 interface Address {
   id: string
-  recipient: string // 收件人
+  consignee: string // 收件人
   phone: string // 电话
   province: string // 省份
   city: string // 城市
   district: string // 区/县
-  detail: string // 详细地址
+  detailAddress: string // 详细地址
   isDefault: boolean // 是否默认地址
 }
-interface Address {
-  id: string
-  recipient: string // 收件人
-  phone: string // 电话
-  province: string // 省份
-  city: string // 城市
-  district: string // 区/县
-  detail: string // 详细地址
-  isDefault: boolean // 是否默认地址
+// 地址名称映射
+interface Area {
+  code: string
+  name: string
 }
 
+interface City extends Area {
+  provinceCode: string
+}
+
+interface District extends Area {
+  cityCode: string
+}
+// 获取省份名称
+const getProvinceName = (provinceCode: string) => {
+  const province = (provincesData as Area[]).find(p => p.code === provinceCode)
+  return province ? province.name : provinceCode
+}
+
+// 获取城市名称
+const getCityName = (cityCode: string) => {
+  const city = (citiesData as City[]).find(c => c.code === cityCode)
+  return city ? city.name : cityCode
+}
+
+// 获取区县名称
+const getDistrictName = (districtCode: string) => {
+  const district = (districtsData as District[]).find(d => d.code === districtCode)
+  return district ? district.name : districtCode
+}
 // 分页信息
 const addressPagination = ref({
   currentPage: 1,
-  pageSize: 10,
+  pageSize: 5,
   total: 0,
   pages: 1,
 })
@@ -564,15 +590,27 @@ const selectedAddress = ref({
   city: '',
   district: '',
 })
+const handlePageChange = (page: number) => {
+  console.log('切换到第', page, '页')
+  addressPagination.value.currentPage = page
+  getAddressList()
+}
+
+const handleSizeChange = (size: number) => {
+  console.log('每页条数变更为', size)
+  addressPagination.value.pageSize = size
+  addressPagination.value.currentPage = 1 // 重置到第一页
+  getAddressList()
+}
 
 // 地址表单数据
 const addressForm = ref<Partial<Address>>({
-  recipient: '',
+  consignee: '',
   phone: '',
   province: '',
   city: '',
   district: '',
-  detail: '',
+  detailAddress: '',
   isDefault: false,
 })
 
@@ -748,10 +786,7 @@ const sendVerificationCode = async () => {
   }
 }
 
-const handlePageChange = (page: number) => {
-  addressPagination.value.currentPage = page
-  getAddressList()
-}
+
 // 开始倒计时
 const startCountDown = () => {
   countDown.value = 60
@@ -840,14 +875,10 @@ const getAddressList = async () => {
         pageNum: addressPagination.value.currentPage,
         pageSize: addressPagination.value.pageSize,
       },
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      },
+     
     )
     console.log('获取地址列表成功:', response.data)
-    addressList.value = response.data.records || []
+    addressList.value = response.data.list || []
     addressPagination.value.total = response.data.total || 0
     addressPagination.value.pages = response.data.pages || 1
     // 如果是第一页且没有地址，则显示添加地址表单
@@ -864,7 +895,7 @@ const getAddressList = async () => {
 // 新增/编辑地址
 const saveAddress = async () => {
   // 表单验证
-  if (!addressForm.value.recipient) {
+  if (!addressForm.value.consignee) {
     ElMessage.error('请填写收件人')
     return
   }
@@ -888,61 +919,107 @@ const saveAddress = async () => {
     !addressForm.value.province ||
     !addressForm.value.city ||
     !addressForm.value.district ||
-    !addressForm.value.detail
+    !addressForm.value.detailAddress
   ) {
     ElMessage.error('请填写完整地址信息')
     return
   }
 
   try {
-    const addressData = {
-      consignee: addressForm.value.recipient,
+   
+     const addressAdd = {
+      consignee: addressForm.value.consignee,
       phone: addressForm.value.phone,
       province: addressForm.value.province,
       city: addressForm.value.city,
       district: addressForm.value.district,
-      detailAddress: addressForm.value.detail,
+      detailAddress: addressForm.value.detailAddress,
       isDefault: addressForm.value.isDefault ? 0 : 1,
     }
+     const addressAddId = {
+      id: editingAddressId.value, // 单独的id
+      consignee: addressForm.value.consignee,
+      phone: addressForm.value.phone,
+      province: addressForm.value.province,
+      city: addressForm.value.city,
+      district: addressForm.value.district,
+      detailAddress: addressForm.value.detailAddress,
+      isDefault: addressForm.value.isDefault ? 0 : 1,
+    }
+    let response: any
     if (editingAddressId.value) {
-      // 编辑地址
-      const response = await request(
-        `/server/api/user/updateUserAddress${editingAddressId.value}`,
-        'PUT',
-        addressData,
-      )
+      // 编辑地址  
+      const updateParams = {
+        id: editingAddressId.value, // 单独的id
+        row: addressAddId // 地址信息体
+      };
+      response = await request('/server/api/user/updateUserAddress', 'POST', addressAddId)
       console.log('编辑地址返回:', response)
-      ElMessage.success('地址更新成功')
+        if (response.code === 0) {
+        ElMessage.success('地址更新成功')
+      } else {
+        ElMessage.error(response.msg || '地址更新失败')
+        return
+      }
     } else {
-      console.log('新增地址数据:', addressData)
+      console.log('新增地址数据:', addressForm)
       // 新增地址
-      const response = await request('/server/api/user/addUserAddress', 'POST', addressData)
+      response = await request('/server/api/user/addUserAddress', 'POST', addressAdd)
       if (response.code === 0) {
         console.log('新增地址返回:', response)
         ElMessage.success('地址添加成功')
-        resetAddressForm()
-        getAddressList()
+       
       } else {
         console.log('新增地址失败:', response)
+        return
       }
     }
+     resetAddressForm()
+        getAddressList()
   } catch (error) {
     // ElMessage.error('保存地址失败，请稍后重试')
     console.error('保存地址失败:', error)
   }
 }
 
-// 编辑地址
-const editAddress = (address: Address) => {
-  addressForm.value = { ...address }
-  editingAddressId.value = address.id
-  showAddressForm.value = true
+// 获取地址详细信息
+const editAddress = async (address: Address) => {
+  try {
+    // 调用后端接口获取地址详情
+    const response = await request(
+      '/server/api/user/UserAddressDetail',
+      'GET',
+      { id: address.id }
+    )
+    
+    if (response.code === 0 && response.data) {
+      // 成功获取地址详情后填充表单
+      const addressDetail = response.data
+      addressForm.value = {
+        consignee: addressDetail.consignee,
+        phone: addressDetail.phone,
+        province: addressDetail.province,
+        city: addressDetail.city,
+        district: addressDetail.district,
+        detailAddress: addressDetail.detailAddress,
+        isDefault: addressDetail.isDefault === 0 // 根据后端返回值调整
+      }
+      
+      editingAddressId.value = addressDetail.id
+      showAddressForm.value = true
 
-  // 回显地址选择器数据
-  selectedAddress.value = {
-    province: address.province,
-    city: address.city,
-    district: address.district,
+      // 回显地址选择器数据
+      selectedAddress.value = {
+        province: addressDetail.province,
+        city: addressDetail.city,
+        district: addressDetail.district,
+      }
+    } else {
+      ElMessage.error(response.msg || '获取地址详情失败')
+    }
+  } catch (error) {
+    console.error('获取地址详情失败:', error)
+    ElMessage.error('获取地址详情失败，请稍后重试')
   }
 }
 
@@ -980,12 +1057,12 @@ const setDefaultAddress = async (id: string) => {
 // 重置地址表单
 const resetAddressForm = () => {
   addressForm.value = {
-    recipient: '',
+    consignee: '',
     phone: '',
     province: '',
     city: '',
     district: '',
-    detail: '',
+    detailAddress: '',
     isDefault: false,
   }
   editingAddressId.value = ''
@@ -1001,6 +1078,20 @@ const resetAddressForm = () => {
 
 // 取消编辑，恢复原始值
 const cancelEdit = () => {
+  const isBaseInfoModified = 
+    formData.value.nickname !== userInfo.value.nickname ||
+    formData.value.sex !== userInfo.value.sex ||
+    formData.value.phone !== userInfo.value.phone ||
+    formData.value.birthday !== userInfo.value.birthday ||
+    formData.value.email !== userInfo.value.email;
+
+  // 如果没有修改，则直接返回，不执行后续操作
+  if (!isBaseInfoModified) {
+    ElMessage.info('您还没有进行任何修改')
+    return
+  }
+
+  // 如果有修改，则执行重置操作
   formData.value = { ...userInfo.value }
 
   if (window.layui) {
@@ -1009,7 +1100,38 @@ const cancelEdit = () => {
     })
   }
 
-  window.layui.layer.msg('已恢复原始值')
+  ElMessage.success('已恢复原始值')
+}
+const cancelWord = () => {
+  // 判断密码表单是否有修改
+  const isPasswordFormModified = 
+    passwordForm.value.oldPassword !== '' ||
+    passwordForm.value.newPassword !== '' ||
+    passwordForm.value.code !== '' ||
+    passwordForm.value.confirmPassword !== '';
+
+  // 如果没有修改，则直接返回，不执行后续操作
+  if (!isPasswordFormModified) {
+    ElMessage.info('您还没有进行任何修改')
+    return
+  }
+
+  // 如果有修改，则执行重置操作
+  passwordForm.value = {
+    oldPassword: '',
+    newPassword: '',
+    email: userInfo.value.email,
+    code: '',
+    confirmPassword: '',
+  }
+
+  if (window.layui) {
+    window.layui.use('form', (form: any) => {
+      form.render()
+    })
+  }
+
+  ElMessage.success('已恢复原始值')
 }
 
 // 处理签名输入
@@ -1275,6 +1397,24 @@ const logout = () => {
 </script>
 
 <style scoped>
+
+:deep(.layui-form-radio:hover>*, .layui-form-radioed, .layui-form-radioed>i) {
+    color: #fd9860;
+}
+:deep(.layui-form-radioed) {
+    color: #fd9860;
+}
+:deep(.layui-form-radioed>i) {
+    color: #fd9860;
+}
+.address-content {
+  color: #666;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
 .empty-address {
   margin-top: 2rem;
   text-align: center;
@@ -1375,7 +1515,7 @@ const logout = () => {
   background-color: #fd9860;
   color: white;
   padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 2px;
   font-size: 0.8rem;
 }
 
@@ -1416,7 +1556,30 @@ const logout = () => {
   border-color: #fd9860;
   color: #fd9860;
 }
+.btn-edit {
+  background-color: #409eff;
+  border-color: #409eff;
+  color: white;
+  min-width: 60px;
+}
 
+.btn-edit:hover {
+  background-color: #66b1ff;
+  border-color: #66b1ff;
+}
+
+/* 删除按钮样式 */
+.btn-delete {
+  background-color: #f44b4b;
+  border-color: #f44b4b;
+  color: white;
+  min-width: 60px;
+}
+
+.btn-delete:hover {
+  background-color: #fb7b7b;
+  border-color: #fb7b7b;
+}
 .layui-btn-primary:hover {
   border-color: #fd9860;
   color: #fd9860;

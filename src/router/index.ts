@@ -128,7 +128,7 @@ const routes = [
   },
   //登录
   {
-    path: '/Login',
+    path: '/login',
     name: 'petLogin',
     component: () => import('@/views/EnterPet/login.vue'),
     meta: { title: '欢迎登录 PetGo' },
@@ -146,7 +146,7 @@ const routes = [
   },
   //注册
   {
-    path: '/Register',
+    path: '/register',
     name: 'register',
     component: () => import('@/views/EnterPet/Register.vue'),
     meta: { title: '欢迎注册 PetGo' },
@@ -154,26 +154,87 @@ const routes = [
 
   //协议
   {
-    path: '/Protocal',
+    path: '/protocal',
     name: 'protocal',
     component: () => import('@/views/EnterPet/Protocal.vue'),
     meta: { title: '用户协议' },
   },
   //找回密码
   {
-    path: '/Forget',
+    path: '/forget',
     name: 'forget',
     component: () => import('@/views/EnterPet/ForgetPassword.vue'),
     meta: { title: '找回密码' },
   },
   //个人中心
   {
-    path: '/Person',
+    path: '/person',
     name: 'PersonalCenter',
     component: () => import('@/views/PersonalCenter.vue'),
     meta: { title: '个人中心' },
   },
+  //后台管理
+  {
+     path: '/admin',
+    name: 'homePage',
+    component: () => import('@/views/admin/HomePage.vue'),
+    meta: { title: '后台管理' },
+     children: [
+      // 数据概览
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/admin/Data.vue'),
+        meta: {
+          title: '数据概览',
+         
+        }
+      },
+      // 用户管理
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/admin/User.vue'),
+        meta: {
+          title: '用户管理',
+          icon: 'el-icon-user',
+        
+        }
+      },
+      // 寄养服务管理
+      {
+        path: 'foster',
+        name: 'foster',
+        meta: {
+          title: '寄养服务管理',
+          icon: 'el-icon-house',
+          
+        },
+        children: [
+          {
+            path: 'audit',
+            name: 'fosterAudit',
+            component: () => import('@/views/admin/Judge.vue'),
+            meta: {
+              title: '服务审核',
+            
+            }
+          },
+          {
+            path: 'orders',
+            name: 'fosterOrder',
+            component: () => import('@/views/admin/Order.vue'),
+            meta: {
+              title: '寄养订单',
+            
+            }
+          }
+        ]
 
+  }
+
+]
+  }
 ]
 
 const router = createRouter({

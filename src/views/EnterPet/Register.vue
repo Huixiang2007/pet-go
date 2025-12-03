@@ -247,7 +247,7 @@ const handleRegister = async () => {
       ElMessage.success('注册成功')
       // 注册成功后清空表单并跳转到登录页
       registerStore.clearForm()
-      router.push('/Person')
+      router.push('/person')
     } else {
       ElMessage.error(response.data.msg || '注册失败')
     }
@@ -407,7 +407,7 @@ onUnmounted(() => {
 })
 
 const toLogin = () => {
-  router.push('/Login')
+  router.push('/login')
 }
 const toProtocal = () => {
   router.push('/protocal')

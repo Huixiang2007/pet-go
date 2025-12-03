@@ -185,7 +185,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '../../utils/request'
-import { el } from 'element-plus/es/locale'
+
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 declare global {
@@ -203,7 +203,7 @@ const errorMessage = ref('')
 const isResetPassword = ref(true)
 const titleEmailChars = '身份验证'.split('')
 const titleResetChars = '重置密码'.split('')
-
+const isSendingCode = ref(false)
 const timer = ref<number | null>(null)
 let layer: any
 
@@ -214,6 +214,7 @@ const formData = ref({
   newPassword: '',
   confirmPassword: '',
 })
+
 
 const togglePanel = () => {
   step.value = 1
@@ -242,14 +243,17 @@ const handleSecondFormSubmit = () => {
 // 发送验证码
 
 const sendCaptcha = async () => {
-  if (countdown.value > 0) return
+  if (isSendingCode.value ||countdown.value > 0) return
+
   const qqEmailReg = /^[1-9]\d+@qq\.com$/
   if (!qqEmailReg.test(formData.value.email)) {
     errorMessage.value = '请输入正确的QQ邮箱格式'
     return
   }
+ 
 
   try {
+     isSendingCode.value = true
     const response = await request(
       '/server/api/user/sendCode',
       'POST',
@@ -287,14 +291,34 @@ const sendCaptcha = async () => {
 }
 
 // 验证邮箱和验证码
-const verifyEmail = async () => {
+const verifyEmail = async (email: string, code: string): Promise<boolean> => {
   try {
+    const response = await request(
+      '/server/api/user/codeValidate',
+      'POST',
+      {
+        email: email,
+        code: code
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+    console.log('验证邮箱和验证码:', response)
+     if (response.code === 0) {
     layer.msg('验证成功，请重置密码', { icon: 1 })
     step.value = 2
     isRightPanelActive.value = false
-    errorMessage.value = ''
+    errorMessage.value = ''}
+    else {
+      ElMessage.error(response.msg || '验证码验证失败')
+      return false
+    }
   } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || '验证失败，请检查信息'
+     console.error('验证码验证失败:', error)
+    return false
   }
 }
 
@@ -306,13 +330,26 @@ const resetPassword = async () => {
   }
 
   try {
-    // await axios.post('/api/user/reset-password', {
-    //   email: formData.value.email,
-    //   newPassword: formData.value.newPassword
-    // })
-
-    layer.msg('密码重置成功，请登录', { icon: 1 })
+    const response = await request(
+      '/server/api/user/forgetPassword',
+      'POST',
+      {
+        againPassword: formData.value.confirmPassword,
+        password: formData.value.newPassword,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+    if (response.code == 0) {
+ layer.msg('密码重置成功，请登录', { icon: 1 })
     router.push('/login')
+      }
+      else{
+        ElMessage.error(response.msg || '密码重置失败，请重试')
+      }  
   } catch (error: any) {
     errorMessage.value = error.response?.data?.message || '密码重置失败，请重试'
   }
@@ -320,6 +357,7 @@ const resetPassword = async () => {
 
 // 生命周期钩子
 onMounted(() => {
+   
   if (window.layui) {
     isResetPassword.value = true
     window.layui.use(['form', 'layer'], (form: any, layerInstance: any) => {
@@ -348,7 +386,12 @@ onMounted(() => {
 
       // 表单提交事件
       form.on('submit(verify-email)', () => {
-        verifyEmail()
+        if (!formData.value.email || !formData.value.captcha) {
+          layer.msg('请输入邮箱和验证码')
+          return false
+        }
+        
+        verifyEmail(formData.value.email, formData.value.captcha)
         return false
       })
 

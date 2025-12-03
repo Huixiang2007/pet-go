@@ -72,6 +72,8 @@ declare module 'vue' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTimePicker: typeof import('element-plus/es')['ElTimePicker']
     ElUpload: typeof import('element-plus/es')['ElUpload']
+    FlashSale: typeof import('./src/components/FlashSale.vue')['default']
+    FlashSaleProduct: typeof import('./src/components/FlashSaleProduct.vue')['default']
     FragmentCarousel: typeof import('./src/components/FragmentCarousel.vue')['default']
     Growth: typeof import('./src/components/growth.vue')['default']
     GrowthAlbum: typeof import('./src/components/GrowthAlbum.vue')['default']

@@ -8,12 +8,7 @@
             <img :src="userInfo.avatar" alt="用户头像" class="avatar-img" />
             <div class="avatar-upload-overlay">
               <i class="layui-icon layui-icon-camera"></i>
-              <input
-                type="file"
-                accept="image/*"
-                @change="handleAvatarUpload"
-                class="avatar-file"
-              />
+              <input type="file" accept="image/*" @change="handleAvatarUpload" class="avatar-file" />
             </div>
           </div>
         </div>
@@ -34,12 +29,8 @@
       <!-- 侧边导航栏 -->
       <aside class="sidebar">
         <ul class="nav-list">
-          <li
-            v-for="(item, index) in navItems"
-            :key="index"
-            :class="{ active: currentTab === index }"
-            @click="currentTab = index"
-          >
+          <li v-for="(item, index) in navItems" :key="index" :class="{ active: currentTab === index }"
+            @click="currentTab = index">
             <i class="layui-icon" :class="item.icon"></i>
             <span>{{ item.name }}</span>
           </li>
@@ -58,14 +49,8 @@
             <div class="layui-form-item">
               <label class="layui-form-label">昵称</label>
               <div class="layui-input-block">
-                <input
-                  type="text"
-                  name="nickname"
-                  v-model="formData.nickname"
-                  lay-verify="required"
-                  placeholder="请输入昵称"
-                  class="layui-input"
-                />
+                <input type="text" name="nickname" v-model="formData.nickname" lay-verify="required" placeholder="请输入昵称"
+                  class="layui-input" />
               </div>
             </div>
 
@@ -80,44 +65,25 @@
             <div class="layui-form-item">
               <label class="layui-form-label">生日</label>
               <div class="layui-input-block">
-                <el-date-picker
-                  v-model="formData.birthday"
-                  type="date"
-                  name="birthday"
-                  placeholder="请选择生日日期"
-                  :max-date="new Date(maxBirthdayDate)"
-                  value-format="YYYY-MM-DD"
-                  style="width: 100%"
-                  :disabled-date="disabledDate"
-                />
+                <el-date-picker v-model="formData.birthday" type="date" name="birthday" placeholder="请选择生日日期"
+                  :max-date="new Date(maxBirthdayDate)" value-format="YYYY-MM-DD" style="width: 100%"
+                  :disabled-date="disabledDate" />
               </div>
             </div>
 
             <div class="layui-form-item">
               <label class="layui-form-label">手机</label>
               <div class="layui-input-block">
-                <input
-                  type="text"
-                  name="Phone"
-                  v-model="formData.phone"
-                  lay-verify="required|phone"
-                  placeholder="请输入手机号"
-                  class="layui-input"
-                />
+                <input type="text" name="Phone" v-model="formData.phone" lay-verify="required|phone"
+                  placeholder="请输入手机号" class="layui-input" />
               </div>
             </div>
 
             <div class="layui-form-item">
               <label class="layui-form-label">邮箱</label>
               <div class="layui-input-block">
-                <input
-                  type="text"
-                  name="email"
-                  v-model="formData.email"
-                  placeholder="请输入邮箱"
-                  class="layui-input"
-                  readonly
-                />
+                <input type="text" name="email" v-model="formData.email" placeholder="请输入邮箱" class="layui-input"
+                  readonly />
               </div>
             </div>
 
@@ -134,16 +100,9 @@
           <!-- 实名认证表单 -->
           <form class="layui-form profile-form" v-if="currentTab === 1">
             <div class="verify-status" v-if="realNameStatus !== 'unverified'">
-              <div
-                class="status-icon"
-                :class="realNameStatus === 'verified' ? 'success' : 'pending'"
-              >
-                <i
-                  class="layui-icon"
-                  :class="
-                    realNameStatus === 'verified' ? 'layui-icon-ok-circle' : 'layui-icon-clock'
-                  "
-                ></i>
+              <div class="status-icon" :class="realNameStatus === 'verified' ? 'success' : 'pending'">
+                <i class="layui-icon" :class="realNameStatus === 'verified' ? 'layui-icon-ok-circle' : 'layui-icon-clock'
+                  "></i>
               </div>
               <div class="status-text">
                 <h3>{{ realNameStatus === 'verified' ? '已实名认证' : '实名认证审核中' }}</h3>
@@ -161,48 +120,28 @@
               <div class="layui-form-item">
                 <label class="layui-form-label">真实姓名</label>
                 <div class="layui-input-block">
-                  <input
-                    type="text"
-                    name="realName"
-                    v-model="realNameForm.realName"
-                    lay-verify="required"
-                    placeholder="请输入真实姓名"
-                    class="layui-input"
-                  />
+                  <input type="text" name="realName" v-model="realNameForm.realName" lay-verify="required"
+                    placeholder="请输入真实姓名" class="layui-input" />
                 </div>
               </div>
 
               <div class="layui-form-item">
                 <label class="layui-form-label">身份证号</label>
                 <div class="layui-input-block">
-                  <input
-                    type="text"
-                    name="idCard"
-                    v-model="realNameForm.idCard"
-                    lay-verify="required|idCard"
-                    placeholder="请输入身份证号"
-                    class="layui-input"
-                  />
+                  <input type="text" name="idCard" v-model="realNameForm.idCard" lay-verify="required|idCard"
+                    placeholder="请输入身份证号" class="layui-input" />
                 </div>
               </div>
 
               <div class="layui-form-item">
                 <label class="layui-form-label">身份证照片</label>
                 <div class="layui-input-block">
-                  <button
-                    type="button"
-                    class="layui-btn"
-                    @click="selectIdCardPhoto('front')"
-                    style="background-color: #59d4c8; display: block"
-                  >
+                  <button type="button" class="layui-btn" @click="selectIdCardPhoto('front')"
+                    style="background-color: #59d4c8; display: block">
                     <i class="layui-icon layui-icon-upload"></i> 上传身份证信息面
                   </button>
                   <div v-if="realNameForm.idCardFront" class="id-card-preview">
-                    <img
-                      :src="realNameForm.idCardFront"
-                      alt="身份证个人信息面"
-                      class="id-card-img"
-                    />
+                    <img :src="realNameForm.idCardFront" alt="身份证个人信息面" class="id-card-img" />
                     <p class="preview-label">身份证信息面预览</p>
                   </div>
                 </div>
@@ -211,12 +150,8 @@
               <div class="layui-form-item">
                 <label class="layui-form-label"></label>
                 <div class="layui-input-block">
-                  <button
-                    type="button"
-                    class="layui-btn"
-                    @click="selectIdCardPhoto('back')"
-                    style="background-color: #59d4c8; display: block"
-                  >
+                  <button type="button" class="layui-btn" @click="selectIdCardPhoto('back')"
+                    style="background-color: #59d4c8; display: block">
                     <i class="layui-icon layui-icon-upload"></i> 上传身份证国徽面
                   </button>
                   <div v-if="realNameForm.idCardBack" class="id-card-preview">
@@ -240,34 +175,18 @@
             <div class="layui-form-item">
               <label class="layui-form-label">原密码</label>
               <div class="layui-input-block">
-                <input
-                  type="password"
-                  name="oldPassword"
-                  v-model="passwordForm.oldPassword"
-                  lay-verify="required|password"
-                  placeholder="请输入原密码"
-                  class="layui-input"
-                />
+                <input type="password" name="oldPassword" v-model="passwordForm.oldPassword"
+                  lay-verify="required|password" placeholder="请输入原密码" class="layui-input" />
               </div>
             </div>
 
             <div class="layui-form-item">
               <label class="layui-form-label">新密码</label>
               <div class="layui-input-block">
-                <input
-                  type="password"
-                  name="newPassword"
-                  v-model="passwordForm.newPassword"
-                  lay-verify="required|password"
-                  placeholder="请输入新密码"
-                  class="layui-input"
-                />
+                <input type="password" name="newPassword" v-model="passwordForm.newPassword"
+                  lay-verify="required|password" placeholder="请输入新密码" class="layui-input" />
                 <p class="password-rule">密码需8-20位，包含大小写字母、数字和特殊字符</p>
-                <p
-                  v-if="isSamePassword"
-                  class="password-same-warning"
-                  style="color: #e6a23c; margin-top: 5px"
-                >
+                <p v-if="isSamePassword" class="password-same-warning" style="color: #e6a23c; margin-top: 5px">
                   <i class="layui-icon layui-icon-tips"></i> 新密码不能与原密码相同
                 </p>
               </div>
@@ -276,50 +195,27 @@
             <div class="layui-form-item">
               <label class="layui-form-label">确认密码</label>
               <div class="layui-input-block">
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  v-model="passwordForm.confirmPassword"
-                  lay-verify="required|confirmPassword"
-                  placeholder="请确认新密码"
-                  class="layui-input"
-                />
+                <input type="password" name="confirmPassword" v-model="passwordForm.confirmPassword"
+                  lay-verify="required|confirmPassword" placeholder="请确认新密码" class="layui-input" />
               </div>
             </div>
             <!-- 添加邮箱和验证码 -->
             <div class="layui-form-item">
               <label class="layui-form-label">邮箱</label>
               <div class="layui-input-block">
-                <input
-                  v-model="passwordForm.email"
-                  type="text"
-                  name="email"
-                  placeholder="绑定的邮箱"
-                  class="layui-input"
-                  readonly
-                />
+                <input v-model="passwordForm.email" type="text" name="email" placeholder="绑定的邮箱" class="layui-input"
+                  readonly />
               </div>
             </div>
 
             <div class="layui-form-item">
               <label class="layui-form-label">验证码</label>
               <div class="layui-input-block code-input">
-                <input
-                  type="text"
-                  name="verificationCode"
-                  lay-verify="required"
-                  v-model="passwordForm.code"
-                  placeholder="请输入邮箱验证码"
-                  class="layui-input"
-                />
-                <button
-                  style="background-color: #fd9860"
-                  type="button"
-                  class="layui-btn"
-                  :class="{ 'layui-btn-disabled': isSendingCode }"
-                  @click="sendVerificationCode"
-                  :disabled="isSendingCode"
-                >
+                <input type="text" name="verificationCode" lay-verify="required" v-model="passwordForm.code"
+                  placeholder="请输入邮箱验证码" class="layui-input" />
+                <button style="background-color: #fd9860" type="button" class="layui-btn"
+                  :class="{ 'layui-btn-disabled': isSendingCode }" @click="sendVerificationCode"
+                  :disabled="isSendingCode">
                   {{ isSendingCode ? `${countDown}s后重新发送` : '获取验证码' }}
                 </button>
               </div>
@@ -336,15 +232,12 @@
 
           <!-- 地址管理 -->
           <div v-if="currentTab === 3">
-            <button
-              class="layui-btn btn-save"
-              @click="
-                () => {
-                  resetAddressForm()
-                  showAddressForm = true
-                }
-              "
-            >
+            <button class="layui-btn btn-save" @click="
+              () => {
+                resetAddressForm()
+                showAddressForm = true
+              }
+            ">
               <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
             </button>
 
@@ -354,25 +247,15 @@
                 <div class="layui-form-item">
                   <label class="layui-form-label">收件人</label>
                   <div class="layui-input-block">
-                    <input
-                      type="text"
-                      v-model="addressForm.recipient"
-                      placeholder="请输入收件人姓名"
-                      class="layui-input"
-                    />
+                    <input type="text" v-model="addressForm.recipient" placeholder="请输入收件人姓名" class="layui-input" />
                   </div>
                 </div>
 
                 <div class="layui-form-item">
                   <label class="layui-form-label">联系电话</label>
                   <div class="layui-input-block">
-                    <input
-                      type="text"
-                      v-model="addressForm.phone"
-                      lay-verify="phone"
-                      placeholder="请输入联系电话"
-                      class="layui-input"
-                    />
+                    <input type="text" v-model="addressForm.phone" lay-verify="phone" placeholder="请输入联系电话"
+                      class="layui-input" />
                   </div>
                 </div>
 
@@ -384,25 +267,16 @@
                 <div class="layui-form-item">
                   <label class="layui-form-label">详细地址</label>
                   <div class="layui-input-block">
-                    <textarea
-                      v-model="addressForm.detail"
-                      placeholder="请输入详细地址"
-                      class="layui-textarea"
-                      rows="3"
-                    ></textarea>
+                    <textarea v-model="addressForm.detail" placeholder="请输入详细地址" class="layui-textarea"
+                      rows="3"></textarea>
                   </div>
                 </div>
 
                 <div class="layui-form-item">
                   <label class="layui-form-label">默认地址</label>
                   <div class="layui-input-block">
-                    <el-switch
-                      style="height: 39px; line-height: 21px"
-                      v-model="addressForm.isDefault"
-                      active-text="是"
-                      inactive-text="否"
-                      active-color="#fd9860"
-                    />
+                    <el-switch style="height: 39px; line-height: 21px" v-model="addressForm.isDefault" active-text="是"
+                      inactive-text="否" active-color="#fd9860" />
                   </div>
                 </div>
 
@@ -431,36 +305,22 @@
                   {{ address.detail }}
                 </div>
                 <div class="address-actions">
-                  <button
-                    class="layui-btn layui-btn-primary layui-btn-sm"
-                    @click="editAddress(address)"
-                  >
+                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="editAddress(address)">
                     编辑
                   </button>
-                  <button
-                    class="layui-btn layui-btn-primary layui-btn-sm"
-                    @click="deleteAddress(address.id)"
-                  >
+                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="deleteAddress(address.id)">
                     删除
                   </button>
-                  <button
-                    class="layui-btn layui-btn-primary layui-btn-sm"
-                    @click="setDefaultAddress(address.id)"
-                    v-if="!address.isDefault"
-                  >
+                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="setDefaultAddress(address.id)"
+                    v-if="!address.isDefault">
                     设为默认
                   </button>
                 </div>
               </div>
               <div class="pagination-container">
-                <el-pagination
-                  @current-change="handlePageChange"
-                  :current-page="addressPagination.currentPage"
-                  :page-size="addressPagination.pageSize"
-                  :total="addressPagination.total"
-                  layout="prev, pager, next, jumper, ->, total"
-                  background
-                />
+                <el-pagination @current-change="handlePageChange" :current-page="addressPagination.currentPage"
+                  :page-size="addressPagination.pageSize" :total="addressPagination.total"
+                  layout="prev, pager, next, jumper, ->, total" background />
               </div>
             </div>
 
@@ -482,7 +342,6 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 // import axios from 'axios'
 import request from '../utils/request'
 import AddressSelect from '../components/AddressSelect.vue'
-import { el } from 'element-plus/es/locale'
 import { type } from 'os'
 
 declare global {
@@ -1015,7 +874,7 @@ const cancelEdit = () => {
 // 处理签名输入
 
 // 头像上传相关
-interface Avatar {}
+interface Avatar { }
 
 const handleAvatarUpload = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0]
@@ -1325,22 +1184,27 @@ const logout = () => {
   background-color: #fd9860 !important;
   border-color: #fd9860 !important;
 }
+
 .el-switch__label.is-active {
   color: #fd9860;
 }
+
 :deep(.el-switch__label.is-active) {
   color: #fd9860;
 }
+
 .layui-btn-disabled {
   background-color: #f5f5f5 !important;
   border-color: #ddd !important;
   color: #999 !important;
   cursor: not-allowed !important;
 }
+
 .layui-input[readonly] {
   background-color: #f5f5f5;
   cursor: not-allowed;
 }
+
 /* 地址管理样式 */
 .address-form-container {
   margin-top: 1.5rem;
@@ -1406,12 +1270,14 @@ const logout = () => {
   font-size: 0.85rem;
   text-align: right;
 }
+
 .delete-btn {
   min-width: 120px;
   border-color: #d2d2d2;
   background: 0 0;
   color: #5f5f5f;
 }
+
 .delete-btn:hover {
   border-color: #fd9860;
   color: #fd9860;
@@ -1421,6 +1287,7 @@ const logout = () => {
   border-color: #fd9860;
   color: #fd9860;
 }
+
 .layui-input:focus,
 .layui-textarea:focus {
   border-color: #fd9860 !important;
@@ -1430,6 +1297,7 @@ const logout = () => {
 .avatar-file::-webkit-file-upload-button {
   visibility: hidden;
 }
+
 .avatar-file::before {
   content: '';
   display: inline-block;
@@ -1437,6 +1305,7 @@ const logout = () => {
   height: 100%;
   cursor: pointer;
 }
+
 .profile-container {
   min-height: 100vh;
   background-image: url('../../assets/img/background6.png');

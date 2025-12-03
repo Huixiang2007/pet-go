@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed z-10 w-[100%] h-16  rounded-b-lg shadow-md m-auto flex items-center justify-center">
+    <div class="fixed z-10 w-[100%] h-16 bg-white rounded-b-lg shadow-md m-auto flex items-center justify-center">
 
         <!-- 导航容器 -->
         <div class="flex items-center justify-center h-14 w ml-10 relative">
@@ -92,7 +92,7 @@ const navItems = ref<NavItem[]>([
 const activeIndex = ref(0);
 const activeBgColor = ref(navItems.value[0]?.bgColor);
 const isAnimating = ref(false);
-
+const navContainer = ref<HTMLElement | null>(null);
 // 设置活跃项
 const setActive = (index: number, bgColor: string) => {
     activeIndex.value = index;
@@ -102,11 +102,13 @@ const setActive = (index: number, bgColor: string) => {
     setTimeout(() => {
         isAnimating.value = false;
     }, 500);
-    // 改变页面背景色（和原始效果一致）
-    document.body.style.backgroundColor = bgColor;
+    // if (navContainer.value) {
+    //     navContainer.value.style.backgroundColor = bgColor;
+    // }
 };
 watch(activeIndex, (newVal) => {
     activeBgColor.value = navItems.value[newVal]?.bgColor;
+
 });
 
 </script>
@@ -222,6 +224,11 @@ watch(activeIndex, (newVal) => {
 
 :deep(.item.active) {
     font-weight: bold !important;
+}
+
+:deep(.nav-container) {
+    transition: background-color 0.5s ease;
+    /* 添加背景色过渡动画 */
 }
 
 /* 确保图标和文字垂直居中 */

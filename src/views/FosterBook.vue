@@ -184,9 +184,18 @@
                                     <span class="label">特殊备注：</span>
                                     <span class="value">{{ textarea || '无' }}</span>
                                 </div>
-                                <div class="info-item">
-                                    <span class="label">疫苗文件：</span>
-                                    <span class="value">{{ vaccineFiles.length }} 个文件</span>
+                                <div class="info-item info-item-files">
+                                    <div class="flex justify-between">
+                                        <span class="label">疫苗文件：</span>
+                                        <span class="value">{{ vaccineFiles.length }} 个文件</span>
+                                    </div>
+
+                                    <div class="vaccineFilesList">
+                                        <div v-for="(file, index) in vaccineFiles" :key="index" class="file-item">
+
+                                            <img :src="file.previewUrl" alt="预览图">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="info-group">
@@ -214,10 +223,7 @@
                                         {{
                                             (selectedPackage?.price || 0) * calculateStayDays() }} 元</span>
                                 </div>
-                                <div class="info-item">
-                                    <span class="label">清洁费用：</span>
-                                    <span class="value">50 元</span>
-                                </div>
+
                                 <div class="info-item total">
                                     <span class="label">总计：</span>
                                     <span class="value">{{ calculatedPrice }} 元</span>
@@ -239,55 +245,7 @@
                                 <span class="step-subtitle">请核对信息并完成支付</span>
                             </div>
                         </template>
-                        <!-- 订单信息汇总 -->
-                        <div class="order-summary">
-                            <div class="summary-section">
-                                <h4><el-icon color="#409eff">
-                                        <User />
-                                    </el-icon> 宠物信息</h4>
-                                <div class="summary-item">
-                                    <span class="label">宠物名称：</span>
-                                    <span class="value">{{myPets.find(p => p.id === selectedPetId)?.name}}</span>
-                                </div>
-                            </div>
-                            <div class="summary-section">
-                                <h4><el-icon color="#409eff">
-                                        <Calendar />
-                                    </el-icon> 寄养信息</h4>
-                                <div class="summary-item">
-                                    <span class="label">寄养时间：</span>
-                                    <span class="value">
-                                        {{ formatDate(bookingForm.startDate) }} 至 {{ formatDate(bookingForm.endDate) }}
-                                    </span>
-                                </div>
-                                <div class="summary-item">
-                                    <span class="label">寄养天数：</span>
-                                    <span class="value">{{ calculateStayDays() }} 晚</span>
-                                </div>
-                            </div>
-                            <div class="summary-section">
-                                <h4><el-icon color="#409eff">
-                                        <Wallet />
-                                    </el-icon> 费用明细</h4>
-                                <div class="price-details">
-                                    <div class="price-item">
-                                        <span class="label">寄养费用：</span>
-                                        <span class="value">{{ selectedPackage?.price || 0 }} × {{ calculateStayDays()
-                                        }} =
-                                            {{
-                                                (selectedPackage?.price || 0) * calculateStayDays() }} 元</span>
-                                    </div>
-                                    <div class="price-item">
-                                        <span class="label">清洁费用：</span>
-                                        <span class="value">50 元</span>
-                                    </div>
-                                    <div class="price-item total">
-                                        <span class="label">总计：</span>
-                                        <span class="value">{{ calculatedPrice }} 元</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
                         <!-- 支付方式 -->
                         <div class="payment-methods">
                             <h4><el-icon color="#409eff">
@@ -413,6 +371,18 @@ const bookingStore = useBookingStore()
 // 从store中获取数据
 const selectedPackage = computed(() => bookingStore.selectedPackage)
 console.log('selectedPackage', selectedPackage.value)
+const pathSegments = route.path.split('/').filter(segment => segment);
+const fosterId = pathSegments.find(segment => /^\d+$/.test(segment)) || '';
+if (!selectedPackage.value) {
+    ElMessage.error('请先选择套餐！')
+
+    router.push({
+        name: 'fosterDetail',
+        params: {
+            id: fosterId
+        }
+    })
+}
 //如果store中不存在数据，则从路由参数中获取数据
 //离开页面清理数据
 onBeforeRouteLeave((to, from, next) => {
@@ -455,15 +425,6 @@ const isImageFile = (file: any) => {
     return file.type.startsWith('image/')
 }
 
-// 格式化文件大小（字节转MB/KB）
-const formatFileSize = (size: number) => {
-    if (size > 1024 * 1024) {
-        return (size / (1024 * 1024)).toFixed(2) + 'MB'
-    } else {
-        return (size / 1024).toFixed(2) + 'KB'
-    }
-}
-
 // 上传前校验（大小+格式）
 const beforeUpload = (file: File) => {
     const isLt5M = file.size / 1024 / 1024 < 5
@@ -480,10 +441,10 @@ const beforeUpload = (file: File) => {
     return true
 }
 
-// 自定义本地处理文件（不走后端接口，仅前端暂存）
+// 自定义本地处理文件
 const handleLocalUpload = (options: any) => {
     const file = options.file as File
-    // 生成图片预览URL（仅图片文件）
+    // 生成图片预览URL
     const previewUrl = isImageFile(file) ? URL.createObjectURL(file) : ''
 
     // 将文件信息+预览URL存入数组
@@ -510,9 +471,9 @@ const removeFile = (index: number) => {
     }
 }
 const realDaySpots = [
-    3,  // 第1天 - 当天
-    3,  // 第2天
-    2,  // 第3天
+    0,  // 第1天 - 当天
+    0,  // 第2天
+    0,  // 第3天
     2,  // 第4天
     2,  // 第5天
     1,  // 第6天
@@ -574,7 +535,8 @@ const previewDays = computed(() => {
 
         const dateStr = formatDateToYYYYMMDD(date)
         const spots = realDaySpots[i]
-        if (spots) {
+        if (spots !== undefined) {
+            console.log('spots', spots)
             days.push({
                 index: i,
                 date: dateStr,
@@ -589,11 +551,6 @@ const previewDays = computed(() => {
 
     return days
 })
-const dateValidation = ref<{
-    type: 'success' | 'error' | 'warning' | 'info'
-    icon: string
-    message: string
-} | null>(null)
 // 日期格式转换
 const formatDateToYYYYMMDD = (date: Date): string => {
     const year = date.getFullYear()
@@ -649,13 +606,12 @@ const onPreviewDayClick = (day: any) => {
         ElMessage.warning(`${day.displayDate} 已无空位，请选择其他日期`)
         return
     }
-
+    console.log(day.date)
     if (!startDate.value || (startDate.value && endDate.value)) {
         // 重新选择 
         startDate.value = day.date
-        // endDate.value = ''
+        endDate.value = ''
         validateDateRange(day.date, '')
-        findAvailableEndDate(day.date)
     } else if (startDate.value && !endDate.value) {
         const start = new Date(startDate.value)
         const end = new Date(day.date)
@@ -670,36 +626,11 @@ const onPreviewDayClick = (day: any) => {
         validateDateRange(startDate.value, endDate.value)
     }
 }
-// 查找可用结束日期
-const findAvailableEndDate = (startDateStr: string) => {
-    const startIndex = getDateIndex(startDateStr)
-    let availableEndIndex = startIndex
 
-    // 从开始日期往后查找连续可用日期
-    for (let i = startIndex + 1; i < 30; i++) {
-
-        // if (real30DaySpots[i] > 0) {
-        //     availableEndIndex = i
-        // } else {
-        //     break
-        // }
-    }
-
-    if (availableEndIndex === startIndex) {
-        dateValidation.value = {
-            type: 'warning',
-            icon: 'Warning',
-            message: '该日期后无可预订日期，只能预订单日'
-        }
-        return
-    }
-
-}
 
 // 验证日期范围
 const validateDateRange = (startStr: string, endStr: string) => {
     if (!startStr) {
-        dateValidation.value = null
         return
     }
 
@@ -707,7 +638,6 @@ const validateDateRange = (startStr: string, endStr: string) => {
     const endIndex = getDateIndex(endStr)
     // 检查范围内的每一天都有空位
     let hasNoAvailability = false
-    let minSpots = Infinity
 
     for (let i = startIndex; i <= endIndex; i++) {
         if (i >= realDaySpots.length || realDaySpots[i] === undefined) {
@@ -721,11 +651,7 @@ const validateDateRange = (startStr: string, endStr: string) => {
     }
 
     if (hasNoAvailability) {
-        dateValidation.value = {
-            type: 'error',
-            icon: 'CircleCloseFilled',
-            message: '选择的时间范围内不能包含不可预订的日期，请调整'
-        }
+
 
         // 自动调整结束日期
         const today = new Date()
@@ -739,70 +665,31 @@ const validateDateRange = (startStr: string, endStr: string) => {
                 break
             }
         }
-
+        console.log(newEndDate)
         setTimeout(() => {
             if (startDate.value === startStr && endDate.value === endStr) {
                 endDate.value = formatDateToYYYYMMDD(newEndDate)
                 ElMessage.info('已自动调整结束日期，避开不可预订日期')
             }
         }, 100)
-    } else {
-        const nights = endIndex - startIndex
-        dateValidation.value = {
-            type: 'success',
-            icon: 'SuccessFilled',
-            message: `可预订 ${nights} 晚，共 ${nights + 1} 天，每天至少还有 ${minSpots} 个空位`
-        }
     }
-    // if (!endStr) {
-    //     // 只选择了开始日期
-    //     if (realDaySpots[startIndex]) {
-    //         if (realDaySpots[startIndex] > 0) {
-    //             dateValidation.value = {
-    //                 type: 'info',
-    //                 icon: 'InfoFilled',
-    //                 message: '请选择结束日期'
-    //             }
-    //         } else {
-    //             dateValidation.value = {
-    //                 type: 'error',
-    //                 icon: 'CircleCloseFilled',
-    //                 message: '该日期已无空位，请选择其他日期'
-    //             }
-    //         }
-    //     }
-
-    //     return
-    // }
-
-
-    // // 检查结束日期是否在开始日期之后
-    // if (endIndex <= startIndex) {
-    //     dateValidation.value = {
-    //         type: 'error',
-    //         icon: 'CircleCloseFilled',
-    //         message: '结束日期必须晚于开始日期'
-    //     }
-    //     return
-    // }
-
-
 }
 
-
+//计算费用
 const calculatedPrice = computed(() => {
     const days = calculateStayDays()
+    console.log('days', days)
     if (days === 0 || !selectedPackage.value) return 0
-    // 基础费用 
     return (selectedPackage.value.price * days)
 })
 
 // 计算时间
 const calculateStayDays = (): number => {
-    if (!bookingForm.startDate || !bookingForm.endDate) return 0
-
-    const start = new Date(bookingForm.startDate)
-    const end = new Date(bookingForm.endDate)
+    console.log('startDate', startDate.value)
+    console.log('endDate', endDate.value)
+    if (!startDate.value || !endDate.value) return 0
+    const start = new Date(startDate.value)
+    const end = new Date(endDate.value)
     const diff = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
 
     return Math.max(0, diff)
@@ -871,16 +758,9 @@ const nextStep = async () => {
 const previousStep = () => {
     if (currentStep.value > 1) {
         currentStep.value--
-        //   isStepValidated.value[currentStep.value] = false
     }
 }
 
-
-// 日期选择器回调
-const handleDateSelected = (dates: { startDate: string; endDate: string }) => {
-    bookingForm.startDate = dates.startDate
-    bookingForm.endDate = dates.endDate
-}
 
 // 支付确认
 const confirmPayment = async () => {
@@ -1074,6 +954,10 @@ onMounted(() => {
         &:hover {
             background-color: #e6f7ff;
         }
+    }
+
+    :deep(.el-upload__tip) {
+        font-size: 13px;
     }
 }
 
@@ -1290,6 +1174,15 @@ onMounted(() => {
                 .day-spots {
                     color: #dcfce7;
                 }
+
+                &:hover {
+                    background-color: #e0f2fe;
+                    color: #409eff;
+
+                    .day-spots {
+                        color: #409eff;
+                    }
+                }
             }
 
             &.today {
@@ -1392,6 +1285,36 @@ onMounted(() => {
             }
         }
     }
+
+    .info-item-files {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        .vaccineFilesList {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+
+            .file-item {
+                width: 130px;
+                height: 130px;
+                border-radius: 4px;
+                overflow: hidden;
+                margin-bottom: 8px;
+                background: #f1f5f9;
+
+                img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+            }
+        }
+    }
+
+
 }
 
 // 支付方式

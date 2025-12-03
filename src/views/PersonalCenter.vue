@@ -40,7 +40,7 @@
       <!-- 内容展示区 -->
       <main class="content-area">
         <div class="content-header">
-          <h1>{{ navItems[currentTab].name }}</h1>
+          <h1>{{ navItems[currentTab]?.name }}</h1>
         </div>
 
         <div class="content-wrapper">
@@ -342,7 +342,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 // import axios from 'axios'
 import request from '../utils/request'
 import AddressSelect from '../components/AddressSelect.vue'
-import { type } from 'os'
+// import { type } from 'os'
 
 declare global {
   interface Window {
@@ -459,7 +459,7 @@ const isSamePassword = computed(() => {
     passwordForm.value.oldPassword === passwordForm.value.newPassword
   )
 })
-let timer: NodeJS.Timeout | null = null
+// let timer: NodeJS.Timeout | null = null
 
 const router = useRouter()
 const disabledDate = (time: Date) => {
@@ -560,9 +560,9 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (timer) {
-    clearInterval(timer)
-  }
+  // if (timer) {
+  //   clearInterval(timer)
+  // }
 })
 //发送验证码
 const sendVerificationCode = async () => {
@@ -614,20 +614,20 @@ const handlePageChange = (page: number) => {
 // 开始倒计时
 const startCountDown = () => {
   countDown.value = 60
-  timer = setInterval(() => {
-    countDown.value--
-    if (countDown.value <= 0) {
-      stopCountDown()
-    }
-  }, 1000)
+  // timer = setInterval(() => {
+  //   countDown.value--
+  //   if (countDown.value <= 0) {
+  //     stopCountDown()
+  //   }
+  // }, 1000)
 }
 
 // 停止倒计时
 const stopCountDown = () => {
-  if (timer) {
-    clearInterval(timer)
-    timer = null
-  }
+  // if (timer) {
+  //   clearInterval(timer)
+  //   timer = null
+  // }
   isSendingCode.value = false
 }
 
@@ -1046,8 +1046,8 @@ const submitRealName = async () => {
     formData.append('realName', realNameForm.value.realName)
     formData.append('idCard', realNameForm.value.idCard)
     // 将正反面照片都添加到 otherFiles 数组中
-    formData.append('otherFiles', realNameForm.value.idCardFrontFile)
-    formData.append('otherFiles', realNameForm.value.idCardBackFile)
+    // formData.append('otherFiles', realNameForm.value.idCardFrontFile)
+    // formData.append('otherFiles', realNameForm.value.idCardBackFile)
     console.log('formData', formData)
     // 调用后端接口提交实名认证信息
     const response = await request('/server/api/user/userAuth', 'POST', formData, {

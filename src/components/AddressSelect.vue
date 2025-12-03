@@ -9,14 +9,14 @@
           {{ province.name }}
         </option>
       </select>
-      
+
       <select v-model="selectedCity" @change="handleCityChange" :disabled="!selectedProvince">
         <option value="">请选择城市</option>
         <option :value="city.code" v-for="city in cities" :key="city.code">
           {{ city.name }}
         </option>
       </select>
-      
+
       <select v-model="selectedDistrict" @change="handleDistrictChange" :disabled="!selectedCity">
         <option value="">请选择区县</option>
         <option :value="district.code" v-for="district in districts" :key="district.code">
@@ -28,7 +28,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';    
 import { defineComponent } from 'vue';
 // 导入china-division数据
 import provincesData from 'china-division/dist/provinces.json';
@@ -68,7 +67,7 @@ export default defineComponent({
         district: ''
       }),
       validator: (value: any) => {
-        return ['province', 'city', 'district'].every(key => 
+        return ['province', 'city', 'district'].every(key =>
           Object.prototype.hasOwnProperty.call(value, key)
         );
       }
@@ -105,14 +104,14 @@ export default defineComponent({
           this.selectedProvince = newValue.province || '';
           this.selectedCity = newValue.city || '';
           this.selectedDistrict = newValue.district || '';
-          
+
           // 更新联动选项
           if (this.selectedProvince) {
             this.cities = (citiesData as City[]).filter(
               city => city.provinceCode === this.selectedProvince
             );
           }
-          
+
           if (this.selectedCity) {
             this.districts = (districtsData as District[]).filter(
               district => district.cityCode === this.selectedCity
@@ -132,64 +131,64 @@ export default defineComponent({
       this.selectedProvince = provinceCode;
       this.selectedCity = '';
       this.selectedDistrict = '';
-      
+
       // 筛选对应城市
       this.cities = (citiesData as City[]).filter(
         city => city.provinceCode === provinceCode
       );
-      
+
       // 更新地址表单
       this.addressForm.province = (provincesData as Area[]).find(
         p => p.code === provinceCode
       )?.name || '';
       this.addressForm.city = '';
       this.addressForm.district = '';
-      
+
       // 触发更新事件
       this.emitUpdateModelValue();
     },
-    
+
     // 处理城市选择变化
     handleCityChange(e: Event) {
       const target = e.target as HTMLSelectElement;
       const cityCode = target.value;
       this.selectedCity = cityCode;
       this.selectedDistrict = '';
-      
+
       // 筛选对应区县
       this.districts = (districtsData as District[]).filter(
         district => district.cityCode === cityCode
       );
-      
+
       // 更新地址表单
       this.addressForm.city = (citiesData as City[]).find(
         c => c.code === cityCode
       )?.name || '';
       this.addressForm.district = '';
-      
+
       // 触发更新事件
       this.emitUpdateModelValue();
     },
-    
+
     // 处理区县选择变化
     handleDistrictChange(e: Event) {
       const target = e.target as HTMLSelectElement;
       const districtCode = target.value;
       this.selectedDistrict = districtCode;
-      
+
       // 更新地址表单
       this.addressForm.district = (districtsData as District[]).find(
         d => d.code === districtCode
       )?.name || '';
-      
+
       // 触发更新事件
       this.emitUpdateModelValue();
     },
-    
+
     // 编辑地址时回显地区信息
     editAddress(address: Address) {
       this.addressForm = { ...address };
-      
+
       // 查找对应的地区编码
       const province = (provincesData as Area[]).find(
         p => p.name === address.province
@@ -199,7 +198,7 @@ export default defineComponent({
         this.cities = (citiesData as City[]).filter(
           city => city.provinceCode === province.code
         );
-        
+
         const city = (citiesData as City[]).find(
           c => c.name === address.city
         );
@@ -208,7 +207,7 @@ export default defineComponent({
           this.districts = (districtsData as District[]).filter(
             d => d.cityCode === city.code
           );
-          
+
           const district = (districtsData as District[]).find(
             d => d.name === address.district
           );
@@ -217,11 +216,11 @@ export default defineComponent({
           }
         }
       }
-      
+
       this.editingAddressId = address.id;
       this.showAddressForm = true;
     },
-    
+
     // 重置地址表单时清空选择
     resetAddressForm() {
       // 重置其他表单字段
@@ -237,7 +236,7 @@ export default defineComponent({
       this.cities = [];
       this.districts = [];
     },
-    
+
     // 统一触发modelValue更新
     emitUpdateModelValue() {
       this.$emit('update:modelValue', {
@@ -256,6 +255,7 @@ export default defineComponent({
   width: 100px;
   font-weight: 500;
 }
+
 .layui-input-block select {
   width: 32%;
   display: inline-block;
@@ -266,7 +266,8 @@ export default defineComponent({
   border: 1px solid #e6e6e6;
   border-radius: 4px;
   padding: 0 10px;
-  box-sizing: border-box; /* 修复盒模型问题 */
+  box-sizing: border-box;
+  /* 修复盒模型问题 */
 }
 
 .layui-input-block select:last-child {

@@ -239,10 +239,10 @@ onUnmounted(() => {
 
 const router = useRouter()
 const toRegister = () => {
-  router.push('/Register')
+  router.push('/register')
 }
 const toForgotPassword = () => {
-  router.push('/Forget')
+  router.push('/forget')
 }
 
 const handleLogin = async (formData: LoginForm) => {
@@ -311,7 +311,7 @@ const handleLogin = async (formData: LoginForm) => {
       localStorage.removeItem('rememberedLoginType')
     }
     ElMessage.success('登录成功，欢迎进入PetGO!')
-    router.push('/Person')
+    router.push('/person')
   } else{const errorMsg = response.data.msg
       ElMessage.error(errorMsg)
       

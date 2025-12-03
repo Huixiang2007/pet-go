@@ -183,16 +183,72 @@ const routes = [
   //个人中心
   {
     path: '/person',
-    name: 'personalCenter',
+    name: 'PersonalCenter',
     component: () => import('@/views/PersonalCenter.vue'),
     meta: { title: '个人中心' },
   },
+  //后台管理
   {
-    path: '/join-us',
-    name: 'joinUs',
-    component: () => import('@/views/JoinUs.vue'),
-    meta: { title: '加入我们' },
-  },
+     path: '/admin',
+    name: 'homePage',
+    component: () => import('@/views/admin/HomePage.vue'),
+    meta: { title: '后台管理' },
+     children: [
+      // 数据概览
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/admin/Data.vue'),
+        meta: {
+          title: '数据概览',
+         
+        }
+      },
+      // 用户管理
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/admin/User.vue'),
+        meta: {
+          title: '用户管理',
+          icon: 'el-icon-user',
+        
+        }
+      },
+      // 寄养服务管理
+      {
+        path: 'foster',
+        name: 'foster',
+        meta: {
+          title: '寄养服务管理',
+          icon: 'el-icon-house',
+          
+        },
+        children: [
+          {
+            path: 'audit',
+            name: 'fosterAudit',
+            component: () => import('@/views/admin/Judge.vue'),
+            meta: {
+              title: '服务审核',
+            
+            }
+          },
+          {
+            path: 'orders',
+            name: 'fosterOrder',
+            component: () => import('@/views/admin/Order.vue'),
+            meta: {
+              title: '寄养订单',
+            
+            }
+          }
+        ]
+
+  }
+
+]
+  }
 ]
 
 const router = createRouter({

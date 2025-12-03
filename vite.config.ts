@@ -33,9 +33,16 @@ export default defineConfig({
     '/server': {
       target: 'http://8.131.100.56:8085',
       changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/server/, ''), 
+      rewrite: (path) => path.replace(/^\/server/, ''),
     },
     // https: {},
+  },
+},
+build:{
+  rollupOptions: {
+    external: [
+    'echarts'
+    ],
   },
 }
 })

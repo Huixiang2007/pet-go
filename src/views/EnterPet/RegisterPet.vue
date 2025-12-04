@@ -96,7 +96,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useRegisterStore,RegisterForm } from '../../stores/register'
 import ConfirmCode from '../../components/ConfirmCode.vue'
-import { start } from 'repl'
 const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> | null>(null)
 const registerStore = useRegisterStore()
 const router = useRouter()
@@ -104,12 +103,10 @@ const route = useRoute()
 const isRegister = ref(false)
 const form = registerStore.form
 const titleRegisterChars = '欢迎注册 PetGo'.split('')
-const countdown = ref(0)
-const timer = ref(null)
 const isSending = ref(false)
 declare global {
   interface Window {
-    layui: any
+    layui: any // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 // 响应式状态管理
@@ -245,8 +242,8 @@ onMounted(() => {
 
   if (window.layui) {
     isRegister.value = true
-    window.layui.use(['form', 'layer', 'util'], function (form:any, layer:any, util:any) {
-      var $ = window.layui.$
+    window.layui.use(['form', 'layer', 'util'], function (form:any ) {// eslint-disable-line @typescript-eslint/no-explicit-any
+      const  $ = window.layui.$
 
       form.config.verifyOnBlur = true
       // 自定义验证规则
@@ -272,7 +269,7 @@ onMounted(() => {
           '密码需8-20位，包含大小写字母、数字和特殊字符',
         ],
         confirmPassword: function (value:string) {
-          var passwordValue = $('#reg-password').val()
+          const passwordValue = $('#reg-password').val()
           if (value !== passwordValue) {
             return '两次密码输入不一致'
           }
@@ -291,7 +288,7 @@ onMounted(() => {
         .off('blur')
         .on('blur', function (this:HTMLElement) {
           const $this = $(this)
-          const nativeEl = this
+      
           if (isForcedBlur) {
             isForcedBlur = false // 重置标志
             return
@@ -308,7 +305,7 @@ onMounted(() => {
             isForcedBlur = true
 
             setTimeout(() => {
-              nativeEl.blur() // 原生方法更可靠
+              this.blur() // 原生方法更可靠
             }, 100) //
           }
           // 使用 setTimeout 确保验证完成后重置标志
@@ -318,8 +315,8 @@ onMounted(() => {
         })
 
       // 提交事件
-      form.on('submit(demo-reg)', function (data:any) {
-        var field = data.field // 获取表单字段值
+      form.on('submit(demo-reg)', function () {
+       // 获取表单字段值
 
         // 是否勾选同意
         if (!isAgreed.value) {

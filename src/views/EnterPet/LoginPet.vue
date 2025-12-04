@@ -108,11 +108,11 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance } from 'element-plus'
 import Captcha from '../../components/CaptchaLoad.vue'
 const captchaRef = ref<InstanceType<typeof Captcha> | null>(null)
 import axios from 'axios'
-import { lo } from 'element-plus/es/locale'
+
 const isAccount = ref(true)
 
 // 定义登录表单数据类型
@@ -122,7 +122,7 @@ interface LoginForm {
 }
 declare global {
   interface Window {
-    layui: any
+    layui: any  // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 const loginFormRef = ref<FormInstance>()
@@ -141,7 +141,7 @@ const changeLoginType = () => {
   }
 }
 let hideErrorTimer: number | null = null
-let layer: any
+
 onMounted(() => {
   
   const loginInput = document.querySelector('input[name="loginId"]') as HTMLInputElement
@@ -180,17 +180,17 @@ onMounted(() => {
         if (passwordInput) passwordInput.value = rememberedPassword
         if (rememberCheckbox) rememberCheckbox.checked = true
       })
-    } catch (error) {
+    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       // 解密失败时清除无效数据
       localStorage.removeItem('rememberedLoginId')
       localStorage.removeItem('rememberedPassword')
       localStorage.removeItem('rememberedLoginType')
-      console.log('解密记住密码数据失败，已清除无效数据')
+      console.log(error)
     }
   }
   if (window.layui) {
     isLogin.value = true
-    window.layui.use(['form', 'layer'], (form: any, layer: any) => {
+    window.layui.use(['form'], (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
       form.verify({
         verifyType: function (value: string) {
           if (isAccount.value) {
@@ -217,7 +217,7 @@ onMounted(() => {
         },
       })
 
-      form.on('submit(demo-login)', (data: any) => {
+      form.on('submit(demo-login)', (data: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
   
         handleLogin(data.field)
         return false
@@ -238,7 +238,7 @@ onUnmounted(() => {
 })
 // 添加一个变量来跟踪当前是否有消息显示
 const isMessageShowing = ref(false)
-const currentMessageInstance = ref<any>(null)
+const currentMessageInstance = ref<any>(null)// eslint-disable-line @typescript-eslint/no-explicit-any
 
 // 创建一个包装函数来控制 ElMessage 的显示
 const showMessage = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
@@ -303,7 +303,7 @@ const handleLogin = async (formData: LoginForm) => {
       loading.value = false
       return
     }
-    let response: any
+    let response: any // eslint-disable-line @typescript-eslint/no-explicit-any
     // 调用登录接口
     if (isAccount.value) {
       response = await axios.post(
@@ -365,8 +365,9 @@ const handleLogin = async (formData: LoginForm) => {
       }
      }
   }
-  catch (error: any) {
+  catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     // 登录失败处理
+    console.error(error)
   //   let errorMsg = '登录失败，请稍后重试'
   //  ElMessage.error(errorMsg)
     // errorMessage.value = errorMsg

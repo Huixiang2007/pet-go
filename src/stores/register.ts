@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 
 // 定义表单数据的类型接口（TypeScript 类型约束）
-interface RegisterForm {
+export interface RegisterForm {
   email: string
   vercode: string
   password: string

@@ -8,11 +8,11 @@
       <ShopCategoryNav />
     </header>
     <main class="flex flex-col items-center bg-[#fefcea] min-h-screen">
-      <div class="bg-white rounded-lg shadow-sm p-6 my-8 mx-[120px] shawdow-xl">
+      <div class="bg-white rounded-lg shadow-sm py-6 my-8 shawdow-xl px-12 w-[1260px]">
         <div class="flex items-center justify-between pb-4 border-b border-gray-100">
           <div>
             <h1 class="text-md font-bold text-gray-700">搜索结果</h1>
-            <span class="text-gray-500 text-sm">找到 128 件相关商品</span>
+            <span class="text-gray-500 text-sm">找到{{ products.length }}件相关商品</span>
           </div>
 
           <div class="flex items-center justify-center px-6">
@@ -20,10 +20,6 @@
               class="relative px-5 py-2 bg-[#fefcec] text-[#f5a623] font-medium text-sm rounded-md border border-[#f5a623] mr-2 transition-all hover:bg-[#fff8f0]"
             >
               筛选状态
-              <span
-                class="absolute top-[-0.95rem] right-[-0.75rem] w-12 h-6 bg-red-500 text-white rounded-[0.5rem] flex items-center justify-center text-xs"
-                >已筛选</span
-              >
             </button>
             <button
               class="px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 mr-2 transition-all hover:border-[#f5a623] hover:text-[#f5a623] flex items-center gap-1"
@@ -48,24 +44,33 @@
 
             <button
               @click="showRegionModal = true"
-              class="px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 ml-4 transition-all hover:border-[#f5a623] hover:text-[#f5a623]"
+              class="relative px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 ml-4 transition-all hover:border-[#f5a623] hover:text-[#f5a623]"
             >
               <i class="fa fa-map-marked"></i>
               地区选择
+              <span
+                v-if="filterRegion"
+                class="absolute top-[-0.95rem] right-[-0.55rem] w-12 h-6 bg-red-500 text-white rounded-[0.5rem] flex items-center justify-center text-xs"
+                >已筛选</span
+              >
             </button>
 
             <button
               @click="showBrandModal = true"
-              class="px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 ml-2 transition-all hover:border-[#f5a623] hover:text-[#f5a623]"
+              class="relative px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 ml-2 transition-all hover:border-[#f5a623] hover:text-[#f5a623]"
             >
               <i class="fa fa-shopping-bag"></i>
+              <span
+                v-if="filterBrand"
+                class="absolute top-[-0.95rem] right-[-0.55rem] w-12 h-6 bg-red-500 text-white rounded-[0.5rem] flex items-center justify-center text-xs"
+                >已筛选</span
+              >
               品牌选择
             </button>
             <!-- 地区选择弹窗 -->
             <div
               v-if="showRegionModal"
               class="fixed inset-0 bg-black/50 flex items-center justify-center z-[5000]"
-              @click.self="showRegionModal = false"
             >
               <div
                 class="bg-white rounded-lg w-[600px] max-h-[80vh] overflow-hidden flex flex-col animate-fade-in"
@@ -95,42 +100,23 @@
                       {{ region }}
                     </button>
                   </div>
-                  <div v-if="selectedRegion && cities[selectedRegion]" class="mt-6">
-                    <h4 class="text-md font-medium text-gray-700 mb-3">{{ selectedRegion }}城市</h4>
-                    <div class="grid grid-cols-4 gap-2">
-                      <button
-                        v-for="city in cities[selectedRegion]"
-                        :key="city"
-                        @click="selectCity(city)"
-                        :class="[
-                          'px-3 py-2 rounded-md text-sm transition-all',
-                          selectedCity === city
-                            ? 'bg-[#f5a623] text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
-                        ]"
-                      >
-                        {{ city }}
-                      </button>
-                    </div>
+                  <div class="flex items-center justify-end p-4 border-t border-gray-200 gap-3">
+                    <button
+                      @click="resetRegion"
+                      class="px-4 py-2 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50"
+                    >
+                      重置
+                    </button>
+                    <button
+                      @click="confirmRegion"
+                      class="px-4 py-2 bg-[#f5a623] text-white rounded-md hover:bg-[#e09612] transition-colors"
+                    >
+                      确定
+                    </button>
                   </div>
-                </div>
-                <div class="flex items-center justify-end p-4 border-t border-gray-200 gap-3">
-                  <button
-                    @click="resetRegion"
-                    class="px-4 py-2 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50"
-                  >
-                    重置
-                  </button>
-                  <button
-                    @click="confirmRegion"
-                    class="px-4 py-2 bg-[#f5a623] text-white rounded-md hover:bg-[#e09612] transition-colors"
-                  >
-                    确定
-                  </button>
                 </div>
               </div>
             </div>
-
             <!-- 品牌选择弹窗 -->
             <div
               v-if="showBrandModal"
@@ -152,7 +138,7 @@
                 <div class="p-4 overflow-y-auto max-h-[calc(80vh-120px)]">
                   <div class="grid grid-cols-3 gap-3">
                     <label
-                      v-for="(brand,index ) in brandList"
+                      v-for="(brand, index) in brandList"
                       :key="index"
                       class="flex items-center p-3 border border-gray-200 rounded-md cursor-pointer transition-all hover:border-[#f5a623] hover:bg-[#fff8f0]"
                     >
@@ -186,22 +172,22 @@
         </div>
 
         <!-- 商品列表 -->
-        <div class="products mt-8">
+        <div v-if="products.length > 0" class="products mt-8">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-bold text-gray-800">
               <i class="fa fa-star text-[#FF7043] mr-2"></i>热门商品
             </h2>
           </div>
-          <div class="grid grid-cols-4 gap-4">
+          <div class="grid grid-cols-4 gap-[2rem]">
             <div
               v-for="product in products"
               :key="product.id"
-              class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow"
+              class="product-card bg-white rounded-lg w-[270px] overflow-hidden shadow hover:shadow-md transition-shadow"
               @click="productsDeatil(product.id)"
             >
               <div class="w-full h-64 bg-gray-50 overflow-hidden">
                 <img
-                  :src="product.mainImage"
+                  :src="product.mainImage || './img/宠物1.jpg'"
                   :alt="product.title"
                   class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                 />
@@ -235,18 +221,39 @@
             </div>
           </div>
         </div>
+        <div v-else-if="!idLoading && products.length === 0" class="text-center py-16">
+          <i class="fa fa-search text-5xl text-gray-300"></i>
+          <p class="mt-4 text-lg text-gray-500">抱歉，没有找到相关商品</p>
+          <p class="text-gray-400 mt-2">请尝试其他关键词或筛选条件</p>
+          <button
+            @click="
+              keywords = '',
+              SearchProducts()
+            "
+            class="mt-4 px-6 py-2 bg-[#f5a623] text-white rounded-md hover:bg-[#e09612]"
+          >
+            清空搜索条件
+          </button>
+        </div>
       </div>
     </main>
   </div>
+  <img
+    v-show="showBackToTop"
+    @click="scrollToTop"
+    class="fixed bottom-6 right-4 z-50 w-20 h-20 hover:scale-105 transition-transform"
+    aria-label="回到顶部"
+    src="/img/火箭.gif"
+  />
 </template>
 
 <script lang="ts" setup>
 import axios from 'axios'
-import { ref,  onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
-const route = useRouter().currentRoute.value
+const route = useRoute()
 
 // 滚动相关状态
 const scrollY = ref(0)
@@ -255,13 +262,16 @@ const isScrolledPast50 = ref(false)
 const activesort = ref(false)
 const showRegionModal = ref(false)
 const showBrandModal = ref(false)
-
+const filterRegion = ref(false)
+const filterBrand = ref(false)
 const selectedRegion = ref('')
 const selectedCity = ref('')
+const keywords = ref('')
 
 // 品牌选择
-const brandList = ref<string[]>([])  // 品牌列表
-const selectedBrands = ref<string[]>([])  // 选择的品牌
+const regions = ref<string[]>([])
+const brandList = ref<string[]>([]) // 品牌列表
+const selectedBrands = ref<string[]>([]) // 选择的品牌
 
 const currentPage = ref(1)
 const hasmore = ref(true)
@@ -284,9 +294,7 @@ const productsDeatil = (id: string) => {
     path: `/productDetail/${id}`,
   })
 }
-//搜索
-const keywords = (route.query.keyword as string) || ''
-console.log('搜索关键词:', keywords)
+
 const SearchProducts = () => {
   if (!idLoading.value && hasmore.value) {
     idLoading.value = true
@@ -297,7 +305,7 @@ const SearchProducts = () => {
         data: {
           pageNum: currentPage.value,
           pageSize: pageSize.value,
-          title: keywords,
+          title: keywords.value,
         },
       })
       .then((res) => {
@@ -318,6 +326,21 @@ const SearchProducts = () => {
       })
   }
 }
+const resetSearchState = () => {
+  products.value = []
+  currentPage.value = 1
+  hasmore.value = true
+}
+watch(
+  () => route.query.keyword,
+  (newValue) => {
+    keywords.value = (newValue as string) || ''
+    console.log('新的搜索关键词:', keywords.value)
+    resetSearchState()
+    SearchProducts()
+  },
+  { immediate: true },
+)
 //获取品牌
 const getBrands = () => {
   axios
@@ -326,8 +349,28 @@ const getBrands = () => {
       method: 'GET',
     })
     .then((res) => {
-      console.log(res.data)
+      console.log(res)
       brandList.value = res.data.data
+    })
+    .catch((error) => {
+      console.log(error)
+    })
+}
+//获取地区
+const getRegions = () => {
+  axios
+    .request({
+      url: '/server/api/shop/product/delivery',
+      method: 'POST',
+      data: {
+        pageSize: 100,
+        page: 1,
+      },
+    })
+    .then((res) => {
+      console.log(res)
+      regions.value = res.data.data
+      regions.value[0] = '全部'
     })
     .catch((error) => {
       console.log(error)
@@ -337,61 +380,15 @@ const getBrands = () => {
 const confirmBrands = () => {
   console.log('选择的品牌:', selectedBrands.value)
   showBrandModal.value = false
-
-  if (!idLoading.value && hasmore.value) {
-    idLoading.value = true
-    axios
-      .request({
-        url: '/server/api/shop/product/filter',
-        method: 'POST',
-        data: {
-          pageNum: currentPage.value,
-          pageSize: pageSize.value,
-          title: keywords,
-          brandName: selectedBrands.value,
-        },
-      })
-      .then((res) => {
-        idLoading.value = false
-        console.log(res.data)
-        const newSearchProducts = res.data.data.list
-
-        products.value = [...products.value, ...newSearchProducts]
-        if (newSearchProducts.length < pageSize.value) {
-          hasmore.value = false
-        } else {
-          currentPage.value++
-        }
-      })
-      .catch((error) => {
-        idLoading.value = false
-        console.log(error)
-      })
-  }
+  filterBrand.value = true
 }
-
-// 地区数据
-const regions = ['北京', '上海', '广东', '浙江', '江苏', '四川', '湖北', '山东', '河南', '湖南']
-const cities: Record<string, string[]> = {
-  北京: ['北京'],
-  上海: ['上海'],
-  广东: ['广州', '深圳', '东莞', '佛山', '珠海'],
-  浙江: ['杭州', '宁波', '温州', '嘉兴', '绍兴'],
-  江苏: ['南京', '苏州', '无锡', '常州', '徐州'],
-  四川: ['成都', '绵阳', '德阳', '自贡', '泸州'],
-  湖北: ['武汉', '襄阳', '宜昌', '黄石', '十堰'],
-  山东: ['济南', '青岛', '烟台', '潍坊', '淄博'],
-  河南: ['郑州', '洛阳', '开封', '安阳', '新乡'],
-  湖南: ['长沙', '株洲', '湘潭', '衡阳', '邵阳'],
-}
-
-
 
 // 监听滚动事件
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
   SearchProducts()
-     getBrands ()
+  getBrands()
+  getRegions()
 })
 
 const handleScroll = () => {
@@ -404,15 +401,16 @@ const handleScroll = () => {
     SearchProducts()
   }
 }
-
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}
 // 地区选择相关方法
 const selectRegion = (region: string) => {
   selectedRegion.value = region
   selectedCity.value = '' // 重置城市选择
-}
-
-const selectCity = (city: string) => {
-  selectedCity.value = city
 }
 
 const resetRegion = () => {
@@ -421,8 +419,8 @@ const resetRegion = () => {
 }
 
 const confirmRegion = () => {
-  // 这里可以添加确认地区选择后的逻辑
   console.log('选择的地区:', selectedRegion.value, '选择的城市:', selectedCity.value)
+  filterRegion.value = true
   showRegionModal.value = false
 }
 
@@ -430,6 +428,5 @@ const confirmRegion = () => {
 const resetBrands = () => {
   selectedBrands.value = []
 }
-
 </script>
 <style scoped></style>

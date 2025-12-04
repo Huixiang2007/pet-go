@@ -57,11 +57,11 @@
         type="text"
          placeholder="搜索宠物用品..."
           @keyup.enter="searchKey"
-        class="outline-none  w-full py-2 pl-10 pr-4 rounded-full border border-[#f5a623]">
+         class="outline-none  w-full py-2 pl-10 pr-4 rounded-full border border-[#f5a623]">
         <i  @click="searchKey"  class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
       </div>
     </div>
-      <router-link to="/SellerItemManager" class="border-[1px] border-orange-400 ml-12
+      <router-link to="/seller-item-manager" class="border-[1px] border-orange-400 ml-12
   rounded-full px-5 py-2 text-orange-700 font-medium flex items-center gap-2 shadow-sm
    hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group hidden xl:flex cursor-pointer">
     <i class="fa fa-paw text-xl text-orange-500 animate-bounce"></i>
@@ -373,7 +373,7 @@ const searchKey=()=>{
   const searchValue=title.value.trim()
    if (searchValue) {
   router.push({
-    path: '/Search',
+    path: '/search',
      query: {
         keyword: searchValue
       }

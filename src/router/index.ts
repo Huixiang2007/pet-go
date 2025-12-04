@@ -45,98 +45,98 @@ const routes = [
   },
   //  商品详情
   {
-    path: '/producDetail/:id',
+    path: '/product-detail/:id',
     name: 'productsDetail',
     component: () => import('@/views/Petshop/ProductDetail.vue'),
   },
   //  订单列表
   {
     path: '/order-list',
-    name: 'orderList ',
+    name: 'OrderList ',
     component: () => import('@/views/Petshop/OrderList.vue'),
   },
   //物流信息
   {
-    path: '/PackageInfo',
+    path: '/package-info',
     name: 'PackageInfo',
     component: () => import('@/views/Petshop/PackageInfo.vue'),
   },
   //  搜索
   {
-    path: '/Search',
+    path: '/search',
     name: 'Search',
     component: () => import('@/views/Petshop/SearchProduct.vue'),
   },
   // 店铺
   {
-    path: '/Store',
+    path: '/store',
     name: 'Store',
     component: () => import('@/views/Petshop/ShopStore.vue'),
   },
   // 注册店铺
-  // {
-  //   path: '/StoreRegister',
-  //   name: 'StoreRegister',
-  //   component: () => import('@/views/Petshop/SellerRegisition.vue'),
-  // },
+  {
+    path: '/store-register',
+    name: 'StoreRegister',
+    component: () => import('@/views/Petshop/SellerRegisition.vue'),
+  },
   // 订单管理
   {
-    path: '/SellerOrderManager',
+    path: '/seller-order-manager',
     name: 'SellerOrderManager',
     component: () => import('@/views/Petshop/SellerOrderMana.vue'),
   },
   // 电商用户管理
 
   {
-    path: '/SellerUserManager',
+    path: '/seller-user-manager',
     name: 'SellerUserManager',
     component: () => import('@/views/Petshop/SellerUserMana.vue'),
   },
   // 优惠卷管理
   {
-    path: '/CouponManagement',
+    path: '/coupon-management',
     name: 'CouponManagement',
     component: () => import('@/views/Petshop/CouponManagement.vue'),
   },
   // 商品管理
   {
-    path: '/SellerItemManager',
+    path: '/seller-item-manager',
     name: 'SellerItemManager',
     component: () => import('@/views/Petshop/SellerItemMana.vue'),
   },
   // 店铺设置
   {
-    path: '/ShopSetting',
+    path: '/shop-setting',
     name: '/ShopSetting',
     component: () => import('@/views/Petshop/ShopSetting.vue'),
   },
   {
-    path: '/AddProduct',
+    path: '/add-product',
     name: 'addProduct',
     component: () => import('@/views/Petshop/AddProduct.vue'),
     meta: { title: '欢迎注册 PetGo' },
   },
   // 销售分析
   {
-    path: '/Analytics',
+    path: '/analytics',
     name: 'Analytics',
     component: () => import('@/views/Petshop/SalesAnalytics.vue'),
   },
   // 秒杀
   {
-    path: '/FlashSale',
+    path: '/flash-sale' ,
     name: 'FlashSale',
     component: () => import('@/views/Petshop/FlashSale.vue'),
   },
   //消息
   {
     path: '/customer-service',
-    name: 'customerService',
+    name: 'CustomerService',
     component: () => import('@/views/Petshop/CustomerService.vue'),
   },
   // 添加商品
   {
-    path: '/AddProduct',
+    path: '/add-product',
     name: 'AddProduct',
     component: () => import('@/views/Petshop/AddProduct.vue'),
   },
@@ -183,16 +183,72 @@ const routes = [
   //个人中心
   {
     path: '/person',
-    name: 'personalCenter',
+    name: 'PersonalCenter',
     component: () => import('@/views/PersonalCenter.vue'),
     meta: { title: '个人中心' },
   },
+  //后台管理
   {
-    path: '/join-us',
-    name: 'joinUs',
-    component: () => import('@/views/JoinUs.vue'),
-    meta: { title: '加入我们' },
-  },
+     path: '/admin',
+    name: 'homePage',
+    component: () => import('@/views/admin/HomePage.vue'),
+    meta: { title: '后台管理' },
+     children: [
+      // 数据概览
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/admin/Data.vue'),
+        meta: {
+          title: '数据概览',
+         
+        }
+      },
+      // 用户管理
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/admin/User.vue'),
+        meta: {
+          title: '用户管理',
+          icon: 'el-icon-user',
+        
+        }
+      },
+      // 寄养服务管理
+      {
+        path: 'foster',
+        name: 'foster',
+        meta: {
+          title: '寄养服务管理',
+          icon: 'el-icon-house',
+          
+        },
+        children: [
+          {
+            path: 'audit',
+            name: 'fosterAudit',
+            component: () => import('@/views/admin/Judge.vue'),
+            meta: {
+              title: '服务审核',
+            
+            }
+          },
+          {
+            path: 'orders',
+            name: 'fosterOrder',
+            component: () => import('@/views/admin/Order.vue'),
+            meta: {
+              title: '寄养订单',
+            
+            }
+          }
+        ]
+
+  }
+
+]
+  }
 ]
 
 const router = createRouter({

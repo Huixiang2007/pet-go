@@ -10,44 +10,44 @@
         </button>
       </div>
 
-      <router-link to="/SellerOrderManager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
-       :class="currentRoute === '/SellerOrderManager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
+      <router-link to="/seller-order-manager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/seller-order-manager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-users w-5 text-center"></i>
         <span v-if="isCollapsed">订单管理</span>
       </router-link>
 
-     <router-link to="/SellerUserManager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium  rounded-md transition-colors"
-      :class="currentRoute === '/SellerUserManager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
+     <router-link to="/seller-user-manager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium  rounded-md transition-colors"
+      :class="currentRoute === '/seller-user-manager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-receipt w-5 text-center"></i>
         <span v-if="isCollapsed">用户管理</span>
       </router-link>
 
 
 
-      <router-link to="/SellerItemManager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
-       :class="currentRoute === '/SellerItemManager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
+      <router-link to="/seller-item-manager" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/seller-item-manager' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-boxes-stacked w-5 text-center"></i>
         <span v-if="isCollapsed">商品管理</span>
       </router-link>
 
 
 
-      <router-link to="/CouponManagement" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
-       :class="currentRoute === '/CouponManagement' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
+      <router-link to="/coupon-management" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/coupon-management' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-ticket w-5 text-center"></i>
         <span v-if="isCollapsed">优惠卷管理</span>
       </router-link>
 
       <div class="px-4 py-2 mt-4 text-xs text-gray-400 font-medium" v-if="isCollapsed">店铺设置</div>
 
-      <router-link to="/ShopSetting" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
-       :class="currentRoute === '/ShopSetting' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
+      <router-link to="/shop-setting" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/shop-setting' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-gear w-5 text-center"></i>
         <span v-if="isCollapsed">店铺设置</span>
     </router-link>
 
-      <router-link to="/Analytics" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
-       :class="currentRoute === '/Analytics' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
+      <router-link to="/analytics" class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors"
+       :class="currentRoute === '/analytics' ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'">
         <i class="fa-solid fa-chart-line w-5 text-center"></i>
         <span v-if="isCollapsed">数据统计</span>
       </router-link>

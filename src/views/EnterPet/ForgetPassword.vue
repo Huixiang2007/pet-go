@@ -77,7 +77,7 @@
             <div class="layui-input-prefix">
               <i class="layui-icon layui-icon-password"></i>
             </div>
-            <input type="password" name="newPassword" v-model="formData.newPassword" lay-verify="required|password"
+            <input type="password" name="newPassword" v-model="formData.newPassword" lay-verify="required"
               placeholder="新密码" lay-reqtext="请填写新密码" autocomplete="off" class="layui-input" lay-affix="eye" />
           </div>
         </div>
@@ -88,18 +88,17 @@
               <i class="layui-icon layui-icon-password"></i>
             </div>
             <input type="password" name="confirmPassword" v-model="formData.confirmPassword"
-              lay-verify="required|confirmPassword" placeholder="确认新密码" lay-reqtext="请确认新密码" autocomplete="off"
+              lay-verify="required" placeholder="确认新密码" lay-reqtext="请确认新密码" autocomplete="off"
               class="layui-input" lay-affix="eye" />
           </div>
         </div>
 
-        <div v-if="errorMessage" class="error-message">
-          <i class="layui-icon layui-icon-info-circle error-icon"></i>
-          {{ errorMessage }}
-        </div>
+      <div class="password-reminder">
+    <p class="reminder-text">密码需8-20位，包含大小写字母、数字和特殊字符</p>
+  </div>
 
         <div class="layui-form-item">
-          <button class="layui-btn btn-donate" lay-submit lay-filter="reset-password">
+          <button class="layui-btn btn-donate" @click="resetPassword" >
             重置密码
           </button>
         </div>
@@ -126,6 +125,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '../../utils/request'
+
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 
 declare global {
@@ -143,7 +143,7 @@ const errorMessage = ref('')
 const isResetPassword = ref(true)
 const titleEmailChars = '身份验证'.split('')
 const titleResetChars = '重置密码'.split('')
-
+const isSendingCode = ref(false)
 const timer = ref<number | null>(null)
 let layer: any
 
@@ -155,10 +155,14 @@ const formData = ref({
   confirmPassword: '',
 })
 
+
 const togglePanel = () => {
   step.value = 1
   isRightPanelActive.value = true
   errorMessage.value = ''
+    setTimeout(() => {
+    renderLayuiForm()
+  }, 600) // 等待动画完成后再渲染
 }
 // 路由实例
 const router = useRouter()
@@ -168,28 +172,38 @@ const toLogin = () => {
   router.push('/login')
 }
 
-// 表单提交处理（替代原生事件绑定）
-const handleFirstFormSubmit = () => {
-  // 阻止默认提交行为（已通过@submit.prevent实现）
-  // 可在这里添加额外的表单处理逻辑
+const renderLayuiForm = () => {
+  if (window.layui) {
+    window.layui.use(['form'], (form: any) => {
+      // 延迟一小段时间确保 DOM 已更新
+      setTimeout(() => {
+        form.render()
+      }, 100)
+    })
+  }
 }
-
-const handleSecondFormSubmit = () => {
-  // 阻止默认提交行为（已通过@submit.prevent实现）
-  // 可在这里添加额外的表单处理逻辑
-}
-
 // 发送验证码
 
 const sendCaptcha = async () => {
-  if (countdown.value > 0) return
-  const qqEmailReg = /^[1-9]\d+@qq\.com$/
-  if (!qqEmailReg.test(formData.value.email)) {
-    errorMessage.value = '请输入正确的QQ邮箱格式'
+ 
+  if (isSendingCode.value ||countdown.value >0)  
+    return
+  
+  if (!formData.value.email) {
+    ElMessage.warning('请输入您的邮箱！')
     return
   }
+  
+
+  const qqEmailReg = /^[1-9]\d+@qq\.com$/
+  if (!qqEmailReg.test(formData.value.email)) {
+    ElMessage.error('请输入正确的QQ邮箱格式！')
+    return
+  }
+ 
 
   try {
+     isSendingCode.value = true
     const response = await request(
       '/server/api/user/sendCode',
       'POST',
@@ -226,40 +240,110 @@ const sendCaptcha = async () => {
   }
 }
 
+const isVerifying = ref(false)
 // 验证邮箱和验证码
 const verifyEmail = async () => {
-  try {
+   const qqEmailReg = /^[1-9]\d+@qq\.com$/
+  if (!qqEmailReg.test(formData.value.email)) {
+    errorMessage.value = '请输入正确的QQ邮箱格式'
+    return false
+  }
+    // 添加防止重复提交的逻辑
+  if (isVerifying.value) {
+    return false
+  }
+  
+  isVerifying.value = true
+ try {
+  
+    const response = await request(
+      '/server/api/user/codeValidate',
+      'POST',
+      {
+        email: formData.value.email,
+        code: formData.value.captcha,
+      }, 
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', 
+           'Authorization': 'Bearer ', // 替换为实际需要的Header名称// 明确指定格式
+        },
+      }
+    );
+    console.log('验证邮箱和验证码:', response)
+     if (response.code === 0) {
     layer.msg('验证成功，请重置密码', { icon: 1 })
     step.value = 2
     isRightPanelActive.value = false
     errorMessage.value = ''
-  } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || '验证失败，请检查信息'
-  }
+       setTimeout(() => {
+        renderLayuiForm()
+      }, 600) // 等待动画完成后再渲染
+    return true}
+    else {
+    
+      return false
+    }
+  } finally {
+    isVerifying.value = false
+  } 
 }
 
 // 重置密码
 const resetPassword = async () => {
-  if (formData.value.newPassword !== formData.value.confirmPassword) {
-    errorMessage.value = '两次输入的密码不一致'
+  // 检查新密码是否为空
+  if (!formData.value.newPassword) {
+   ElMessage.error('请输入新密码')
     return
   }
+  
+  // 检查确认密码是否为空
+  if (!formData.value.confirmPassword) {
+      ElMessage.error('确认密码不能为空')
+    return
+  }
+    const passwordReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/
+    if (!passwordReg.test(formData.value.newPassword)) {
+   ElMessage.error('密码需8-20位，包含大小写字母、数字和特殊字符')
+   return
+  }
 
+  if (formData.value.newPassword !== formData.value.confirmPassword) {
+
+    ElMessage.error('两次输入的密码不一致')
+    return
+  }
+  
   try {
-    // await axios.post('/api/user/reset-password', {
-    //   email: formData.value.email,
-    //   newPassword: formData.value.newPassword
-    // })
-
-    layer.msg('密码重置成功，请登录', { icon: 1 })
+    const response = await request(
+      '/server/api/user/forgetPassword',
+      'POST',
+      {
+        againPassword: formData.value.confirmPassword,
+        password: formData.value.newPassword,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', 
+           'Authorization': 'Bearer ', // 替换为实际需要的Header名称// 明确指定格式
+        },
+      }
+    )
+    if (response.code == 0) {
+ layer.msg('密码重置成功，请登录', { icon: 1 })
     router.push('/login')
-  } catch (error: any) {
-    errorMessage.value = error.response?.data?.message || '密码重置失败，请重试'
+      }
+      else{
+        ElMessage.error(response.msg || '密码重置失败，请重试')
+      }  
+  } catch (error) {
+   
   }
 }
 
 // 生命周期钩子
 onMounted(() => {
+   
   if (window.layui) {
     isResetPassword.value = true
     window.layui.use(['form', 'layer'], (form: any, layerInstance: any) => {
@@ -288,16 +372,20 @@ onMounted(() => {
 
       // 表单提交事件
       form.on('submit(verify-email)', () => {
+        if (!formData.value.email || !formData.value.captcha) {
+          layer.msg('请输入邮箱和验证码')
+          return false
+        }
+        
         verifyEmail()
         return false
       })
 
-      form.on('submit(reset-password)', () => {
-        resetPassword()
-        return false
-      })
+     
 
-      form.render()
+     setTimeout(() => {
+        form.render()
+      }, 100)
     })
   } else {
     console.error('Layui 未加载，请检查引入是否正确')
@@ -312,6 +400,16 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.password-reminder {
+  margin: -20px 0 15px 25px;
+  text-align: left;
+}
+
+.reminder-text {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
+}
 .error-message {
   /* 间距控制：与上方元素保持距离 */
   margin-top: 0.5rem;
@@ -515,7 +613,7 @@ body {
   background-image: url('../../assets/img/background1.png');
   height: 300px !important;
   background-color: var(--white);
-  border-radius: var(--button-radius);
+  border-radius: 4px;
   box-shadow:
     0 0.9rem 1.7rem rgba(0, 0, 0, 0.25),
     0 0.7rem 0.7rem rgba(0, 0, 0, 0.22);

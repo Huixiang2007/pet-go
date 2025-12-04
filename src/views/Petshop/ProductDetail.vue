@@ -170,7 +170,8 @@
           <div class="lg:fixed h-[100vh] w-[430px] py-5 pl-2 mt-[-112px] pr-[6rem] overflow-auto">
             <div>
               <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-500">{{ product.shopName }}</div>
+                <div @click="goStore"
+                 class="text-sm text-gray-500">{{ product.shopName }}</div>
               </div>
               <h1 class="mt-4 text-2xl font-bold">{{ product.title}}</h1>
 
@@ -279,6 +280,8 @@
 import axios from 'axios'
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 interface MediaItem { //定义媒体资源
   type: 'image' | 'video'
   src: string
@@ -442,7 +445,6 @@ const productDetail = () => {
     console.log('接口返回数据:', res)
     const productNew = res.data.data
     product.value = productNew
-
     const imageList = productNew.images?.split(',') || []
     const mainImage = productNew.mainImage || imageList[0] || ""
 
@@ -498,7 +500,11 @@ const productDetail = () => {
     console.log('错误详情:', err.response.data)
   })
 }
-
+const goStore = () => {
+  router.push({
+    path: '/Store'
+  })
+}
 
 function selectSkuOption(specName: string, option: string) {
   selectedOptions.value[specName] = option

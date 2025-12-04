@@ -130,6 +130,7 @@ declare module 'vue' {
     ShopFoot: typeof import('./src/components/ShopFoot.vue')['default']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
     SjjSss: typeof import('./src/components/SjjSss.vue')['default']
+    UserHeader: typeof import('./src/components/UserHeader.vue')['default']
   }
   export interface GlobalDirectives {
     vInfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']

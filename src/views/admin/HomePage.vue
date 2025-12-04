@@ -27,10 +27,7 @@
 import { ref } from 'vue'
 // 导入子组件
 import Sidebar from '@/components/Sidebar.vue'
-import Header from '@/components/Header.vue'
-
-
-import Data from '@/views/admin/Data.vue'
+import Header from '@/components/UserHeader.vue'
 // 侧边栏折叠状态（仅为样式服务）
 const sidebarOpened = ref(true)
 </script>

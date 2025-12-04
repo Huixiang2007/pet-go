@@ -89,7 +89,6 @@ import {
   User, 
   House, 
   Shop, 
-  Location, 
   Setting,
   PieChart  // 导入数据概览图标
 } from '@element-plus/icons-vue'
@@ -104,7 +103,7 @@ const activeMenu = computed(() => route.path || '/dashboard')
 
 <script lang="ts">
 export default {
-  name: 'Sidebar'
+  name: 'SidebarLeft'
 }
 </script>
 

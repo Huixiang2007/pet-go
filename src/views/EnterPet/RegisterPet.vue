@@ -94,9 +94,8 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useRegisterStore } from '../../stores/register'
+import { useRegisterStore,RegisterForm } from '../../stores/register'
 import ConfirmCode from '../../components/ConfirmCode.vue'
-import { start } from 'repl'
 const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> | null>(null)
 const registerStore = useRegisterStore()
 const router = useRouter()
@@ -104,24 +103,22 @@ const route = useRoute()
 const isRegister = ref(false)
 const form = registerStore.form
 const titleRegisterChars = '欢迎注册 PetGo'.split('')
-const countdown = ref(0)
-const timer = ref(null)
 const isSending = ref(false)
 declare global {
   interface Window {
-    layui: any
+    layui: any // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 // 响应式状态管理
 const isAgreed = ref(false) // 协议勾选状态
 const showError = ref(false) // 错误提示显示状态
 const registerActive = ref(false) // 注册按钮激活状态
-const handleInput = (key, value) => {
+const handleInput = (key: keyof RegisterForm, value: string) => {
   // 调用Store的setField方法，更新对应字段（key必须是form中定义的：phone/vercode等）
   registerStore.setField(key, value)
 }
 // 定时器管理（避免内存泄漏）
-let hideErrorTimer = null
+let hideErrorTimer :NodeJS.Timeout | null = null
 
 /**
  * 处理协议勾选状态变化
@@ -130,13 +127,13 @@ const handleCheck = () => {
   // 勾选时立即隐藏错误提示
   if (isAgreed.value) {
     showError.value = false
-    clearTimeout(hideErrorTimer)
+ if (hideErrorTimer) clearTimeout(hideErrorTimer)
     return
   }
 
   // 未勾选时显示错误提示并定时隐藏
   showError.value = true
-  clearTimeout(hideErrorTimer) // 清除旧定时器，防止多次触发
+  if (hideErrorTimer) clearTimeout(hideErrorTimer)// 清除旧定时器，防止多次触发
   hideErrorTimer = setTimeout(() => {
     showError.value = false
     hideErrorTimer = null // 清空定时器引用
@@ -155,7 +152,7 @@ const handleRegister = async () => {
   // 校验协议勾选状态
   if (!isAgreed.value) {
     showError.value = true
-    clearTimeout(hideErrorTimer)
+    if (hideErrorTimer) clearTimeout(hideErrorTimer)
     hideErrorTimer = setTimeout(() => {
       showError.value = false
       hideErrorTimer = null
@@ -165,7 +162,7 @@ const handleRegister = async () => {
 
   try {
     console.log('wobeidianl')
-    // console.log(ConfirmCodeRef.value.startCountdown())
+    console.log(ConfirmCodeRef.value.startCountdown())
     // 调用注册接口
     const response = await axios.post(
       '/server/api/user/register',
@@ -189,7 +186,7 @@ const handleRegister = async () => {
       ElMessage.success('注册成功')
       // 注册成功后清空表单并跳转到登录页
       registerStore.clearForm()
-      router.push('/Person')
+      router.push('/person')
     } else {
       ElMessage.error(response.data.msg || '注册失败')
     }
@@ -245,8 +242,8 @@ onMounted(() => {
 
   if (window.layui) {
     isRegister.value = true
-    window.layui.use(['form', 'layer', 'util'], function (form, layer, util) {
-      var $ = window.layui.$
+    window.layui.use(['form', 'layer', 'util'], function (form:any ) {// eslint-disable-line @typescript-eslint/no-explicit-any
+      const  $ = window.layui.$
 
       form.config.verifyOnBlur = true
       // 自定义验证规则
@@ -271,14 +268,14 @@ onMounted(() => {
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/, // 正则表达式
           '密码需8-20位，包含大小写字母、数字和特殊字符',
         ],
-        confirmPassword: function (value, item) {
-          var passwordValue = $('#reg-password').val()
+        confirmPassword: function (value:string) {
+          const passwordValue = $('#reg-password').val()
           if (value !== passwordValue) {
             return '两次密码输入不一致'
           }
         },
       })
-      $('#reg-password').on('blur', function () {
+      $('#reg-password').on('blur', function (this:HTMLElement) {
         const $this = $(this)
         $this.attr('lay-verify', 'password')
         form.validate(this) // 触发当前输入框的验证
@@ -289,9 +286,9 @@ onMounted(() => {
       let isForcedBlur = false
       $('#confirm-password')
         .off('blur')
-        .on('blur', function () {
+        .on('blur', function (this:HTMLElement) {
           const $this = $(this)
-          const nativeEl = this
+      
           if (isForcedBlur) {
             isForcedBlur = false // 重置标志
             return
@@ -308,7 +305,7 @@ onMounted(() => {
             isForcedBlur = true
 
             setTimeout(() => {
-              nativeEl.blur() // 原生方法更可靠
+              this.blur() // 原生方法更可靠
             }, 100) //
           }
           // 使用 setTimeout 确保验证完成后重置标志
@@ -318,8 +315,8 @@ onMounted(() => {
         })
 
       // 提交事件
-      form.on('submit(demo-reg)', function (data) {
-        var field = data.field // 获取表单字段值
+      form.on('submit(demo-reg)', function () {
+       // 获取表单字段值
 
         // 是否勾选同意
         if (!isAgreed.value) {
@@ -349,7 +346,7 @@ onUnmounted(() => {
 })
 
 const toLogin = () => {
-  router.push('/Login')
+  router.push('/login')
 }
 const toProtocal = () => {
   router.push('/protocal')

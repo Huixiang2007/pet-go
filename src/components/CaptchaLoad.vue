@@ -14,7 +14,7 @@
 import { defineComponent, ref, onMounted } from 'vue'
 
 export default defineComponent({
-  name: 'Captcha',
+  name: 'CaptchaPicture',
   props: {
     width: {
       type: Number,
@@ -25,9 +25,9 @@ export default defineComponent({
       default: 38
     }
   },
-  setup(props) {
+  setup() {
     const captchaCanvasRef = ref<HTMLCanvasElement | null>(null)
-    let correctCode = ''
+    let correctCode = '1111'
 
     // 生成随机字符（4位字母数字）
     const getRandomCode = () => {

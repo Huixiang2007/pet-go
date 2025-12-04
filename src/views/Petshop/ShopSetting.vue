@@ -329,7 +329,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted,Ref } from 'vue'
+import { ref, onMounted,  type Ref } from 'vue'
 
 // 定义数据类型
 interface Province {

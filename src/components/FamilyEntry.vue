@@ -12,163 +12,75 @@
                     <label class="block text-sm font-medium text-gray-700">
                         家庭名称 <span class="text-red-500">*</span>
                     </label>
-                    <input type="text" v-model="form.familyName"
+                    <input type="text" v-model="form.name"
                         class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
                         placeholder="请输入家庭名称/昵称" required />
                 </div>
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700">
-                        可寄养宠物类型 <span class="text-red-500">*</span>
+                        可接待宠物类型 <span class="text-red-500">*</span>
                     </label>
-                    <select v-model="form.petType"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none bg-white"
-                        required>
-                        <option value="" class="text-gray-400">请选择可寄养类型</option>
-                        <option value="小型犬">小型犬</option>
-                        <option value="中型犬">中型犬</option>
-                        <option value="大型犬">大型犬</option>
-                        <option value="猫咪">猫咪</option>
-                        <option value="其他宠物">其他宠物</option>
-                        <option value="全部类型">全部类型</option>
-                    </select>
+                    <el-select v-model="form.petTypes" multiple class="w-full" placeholder="请选择可接待的宠物类型">
+                        <el-option v-for="animal in animalOptions" :key="animal.value" :label="animal.label"
+                            :value="animal.label" />
+                    </el-select>
                 </div>
             </div>
-
-            <!-- 家庭环境照片 -->
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">
-                    家庭环境照片 <span class="text-red-500">*</span>
-                </label>
-                <FileUpload :preview-image="imagePreviews.familyPhoto" accept="image/*"
-                    @file-change="handleFileChange($event, 'familyPhoto')">
-                    <template #default>
-                        <i class="fa fa-camera text-4xl text-purple-500 mb-2"></i>
-                        <span class="text-gray-600">点击上传家庭环境照片</span>
-                        <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
-                    </template>
-                </FileUpload>
-            </div>
-        </div>
-
-        <!-- 家庭成员信息 -->
-        <div class="space-y-4">
-            <div class="flex items-center border-b border-purple-100 pb-2">
-                <i class="fa fa-user text-purple-600 text-xl mr-3"></i>
-                <h2 class="text-xl font-semibold text-gray-800">家庭成员信息</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        户主姓名 <span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" v-model="form.familyContactName"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                        placeholder="请输入户主姓名" required />
-                </div>
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        联系电话 <span class="text-red-500">*</span>
-                    </label>
-                    <input type="tel" v-model="form.familyContactPhone"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                        placeholder="请输入联系电话" required />
-                </div>
-            </div>
-
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">
-                    居住地址 <span class="text-red-500">*</span>
-                </label>
-                <input type="text" v-model="form.familyAddress"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                    placeholder="请输入详细居住地址" required />
-            </div>
-
-            <!-- 身份证正反面上传 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        身份证正面 <span class="text-red-500">*</span>
-                    </label>
-                    <FileUpload :preview-image="imagePreviews.familyIdCardFront" accept="image/*"
-                        @file-change="handleFileChange($event, 'familyIdCardFront')">
-                        <template #default>
-                            <i class="fa fa-id-card-o text-4xl text-purple-500 mb-2"></i>
-                            <span class="text-gray-600">点击上传户主身份证正面</span>
-                            <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
-                        </template>
-                    </FileUpload>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        身份证反面 <span class="text-red-500">*</span>
-                    </label>
-                    <FileUpload :preview-image="imagePreviews.familyIdCardBack" accept="image/*"
-                        @file-change="handleFileChange($event, 'familyIdCardBack')">
-                        <template #default>
-                            <i class="fa fa-id-card text-4xl text-purple-500 mb-2"></i>
-                            <span class="text-gray-600">点击上传户主身份证反面</span>
-                            <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
-                        </template>
-                    </FileUpload>
-                </div>
-            </div>
-
-            <!-- 其他证件材料 -->
             <div class="space-y-2 mt-4">
                 <label class="block text-sm font-medium text-gray-700">
-                    其他证件材料（可选）
+                    机构资质证书（支持多张，最多6张）<span class="text-red-500">*</span>
                 </label>
-                <FileUpload :preview-image="imagePreviews.familyOtherDocs" accept="image/*"
-                    @file-change="handleFileChange($event, 'familyOtherDocs')">
-                    <template #default>
-                        <i class="fa fa-files-o text-4xl text-purple-500 mb-2"></i>
-                        <span class="text-gray-600">点击上传其他相关证件（如宠物疫苗证明、养宠经验证明等）</span>
-                        <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
-                    </template>
-                </FileUpload>
+
+                <FileUpload ref="qualificationRef" accept="image/*,.pdf" :max-count="6"
+                    accept-description="JPG、PNG、PDF格式"
+                    @file-change="files => form.qualificationPhotos = files.map(f => f.url)" />
             </div>
         </div>
 
-        <!-- 寄养能力说明 -->
-        <div class="space-y-4">
-            <div class="flex items-center border-b border-purple-100 pb-2">
-                <i class="fa fa-heart text-purple-600 text-xl mr-3"></i>
-                <h2 class="text-xl font-semibold text-gray-800">寄养能力说明</h2>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 家庭环境照片 -->
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">
+                环境照片（支持多张，最多6张）<span class="text-red-500">*</span>
+            </label>
+
+            <FileUpload ref="environmentRef" accept="image/*" :max-count="6" accept-description="JPG、PNG格式"
+                @file-change="files => form.environmentPhotos = files.map(f => f.url)" />
+        </div>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div class="space-y-4">
+                <div class="flex items-center border-b border-purple-100 pb-2">
+                    <i class="fa fa-map-marker text-purple-600 text-xl mr-3"></i>
+                    <h2 class="text-lg font-semibold text-gray-800">家庭地址</h2>
+                </div>
+                <AddressSelect v-model="selectedAddress" @change="handleAddressChange" />
+
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700">
-                        可寄养数量 <span class="text-red-500">*</span>
+                        详细地址 <span class="text-red-500">*</span>
                     </label>
-                    <input type="number" v-model="form.maxPetCount" min="1"
+                    <input type="text" v-model="form.detailAddress"
                         class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                        placeholder="请输入可寄养宠物数量" required />
-                </div>
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700">
-                        是否有养宠经验 <span class="text-red-500">*</span>
-                    </label>
-                    <select v-model="form.hasPetExperience"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none bg-white"
-                        required>
-                        <option value="" class="text-gray-400">请选择</option>
-                        <option value="有">有</option>
-                        <option value="无">无</option>
-                    </select>
+                        placeholder="请输入机构详细地址" required />
                 </div>
             </div>
 
-            <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">
-                    寄养说明 <span class="text-red-500">*</span>
-                </label>
-                <textarea v-model="form.familyDescription"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
-                    placeholder="请描述您的寄养环境、经验、优势等" required></textarea>
+            <div class="space-y-4">
+                <div class="flex items-center border-b border-purple-100 pb-2">
+                    <i class="fa fa-info-circle text-purple-600 text-xl mr-3"></i>
+                    <h2 class="text-lg font-semibold text-gray-800">寄养说明</h2>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        寄样说明 <span class="text-red-500">*</span>
+                    </label>
+                    <textarea v-model="form.description"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
+                        placeholder="请输入寄样说明" required></textarea>
+                </div>
             </div>
         </div>
 
@@ -187,87 +99,130 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue'
-import axios from 'axios'
+import { reactive, ref } from 'vue'
+import request from '@/utils/request'
 import FileUpload from '@/components/FileUpload.vue'
+import { ElMessage } from 'element-plus'
+import provincesData from 'china-division/dist/provinces.json';
+import citiesData from 'china-division/dist/cities.json';
+import districtsData from 'china-division/dist/areas.json';
 
-const emit = defineEmits<{
-    'submit-success': [data: any]
-    'validation-error': [message: string]
-}>()
-
-// 图片预览
-interface ImagePreviews {
-    familyPhoto: string
-    familyIdCardFront: string
-    familyIdCardBack: string
-    familyOtherDocs: string
-}
-
-const imagePreviews = reactive<ImagePreviews>({
-    familyPhoto: '',
-    familyIdCardFront: '',
-    familyIdCardBack: '',
-    familyOtherDocs: ''
+const animalOptions = [
+    { value: 'cat', label: '猫' },
+    { value: 'dog', label: '狗' },
+    { value: 'fish', label: '鱼' },
+    { value: 'bird', label: '鸟' },
+    { value: 'rabbit', label: '兔' },
+    { value: 'snake', label: '蛇' },
+    { value: 'other', label: '其他' },
+]
+const selectedAddress = ref({
+    province: '',
+    city: '',
+    district: '',
 })
-
+const isSuccess = ref(false)
 // 表单数据
-const form = reactive({
-    familyName: '',
-    petType: '',
-    familyContactName: '',
-    familyContactPhone: '',
-    familyAddress: '',
-    maxPetCount: 1,
-    hasPetExperience: '',
-    familyDescription: ''
-})
-
-// 文件上传处理
-const handleFileChange = (dataUrl: string, type: keyof ImagePreviews) => {
-    imagePreviews[type] = dataUrl
+interface OrganizationForm {
+    providerType: string
+    name: string
+    description: string
+    province: string
+    city: string
+    district: string
+    detailAddress: string
+    cover: string
+    petTypes: string[]
+    qualificationPhotos: string[]
+    environmentPhotos: string[]
 }
 
+const form = reactive<OrganizationForm>({
+    providerType: '个人',
+    name: '',
+    description: '',
+    province: '',
+    city: '',
+    district: '',
+    detailAddress: '',
+    cover: '',
+    petTypes: [],
+    qualificationPhotos: [],
+    environmentPhotos: []
+})
+const qualificationRef = ref<any>(null)
+const environmentRef = ref<any>(null)
+
+// 修复地址同步逻辑
+interface Area {
+    code: string;
+    name: string;
+}
+
+interface City extends Area {
+    provinceCode: string;
+}
+
+interface District extends Area {
+    cityCode: string;
+}
+
+// 获取省份名称
+const getProvinceName = (provinceCode: string) => {
+    const province = (provincesData as Area[]).find(p => p.code === provinceCode)
+    return province ? province.name : provinceCode
+}
+
+// 获取城市名称
+const getCityName = (cityCode: string) => {
+    const city = (citiesData as City[]).find(c => c.code === cityCode)
+    return city ? city.name : cityCode
+}
+
+// 获取区县名称
+const getDistrictName = (districtCode: string) => {
+    const district = (districtsData as District[]).find(d => d.code === districtCode)
+    return district ? district.name : districtCode
+}
+const handleAddressChange = () => {
+    form.province = getProvinceName(selectedAddress.value.province)
+    form.city = getCityName(selectedAddress.value.city)
+    form.district = getDistrictName(selectedAddress.value.district)
+}
 // 表单验证
 const validateForm = (): boolean => {
     const requiredFields = [
-        { value: form.familyName, field: '家庭名称' },
-        { value: form.petType, field: '可寄养宠物类型' },
-        { value: form.familyContactName, field: '户主姓名' },
-        { value: form.familyContactPhone, field: '联系电话' },
-        { value: form.familyAddress, field: '居住地址' },
-        { value: form.hasPetExperience, field: '养宠经验' },
-        { value: form.familyDescription, field: '寄养说明' }
+        { value: form.name, field: '家庭名称' },
+        { value: form.petTypes.length > 0, field: '可接待宠物类型' },
+        { value: form.province, field: '省份' },
+        { value: form.city, field: '城市' },
+        { value: form.district, field: '区域' },
+        { value: form.detailAddress, field: '详细地址' },
+        { value: form.description, field: '寄养说明' }
     ]
 
     for (const field of requiredFields) {
         if (!field.value) {
-            emit('validation-error', `请填写${field.field}！`)
+
+            ElMessage({
+                message: `请填写${field.field}！`,
+                type: 'error',
+                duration: 3000
+            })
+
             return false
         }
     }
 
-    const requiredFiles = [
-        { value: imagePreviews.familyPhoto, field: '家庭环境照片' },
-        { value: imagePreviews.familyIdCardFront, field: '身份证正面' },
-        { value: imagePreviews.familyIdCardBack, field: '身份证反面' }
-    ]
+    // 验证文件上传
+    if (form.qualificationPhotos.length === 0) {
+        ElMessage.error('请至少上传1张资质证书！')
 
-    for (const file of requiredFiles) {
-        if (!file.value) {
-            emit('validation-error', `请上传${file.field}！`)
-            return false
-        }
-    }
-
-    if (form.maxPetCount < 1) {
-        emit('validation-error', '可寄养数量至少为1')
         return false
     }
+    if (form.environmentPhotos.length === 0) {
+        ElMessage.error('请至少上传1张环境照片！')
 
-    const phoneRegex = /^1[3-9]\d{9}$/
-    if (!phoneRegex.test(form.familyContactPhone)) {
-        emit('validation-error', '请输入正确的手机号码！')
         return false
     }
 
@@ -279,57 +234,52 @@ const submitForm = async () => {
     if (!validateForm()) {
         return
     }
+    const submitData = {
+        ...form,
 
-    const formData = new FormData()
-    formData.append('type', 'family')
-    formData.append('userId', localStorage.getItem('userId') || '')
-
-    Object.keys(form).forEach(key => {
-        // formData.append(key, form[key as keyof typeof form])
-    })
-
-    const files = [
-        { key: 'familyPhoto', preview: imagePreviews.familyPhoto },
-        { key: 'familyIdCardFront', preview: imagePreviews.familyIdCardFront },
-        { key: 'familyIdCardBack', preview: imagePreviews.familyIdCardBack }
-    ]
-
-    for (const file of files) {
-        if (file.preview) {
-            const response = await fetch(file.preview)
-            const blob = await response.blob()
-            const fileObj = new File([blob], `${file.key}.jpg`, { type: 'image/jpeg' })
-            formData.append(file.key, fileObj)
-        }
+        qualificationPhotos: form.qualificationPhotos.join(','),
+        environmentPhotos: form.environmentPhotos.join(',')
     }
-
     try {
-        const response = await axios({
-            url: '/server/api/partner/apply',
-            method: 'POST',
-            data: formData,
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+        const response = await request(
+            '/server/api/foster/provider/add',
+            'POST',
+            submitData
+        )
+        console.log('提交成功', response)
+        if (response.code === 0) {
+            ElMessage({
+                message: '提交成功！我们将在1-3个工作日内审核',
+                type: 'success',
+                duration: 3000
+            })
+            isSuccess.value = true
+            // 重置表单
+            form.name = ''
+            form.description = ''
+            form.province = ''
+            form.city = ''
+            form.district = ''
+            form.detailAddress = ''
+            form.petTypes = []
+            form.qualificationPhotos = []
+            form.environmentPhotos = []
+            selectedAddress.value = { province: '', city: '', district: '' }
+            if (qualificationRef.value) {
+                qualificationRef.value.clearFiles()
             }
-        })
-
-        emit('submit-success', response.data)
-
-        Object.keys(form).forEach(key => {
-            if (key !== 'maxPetCount') {
-                // form[key as keyof typeof form] = ''
+            if (environmentRef.value) {
+                environmentRef.value.clearFiles()
             }
-        })
-        form.maxPetCount = 1
-
-        Object.keys(imagePreviews).forEach(key => {
-            imagePreviews[key as keyof ImagePreviews] = ''
-        })
-
+        } else {
+            ElMessage.error(response.msg || '提交失败，请稍后重试')
+        }
     } catch (error) {
         console.error('提交失败', error)
-        emit('validation-error', '提交失败，请稍后重试')
+
+        ElMessage.error('提交失败，请稍后重试')
+
     }
 }
+
 </script>

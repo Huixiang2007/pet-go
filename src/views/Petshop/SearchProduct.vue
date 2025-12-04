@@ -291,7 +291,7 @@ interface Products {
 }
 const productsDeatil = (id: string) => {
   router.push({
-    path: `/productDetail/${id}`,
+    path: `/product-detail/${id}`,
   })
 }
 

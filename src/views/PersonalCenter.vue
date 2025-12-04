@@ -65,9 +65,9 @@
             <div class="layui-form-item">
               <label class="layui-form-label">生日</label>
               <div class="layui-input-block">
-                <el-date-picker v-model="formData.birthday" type="date" name="birthday" placeholder="请选择生日日期"
-                  :max-date="new Date(maxBirthdayDate)" value-format="YYYY-MM-DD" style="width: 100%"
-                  :disabled-date="disabledDate" />
+                <el-date-picker class="custom-style" v-model="formData.birthday" type="date" name="birthday"
+                  placeholder="请选择生日日期" :max-date="new Date(maxBirthdayDate)" value-format="YYYY-MM-DD"
+                  style="width: 100%; height:37px;" :disabled-date="disabledDate" />
               </div>
             </div>
 
@@ -92,83 +92,163 @@
                 <button class="layui-btn btn-save" lay-submit lay-filter="save-base-info">
                   保存修改
                 </button>
-                <button class="layui-btn delete-btn" @click="cancelEdit">取消修改</button>
+                <button class="layui-btn delete-btn" type="button" @click="cancelEdit">取消修改</button>
               </div>
             </div>
+            <div class="show-photo">
+              <img src="@/assets/img/catPicture.png" alt="这是展示图片">
+              </div>
           </form>
 
           <!-- 实名认证表单 -->
-          <form class="layui-form profile-form" v-if="currentTab === 1">
-            <div class="verify-status" v-if="realNameStatus !== 'unverified'">
-              <div class="status-icon" :class="realNameStatus === 'verified' ? 'success' : 'pending'">
-                <i class="layui-icon" :class="realNameStatus === 'verified' ? 'layui-icon-ok-circle' : 'layui-icon-clock'
-                  "></i>
-              </div>
-              <div class="status-text">
-                <h3>{{ realNameStatus === 'verified' ? '已实名认证' : '实名认证审核中' }}</h3>
-                <p>
-                  {{
-                    realNameStatus === 'verified'
-                      ? '您已完成实名认证，不可修改'
-                      : '您的实名认证申请正在审核中，请耐心等待'
-                  }}
-                </p>
-              </div>
-            </div>
+        <!-- 实名认证表单 -->
+<form class="layui-form profile-form" v-if="currentTab === 1">
+  <!-- 审核中状态 -->
+  <div v-if="realNameStatus === 'pending'">
+    <div  class="verify-status">
+    <div class="status-icon pending">
+      <i class="layui-icon layui-icon-log"></i>
+    </div>
+    <div class="status-text">
+      <h3>实名认证审核中</h3>
+      <p>您的实名认证申请正在审核中，请耐心等待</p>
+    </div>
+    
+    <!-- 查看材料按钮 -->
+    <div class="view-materials-section">
+      <button type="button" class="layui-btn layui-btn-primary" @click="showSubmittedMaterials = !showSubmittedMaterials">
+        {{ showSubmittedMaterials ? '隐藏材料' : '查看已提交材料' }}
+      </button>
+    </div>
+    
+   
+    </div>
+     <!-- 审核中显示已提交材料（默认隐藏） -->
+    <div class="submitted-materials" v-if="showSubmittedMaterials">
+      <h4>已提交的认证材料：</h4>
+      <div class="layui-form-item">
+        <label class="layui-form-label" >真实姓名</label>
+        <div class="layui-input-block info-display">{{ realNameInfo.realName || '未填写' }}</div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label" >身份证号</label>
+        <div class="layui-input-block info-display">{{ maskIdCard(realNameInfo.idCard) || '未填写' }}</div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">身份证信息面</label>
+        <div class="layui-input-block">
+          <img v-if="realNameInfo.idCardFront" :src="realNameInfo.idCardFront" class="id-card-img" alt="身份证信息面">
+          <span v-else>未上传</span>
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label" >身份证国徽面</label>
+        <div class="layui-input-block">
+          <img v-if="realNameInfo.idCardBack" :src="realNameInfo.idCardBack" class="id-card-img" alt="身份证国徽面">
+          <span v-else>未上传</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            <div v-else>
-              <div class="layui-form-item">
-                <label class="layui-form-label">真实姓名</label>
-                <div class="layui-input-block">
-                  <input type="text" name="realName" v-model="realNameForm.realName" lay-verify="required"
-                    placeholder="请输入真实姓名" class="layui-input" />
-                </div>
-              </div>
+  <!-- 已认证状态 -->
+  <div v-if="realNameStatus === 'verified'">
+    <div class="verify-status">   
+    <div class="status-icon success">
+      <i class="layui-icon layui-icon-ok"></i>
+    </div>
+    <div class="status-text">
+      <h3>已实名认证</h3>
+      <p>您已完成实名认证，不可修改</p>
+    </div>
+    
+    <!-- 查看材料按钮 -->
+    <div class="view-materials-section">
+      <button type="button" class="layui-btn layui-btn-primary" @click="showSubmittedMaterials = !showSubmittedMaterials">
+        {{ showSubmittedMaterials ? '隐藏材料' : '查看认证材料' }}
+      </button>
+    </div>
+    </div>
+    <!-- 已认证显示已提交材料（默认隐藏） -->
+    <div class="submitted-materials" v-if="showSubmittedMaterials">
+      <h4>认证材料信息：</h4>
+      <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block info-display">{{ realNameInfo.realName || '未填写' }}</div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">身份证号</label>
+        <div class="layui-input-block info-display">{{ maskIdCard(realNameInfo.idCard) || '未填写' }}</div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">身份证信息面</label>
+        <div class="layui-input-block">
+          <img v-if="realNameInfo.idCardFront" :src="realNameInfo.idCardFront" class="id-card-img" alt="身份证信息面">
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">身份证国徽面</label>
+        <div class="layui-input-block">
+          <img v-if="realNameInfo.idCardBack" :src="realNameInfo.idCardBack" class="id-card-img" alt="身份证国徽面">
+        </div>
+      </div>
+    </div>
+  </div>
 
-              <div class="layui-form-item">
-                <label class="layui-form-label">身份证号</label>
-                <div class="layui-input-block">
-                  <input type="text" name="idCard" v-model="realNameForm.idCard" lay-verify="required|idCard"
-                    placeholder="请输入身份证号" class="layui-input" />
-                </div>
-              </div>
+  <!-- 未认证状态 -->
+  <div v-if="realNameStatus === 'unverified'">
+    <div class="layui-form-item">
+      <label class="layui-form-label">真实姓名</label>
+      <div class="layui-input-block">
+        <input type="text" name="realName" v-model="realNameForm.realName" lay-verify="required"
+          placeholder="请输入真实姓名" class="layui-input" />
+      </div>
+    </div>
 
-              <div class="layui-form-item">
-                <label class="layui-form-label">身份证照片</label>
-                <div class="layui-input-block">
-                  <button type="button" class="layui-btn" @click="selectIdCardPhoto('front')"
-                    style="background-color: #59d4c8; display: block">
-                    <i class="layui-icon layui-icon-upload"></i> 上传身份证信息面
-                  </button>
-                  <div v-if="realNameForm.idCardFront" class="id-card-preview">
-                    <img :src="realNameForm.idCardFront" alt="身份证个人信息面" class="id-card-img" />
-                    <p class="preview-label">身份证信息面预览</p>
-                  </div>
-                </div>
-              </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">身份证号</label>
+      <div class="layui-input-block">
+        <input type="text" name="idCard" v-model="realNameForm.idCard" lay-verify="required|idCard"
+          placeholder="请输入身份证号" class="layui-input" />
+      </div>
+    </div>
 
-              <div class="layui-form-item">
-                <label class="layui-form-label"></label>
-                <div class="layui-input-block">
-                  <button type="button" class="layui-btn" @click="selectIdCardPhoto('back')"
-                    style="background-color: #59d4c8; display: block">
-                    <i class="layui-icon layui-icon-upload"></i> 上传身份证国徽面
-                  </button>
-                  <div v-if="realNameForm.idCardBack" class="id-card-preview">
-                    <img :src="realNameForm.idCardBack" alt="身份证国徽面" class="id-card-img" />
-                    <p class="preview-label">身份证国徽面预览</p>
-                  </div>
-                </div>
-              </div>
-              <div class="layui-form-item">
-                <div class="layui-input-block">
-                  <button class="layui-btn btn-save" lay-submit lay-filter="submit-real-name">
-                    提交认证
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
+    <div class="layui-form-item">
+      <label class="layui-form-label">身份证照片</label>
+      <div class="layui-input-block">
+        <button type="button" class="layui-btn" @click="selectIdCardPhoto('front')"
+          style="background-color: #59d4c8; display: block">
+          <i class="layui-icon layui-icon-upload"></i> 上传身份证信息面
+        </button>
+        <div v-if="realNameForm.idCardFront" class="id-card-preview">
+          <img :src="realNameForm.idCardFront" alt="身份证个人信息面" class="id-card-img" />
+          <p class="preview-label">身份证信息面预览</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label"></label>
+      <div class="layui-input-block">
+        <button type="button" class="layui-btn" @click="selectIdCardPhoto('back')"
+          style="background-color: #59d4c8; display: block">
+          <i class="layui-icon layui-icon-upload"></i> 上传身份证国徽面
+        </button>
+        <div v-if="realNameForm.idCardBack" class="id-card-preview">
+          <img :src="realNameForm.idCardBack" alt="身份证国徽面" class="id-card-img" />
+          <p class="preview-label">身份证国徽面预览</p>
+        </div>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button class="layui-btn btn-save" lay-submit lay-filter="submit-real-name">
+          提交认证
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
 
           <!-- 修改密码表单 -->
           <form class="layui-form profile-form" v-if="currentTab === 2">
@@ -226,6 +306,8 @@
                 <button class="layui-btn btn-save" lay-submit lay-filter="change-password">
                   确认修改
                 </button>
+                <button class="layui-btn delete-btn" type="button" @click="cancelWord">取消修改</button>
+
               </div>
             </div>
           </form>
@@ -247,7 +329,7 @@
                 <div class="layui-form-item">
                   <label class="layui-form-label">收件人</label>
                   <div class="layui-input-block">
-                    <input type="text" v-model="addressForm.recipient" placeholder="请输入收件人姓名" class="layui-input" />
+                    <input type="text" v-model="addressForm.consignee" placeholder="请输入收件人姓名" class="layui-input" />
                   </div>
                 </div>
 
@@ -267,7 +349,7 @@
                 <div class="layui-form-item">
                   <label class="layui-form-label">详细地址</label>
                   <div class="layui-input-block">
-                    <textarea v-model="addressForm.detail" placeholder="请输入详细地址" class="layui-textarea"
+                    <textarea v-model="addressForm.detailAddress" placeholder="请输入详细地址" class="layui-textarea"
                       rows="3"></textarea>
                   </div>
                 </div>
@@ -297,30 +379,32 @@
             <div class="address-list" v-if="!showAddressForm && addressList.length > 0">
               <div class="address-item" v-for="address in addressList" :key="address.id">
                 <div class="address-header">
-                  <span class="recipient">{{ address.recipient }} {{ address.phone }}</span>
-                  <span class="default-tag" v-if="address.isDefault">默认地址</span>
+                  <span class="recipient">{{ address.consignee }} {{ address.phone }}</span>
+                  <span class="default-tag" v-if="!address.isDefault">默认地址</span>
                 </div>
                 <div class="address-content">
-                  {{ address.province }} {{ address.city }} {{ address.district }}
-                  {{ address.detail }}
+                  {{ getProvinceName(address.province) }} {{ getCityName(address.city) }} {{
+                    getDistrictName(address.district) }}
+                  {{ address.detailAddress }}
                 </div>
                 <div class="address-actions">
-                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="editAddress(address)">
+                  <button class="layui-btn btn-edit layui-btn-sm" @click="editAddress(address)">
                     编辑
                   </button>
-                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="deleteAddress(address.id)">
+                  <button class="layui-btn btn-delete layui-btn-sm" @click="deleteAddress(address.id)">
                     删除
                   </button>
                   <button class="layui-btn layui-btn-primary layui-btn-sm" @click="setDefaultAddress(address.id)"
-                    v-if="!address.isDefault">
+                    v-if="address.isDefault">
                     设为默认
                   </button>
                 </div>
               </div>
               <div class="pagination-container">
-                <el-pagination @current-change="handlePageChange" :current-page="addressPagination.currentPage"
+                <el-pagination @current-change="handlePageChange" @size-change="handleSizeChange"
+                  :page-sizes="[3, 5, 8, 10]" :current-page="addressPagination.currentPage"
                   :page-size="addressPagination.pageSize" :total="addressPagination.total"
-                  layout="prev, pager, next, jumper, ->, total" background />
+                  layout="sizes,prev, pager, next, jumper, ->, total" background />
               </div>
             </div>
 
@@ -338,15 +422,16 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, watch, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 // import axios from 'axios'
 import request from '../utils/request'
 import AddressSelect from '../components/AddressSelect.vue'
-// import { type } from 'os'
-
+import provincesData from 'china-division/dist/provinces.json';
+import citiesData from 'china-division/dist/cities.json';
+import districtsData from 'china-division/dist/areas.json';
 declare global {
   interface Window {
-    layui: any
+    layui: any // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 
@@ -359,14 +444,45 @@ const navItems = [
 ]
 
 // 状态管理
-const maxSignatureLength = 100
+
 const currentTab = ref(0)
-const isUploadingAvatar = ref(false)
 const isSendingCode = ref(false)
 const countDown = ref(60)
-const isChangingPhone = ref(false)
-const avatarInput = ref<HTMLInputElement | null>(null)
 const maxBirthdayDate = ref('')
+const showSubmittedMaterials = ref(false) 
+
+const realNameInfo = ref({
+  realName: '',
+  idCard: '',
+  idCardFront: '',
+  idCardBack: ''
+})
+const isMessageShowing = ref(false)
+const currentMessageInstance = ref<any>(null) // eslint-disable-line @typescript-eslint/no-explicit-any
+// 身份证号脱敏处理
+const maskIdCard = (idCard: string) => {
+  if (!idCard) return ''
+  return idCard.replace(/^(.{6})(?:\d+)(.{4})$/, '$1********$2')
+}
+const showMessage = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
+  // 如果已经有消息在显示，先关闭它
+  if (isMessageShowing.value && currentMessageInstance.value) {
+    currentMessageInstance.value.close()
+  }
+  
+  // 显示新消息
+  currentMessageInstance.value = ElMessage({
+    type,
+    message,
+    onClose: () => {
+      isMessageShowing.value = false
+      currentMessageInstance.value = null
+    }
+  })
+  
+  isMessageShowing.value = true
+  return currentMessageInstance.value
+}
 
 // 用户信息
 const userInfo = ref({
@@ -390,31 +506,51 @@ const formData = ref({
   email: '',
 })
 // 地址数据类型定义
+
 interface Address {
   id: string
-  recipient: string // 收件人
+  consignee: string // 收件人
   phone: string // 电话
   province: string // 省份
   city: string // 城市
   district: string // 区/县
-  detail: string // 详细地址
+  detailAddress: string // 详细地址
   isDefault: boolean // 是否默认地址
 }
-interface Address {
-  id: string
-  recipient: string // 收件人
-  phone: string // 电话
-  province: string // 省份
-  city: string // 城市
-  district: string // 区/县
-  detail: string // 详细地址
-  isDefault: boolean // 是否默认地址
+// 地址名称映射
+interface Area {
+  code: string
+  name: string
 }
 
+interface City extends Area {
+  provinceCode: string
+}
+
+interface District extends Area {
+  cityCode: string
+}
+// 获取省份名称
+const getProvinceName = (provinceCode: string) => {
+  const province = (provincesData as Area[]).find(p => p.code === provinceCode)
+  return province ? province.name : provinceCode
+}
+
+// 获取城市名称
+const getCityName = (cityCode: string) => {
+  const city = (citiesData as City[]).find(c => c.code === cityCode)
+  return city ? city.name : cityCode
+}
+
+// 获取区县名称
+const getDistrictName = (districtCode: string) => {
+  const district = (districtsData as District[]).find(d => d.code === districtCode)
+  return district ? district.name : districtCode
+}
 // 分页信息
 const addressPagination = ref({
   currentPage: 1,
-  pageSize: 10,
+  pageSize: 5,
   total: 0,
   pages: 1,
 })
@@ -423,15 +559,27 @@ const selectedAddress = ref({
   city: '',
   district: '',
 })
+const handlePageChange = (page: number) => {
+  console.log('切换到第', page, '页')
+  addressPagination.value.currentPage = page
+  getAddressList()
+}
+
+const handleSizeChange = (size: number) => {
+  console.log('每页条数变更为', size)
+  addressPagination.value.pageSize = size
+  addressPagination.value.currentPage = 1 // 重置到第一页
+  getAddressList()
+}
 
 // 地址表单数据
 const addressForm = ref<Partial<Address>>({
-  recipient: '',
+  consignee: '',
   phone: '',
   province: '',
   city: '',
   district: '',
-  detail: '',
+  detailAddress: '',
   isDefault: false,
 })
 
@@ -477,7 +625,7 @@ onMounted(() => {
     passwordForm.value.email = userInfo.value.email
     // 初始化表单验证
     if (window.layui) {
-      window.layui.use(['form', 'layer'], (form: any, layer: any) => {
+      window.layui.use(['form', 'layer'], (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
         form.verify({
           password: function (value: string) {
             const passwordReg =
@@ -546,7 +694,7 @@ onMounted(() => {
   watch(currentTab, () => {
     nextTick(() => {
       if (window.layui) {
-        window.layui.use('form', (form: any) => {
+        window.layui.use('form', (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
           form.render()
         })
       }
@@ -555,7 +703,13 @@ onMounted(() => {
         addressPagination.value.currentPage = 1
         getAddressList()
       }
+      if (currentTab.value === 1) {
+        getUserInfo()
+      }
     })
+  })
+  watch(realNameStatus,()=>{
+    showSubmittedMaterials.value = false
   })
 })
 
@@ -564,6 +718,9 @@ onUnmounted(() => {
   //   clearInterval(timer)
   // }
 })
+
+
+
 //发送验证码
 const sendVerificationCode = async () => {
   if (isSendingCode.value || countDown.value < 60) return
@@ -598,19 +755,17 @@ const sendVerificationCode = async () => {
       ElMessage.error(response.msg || '发送验证码失败，请稍后重试')
       isSendingCode.value = false
     }
-  } catch (error) {
+  } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
     ElMessage.error('发送验证码失败，请稍后重试')
     isSendingCode.value = false
+    console.log(error)
     if (countDown.value < 60) {
       stopCountDown()
     }
   }
 }
 
-const handlePageChange = (page: number) => {
-  addressPagination.value.currentPage = page
-  getAddressList()
-}
+
 // 开始倒计时
 const startCountDown = () => {
   countDown.value = 60
@@ -636,9 +791,9 @@ const getUserInfo = async () => {
   if (isFetching.value) return
   isFetching.value = true
   try {
-    // 从 localStorage 或其他地方获取 userId
+
     const userId = localStorage.getItem('userId') || ''
-    const token = localStorage.getItem('authToken') || ''
+  
 
     if (!userId) {
       window.layui?.layer.msg('用户未登录')
@@ -646,7 +801,6 @@ const getUserInfo = async () => {
     }
     const response = await request('/server/api/user/getUserInfo/userId', 'GET', {
       userId: userId,
-      // token: token,
     })
 
     if (response.code == 0) {
@@ -662,13 +816,39 @@ const getUserInfo = async () => {
         avatar: userData.avatar,
         email: userData.email,
       }
+       if (userData.status) {
+        realNameInfo.value = {
+          realName: userData.realNameInfo.realName,
+          idCard: userData.realNameInfo.idCard,
+          idCardFront: userData.realNameInfo.idCardFront,
+          idCardBack: userData.realNameInfo.idCardBack
+        }
+      }
 
       // 同步更新表单数据
       formData.value = { ...userInfo.value }
-
+      // 设置实名认证状态
+      if (userData.status !== undefined) {
+        // 根据后端返回的状态设置 realNameStatus
+        // 假设后端返回的 status 值含义：
+        // 0: 未认证, 1: 审核中, 2: 已认证
+        switch (userData.status) {
+          case 0:
+            realNameStatus.value = 'unverified'
+            break
+          case 1:
+            realNameStatus.value = 'pending'
+            break
+          case 2:
+            realNameStatus.value = 'verified'
+            break
+          default:
+            realNameStatus.value = 'unverified'
+        }
+      }
       // 重新渲染表单
       if (window.layui) {
-        window.layui.use('form', (form: any) => {
+        window.layui.use('form', (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
           form.render()
         })
       }
@@ -699,14 +879,10 @@ const getAddressList = async () => {
         pageNum: addressPagination.value.currentPage,
         pageSize: addressPagination.value.pageSize,
       },
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      },
+
     )
     console.log('获取地址列表成功:', response.data)
-    addressList.value = response.data.records || []
+    addressList.value = response.data.list || []
     addressPagination.value.total = response.data.total || 0
     addressPagination.value.pages = response.data.pages || 1
     // 如果是第一页且没有地址，则显示添加地址表单
@@ -723,7 +899,7 @@ const getAddressList = async () => {
 // 新增/编辑地址
 const saveAddress = async () => {
   // 表单验证
-  if (!addressForm.value.recipient) {
+  if (!addressForm.value.consignee) {
     ElMessage.error('请填写收件人')
     return
   }
@@ -747,61 +923,111 @@ const saveAddress = async () => {
     !addressForm.value.province ||
     !addressForm.value.city ||
     !addressForm.value.district ||
-    !addressForm.value.detail
+    !addressForm.value.detailAddress
   ) {
     ElMessage.error('请填写完整地址信息')
     return
   }
 
   try {
-    const addressData = {
-      consignee: addressForm.value.recipient,
+
+    const addressAdd = {
+      consignee: addressForm.value.consignee,
       phone: addressForm.value.phone,
       province: addressForm.value.province,
       city: addressForm.value.city,
       district: addressForm.value.district,
-      detailAddress: addressForm.value.detail,
+      detailAddress: addressForm.value.detailAddress,
       isDefault: addressForm.value.isDefault ? 0 : 1,
     }
+    const addressAddId = {
+      id: editingAddressId.value, // 单独的id
+      consignee: addressForm.value.consignee,
+      phone: addressForm.value.phone,
+      province: addressForm.value.province,
+      city: addressForm.value.city,
+      district: addressForm.value.district,
+      detailAddress: addressForm.value.detailAddress,
+      isDefault: addressForm.value.isDefault ? 0 : 1,
+    }
+    let response: any // eslint-disable-line @typescript-eslint/no-explicit-any
     if (editingAddressId.value) {
-      // 编辑地址
-      const response = await request(
-        `/server/api/user/updateUserAddress${editingAddressId.value}`,
-        'PUT',
-        addressData,
-      )
+      // 编辑地址  
+
+      response = await request(`/server/api/user/updateUserAddress?id=${editingAddressId.value}`, 'POST', addressAddId)
       console.log('编辑地址返回:', response)
-      ElMessage.success('地址更新成功')
+      if (response.code === 0) {
+        ElMessage.success('地址更新成功')
+      } else {
+        ElMessage.error(response.msg || '地址更新失败')
+        return
+      }
     } else {
-      console.log('新增地址数据:', addressData)
+      console.log('新增地址数据:', addressForm)
       // 新增地址
-      const response = await request('/server/api/user/addUserAddress', 'POST', addressData)
+      response = await request('/server/api/user/addUserAddress', 'POST', addressAdd)
       if (response.code === 0) {
         console.log('新增地址返回:', response)
         ElMessage.success('地址添加成功')
-        resetAddressForm()
-        getAddressList()
+
       } else {
         console.log('新增地址失败:', response)
+        return
       }
     }
+    resetAddressForm()
+    getAddressList()
   } catch (error) {
     // ElMessage.error('保存地址失败，请稍后重试')
     console.error('保存地址失败:', error)
   }
 }
 
-// 编辑地址
-const editAddress = (address: Address) => {
-  addressForm.value = { ...address }
-  editingAddressId.value = address.id
-  showAddressForm.value = true
+// 获取地址详细信息
+const editAddress = async (address: Address) => {
+  try {
+    // 调用后端接口获取地址详情
+    const response = await request(
+      '/server/api/user/UserAddressDetail',
+      'GET',
+      { id: address.id }
+    )
 
-  // 回显地址选择器数据
-  selectedAddress.value = {
-    province: address.province,
-    city: address.city,
-    district: address.district,
+    if (response.code === 0 && response.data) {
+      console.log('获取地址详情成功:', response.data)
+      // 成功获取地址详情后填充表单
+      const addressDetail = response.data
+      addressForm.value = {
+        consignee: addressDetail.consignee,
+        phone: addressDetail.phone,
+        province: addressDetail.province,
+        city: addressDetail.city,
+        district: addressDetail.district,
+        detailAddress: addressDetail.detailAddress,
+        isDefault: addressDetail.isDefault === 0 // 根据后端返回值调整
+      }
+
+      editingAddressId.value = addressDetail.id
+      showAddressForm.value = true
+
+//  const codes = getAddressCodeByName(
+//           addressDetail.province, 
+//           addressDetail.city, 
+//           addressDetail.district
+//         )
+        
+        // 回显地址选择器数据（使用编码）
+        selectedAddress.value = {
+          province: addressDetail.province,
+          city: addressDetail.city,
+          district: addressDetail.district,
+        }
+    } else {
+      ElMessage.error(response.msg || '获取地址详情失败')
+    }
+  } catch (error) {
+    console.error('获取地址详情失败:', error)
+    ElMessage.error('获取地址详情失败，请稍后重试')
   }
 }
 
@@ -814,12 +1040,29 @@ const deleteAddress = (id: string) => {
     },
     async (index: number) => {
       try {
-        // await axios.delete(`/api/user/addresses/${id}`)
-        window.layui.layer.close(index)
-        window.layui.layer.msg('地址已删除')
+       const response = await request(
+      '/server/api/user/deleteUserAddress',
+      'POST',
+      {
+        id: id,
+      },
+      {
+        headers: { 
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+      console.log('删除成功:', response)
+    if (response.code === 0) {
+      window.layui.layer.close(index)
+    ElMessage.success('地址删除成功!')
         getAddressList()
-      } catch (error) {
-        window.layui.layer.msg('删除失败，请稍后重试')
+    }      
+      } catch (error: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
+        console.error('删除失败:', error)
+        ElMessage.error('删除失败，请稍后重试')
+      }finally{
+        window.layui.layer.close(index) 
       }
     },
   )
@@ -828,23 +1071,41 @@ const deleteAddress = (id: string) => {
 // 设为默认地址
 const setDefaultAddress = async (id: string) => {
   try {
-    // await axios.patch(`/api/user/addresses/${id}/default`)
-    window.layui.layer.msg('已设为默认地址')
+     const response = await request(
+      '/server/api/user/setDefaultUserAddress',
+      'POST',
+      {
+        id: id,
+      },
+      {
+        headers: { 
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    )
+      console.log('设置默认地址成功:', response)
+    if (response.code === 0) {
+       ElMessage.success('默认地址更改成功')
     getAddressList()
+    }
+    else{
+      ElMessage.error('设置默认地址失败')
+    } 
   } catch (error) {
-    window.layui.layer.msg('操作失败，请稍后重试')
+
+    console.error('操作失败:', error)
   }
 }
 
 // 重置地址表单
 const resetAddressForm = () => {
   addressForm.value = {
-    recipient: '',
+    consignee: '',
     phone: '',
     province: '',
     city: '',
     district: '',
-    detail: '',
+    detailAddress: '',
     isDefault: false,
   }
   editingAddressId.value = ''
@@ -860,21 +1121,66 @@ const resetAddressForm = () => {
 
 // 取消编辑，恢复原始值
 const cancelEdit = () => {
+  const isBaseInfoModified =
+    formData.value.nickname !== userInfo.value.nickname ||
+    formData.value.sex !== userInfo.value.sex ||
+    formData.value.phone !== userInfo.value.phone ||
+    formData.value.birthday !== userInfo.value.birthday ||
+    formData.value.email !== userInfo.value.email;
+
+  // 如果没有修改，则直接返回，不执行后续操作
+  if (!isBaseInfoModified) {
+    ElMessage.info('您还没有进行任何修改')
+    return
+  }
+
+  // 如果有修改，则执行重置操作
   formData.value = { ...userInfo.value }
 
   if (window.layui) {
-    window.layui.use('form', (form: any) => {
+    window.layui.use('form', (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
       form.render()
     })
   }
 
-  window.layui.layer.msg('已恢复原始值')
+  ElMessage.success('已恢复原始值')
+}
+const cancelWord = () => {
+  // 判断密码表单是否有修改
+  const isPasswordFormModified =
+    passwordForm.value.oldPassword !== '' ||
+    passwordForm.value.newPassword !== '' ||
+    passwordForm.value.code !== '' ||
+    passwordForm.value.confirmPassword !== '';
+
+  // 如果没有修改，则直接返回，不执行后续操作
+  if (!isPasswordFormModified) {
+    ElMessage.info('您还没有进行任何修改')
+    return
+  }
+
+  // 如果有修改，则执行重置操作
+  passwordForm.value = {
+    oldPassword: '',
+    newPassword: '',
+    email: userInfo.value.email,
+    code: '',
+    confirmPassword: '',
+  }
+
+  if (window.layui) {
+    window.layui.use('form', (form: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+      form.render()
+    })
+  }
+
+  ElMessage.success('已恢复原始值')
 }
 
 // 处理签名输入
 
 // 头像上传相关
-interface Avatar { }
+
 
 const handleAvatarUpload = async (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0]
@@ -969,7 +1275,7 @@ const selectIdCardPhoto = (type: 'front' | 'back') => {
   fileInput.click()
   document.body.removeChild(fileInput)
 }
-// ... existing code ...
+
 
 const isUPing = ref(false)
 // 保存修改的基本信息
@@ -1012,7 +1318,8 @@ const saveBaseInfo = async () => {
     )
     if (response.code == 0) {
       console.log('保存基本信息:', response)
-      ElMessage.success('保存信息成功！')
+
+      showMessage( 'success','保存信息成功！')
       // 更新用户信息
       userInfo.value.nickname = formData.value.nickname
       userInfo.value.sex = formData.value.sex
@@ -1021,8 +1328,8 @@ const saveBaseInfo = async () => {
     } else {
       ElMessage.error(response.msg || '保存失败，请稍后重试')
     }
-  } catch (error: any) {
-    ElMessage.error(error.message || '保存失败，请稍后重试')
+  } catch (error: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
+    showMessage( 'error',error.message || '保存失败，请稍后重试')
   } finally {
     isUPing.value = false
   }
@@ -1031,12 +1338,16 @@ const saveBaseInfo = async () => {
 // 提交实名认证
 const submitRealName = async () => {
   if (!realNameForm.value.realName || !realNameForm.value.idCard) {
-    window.layui.layer.msg('请填写完整信息')
+    ElMessage.warning('请填写完整信息')
     return
   }
 
   if (!realNameForm.value.idCardFront || !realNameForm.value.idCardBack) {
-    window.layui.layer.msg('请上传身份证照片')
+    ElMessage.warning('请上传身份证照片')
+    return
+  }
+  if (!realNameForm.value.idCardFrontFile || !realNameForm.value.idCardBackFile) {
+    ElMessage.warning('身份证照片文件缺失，请重新上传')
     return
   }
 
@@ -1046,8 +1357,8 @@ const submitRealName = async () => {
     formData.append('realName', realNameForm.value.realName)
     formData.append('idCard', realNameForm.value.idCard)
     // 将正反面照片都添加到 otherFiles 数组中
-    // formData.append('otherFiles', realNameForm.value.idCardFrontFile)
-    // formData.append('otherFiles', realNameForm.value.idCardBackFile)
+    formData.append('otherFiles', realNameForm.value.idCardFrontFile)
+    formData.append('otherFiles', realNameForm.value.idCardBackFile)
     console.log('formData', formData)
     // 调用后端接口提交实名认证信息
     const response = await request('/server/api/user/userAuth', 'POST', formData, {
@@ -1058,7 +1369,13 @@ const submitRealName = async () => {
 
     if (response.code === 0) {
       realNameStatus.value = 'pending'
-      ElMessage.success('提交成功，等待审核')
+        realNameInfo.value = {
+        realName: realNameForm.value.realName,
+        idCard: realNameForm.value.idCard,
+        idCardFront: realNameForm.value.idCardFront,
+        idCardBack: realNameForm.value.idCardBack
+      }
+      ElMessage.success('实名认证提交成功，等待审核')
     } else {
       ElMessage.error(response.msg || '提交失败，请稍后重试')
     }
@@ -1133,7 +1450,138 @@ const logout = () => {
 }
 </script>
 
+
 <style scoped>
+/* 添加查看材料按钮样式 */
+.view-materials-section {
+  margin-left: 60px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.view-materials-section .layui-btn {
+  background-color: #fff;
+  border: 1px solid #fd9860;
+  color: #fd9860;
+}
+
+.view-materials-section .layui-btn:hover {
+  background-color: #fdf4ef;
+}
+
+
+
+.info-display {
+  height: 38px;
+  line-height: 38px;
+  padding: 0 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #e6e6e6;
+  border-radius: 2px;
+  color: #333;
+}
+
+.id-card-img {
+  max-width: 300px;
+  max-height: 200px;
+  margin-top: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+
+
+.submitted-materials {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed #eee;
+}
+
+.submitted-materials h4 {
+  margin-bottom: 15px;
+  color: #666;
+  font-size: 16px;
+}
+
+.info-display {
+  height: 38px;
+  line-height: 38px;
+  padding: 0 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #e6e6e6;
+  border-radius: 2px;
+  color: #333;
+}
+
+
+.id-card-img {
+  max-width: 300px;
+  max-height: 200px;
+  margin-top: 10px;
+  border: 1px solid #eee;
+  border-radius: 4px;
+}
+.show-photo{
+ position: absolute;
+    width: 67%;
+    height: 71%;
+    bottom: 8%;
+    right: -89%;
+}
+.show-photo img{
+  max-width: 100%;
+  max-height: 300px;
+}
+.show-photo-btn{
+  position: absolute;
+    width: 20%;
+    height: 20%;
+    bottom: 10%;
+    right: 10%;
+    background-color: #fff;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.show-photo-btn img{
+  width: 30%;
+  height: 30%;
+}
+.show-photo-btn:hover{
+  background-color: #f5f5f5;
+}
+.show-photo-btn:active{
+  background-color: #eee;
+}
+.show-photo-btn:focus{
+  outline: none;
+}
+.show-photo-btn:disabled{
+  cursor: not-allowed;
+}
+
+:deep(.layui-form-radio:hover>*, .layui-form-radioed, .layui-form-radioed>i) {
+  color: #fd9860;
+}
+
+:deep(.layui-form-radioed) {
+  color: #fd9860;
+}
+
+:deep(.layui-form-radioed>i) {
+  color: #fd9860;
+}
+
+.address-content {
+  color: #666;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
 .empty-address {
   margin-top: 2rem;
   text-align: center;
@@ -1239,7 +1687,7 @@ const logout = () => {
   background-color: #fd9860;
   color: white;
   padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 2px;
   font-size: 0.8rem;
 }
 
@@ -1281,6 +1729,31 @@ const logout = () => {
 .delete-btn:hover {
   border-color: #fd9860;
   color: #fd9860;
+}
+
+.btn-edit {
+  background-color: #409eff;
+  border-color: #409eff;
+  color: white;
+  min-width: 60px;
+}
+
+.btn-edit:hover {
+  background-color: #66b1ff;
+  border-color: #66b1ff;
+}
+
+/* 删除按钮样式 */
+.btn-delete {
+  background-color: #f44b4b;
+  border-color: #f44b4b;
+  color: white;
+  min-width: 60px;
+}
+
+.btn-delete:hover {
+  background-color: #fb7b7b;
+  border-color: #fb7b7b;
 }
 
 .layui-btn-primary:hover {
@@ -1346,8 +1819,8 @@ const logout = () => {
 
 .avatar-preview {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid #fff;
@@ -1419,7 +1892,7 @@ const logout = () => {
 /* 主体内容样式 */
 .profile-body {
   display: flex;
-  min-height: calc(100vh - 152px);
+  min-height: calc(100vh - 133px);
 }
 
 /* 侧边栏样式 */
@@ -1499,10 +1972,6 @@ const logout = () => {
   margin-bottom: 1.5rem;
 }
 
-.layui-form-label {
-  width: 100px;
-  font-weight: 500;
-}
 
 .btn-save {
   background-color: #fd9860;
@@ -1586,6 +2055,9 @@ const logout = () => {
   color: #999;
   background-color: #f5f5f5;
 }
+:deep(.layui-form-label) {
+    width: 101px !important;
+}
 
 /* 响应式调整 */
 @media (max-width: 768px) {
@@ -1614,8 +2086,6 @@ const logout = () => {
     border-bottom: 3px solid #fd9860;
   }
 
-  .layui-form-label {
-    width: 80px;
-  }
+
 }
 </style>

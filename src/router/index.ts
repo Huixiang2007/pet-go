@@ -19,6 +19,12 @@ const routes = [
     name: 'fosterBook',
     component: import('@/views/FosterBook.vue'),
   },
+  //寄养方管理
+  {
+    path: '/foster-manage',
+    name: 'fosterManage',
+    component: import('@/views/FosterManage.vue'),
+  },
   // 电商的首页
   {
     path: '/shop',
@@ -124,7 +130,7 @@ const routes = [
   },
   // 秒杀
   {
-    path: '/flash-sale' ,
+    path: '/flash-sale',
     name: 'FlashSale',
     component: () => import('@/views/Petshop/FlashSale.vue'),
   },
@@ -144,7 +150,7 @@ const routes = [
   {
     path: '/login',
     name: 'petLogin',
-    component: () => import('@/views/EnterPet/login.vue'),
+    component: () => import('@/views/EnterPet/LoginPet.vue'),
     meta: { title: '欢迎登录 PetGo' },
   },
   {
@@ -162,7 +168,7 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: () => import('@/views/EnterPet/Register.vue'),
+    component: () => import('@/views/EnterPet/RegisterPet.vue'),
     meta: { title: '欢迎注册 PetGo' },
   },
 
@@ -170,7 +176,7 @@ const routes = [
   {
     path: '/protocal',
     name: 'protocal',
-    component: () => import('@/views/EnterPet/Protocal.vue'),
+    component: () => import('@/views/EnterPet/ProtocalPage.vue'),
     meta: { title: '用户协议' },
   },
   //找回密码
@@ -183,15 +189,64 @@ const routes = [
   //个人中心
   {
     path: '/person',
-    name: 'personalCenter',
+    name: 'PersonalCenter',
     component: () => import('@/views/PersonalCenter.vue'),
     meta: { title: '个人中心' },
   },
+  //后台管理
   {
-    path: '/join-us',
-    name: 'joinUs',
-    component: () => import('@/views/JoinUs.vue'),
-    meta: { title: '加入我们' },
+    path: '/admin',
+    name: 'homePage',
+    component: () => import('@/views/admin/HomePage.vue'),
+    meta: { title: '后台管理' },
+    children: [
+      // 数据概览
+      {
+        path: 'dashboard',
+        name: 'dashboard',
+        component: () => import('@/views/admin/AllData.vue'),
+        meta: {
+          title: '数据概览',
+        },
+      },
+      // 用户管理
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/admin/AllUser.vue'),
+        meta: {
+          title: '用户管理',
+          icon: 'el-icon-user',
+        },
+      },
+      // 寄养服务管理
+      {
+        path: 'foster',
+        name: 'foster',
+        meta: {
+          title: '寄养服务管理',
+          icon: 'el-icon-house',
+        },
+        children: [
+          {
+            path: 'audit',
+            name: 'fosterAudit',
+            component: () => import('@/views/admin/AllJudge.vue'),
+            meta: {
+              title: '服务审核',
+            },
+          },
+          {
+            path: 'orders',
+            name: 'fosterOrder',
+            component: () => import('@/views/admin/AllOrder.vue'),
+            meta: {
+              title: '寄养订单',
+            },
+          },
+        ],
+      },
+    ],
   },
 ]
 

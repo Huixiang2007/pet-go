@@ -65,17 +65,9 @@
             <div class="layui-form-item">
               <label class="layui-form-label">生日</label>
               <div class="layui-input-block">
-                <el-date-picker
-                  class="custom-style"
-                  v-model="formData.birthday"
-                  type="date"
-                  name="birthday"
-                  placeholder="请选择生日日期"
-                  :max-date="new Date(maxBirthdayDate)"
-                  value-format="YYYY-MM-DD"
-                  style="width: 100%; height:37px;"
-                  :disabled-date="disabledDate"
-                />
+                <el-date-picker class="custom-style" v-model="formData.birthday" type="date" name="birthday"
+                  placeholder="请选择生日日期" :max-date="new Date(maxBirthdayDate)" value-format="YYYY-MM-DD"
+                  style="width: 100%; height:37px;" :disabled-date="disabledDate" />
               </div>
             </div>
 
@@ -100,12 +92,12 @@
                 <button class="layui-btn btn-save" lay-submit lay-filter="save-base-info">
                   保存修改
                 </button>
-                <button class="layui-btn delete-btn"  type="button" @click="cancelEdit">取消修改</button>
+                <button class="layui-btn delete-btn" type="button" @click="cancelEdit">取消修改</button>
               </div>
             </div>
             <div class="show-photo">
               <img src="@/assets/img/addPicture.png" alt="这是展示图片">
-              </div>
+            </div>
           </form>
 
           <!-- 实名认证表单 -->
@@ -237,7 +229,7 @@
                 <button class="layui-btn btn-save" lay-submit lay-filter="change-password">
                   确认修改
                 </button>
-                <button class="layui-btn delete-btn" type="button"  @click="cancelWord">取消修改</button>
+                <button class="layui-btn delete-btn" type="button" @click="cancelWord">取消修改</button>
 
               </div>
             </div>
@@ -260,12 +252,7 @@
                 <div class="layui-form-item">
                   <label class="layui-form-label">收件人</label>
                   <div class="layui-input-block">
-                    <input
-                      type="text"
-                      v-model="addressForm.consignee"
-                      placeholder="请输入收件人姓名"
-                      class="layui-input"
-                    />
+                    <input type="text" v-model="addressForm.consignee" placeholder="请输入收件人姓名" class="layui-input" />
                   </div>
                 </div>
 
@@ -285,12 +272,8 @@
                 <div class="layui-form-item">
                   <label class="layui-form-label">详细地址</label>
                   <div class="layui-input-block">
-                    <textarea
-                      v-model="addressForm.detailAddress"
-                      placeholder="请输入详细地址"
-                      class="layui-textarea"
-                      rows="3"
-                    ></textarea>
+                    <textarea v-model="addressForm.detailAddress" placeholder="请输入详细地址" class="layui-textarea"
+                      rows="3"></textarea>
                   </div>
                 </div>
 
@@ -323,42 +306,28 @@
                   <span class="default-tag" v-if="!address.isDefault">默认地址</span>
                 </div>
                 <div class="address-content">
-                  {{ getProvinceName(address.province) }} {{ getCityName(address.city)}} {{  getDistrictName(address.district)  }}
+                  {{ getProvinceName(address.province) }} {{ getCityName(address.city) }} {{
+                    getDistrictName(address.district) }}
                   {{ address.detailAddress }}
                 </div>
                 <div class="address-actions">
-                  <button
-                    class="layui-btn btn-edit layui-btn-sm"
-                    @click="editAddress(address)"
-                  >
+                  <button class="layui-btn btn-edit layui-btn-sm" @click="editAddress(address)">
                     编辑
                   </button>
-                  <button
-                    class="layui-btn btn-delete layui-btn-sm"
-                    @click="deleteAddress(address.id)"
-                  >
+                  <button class="layui-btn btn-delete layui-btn-sm" @click="deleteAddress(address.id)">
                     删除
                   </button>
-                  <button
-                    class="layui-btn layui-btn-primary layui-btn-sm"
-                    @click="setDefaultAddress(address.id)"
-                    v-if="address.isDefault"
-                  >
+                  <button class="layui-btn layui-btn-primary layui-btn-sm" @click="setDefaultAddress(address.id)"
+                    v-if="address.isDefault">
                     设为默认
                   </button>
                 </div>
               </div>
               <div class="pagination-container">
-                <el-pagination
-                  @current-change="handlePageChange"
-                   @size-change="handleSizeChange"
-                  :page-sizes="[3, 5, 8, 10]"
-                  :current-page="addressPagination.currentPage"
-                  :page-size="addressPagination.pageSize"
-                  :total="addressPagination.total"
-                  layout="sizes,prev, pager, next, jumper, ->, total"
-                  background
-                />
+                <el-pagination @current-change="handlePageChange" @size-change="handleSizeChange"
+                  :page-sizes="[3, 5, 8, 10]" :current-page="addressPagination.currentPage"
+                  :page-size="addressPagination.pageSize" :total="addressPagination.total"
+                  layout="sizes,prev, pager, next, jumper, ->, total" background />
               </div>
             </div>
 
@@ -380,7 +349,6 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 // import axios from 'axios'
 import request from '../utils/request'
 import AddressSelect from '../components/AddressSelect.vue'
-import { type } from 'os'
 import provincesData from 'china-division/dist/provinces.json';
 import citiesData from 'china-division/dist/cities.json';
 import districtsData from 'china-division/dist/areas.json';
@@ -627,7 +595,7 @@ onMounted(() => {
         addressPagination.value.currentPage = 1
         getAddressList()
       }
-       if (currentTab.value === 1) {
+      if (currentTab.value === 1) {
         getUserInfo()
       }
     })
@@ -736,7 +704,7 @@ const getUserInfo = async () => {
 
       // 同步更新表单数据
       formData.value = { ...userInfo.value }
-   // 设置实名认证状态
+      // 设置实名认证状态
       if (userData.status !== undefined) {
         // 根据后端返回的状态设置 realNameStatus
         // 假设后端返回的 status 值含义：
@@ -788,7 +756,7 @@ const getAddressList = async () => {
         pageNum: addressPagination.value.currentPage,
         pageSize: addressPagination.value.pageSize,
       },
-     
+
     )
     console.log('获取地址列表成功:', response.data)
     addressList.value = response.data.list || []
@@ -839,8 +807,8 @@ const saveAddress = async () => {
   }
 
   try {
-   
-     const addressAdd = {
+
+    const addressAdd = {
       consignee: addressForm.value.consignee,
       phone: addressForm.value.phone,
       province: addressForm.value.province,
@@ -849,7 +817,7 @@ const saveAddress = async () => {
       detailAddress: addressForm.value.detailAddress,
       isDefault: addressForm.value.isDefault ? 0 : 1,
     }
-     const addressAddId = {
+    const addressAddId = {
       id: editingAddressId.value, // 单独的id
       consignee: addressForm.value.consignee,
       phone: addressForm.value.phone,
@@ -862,10 +830,10 @@ const saveAddress = async () => {
     let response: any
     if (editingAddressId.value) {
       // 编辑地址  
-     
+
       response = await request(`/server/api/user/updateUserAddress?id=${editingAddressId.value}`, 'POST', addressAddId)
       console.log('编辑地址返回:', response)
-        if (response.code === 0) {
+      if (response.code === 0) {
         ElMessage.success('地址更新成功')
       } else {
         ElMessage.error(response.msg || '地址更新失败')
@@ -878,14 +846,14 @@ const saveAddress = async () => {
       if (response.code === 0) {
         console.log('新增地址返回:', response)
         ElMessage.success('地址添加成功')
-       
+
       } else {
         console.log('新增地址失败:', response)
         return
       }
     }
-     resetAddressForm()
-        getAddressList()
+    resetAddressForm()
+    getAddressList()
   } catch (error) {
     // ElMessage.error('保存地址失败，请稍后重试')
     console.error('保存地址失败:', error)
@@ -901,7 +869,7 @@ const editAddress = async (address: Address) => {
       'GET',
       { id: address.id }
     )
-    
+
     if (response.code === 0 && response.data) {
       // 成功获取地址详情后填充表单
       const addressDetail = response.data
@@ -914,7 +882,7 @@ const editAddress = async (address: Address) => {
         detailAddress: addressDetail.detailAddress,
         isDefault: addressDetail.isDefault === 0 // 根据后端返回值调整
       }
-      
+
       editingAddressId.value = addressDetail.id
       showAddressForm.value = true
 
@@ -988,7 +956,7 @@ const resetAddressForm = () => {
 
 // 取消编辑，恢复原始值
 const cancelEdit = () => {
-  const isBaseInfoModified = 
+  const isBaseInfoModified =
     formData.value.nickname !== userInfo.value.nickname ||
     formData.value.sex !== userInfo.value.sex ||
     formData.value.phone !== userInfo.value.phone ||
@@ -1014,7 +982,7 @@ const cancelEdit = () => {
 }
 const cancelWord = () => {
   // 判断密码表单是否有修改
-  const isPasswordFormModified = 
+  const isPasswordFormModified =
     passwordForm.value.oldPassword !== '' ||
     passwordForm.value.newPassword !== '' ||
     passwordForm.value.code !== '' ||
@@ -1212,7 +1180,7 @@ const submitRealName = async () => {
     ElMessage.warning('请上传身份证照片')
     return
   }
-    if (!realNameForm.value.idCardFrontFile || !realNameForm.value.idCardBackFile) {
+  if (!realNameForm.value.idCardFrontFile || !realNameForm.value.idCardBackFile) {
     ElMessage.warning('身份证照片文件缺失，请重新上传')
     return
   }
@@ -1312,23 +1280,26 @@ const logout = () => {
 </script>
 
 <style scoped>
-.show-photo{
- position: absolute;
-    width: 67%;
-    height: 71%;
-    bottom: 8%;
-    right: -84%;
+.show-photo {
+  position: absolute;
+  width: 67%;
+  height: 71%;
+  bottom: 8%;
+  right: -84%;
 }
 
 :deep(.layui-form-radio:hover>*, .layui-form-radioed, .layui-form-radioed>i) {
-    color: #fd9860;
+  color: #fd9860;
 }
+
 :deep(.layui-form-radioed) {
-    color: #fd9860;
+  color: #fd9860;
 }
+
 :deep(.layui-form-radioed>i) {
-    color: #fd9860;
+  color: #fd9860;
 }
+
 .address-content {
   color: #666;
   margin-bottom: 1rem;
@@ -1337,6 +1308,7 @@ const logout = () => {
   background-color: #f9f9f9;
   border-radius: 4px;
 }
+
 .empty-address {
   margin-top: 2rem;
   text-align: center;
@@ -1485,6 +1457,7 @@ const logout = () => {
   border-color: #fd9860;
   color: #fd9860;
 }
+
 .btn-edit {
   background-color: #409eff;
   border-color: #409eff;
@@ -1509,6 +1482,7 @@ const logout = () => {
   background-color: #fb7b7b;
   border-color: #fb7b7b;
 }
+
 .layui-btn-primary:hover {
   border-color: #fd9860;
   color: #fd9860;

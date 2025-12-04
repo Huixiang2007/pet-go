@@ -130,7 +130,7 @@ const request = <T = any>(
   //参数
   url: string,
   method: Method,
-  submitData: object,
+  submitData?: object,
   config: AxiosRequestConfig = {},
 ) => {
   //T, Data<T>分别表示请求数据类型（暂时用不到）和响应数据类型

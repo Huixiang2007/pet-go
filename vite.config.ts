@@ -28,14 +28,18 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
- server: {
-  proxy: {
-    '/server': {
-      target: 'http://8.131.100.56:8085',
-      changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/server/, ''), 
+  server: {
+    proxy: {
+      '/server': {
+        target: 'http://8.131.100.56:8085',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/server/, ''),
+      },
     },
-    // https: {},
   },
-}
+  build: {
+    rollupOptions: {
+      external: ['echarts'],
+    },
+  },
 })

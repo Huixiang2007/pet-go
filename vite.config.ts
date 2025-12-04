@@ -1,5 +1,5 @@
 // import { fileURLToPath, URL } from 'node:url'
-
+import path from 'path'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -25,24 +25,21 @@ export default defineConfig({
   resolve: {
     alias: {
       // '@': fileURLToPath(new URL('./src', import.meta.url))
-      '@': resolve(__dirname, './src'),
+      '@': path.resolve(__dirname, './src'),
     },
   },
- server: {
-  proxy: {
-    '/server': {
-      target: 'http://8.131.100.56:8085',
-      changeOrigin: true,
-      rewrite: (path) => path.replace(/^\/server/, ''),
+  server: {
+    proxy: {
+      '/server': {
+        target: 'http://8.131.100.56:8085',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/server/, ''),
+      },
     },
-    // https: {},
   },
-},
-build:{
-  rollupOptions: {
-    external: [
-    'echarts'
-    ],
+  build: {
+    rollupOptions: {
+      external: ['echarts'],
+    },
   },
-}
 })

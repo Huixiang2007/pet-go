@@ -27,7 +27,7 @@ export default defineComponent({
   },
   setup(props) {
     const captchaCanvasRef = ref<HTMLCanvasElement | null>(null)
-    let correctCode = ''
+    let correctCode = '1111'
 
     // 生成随机字符（4位字母数字）
     const getRandomCode = () => {

@@ -12,7 +12,7 @@
             <div class="flex flex-row gap-3">
               <el-input
                 placeholder="请输入商品名/商品编号"
-                v-model="input"
+
                 clearable
                 style="width: 200px"
               >
@@ -121,7 +121,7 @@
 
 <script lang="ts" setup>
 import { ref,reactive} from 'vue'
-import { ElMessage,FormInstance,FormRules } from 'element-plus'
+import { ElMessage,type FormInstance, type FormRules } from 'element-plus'
 
 
 interface TableRow {

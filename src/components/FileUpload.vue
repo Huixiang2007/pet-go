@@ -109,25 +109,25 @@ const handleDrop = (event: DragEvent) => {
 }
 
 const handleFileInput = (event: Event) => {
-    const input = event.target as HTMLInputElement
-    if (input.files && input.files.length > 0) {
-        const file = props.multiple ? Array.from(input.files) : input.files[0]
-        if (Array.isArray(file)) {
-            // 处理多个文件
-            const validFiles = file.filter(f => validateFile(f))
-            if (validFiles.length > 0) {
-                emit('update:modelValue', validFiles)
-                // 只预览第一个文件
-                processFile(validFiles[0]!)
-            }
-        } else {
-            // if (validateFile(file)) {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files.length > 0) {
+    // 单文件处理
+    if (!props.multiple) {
+      const file = input.files[0]! // 方案1：非空断言
+      if (validateFile(file)) {
+        emit('update:modelValue', file)
+        processFile(file)
+      }
+    }
+    // 多文件处理
+    else {
+  // if (validateFile(file)) {
             //     emit('update:modelValue', file)
             //     processFile(file)
             // }
         }
-        input.value = '' // 重置input，允许重新选择相同文件
-    }
+    input.value = ''
+  }
 }
 
 const validateFile = (file: File): boolean => {

@@ -147,7 +147,7 @@
 </template>
 
 <script setup lang="ts">
-import OrderCard, { Order } from '@/views/Petshop/OrderCard.vue';
+import OrderCard, {type Order } from '@/views/Petshop/OrderCard.vue';
 import Coupons from '@/views/Petshop/MyCoupons.vue';
 import Comments from '@/views/Petshop/MyComments.vue';
 import { ref, computed } from 'vue';

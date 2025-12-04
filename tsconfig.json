@@ -9,6 +9,7 @@
     }
   ],
   "compilerOptions": {
+    //  "strict": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
      "baseUrl": ".", // 基础路径（必须加）

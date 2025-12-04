@@ -69,7 +69,6 @@
                     type="text"
                     name="captcha"
                     value=""
-                    lay-verify="required"
                     placeholder="验证码"
                     lay-reqtext="请填写验证码"
                     autocomplete="off"
@@ -92,7 +91,7 @@
             >
           </div>
           <div class="layui-form-item">
-            <button class="layui-btn btn-donate" lay-submit lay-filter="demo-login">登录</button>
+            <button class="layui-btn btn-donate" lay-submit lay-filter="demo-login" >{{ loading ? '登录中...' : '登录' }}</button>
           </div>
           <div class="layui-form-item demo-login-other" style="text-align: right">
             <span @click="changeLoginType" class="register">
@@ -113,6 +112,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import Captcha from '../../components/CaptchaLoad.vue'
 const captchaRef = ref<InstanceType<typeof Captcha> | null>(null)
 import axios from 'axios'
+import { lo } from 'element-plus/es/locale'
 const isAccount = ref(true)
 
 // 定义登录表单数据类型
@@ -143,6 +143,7 @@ const changeLoginType = () => {
 let hideErrorTimer: number | null = null
 let layer: any
 onMounted(() => {
+  
   const loginInput = document.querySelector('input[name="loginId"]') as HTMLInputElement
   const passwordInput = document.querySelector('input[name="password"]') as HTMLInputElement
   const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
@@ -217,9 +218,8 @@ onMounted(() => {
       })
 
       form.on('submit(demo-login)', (data: any) => {
-    
+  
         handleLogin(data.field)
-       
         return false
       })
       form.render()
@@ -236,7 +236,30 @@ onUnmounted(() => {
   }
   loginFormRef.value = undefined
 })
+// 添加一个变量来跟踪当前是否有消息显示
+const isMessageShowing = ref(false)
+const currentMessageInstance = ref<any>(null)
 
+// 创建一个包装函数来控制 ElMessage 的显示
+const showMessage = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
+  // 如果已经有消息在显示，先关闭它
+  if (isMessageShowing.value && currentMessageInstance.value) {
+    currentMessageInstance.value.close()
+  }
+  
+  // 显示新消息
+  currentMessageInstance.value = ElMessage({
+    type,
+    message,
+    onClose: () => {
+      isMessageShowing.value = false
+      currentMessageInstance.value = null
+    }
+  })
+  
+  isMessageShowing.value = true
+  return currentMessageInstance.value
+}
 const router = useRouter()
 const toRegister = () => {
   router.push('/register')
@@ -248,19 +271,32 @@ const toForgotPassword = () => {
 const handleLogin = async (formData: LoginForm) => {
   if (loading.value) return
   loading.value = true
+   
+   
+     
 
   try {
     const rememberCheckbox = document.querySelector('input[name="remember"]') as HTMLInputElement
     const shouldRemember = rememberCheckbox?.checked || false
     const captchaInput = document.querySelector('input[name="captcha"]') as HTMLInputElement
     const captchaValue = captchaInput?.value.trim()
+ 
+      if (!captchaInput.value ) {
+     
+ showMessage('error', '请输入验证码')
+      loading.value = false
+          return
+      }
+   
     if (captchaRef.value && !captchaRef.value.validateCaptcha(captchaValue)) {
-      ElMessage.error('验证码错误，请重新输入')
+      showMessage('error', '验证码错误，请重新输入')
+       
+     
       // 刷新验证码
       if (captchaRef.value) {
         captchaRef.value.refreshCaptcha()
       }
-      // 清空验证码输入框
+     
       if (captchaInput) {
         captchaInput.value = ''
       }
@@ -310,9 +346,11 @@ const handleLogin = async (formData: LoginForm) => {
       localStorage.removeItem('rememberedPassword')
       localStorage.removeItem('rememberedLoginType')
     }
-    ElMessage.success('登录成功，欢迎进入PetGO!')
+    
+    showMessage('success', '登录成功，欢迎进入PetGO!')
     router.push('/person')
-  } else{const errorMsg = response.data.msg
+  } else{
+    const errorMsg = response.data.msg
       ElMessage.error(errorMsg)
       
       // 刷新验证码
@@ -320,16 +358,17 @@ const handleLogin = async (formData: LoginForm) => {
         captchaRef.value.refreshCaptcha()
       }
       // 清空验证码输入框
-   
+    
 
       if (captchaInput) {
         captchaInput.value = ''
-      }}
+      }
+     }
   }
   catch (error: any) {
     // 登录失败处理
-    let errorMsg = '登录失败，请稍后重试'
-   ElMessage.error(errorMsg)
+  //   let errorMsg = '登录失败，请稍后重试'
+  //  ElMessage.error(errorMsg)
     // errorMessage.value = errorMsg
     if (captchaRef.value) {
       captchaRef.value.refreshCaptcha()
@@ -339,9 +378,12 @@ const handleLogin = async (formData: LoginForm) => {
     if (captchaInput) {
       captchaInput.value = ''
     }
-    
+
   } finally {
+    // 确保总是重置loading状态
     loading.value = false
+     
+
   }
 }
 </script>

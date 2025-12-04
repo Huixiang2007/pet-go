@@ -103,13 +103,16 @@
                 <button class="layui-btn delete-btn"  type="button" @click="cancelEdit">取消修改</button>
               </div>
             </div>
+            <div class="show-photo">
+              <img src="@/assets/img/addPicture.png" alt="这是展示图片">
+              </div>
           </form>
 
           <!-- 实名认证表单 -->
           <form class="layui-form profile-form" v-if="currentTab === 1">
-            <div class="verify-status" v-if="realNameStatus !== 'unverified'">
+            <div class="verify-status" v-if="realNameStatus == 'unverified'">
               <div class="status-icon" :class="realNameStatus === 'verified' ? 'success' : 'pending'">
-                <i class="layui-icon" :class="realNameStatus === 'verified' ? 'layui-icon-ok-circle' : 'layui-icon-clock'
+                <i class="layui-icon" :class="realNameStatus === 'verified' ? 'layui-icon-ok' : 'layui-icon-log'
                   "></i>
               </div>
               <div class="status-text">
@@ -624,6 +627,9 @@ onMounted(() => {
         addressPagination.value.currentPage = 1
         getAddressList()
       }
+       if (currentTab.value === 1) {
+        getUserInfo()
+      }
     })
   })
 })
@@ -702,7 +708,7 @@ const getUserInfo = async () => {
   if (isFetching.value) return
   isFetching.value = true
   try {
-    // 从 localStorage 或其他地方获取 userId
+
     const userId = localStorage.getItem('userId') || ''
     const token = localStorage.getItem('authToken') || ''
 
@@ -712,7 +718,6 @@ const getUserInfo = async () => {
     }
     const response = await request('/server/api/user/getUserInfo/userId', 'GET', {
       userId: userId,
-      // token: token,
     })
 
     if (response.code == 0) {
@@ -731,7 +736,25 @@ const getUserInfo = async () => {
 
       // 同步更新表单数据
       formData.value = { ...userInfo.value }
-
+   // 设置实名认证状态
+      if (userData.status !== undefined) {
+        // 根据后端返回的状态设置 realNameStatus
+        // 假设后端返回的 status 值含义：
+        // 0: 未认证, 1: 审核中, 2: 已认证
+        switch (userData.idCardStatus) {
+          case 0:
+            realNameStatus.value = 'unverified'
+            break
+          case 1:
+            realNameStatus.value = 'pending'
+            break
+          case 2:
+            realNameStatus.value = 'verified'
+            break
+          default:
+            realNameStatus.value = 'unverified'
+        }
+      }
       // 重新渲染表单
       if (window.layui) {
         window.layui.use('form', (form: any) => {
@@ -839,11 +862,8 @@ const saveAddress = async () => {
     let response: any
     if (editingAddressId.value) {
       // 编辑地址  
-      const updateParams = {
-        id: editingAddressId.value, // 单独的id
-        row: addressAddId // 地址信息体
-      };
-      response = await request('/server/api/user/updateUserAddress', 'POST', addressAddId)
+     
+      response = await request(`/server/api/user/updateUserAddress?id=${editingAddressId.value}`, 'POST', addressAddId)
       console.log('编辑地址返回:', response)
         if (response.code === 0) {
         ElMessage.success('地址更新成功')
@@ -1184,12 +1204,16 @@ const saveBaseInfo = async () => {
 // 提交实名认证
 const submitRealName = async () => {
   if (!realNameForm.value.realName || !realNameForm.value.idCard) {
-    window.layui.layer.msg('请填写完整信息')
+    ElMessage.warning('请填写完整信息')
     return
   }
 
   if (!realNameForm.value.idCardFront || !realNameForm.value.idCardBack) {
-    window.layui.layer.msg('请上传身份证照片')
+    ElMessage.warning('请上传身份证照片')
+    return
+  }
+    if (!realNameForm.value.idCardFrontFile || !realNameForm.value.idCardBackFile) {
+    ElMessage.warning('身份证照片文件缺失，请重新上传')
     return
   }
 
@@ -1199,9 +1223,10 @@ const submitRealName = async () => {
     formData.append('realName', realNameForm.value.realName)
     formData.append('idCard', realNameForm.value.idCard)
     // 将正反面照片都添加到 otherFiles 数组中
-    // formData.append('otherFiles', realNameForm.value.idCardFrontFile)
-    // formData.append('otherFiles', realNameForm.value.idCardBackFile)
+    formData.append('otherFiles', realNameForm.value.idCardFrontFile)
+    formData.append('otherFiles', realNameForm.value.idCardBackFile)
     console.log('formData', formData)
+    console.log('提交数据:', realNameForm.value.realName)
     // 调用后端接口提交实名认证信息
     const response = await request('/server/api/user/userAuth', 'POST', formData, {
       headers: {
@@ -1287,6 +1312,13 @@ const logout = () => {
 </script>
 
 <style scoped>
+.show-photo{
+ position: absolute;
+    width: 67%;
+    height: 71%;
+    bottom: 8%;
+    right: -84%;
+}
 
 :deep(.layui-form-radio:hover>*, .layui-form-radioed, .layui-form-radioed>i) {
     color: #fd9860;

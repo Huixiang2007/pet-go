@@ -34,7 +34,7 @@
 
     <!-- 右侧：功能入口区 -->
     <div class="header-right">
-      <!-- 主题切换（简化写法，无自闭合） -->
+      <!-- 主题切换-->
       <el-dropdown trigger="click">
         <el-button icon="Moon" circle class="header-btn"></el-button>
         <template #dropdown>
@@ -134,13 +134,19 @@ import {
   Menu, Search, Moon, Bell, Check, User, Lock, 
   ArrowDown, ArrowUp 
 } from '@element-plus/icons-vue'
-
+interface NotificationItem {
+  type: string
+  title: string
+  content: string
+  time: string
+  read: boolean
+}
 // 其他逻辑（变量、方法）保持不变...
 const isMobile = ref(false)
 const sidebarOpened = ref(false)
 const searchValue = ref('')
 const unreadCount = ref(0)
-const notificationList = ref([])
+const notificationList = ref<NotificationItem[]>([])
 const userAvatar = ref('')
 const userName = ref('')
 
@@ -148,11 +154,11 @@ const handleSearch = () => {
   // 搜索逻辑
 }
 
-const getIconClass = (type) => {
+const getIconClass = (type: string) => {
   // 图标类名逻辑
 }
 
-const getIconComponent = (type) => {
+const getIconComponent = (type: string) => {
   // 图标组件逻辑
 }
 </script>

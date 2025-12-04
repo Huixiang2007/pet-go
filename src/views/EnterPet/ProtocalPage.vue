@@ -191,7 +191,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
@@ -203,7 +203,7 @@ const handleConfirm = () => {
   // 返回注册页
   router.push({
     path: '/register',
-    query: { isAgreed: isAgreed.value },
+    query: { isAgreed: isAgreed.value.toString() },
   })
   // 可在这里通过 pinia 或事件总线传递 "已同意协议" 的状态给注册页
 }

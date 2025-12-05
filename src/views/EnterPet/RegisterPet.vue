@@ -94,7 +94,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useRegisterStore,RegisterForm } from '../../stores/register'
+import { useRegisterStore, RegisterForm } from '../../stores/register'
 import ConfirmCode from '../../components/ConfirmCode.vue'
 const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> | null>(null)
 const registerStore = useRegisterStore()
@@ -106,7 +106,7 @@ const titleRegisterChars = '欢迎注册 PetGo'.split('')
 const isSending = ref(false)
 declare global {
   interface Window {
-    layui: any // eslint-disable-line @typescript-eslint/no-explicit-any
+    layui: any
   }
 }
 // 响应式状态管理
@@ -118,7 +118,7 @@ const handleInput = (key: keyof RegisterForm, value: string) => {
   registerStore.setField(key, value)
 }
 // 定时器管理（避免内存泄漏）
-let hideErrorTimer :NodeJS.Timeout | null = null
+let hideErrorTimer: NodeJS.Timeout | null = null
 
 /**
  * 处理协议勾选状态变化
@@ -127,13 +127,13 @@ const handleCheck = () => {
   // 勾选时立即隐藏错误提示
   if (isAgreed.value) {
     showError.value = false
- if (hideErrorTimer) clearTimeout(hideErrorTimer)
+    if (hideErrorTimer) clearTimeout(hideErrorTimer)
     return
   }
 
   // 未勾选时显示错误提示并定时隐藏
   showError.value = true
-  if (hideErrorTimer) clearTimeout(hideErrorTimer)// 清除旧定时器，防止多次触发
+  if (hideErrorTimer) clearTimeout(hideErrorTimer) // 清除旧定时器，防止多次触发
   hideErrorTimer = setTimeout(() => {
     showError.value = false
     hideErrorTimer = null // 清空定时器引用
@@ -242,8 +242,9 @@ onMounted(() => {
 
   if (window.layui) {
     isRegister.value = true
-    window.layui.use(['form', 'layer', 'util'], function (form:any ) {// eslint-disable-line @typescript-eslint/no-explicit-any
-      const  $ = window.layui.$
+    window.layui.use(['form', 'layer', 'util'], function (form: any) {
+
+      const $ = window.layui.$
 
       form.config.verifyOnBlur = true
       // 自定义验证规则
@@ -268,14 +269,14 @@ onMounted(() => {
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/, // 正则表达式
           '密码需8-20位，包含大小写字母、数字和特殊字符',
         ],
-        confirmPassword: function (value:string) {
+        confirmPassword: function (value: string) {
           const passwordValue = $('#reg-password').val()
           if (value !== passwordValue) {
             return '两次密码输入不一致'
           }
         },
       })
-      $('#reg-password').on('blur', function (this:HTMLElement) {
+      $('#reg-password').on('blur', function (this: HTMLElement) {
         const $this = $(this)
         $this.attr('lay-verify', 'password')
         form.validate(this) // 触发当前输入框的验证
@@ -286,9 +287,9 @@ onMounted(() => {
       let isForcedBlur = false
       $('#confirm-password')
         .off('blur')
-        .on('blur', function (this:HTMLElement) {
+        .on('blur', function (this: HTMLElement) {
           const $this = $(this)
-      
+
           if (isForcedBlur) {
             isForcedBlur = false // 重置标志
             return
@@ -316,7 +317,7 @@ onMounted(() => {
 
       // 提交事件
       form.on('submit(demo-reg)', function () {
-       // 获取表单字段值
+        // 获取表单字段值
 
         // 是否勾选同意
         if (!isAgreed.value) {

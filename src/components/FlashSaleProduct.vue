@@ -12,15 +12,22 @@
         class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
       />
 
-      <div class="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm">
+      <div
+        class="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm"
+      >
         秒杀
       </div>
 
-      <div v-if="product.stock <= 100" class="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md shadow-sm">
+      <div
+        v-if="product.stock <= 100"
+        class="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-md shadow-sm"
+      >
         仅剩{{ product.stock }}件
       </div>
 
-      <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+      <div
+        class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3"
+      >
         <div class="flex items-center justify-between text-xs text-white mb-1">
           <span>已抢 {{ product.sales }}/{{ product.totalStock }} 件</span>
           <span>{{ Math.round((product.sales / product.totalStock) * 100) }}%</span>
@@ -34,55 +41,56 @@
       </div>
     </div>
 
-  <div class="p-4">
-    <div class="mb-2">
-      <h3 class="font-medium text-gray-800 line-clamp-2 text-sm md:text-base h-10">
-        {{ product.title }}
-      </h3>
-    </div>
-
-    <div class="flex items-center text-xs text-gray-400 mb-3">
-      <i class="fa fa-shop mr-1"></i>
-      <span>{{ product.shopName }}</span>
-      <span class="mx-2">|</span>
-      <i class="fa fa-fire text-red-400 mr-1"></i>
-      <span>销量：{{ product.sales }}+</span>
-    </div>
-
-    <div class="flex justify-between items-center p-3 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-l-xl relative overflow-hidden">
-      <div class="flex items-center">
-        <span class="text-red-600 font-bold text-lg md:text-xl">¥{{ product.seckillPrice.toFixed(2) }}</span>
+    <div class="p-4">
+      <div class="mb-2">
+        <h3 class="font-medium text-gray-800 line-clamp-2 text-sm md:text-base h-10">
+          {{ product.title }}
+        </h3>
       </div>
- <div class="flex items-center ml-4">
-    <div
-      :style="{ clipPath: 'polygon(0 0, 100% 0, 90% 100%, 0% 100%)' }"
-      class="h-[40px] w-[100px] ml-[-10px] text-xs bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-0.5 font-medium flex items-center justify-center"
-    >
-    <i class="fa fa-arrow-down mr-2 text-white"></i>
-      直降
-      ¥{{ (product.originalPrice - product.seckillPrice).toFixed(2) }}
+
+      <div class="flex items-center text-xs text-gray-400 mb-3">
+        <i class="fa fa-shop mr-1"></i>
+        <span>{{ product.shopName }}</span>
+        <span class="mx-2">|</span>
+        <i class="fa fa-fire text-red-400 mr-1"></i>
+        <span>销量：{{ product.sales }}+</span>
+      </div>
+
+      <div
+        class="flex justify-between items-center p-3 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-l-xl relative overflow-hidden"
+      >
+        <div class="flex items-center">
+          <span class="text-red-600 font-bold text-lg md:text-xl"
+            >¥{{ product.seckillPrice.toFixed(2) }}</span
+          >
+        </div>
+        <div class="flex items-center ml-4">
+          <div
+            :style="{ clipPath: 'polygon(0 0, 100% 0, 90% 100%, 0% 100%)' }"
+            class="h-[40px] w-[100px] ml-[-10px] text-xs bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-0.5 font-medium flex items-center justify-center"
+          >
+            <i class="fa fa-arrow-down mr-2 text-white"></i>
+            直降 ¥{{ (product.originalPrice - product.seckillPrice).toFixed(2) }}
+          </div>
+          <button
+            class="w-[60px] h-[40px] z-80 bg-gradient-to-r from-orange-500 to-red-600 text-white flex items-center justify-center transition-all duration-300 hover:opacity-90 active:scale-95 shadow-md relative overflow-hidden z-10"
+            :class="{ 'animate-pulse': product.stock <= 10 }"
+            :style="{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }"
+            :disabled="product.sales >= product.totalStock"
+            @click.stop="handleBuyNow(product)"
+          >
+            <span
+              class="relative z-10 font-bold text-sm md:text-base"
+              :class="{ 'animate-pulse': product.stock <= 10 }"
+            >
+              <i class="fa fa-bell animate-bell"></i>
+              抢!
+            </span>
+          </button>
+        </div>
+      </div>
     </div>
-    <button
-      class="w-[60px] h-[40px] z-80 bg-gradient-to-r from-orange-500 to-red-600 text-white
-      flex items-center justify-center
-      transition-all duration-300 hover:opacity-90 active:scale-95
-      shadow-md relative overflow-hidden z-10"
-      :class="{ 'animate-pulse': product.stock <= 10 }"
-      :style="{ clipPath: 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' }"
-      :disabled="product.sales >= product.totalStock"
-      @click.stop="handleBuyNow(product)"
-    >
-      <span class="relative z-10 font-bold text-sm md:text-base" :class="{ 'animate-pulse': product.stock <= 10 }">
-        <i class="fa fa-bell animate-bell"></i>
-        抢!
-      </span>
-    </button>
   </div>
-  </div>
-
-  </div>
-  </div>
-
 </template>
 
 <script lang="ts" setup>
@@ -116,7 +124,7 @@ const flashProducts = ref<FlashProduct[]>([
     seckillPrice: 99.0,
     originalPrice: 199.0,
     totalStock: 3000,
-    stock: 3000
+    stock: 3000,
   },
   {
     id: 2,
@@ -129,7 +137,7 @@ const flashProducts = ref<FlashProduct[]>([
     seckillPrice: 129.0,
     originalPrice: 259.0,
     totalStock: 2000,
-    stock: 200
+    stock: 200,
   },
   {
     id: 3,
@@ -142,7 +150,7 @@ const flashProducts = ref<FlashProduct[]>([
     seckillPrice: 89.0,
     originalPrice: 169.0,
     totalStock: 5000,
-    stock: 50
+    stock: 50,
   },
   {
     id: 4,
@@ -155,8 +163,8 @@ const flashProducts = ref<FlashProduct[]>([
     seckillPrice: 69.0,
     originalPrice: 139.0,
     totalStock: 4000,
-    stock: 4
-    },
+    stock: 4,
+  },
   {
     id: 5,
     name: '宠物尿垫',
@@ -168,15 +176,14 @@ const flashProducts = ref<FlashProduct[]>([
     seckillPrice: 29.9,
     originalPrice: 59.9,
     totalStock: 10000,
-    stock: 100
-  }
+    stock: 100,
+  },
 ])
-
 
 const productsDeatil = (id: number) => {
   router.push({
     path: `/productDetail/${id}`,
-    query: { id: id }
+    query: { id: id },
   })
 }
 
@@ -200,23 +207,38 @@ button:disabled i {
   color: #a09f9f;
 }
 button:disabled:hover {
-opacity: 100;
-transform: scale(1.3);
+  opacity: 100;
+  transform: scale(1.3);
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.3); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
 }
 .animate-pulse {
   animation: pulse 1.5s infinite;
 }
 @keyframes bell {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(30deg); }
-  50% { transform: rotate(0deg); }
-  75% { transform: rotate(-30deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(30deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(-30deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
 }
 .animate-bell {
   animation: bell 0.7s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;

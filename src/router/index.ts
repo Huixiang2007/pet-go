@@ -169,6 +169,12 @@ const routes = [
     name: 'addPet',
     component: () => import('@/views/AddPet.vue'),
   },
+  //加入我们
+  {
+    path: '/join-us',
+    name: 'joinUs',
+    component: () => import('@/views/JoinUs.vue'),
+  },
   //注册
   {
     path: '/register',
@@ -206,10 +212,11 @@ const routes = [
     meta: { title: '后台管理' },
     children: [
       // 数据概览
+
       {
         path: 'dashboard',
         name: 'dashboard',
-        component: () => import('@/views/admin/AllData.vue'),
+        component: () => import('@/views/admin/AllCompete.vue'),
         meta: {
           title: '数据概览',
         },

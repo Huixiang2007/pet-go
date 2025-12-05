@@ -2,8 +2,8 @@
     <div class="w-full">
         <el-table :data="records" border class="mb-4" :header-cell-style="{
             'background-color': '#f0f7ff',
-            'color': '#0277bd',
-            'font-weight': 'bold'
+            color: '#0277bd',
+            'font-weight': 'bold',
         }">
             <el-table-column v-for="column in columns" :key="column.prop" :prop="column.prop" :label="column.label"
                 align="center">
@@ -24,71 +24,71 @@
     </div>
 </template>
 
-<script setup lang="ts" generic="T">
-import { defineProps, computed } from 'vue';
-type DateString = `${number}-${number}-${number}`;
+<script setup lang="ts">
+import { defineProps, computed } from 'vue'
+type DateString = `${number}-${number}-${number}`
 interface HealthRecords {
     // 疫苗
     vaccine: Array<{
-        type: string,
-        date: DateString,
+        type: string
+        date: DateString
         nextReminder?: DateString
-    }>;
+    }>
     // 驱虫
     deworming: Array<{
-        medicine: string,
-        date: string,
+        medicine: string
+        date: string
         nextReminder?: string
     }>
     //病历
     medical: Array<{
-        hospital: string,
-        diagnosis: string,//诊断
-        medicine: string,
+        hospital: string
+        diagnosis: string //诊断
+        medicine: string
         date: string
     }>
 }
 interface TableColumn {
-    prop: string;
-    label: string;
+    prop: string
+    label: string
 }
 //子组件通过definProps接受父组件传递的两个属性:records和columns
 const props = defineProps<{
-    records?: T[];// T 是泛型，由父组件传递的 records 类型推导
-    columns: TableColumn[];
-}>();
+    records?: HealthRecords[]
+    columns: TableColumn[]
+}>()
 
-const emit = defineEmits<{
-    'add-record': [];
-    'edit-record': [index: number];
-}>();
+// const emit = defineEmits<{
+//     'add-record': [];
+//     'edit-record': [index: number];
+// }>();
 console.log(props.records)
 const formattedRecords = computed(() => {
-    return props.records?.map(record => {
+    return props.records?.map((record) => {
         console.log(record)
-        //使用类型守卫判断record是否为对象
         if (typeof record === 'object' && record !== null && !Array.isArray(record)) {
-            const formatted: Record<string, string> = {};
+            const formatted: Record<string, string> = {}
             Object.entries(record).forEach(([key, value]) => {
                 // 格式化日期
                 if ((key.includes('date') || key.includes('Reminder')) && value) {
                     try {
-                        const date = new Date(value as string);
+                        const date = new Date(value as string)
                         if (!isNaN(date.getTime())) {
-                            formatted[key] = date.toLocaleDateString('zh-CN');
+                            formatted[key] = date.toLocaleDateString('zh-CN')
                         } else {
-                            formatted[key] = value as string;
+                            formatted[key] = value as string
                         }
                     } catch {
-                        formatted[key] = value as string;
+                        formatted[key] = value as string
                     }
                 } else {
-                    formatted[key] = value as string || '-';
+                    formatted[key] = (value as string) || '-'
                 }
-            });
-            return formatted;
+            })
+            return formatted
         }
-    });
-});
+
+    })
+})
 console.log(formattedRecords.value)
 </script>

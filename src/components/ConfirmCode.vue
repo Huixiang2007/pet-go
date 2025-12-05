@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch,  onUnmounted, readonly } from 'vue'
+import { defineComponent, ref, computed, watch, onUnmounted, readonly } from 'vue'
 import { ElMessage } from 'element-plus'
 
 export default defineComponent({

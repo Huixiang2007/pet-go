@@ -226,10 +226,7 @@
           <p class="mt-4 text-lg text-gray-500">抱歉，没有找到相关商品</p>
           <p class="text-gray-400 mt-2">请尝试其他关键词或筛选条件</p>
           <button
-            @click="
-              keywords = '',
-              SearchProducts()
-            "
+            @click="((keywords = ''), SearchProducts())"
             class="mt-4 px-6 py-2 bg-[#f5a623] text-white rounded-md hover:bg-[#e09612]"
           >
             清空搜索条件

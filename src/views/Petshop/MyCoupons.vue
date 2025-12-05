@@ -6,14 +6,14 @@
       class="coupon-card bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative"
     >
       <div class="absolute top-3 right-3 text-accent/30">
-          <i class="fa fa-times text-xl mr-4 cursor-pointer text-gray-200 hover:text-gray-500"></i>
+        <i class="fa fa-times text-xl mr-4 cursor-pointer text-gray-200 hover:text-gray-500"></i>
         <i class="fa fa-paw text-2xl"></i>
       </div>
       <div class="mb-4">
-        <span class="text-4xl font-bold text-[#FF7043]">¥{{coupon.price}}</span>
-        <span class="text-gray-500 ml-2">满{{coupon.total}}可用</span>
-        <p class="text-xs text-gray-400 mt-2">有效期至 {{coupon.expire || '长期有效'}}</p>
-        <p class="text-gray-500 mt-2">{{coupon.desc}}</p>
+        <span class="text-4xl font-bold text-[#FF7043]">¥{{ coupon.price }}</span>
+        <span class="text-gray-500 ml-2">满{{ coupon.total }}可用</span>
+        <p class="text-xs text-gray-400 mt-2">有效期至 {{ coupon.expire || '长期有效' }}</p>
+        <p class="text-gray-500 mt-2">{{ coupon.desc }}</p>
       </div>
       <button
         class="w-full bg-[#FF7043] hover:bg-[#FF7043]/90 text-white py-2 rounded-full text-sm transition-colors"
@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref} from 'vue'
+import { ref } from 'vue'
 const couponList = ref([
   {
     id: '1',
@@ -55,9 +55,8 @@ const couponList = ref([
     total: 200,
     status: '已过期',
     statusType: 'expired',
-  }
+  },
 ])
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -22,12 +22,7 @@
         class="search-input"
       >
         <template #append>
-          <el-button
-            icon="Search"
-            type="primary"
-            size="small"
-            @click="handleSearch"
-          ></el-button>
+          <el-button icon="Search" type="primary" size="small" @click="handleSearch"></el-button>
         </template>
       </el-input>
     </div>
@@ -70,7 +65,7 @@
                 v-for="(item, index) in notificationList"
                 :key="index"
                 class="notification-item"
-                :class="{ 'unread': !item.read }"
+                :class="{ unread: !item.read }"
               >
                 <div class="notification-icon">
                   <el-icon :class="getIconClass(item.type)">
@@ -127,7 +122,7 @@
 </template>
 
 <!-- 注意：如果使用的是 Element Plus（Vue 3），需要确保图标已导入，可在 script 中添加： -->
-<script  setup lang="ts">
+<script setup lang="ts">
 import { ref } from 'vue'
 // 导入所需图标（根据你的 Element 版本调整，Element Plus 需手动导入）
 
@@ -161,7 +156,7 @@ const getIconComponent = (type: string) => {
 </script>
 <script lang="ts">
 export default {
-  name: 'userHeader' // 名字随便填，核心是触发导出
+  name: 'userHeader', // 名字随便填，核心是触发导出
 }
 </script>
 <style scoped lang="scss">
@@ -352,11 +347,11 @@ export default {
   .header-search {
     display: none;
   }
-  
+
   .user-name {
     display: none;
   }
-  
+
   .notification-panel {
     width: 300px;
   }

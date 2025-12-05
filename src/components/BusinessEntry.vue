@@ -3,7 +3,7 @@
     <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm p-6 md:p-10">
       <form class="space-y-8">
         <!-- 商铺基本信息 -->
-                  <div class="space-y-4">
+        <div class="space-y-4">
           <div class="flex items-center border-b border-purple-100 pb-2">
             <i class="fa fa-store text-purple-600 text-xl mr-3"></i>
             <h2 class="text-xl font-semibold text-gray-800">商铺基本信息</h2>
@@ -14,25 +14,32 @@
               <label for="shop-name" class="block text-sm font-medium text-gray-700">
                 商铺名称 <span class="text-red-500">*</span>
               </label>
-              <input type="text" id="shop-name" v-model="form.shopName"
+              <input
+                type="text"
+                id="shop-name"
+                v-model="form.shopName"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                placeholder="请输入商铺名称" required />
+                placeholder="请输入商铺名称"
+                required
+              />
             </div>
             <div class="space-y-2">
               <label for="shop-type" class="block text-sm font-medium text-gray-700">
                 店铺类型 <span class="text-red-500">*</span>
               </label>
-              <select id="shop-type" v-model="form.shopType"
+              <select
+                id="shop-type"
+                v-model="form.shopType"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none bg-white"
                 required>
                <option value="" class="text-gray-400">请选择店铺类型</option>
   <option value="个人店">个人店</option>
   <option value="企业店">企业店</option>
   <option value="旗舰店">旗舰店</option>
+
               </select>
             </div>
           </div>
-
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2">
@@ -99,17 +106,27 @@
               <label for="contact-name" class="block text-sm font-medium text-gray-700">
                 联系人姓名 <span class="text-red-500">*</span>
               </label>
-              <input type="text" id="contact-name" v-model="form.contactName"
+              <input
+                type="text"
+                id="contact-name"
+                v-model="form.contactName"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                placeholder="请输入联系人姓名" required />
+                placeholder="请输入联系人姓名"
+                required
+              />
             </div>
             <div class="space-y-2">
               <label for="contact-phone" class="block text-sm font-medium text-gray-700">
                 联系人电话 <span class="text-red-500">*</span>
               </label>
-              <input type="tel" id="contact-phone" v-model="form.contactPhone"
+              <input
+                type="tel"
+                id="contact-phone"
+                v-model="form.contactPhone"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                placeholder="请输入联系人电话" required />
+                placeholder="请输入联系人电话"
+                required
+              />
             </div>
           </div>
 
@@ -117,9 +134,14 @@
             <label for="contact-email" class="block text-sm font-medium text-gray-700">
               联系人邮箱 <span class="text-red-500">*</span>
             </label>
-            <input type="email" id="contact-email" v-model="form.contactEmail"
+            <input
+              type="email"
+              id="contact-email"
+              v-model="form.contactEmail"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-              placeholder="请输入联系人邮箱" required />
+              placeholder="请输入联系人邮箱"
+              required
+            />
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
@@ -182,26 +204,26 @@
             <h2 class="text-xl font-semibold text-gray-800">商铺地址信息</h2>
           </div>
 
-           <div class="mb-4">
-    <label class="block text-sm font-medium text-gray-700 mb-2">
-      选择地区 <span class="text-red-500">*</span>
-    </label>
-    <AddressSelect
-      v-model="addressObject"
-      class="w-full border rounded-xl p-3"
-    />
-    <div class="text-xs text-gray-500 mt-1">
-      当前选择: {{ addressDisplayText }}
-    </div>
-  </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              选择地区 <span class="text-red-500">*</span>
+            </label>
+            <AddressSelect v-model="addressObject" class="w-full border rounded-xl p-3" />
+            <div class="text-xs text-gray-500 mt-1">当前选择: {{ addressDisplayText }}</div>
+          </div>
 
           <div class="space-y-2">
             <label for="address" class="block text-sm font-medium text-gray-700">
               详细地址 <span class="text-red-500">*</span>
             </label>
-            <input type="text" id="address" v-model="form.address"
+            <input
+              type="text"
+              id="address"
+              v-model="form.address"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-              placeholder="请输入详细地址" required />
+              placeholder="请输入详细地址"
+              required
+            />
           </div>
         </div>
 
@@ -216,9 +238,12 @@
             <label class="block text-sm font-medium text-gray-700">
               商铺介绍 <span class="text-red-500">*</span>
             </label>
-            <textarea v-model="form.description"
+            <textarea
+              v-model="form.description"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
-              placeholder="请输入商铺介绍" required></textarea>
+              placeholder="请输入商铺介绍"
+              required
+            ></textarea>
           </div>
         </div>
 
@@ -226,11 +251,12 @@
         <div class="mt-8">
           <button
             class="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl hover:from-purple-700 hover:to-purple-600 active:from-purple-800 active:to-purple-700 transition-all shadow-md hover:shadow-lg"
-            type="button" @click="submitForm" :disabled="isSubmitting">
+            type="button"
+            @click="submitForm"
+            :disabled="isSubmitting"
+          >
             <span v-if="!isSubmitting">提交申请</span>
-            <span v-if="isSubmitting">
-              <i class="fa fa-spinner fa-spin mr-2"></i>提交中...
-            </span>
+            <span v-if="isSubmitting"> <i class="fa fa-spinner fa-spin mr-2"></i>提交中... </span>
           </button>
           <p class="text-center text-gray-500 text-sm mt-4">
             提交后将在1-3个工作日内审核，请保持电话畅通
@@ -269,7 +295,7 @@ const imagePreviews = ref({
 const addressObject = ref({
   province: '',
   city: '',
-  district: ''
+  district: '',
 })
 
 // 表单数据
@@ -283,14 +309,18 @@ const form = reactive({
   city: '',
   district: '',
   address: '',
-  description: ''
+  description: '',
 })
 // 监听地址对象变化，同步到表单
-watch(addressObject, (newValue) => {
-  form.province = newValue.province
-  form.city = newValue.city
-  form.district = newValue.district
-}, { deep: true })
+watch(
+  addressObject,
+  (newValue) => {
+    form.province = newValue.province
+    form.city = newValue.city
+    form.district = newValue.district
+  },
+  { deep: true },
+)
 
 // 计算属性：地址显示文本
 const addressDisplayText = computed(() => {
@@ -302,18 +332,18 @@ const addressDisplayText = computed(() => {
 
   try {
     // 获取省份名称
-    const province = provincesData.find(p => p.code === addressObject.value.province)
+    const province = provincesData.find((p) => p.code === addressObject.value.province)
     provinceName = province ? province.name : `未知(${addressObject.value.province})`
 
     // 获取城市名称
     if (addressObject.value.city) {
-      const city = citiesData.find(c => c.code === addressObject.value.city)
+      const city = citiesData.find((c) => c.code === addressObject.value.city)
       cityName = city ? city.name : `未知(${addressObject.value.city})`
     }
 
     // 获取区县名称
     if (addressObject.value.district) {
-      const district = districtsData.find(d => d.code === addressObject.value.district)
+      const district = districtsData.find((d) => d.code === addressObject.value.district)
       districtName = district ? district.name : `未知(${addressObject.value.district})`
     }
   } catch (error) {
@@ -329,7 +359,7 @@ const getFieldName = (type: string): string => {
     businessLicense: '营业执照',
     idCardFront: '身份证正面',
     idCardBack: '身份证反面',
-    otherDocs: '其他证件'
+    otherDocs: '其他证件',
   }
   return names[type] || type
 }
@@ -338,7 +368,7 @@ const imageData = ref({
   businessLicense: '',
   idCardFront: '',
   idCardBack: '',
-  otherDocs: ''
+  otherDocs: '',
 })
 // 文件上传处理函数 - 修改为存储base64字符串
 const handleFileChange = async (dataUrl:string, type: keyof typeof imageData.value) => {
@@ -360,7 +390,6 @@ const handleFileChange = async (dataUrl:string, type: keyof typeof imageData.val
   }
 }
 
-
 // 表单验证函数
 const validateForm = (): boolean => {
   // 基础字段验证
@@ -374,7 +403,7 @@ const validateForm = (): boolean => {
     { value: form.city, field: '所在城市' },
     { value: form.district, field: '所在区县' },
     { value: form.address, field: '详细地址' },
-    { value: form.description, field: '商铺介绍' }
+    { value: form.description, field: '商铺介绍' },
   ]
 
   // 验证必填字段
@@ -386,11 +415,11 @@ const validateForm = (): boolean => {
   }
 
   // 文件验证
-const requiredImages = [
+  const requiredImages = [
     { value: imageData.value.shopAvatar, field: '商铺头像' },
     { value: imageData.value.businessLicense, field: '营业执照' },
     { value: imageData.value.idCardFront, field: '身份证正面' },
-    { value: imageData.value.idCardBack, field: '身份证反面' }
+    { value: imageData.value.idCardBack, field: '身份证反面' },
   ]
 
   // 验证必填文件
@@ -423,7 +452,6 @@ const submitForm = async () => {
   // 验证表单
   if (!validateForm() || isSubmitting.value) return
 
-
   try {
     let provinceName = ''
     let cityName = ''
@@ -431,105 +459,103 @@ const submitForm = async () => {
 
     // 获取省份名称
     if (addressObject.value.province) {
-      const province = provincesData.find(p => p.code === addressObject.value.province)
+      const province = provincesData.find((p) => p.code === addressObject.value.province)
       provinceName = province ? province.name : ''
     }
 
     // 获取城市名称
     if (addressObject.value.city) {
-      const city = citiesData.find(c => c.code === addressObject.value.city)
+      const city = citiesData.find((c) => c.code === addressObject.value.city)
       cityName = city ? city.name : ''
     }
 
     // 获取区县名称
     if (addressObject.value.district) {
-      const district = districtsData.find(d => d.code === addressObject.value.district)
+      const district = districtsData.find((d) => d.code === addressObject.value.district)
       districtName = district ? district.name : ''
     }
 
+    const userId = Number(localStorage.getItem('userId'))
 
-const userId = Number(localStorage.getItem('userId'))
+    const data = {
+      userId: userId,
+      shopName: form.shopName,
+      shopType: form.shopType,
+      contactName: form.contactName,
+      contactPhone: form.contactPhone,
+      contactEmail: form.contactEmail,
 
-    const data={
-      shopName:form.shopName,
-      shopType:form.shopType,
+      province: provinceName,
+      city: cityName,
+      district: districtName,
 
-      contactName:form.contactName,
-      contactPhone:form.contactPhone,
-      contactEmail:form.contactEmail,
+      address: form.address,
+      description: form.description,
+      shopAvatar: imageData.value.shopAvatar,
 
-      province:provinceName,
-      city:cityName,
-      district:districtName,
-
-      address:form.address,
-      description:form.description,
-      shopAvatar:imageData.value.shopAvatar,
-
-      businessLicense:imageData.value.businessLicense,
-      idCardFront:imageData.value.idCardFront,
-      idCardBack:imageData.value.idCardBack,
+      businessLicense: imageData.value.businessLicense,
+      idCardFront: imageData.value.idCardFront,
+      idCardBack: imageData.value.idCardBack,
     }
-      console.log('FormData内容:')
-  console.log(data)
-  console.log(typeof(userId))
-  console.log(typeof(form.shopName))
-  console.log(typeof(form.shopType))
+    console.log('FormData内容:')
+    console.log(data)
+    console.log(typeof userId)
+    console.log(typeof form.shopName)
+    console.log(typeof form.shopType)
 
-  console.log(typeof(form.contactName))
-  console.log(typeof(form.contactPhone))
-  console.log(typeof(form.contactEmail))
+    console.log(typeof form.contactName)
+    console.log(typeof form.contactPhone)
+    console.log(typeof form.contactEmail)
 
-  console.log(typeof(provinceName))
-  console.log(typeof(cityName))
-  console.log(typeof(districtName))
+    console.log(typeof provinceName)
+    console.log(typeof cityName)
+    console.log(typeof districtName)
 
+    console.log(typeof form.address)
+    console.log(typeof form.description)
+    console.log(typeof imageData.value.shopAvatar)
 
-  console.log(typeof(form.address))
-  console.log(typeof(form.description))
-  console.log(typeof(imageData.value.shopAvatar))
-
-  console.log(typeof(imageData.value.businessLicense))
-  console.log(typeof(imageData.value.idCardFront))
-  console.log(typeof(imageData.value.idCardBack))
+    console.log(typeof imageData.value.businessLicense)
+    console.log(typeof imageData.value.idCardFront)
+    console.log(typeof imageData.value.idCardBack)
 
     // 发送请求
-    axios.request({
-      url: '/server/api/shop/shops/test',
-      method: 'POST',
-      data: data
-    })
-    .then(response => {
-      // 处理成功响应
-      ElMessage.success('提交成功，等待审核！')
-    console.log('提交成功', response.data)
-
-    }).catch(error => {
-      // 处理错误
-      console.log('提交失败:', error.response.data)
-      ElMessage.error('提交失败，请稍后重试。')
-    })
-.finally(() => {
-    // 重置提交状态
-    isSubmitting.value = true
-  })
-}catch (error) {
+    axios
+      .request({
+        url: '/server/api/shop/shops/test',
+        method: 'POST',
+        data: data,
+      })
+      .then((response) => {
+        // 处理成功响应
+        ElMessage.success('提交成功，等待审核！')
+        console.log('提交成功', response.data)
+      })
+      .catch((error) => {
+        // 处理错误
+        console.log('提交失败:', error.response.data)
+        ElMessage.error('提交失败，请稍后重试。')
+      })
+      .finally(() => {
+        // 重置提交状态
+        isSubmitting.value = true
+      })
+  } catch (error) {
     // 处理错误
     console.log('提交失败:', error)
     ElMessage.error('提交失败，请稍后重试。')
   }
 }
 
-  // 重置图片预览
-  Object.keys(imagePreviews.value).forEach(key => {
-    imagePreviews.value[key as keyof typeof imagePreviews.value] = ''
-  })
+// 重置图片预览
+Object.keys(imagePreviews.value).forEach((key) => {
+  imagePreviews.value[key as keyof typeof imagePreviews.value] = ''
+})
 
-  // 重置地址对象
-  addressObject.value = {
-    province: '',
-    city: '',
-    district: ''
-  }
-
+// 重置地址对象
+addressObject.value = {
+  province: '',
+  city: '',
+  district: '',
+}
 </script>

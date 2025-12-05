@@ -7,9 +7,7 @@
           <div class="stat-title">今日订单数</div>
           <div class="stat-value">{{ todayOrderCount }}</div>
           <div class="stat-desc">
-            <span class="trend-up">
-              <i class="el-icon-arrow-up"></i> 12%
-            </span>
+            <span class="trend-up"> <i class="el-icon-arrow-up"></i> 12% </span>
           </div>
         </div>
         <div class="stat-icon">
@@ -22,9 +20,7 @@
           <div class="stat-title">平台总收入</div>
           <div class="stat-value">¥{{ todayIncome.toFixed(2) }}</div>
           <div class="stat-desc">
-            <span class="trend-up">
-              <i class="el-icon-arrow-up"></i> 8.5%
-            </span>
+            <span class="trend-up"> <i class="el-icon-arrow-up"></i> 8.5% </span>
           </div>
         </div>
         <div class="stat-icon">
@@ -37,9 +33,7 @@
           <div class="stat-title">活跃用户数</div>
           <div class="stat-value">{{ activeUserCount }}</div>
           <div class="stat-desc">
-            <span class="trend-up">
-              <i class="el-icon-arrow-up"></i> 5.2%
-            </span>
+            <span class="trend-up"> <i class="el-icon-arrow-up"></i> 5.2% </span>
           </div>
         </div>
         <div class="stat-icon">
@@ -52,9 +46,7 @@
           <div class="stat-title">服务上架总数</div>
           <div class="stat-value">{{ serviceCount }}</div>
           <div class="stat-desc">
-            <span class="trend-up">
-              <i class="el-icon-arrow-up"></i> 3.8%
-            </span>
+            <span class="trend-up"> <i class="el-icon-arrow-up"></i> 3.8% </span>
           </div>
         </div>
         <div class="stat-icon">
@@ -69,6 +61,7 @@
         <div class="chart-header">
           <div class="chart-title">订单趋势（近30天）</div>
           <el-select
+            style="--el-select-width: 67%"
             v-model="chartType"
             placeholder="选择类型"
             size="small"
@@ -157,11 +150,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, toRefs } from 'vue'
+import { ref } from 'vue'
 
 // 仅为样式展示的静态数据
 const todayOrderCount = ref(128)
-const todayIncome = ref(28560.50)
+const todayIncome = ref(28560.5)
 const activeUserCount = ref(3568)
 const serviceCount = ref(892)
 const pendingAuditCount = ref(12)
@@ -171,18 +164,18 @@ const chartType = ref('order')
 </script>
 <script lang="ts">
 export default {
-  name: 'Dashboard'
+  name: 'DashBoard',
 }
 </script>
 <style scoped lang="scss">
 // 暖色系主题变量
-$primary-orange: #FF8A65;    // 主橙色（温暖活力）
-$primary-pink: #FFAB91;      // 粉橙色（柔和温馨）
-$primary-yellow: #FFCC80;    // 暖黄色（明亮活泼）
-$primary-peach: #FFCDD2;     // 水蜜桃色（温柔清新）
-$light-bg: #FFF8F5;          // 整体背景色（浅米白）
+$primary-orange: #ff8a65; // 主橙色（温暖活力）
+$primary-pink: #ffab91; // 粉橙色（柔和温馨）
+$primary-yellow: #ffcc80; // 暖黄色（明亮活泼）
+$primary-peach: #ffcdd2; // 水蜜桃色（温柔清新）
+$light-bg: #fff8f5; // 整体背景色（浅米白）
 $card-shadow: 0 2px 12px rgba(255, 138, 101, 0.1); // 卡片阴影
-$border-color: #FFE0D6;      // 边框色
+$border-color: #ffe0d6; // 边框色
 
 .dashboard-container {
   width: 100%;
@@ -259,7 +252,7 @@ $border-color: #FFE0D6;      // 边框色
 .stat-value {
   font-size: 26px;
   font-weight: 700;
-  color: #3E2723; // 深褐色（比纯黑更温暖）
+  color: #3e2723; // 深褐色（比纯黑更温暖）
   margin-bottom: 8px;
 }
 
@@ -268,18 +261,18 @@ $border-color: #FFE0D6;      // 边框色
 }
 
 .trend-up {
-  color: #4CAF50; // 暖绿色（增长指标）
+  color: #4caf50; // 暖绿色（增长指标）
   display: inline-flex;
   align-items: center;
   gap: 4px;
 }
 
 .trend-down {
-  color: #EF5350; // 暖红色（下降指标）
+  color: #ef5350; // 暖红色（下降指标）
 }
 
 .trend-flat {
-  color: #FF9800; // 橙色（持平指标）
+  color: #ff9800; // 橙色（持平指标）
 }
 
 .stat-icon {
@@ -445,13 +438,13 @@ $border-color: #FFE0D6;      // 边框色
 
 .shortcut-name {
   font-size: 14px;
-  color: #3E2723;
+  color: #3e2723;
   margin-bottom: 8px;
 }
 
 .shortcut-count {
   font-size: 12px;
-  color: #D32F2F; // 暖红色数字
+  color: #d32f2f; // 暖红色数字
   background-color: rgba(211, 47, 47, 0.1);
   padding: 2px 8px;
   border-radius: 12px;

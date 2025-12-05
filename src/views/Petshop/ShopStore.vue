@@ -1,11 +1,18 @@
 <template>
   <NavBar />
-  <div class="bg-gradient-to-b from-amber-50 to-orange-50 min-h-screen pt-24 flex flex-col items-center">
+  <div
+    class="bg-gradient-to-b from-amber-50 to-orange-50 min-h-screen pt-24 flex flex-col items-center"
+  >
     <div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-
-
-      <div class="bg-white rounded-full shadow-sm py-2 px-4 mb-6 flex items-center gap-3 overflow-hidden">
-        <marquee behavior="scroll" direction="left" scrollamount="3" class="text-sm text-orange-600">
+      <div
+        class="bg-white rounded-full shadow-sm py-2 px-4 mb-6 flex items-center gap-3 overflow-hidden"
+      >
+        <marquee
+          behavior="scroll"
+          direction="left"
+          scrollamount="3"
+          class="text-sm text-orange-600"
+        >
           🐾 店铺活动：全场宠物食品满199减30 | 新品玩具买二送一 | 关注店铺领5元无门槛券 🐾
         </marquee>
         <i class="fa fa-bell text-orange-500 ml-2"></i>
@@ -13,6 +20,7 @@
 
       <div class="bg-white rounded-2xl shadow-lg px-6 sm:px-10 py-4 mb-8">
         <div class="flex flex-col md:flex-row items-center gap-8">
+
           <div class="shop-avatar w-28 h-28 rounded-full overflow-hidden border-4 border-orange-100 shadow-lg hover:scale-105 transition-transform">
             <img :src="shopItem.shopAvatar" alt="店铺头像" class="w-full h-full object-cover hover:scale-110">
           </div>
@@ -24,6 +32,7 @@
             </h2>
             <div class="shop-rating flex flex-wrap items-center justify-center md:justify-start gap-4 mb-4">
               <div class="rating-score text-3xl font-bold text-orange-600">{{ shopItem.creditScore }}分</div>
+
               <div class="rating-star text-amber-500 text-lg">
                 <i class="fa fa-star"></i>
                 <i class="fa fa-star"></i>
@@ -33,6 +42,7 @@
               </div>
               <div class="rating-text text-gray-600">超99%用户满意</div>
             </div>
+
             <div class="shop-meta text-gray-600 text-sm mb-5 flex flex-wrap justify-center md:justify-start gap-4">
               <span class="flex items-center gap-1"><i class="fa fa-calendar text-orange-500"></i>开店时间：{{ shopItem.openTime }}</span>
               <span class="flex items-center gap-1"><i class="fa fa-truck text-orange-500"></i>{{ shopItem.status }}</span>
@@ -44,6 +54,7 @@
             <div class="shop-btn flex mt-20 justify-center md:justify-start gap-4">
               <button class="bg-white text-orange-500 px-6 py-2 rounded-full text-sm border-2 border-orange-500 hover:bg-orange-50 transition-all active:scale-95">联系客服</button>
             </div></div>
+
           </div>
         </div>
       </div>
@@ -75,7 +86,8 @@
 
       <div class="mb-10">
         <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-          <i class="fa fa-fire text-orange-500"></i>热销商品</h3>
+          <i class="fa fa-fire text-orange-500"></i>热销商品
+        </h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div
             v-for="product in products"
@@ -83,8 +95,16 @@
             class="product-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl hover:scale-103 transition-all cursor-pointer border border-gray-100"
           >
             <div class="relative w-full h-48 sm:h-56 overflow-hidden">
-              <img :src="product.image" :alt="product.name" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500">
-              <span v-if="product.isNew" class="absolute top-3 left-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">新品</span>
+              <img
+                :src="product.image"
+                :alt="product.name"
+                class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+              />
+              <span
+                v-if="product.isNew"
+                class="absolute top-3 left-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full"
+                >新品</span
+              >
             </div>
             <div class="p-4">
               <h3 class="font-medium text-gray-800 line-clamp-1">{{ product.name }}</h3>
@@ -98,7 +118,9 @@
               <p class="text-xs text-gray-400 mt-1">销量：{{ product.sales }}+</p>
               <div class="mt-3 flex justify-between items-center">
                 <span class="text-orange-600 font-bold text-lg">¥{{ product.price }}</span>
-                <button class="w-9 h-9 bg-orange-50 rounded-full flex items-center justify-center hover:bg-orange-100 transition-colors">
+                <button
+                  class="w-9 h-9 bg-orange-50 rounded-full flex items-center justify-center hover:bg-orange-100 transition-colors"
+                >
                   <i class="fa fa-shopping-cart text-orange-500 text-lg"></i>
                 </button>
               </div>
@@ -108,7 +130,7 @@
       </div>
     </div>
   </div>
-      <ShopFoot />
+  <ShopFoot />
 </template>
 
 <script lang="ts" setup>
@@ -142,7 +164,7 @@ const products = ref<Product[]>([
     category: 'food',
     rating: 5,
     sales: '2.3万',
-    isNew: false
+    isNew: false,
   },
   {
     id: 2,
@@ -153,7 +175,7 @@ const products = ref<Product[]>([
     category: 'food',
     rating: 4,
     sales: '1.8万',
-    isNew: true
+    isNew: true,
   },
   {
     id: 3,
@@ -164,7 +186,7 @@ const products = ref<Product[]>([
     category: 'toy',
     rating: 5,
     sales: '3.1万',
-    isNew: false
+    isNew: false,
   },
   {
     id: 4,
@@ -175,7 +197,7 @@ const products = ref<Product[]>([
     category: 'wash',
     rating: 4,
     sales: '1.5万',
-    isNew: false
+    isNew: false,
   },
   {
     id: 5,
@@ -186,7 +208,7 @@ const products = ref<Product[]>([
     category: 'food',
     rating: 5,
     sales: '9000',
-    isNew: true
+    isNew: true,
   },
   {
     id: 6,
@@ -197,7 +219,7 @@ const products = ref<Product[]>([
     category: 'toy',
     rating: 4,
     sales: '1.2万',
-    isNew: true
+    isNew: true,
   },
   {
     id: 7,
@@ -208,7 +230,7 @@ const products = ref<Product[]>([
     category: 'tool',
     rating: 5,
     sales: '7000',
-    isNew: false
+    isNew: false,
   },
   {
     id: 8,
@@ -219,7 +241,7 @@ const products = ref<Product[]>([
     category: 'tool',
     rating: 4,
     sales: '2.5万',
-    isNew: false
+    isNew: false,
   },
   {
     id: 9,
@@ -230,7 +252,7 @@ const products = ref<Product[]>([
     category: 'toy',
     rating: 5,
     sales: '1.1万',
-    isNew: false
+    isNew: false,
   },
   {
     id: 10,
@@ -241,7 +263,7 @@ const products = ref<Product[]>([
     category: 'wash',
     rating: 4,
     sales: '1.7万',
-    isNew: false
+    isNew: false,
   },
   {
     id: 11,
@@ -252,7 +274,7 @@ const products = ref<Product[]>([
     category: 'tool',
     rating: 5,
     sales: '2万',
-    isNew: false
+    isNew: false,
   },
   {
     id: 12,
@@ -263,8 +285,8 @@ const products = ref<Product[]>([
     category: 'tool',
     rating: 4,
     sales: '8000',
-    isNew: true
-  }
+    isNew: true,
+  },
 ])
 interface shop {
   shopName: string;
@@ -303,6 +325,7 @@ const getstore=()=>{
 onMounted(() => {
   getstore()
 })
+
 
 </script>
 

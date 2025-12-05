@@ -1,32 +1,22 @@
 <template>
-  <div
-    class="fixed z-10 w-[100%] h-16 bg-white rounded-b-lg shadow-md m-auto flex items-center justify-center"
-  >
+  <div class="fixed z-10 w-[100%] h-16 bg-white rounded-b-lg shadow-md m-auto flex items-center justify-center">
     <!-- 导航容器 -->
     <div class="flex items-center justify-center h-14 w ml-10 relative">
-      <div
-        v-for="(item, index) in navItems"
-        :key="item.text"
-        :class="[
-          'item relative z-10 w-[92px] h-[48px] rounded-full flex justify-center items-center mx-[15px] cursor-pointer transition-all duration-500 text-base',
-          { active: activeIndex === index },
-        ]"
-        @click="setActive(index, item.bgColor)"
-      >
+      <div v-for="(item, index) in navItems" :key="item.text" :class="[
+        'item relative z-10 w-[92px] h-[48px] rounded-full flex justify-center items-center mx-[15px] cursor-pointer transition-all duration-500 text-base',
+        { active: activeIndex === index },
+      ]" @click="setActive(index, item.bgColor)">
         {{ item.text }}
         <i class="iconfont" :class="item.color" v-text="item.unicode"></i>
       </div>
-      <div
-        class="active-circle absolute z-0 top-[12px] transition-all duration-400 ease-in-out"
-        :style="{
-          left: `${activeIndex * 125}px`,
-          backgroundColor: activeBgColor,
-          animation: isAnimating ? 'jello 0.5s' : 'none',
-        }"
-      ></div>
+      <div class="active-circle absolute z-0 top-[12px] transition-all duration-400 ease-in-out" :style="{
+        left: `${activeIndex * 125}px`,
+        backgroundColor: activeBgColor,
+        animation: isAnimating ? 'jello 0.5s' : 'none',
+      }"></div>
     </div>
     <div>
-      <el-button type="warning" plain size="default" class="ml-1">登录</el-button>
+      <el-button type="warning" plain size="default" class="ml-1" @click="login">登录</el-button>
     </div>
   </div>
 </template>
@@ -131,6 +121,9 @@ const setActive = (index: number, bgColor: string) => {
 watch(activeIndex, (newVal) => {
   activeBgColor.value = navItems.value[newVal]?.bgColor
 })
+const login = () => {
+  router.push('/login')
+}
 onMounted(() => {
   // 获取当前路由路径
   const currentPath = router.currentRoute.value.path
@@ -141,6 +134,7 @@ onMounted(() => {
     activeBgColor.value = navItems.value[currentIndex]!.bgColor
   }
 })
+
 </script>
 <style scoped>
 .active-circle {
@@ -171,7 +165,7 @@ onMounted(() => {
   margin-left: 7px !important;
 }
 
-.item.active:nth-child(4) ~ .active-circle {
+.item.active:nth-child(4)~.active-circle {
   left: 369px !important;
 }
 
@@ -179,7 +173,7 @@ onMounted(() => {
   color: rgb(229 163 37) !important;
 }
 
-.item.active:nth-child(5) ~ .active-circle {
+.item.active:nth-child(5)~.active-circle {
   left: 492px !important;
 }
 
@@ -187,7 +181,7 @@ onMounted(() => {
   color: rgb(100, 149, 237) !important;
 }
 
-.item.active:nth-child(6) ~ .active-circle {
+.item.active:nth-child(6)~.active-circle {
   left: 616px !important;
 }
 
@@ -195,7 +189,7 @@ onMounted(() => {
   color: rgb(255 35 145) !important;
 }
 
-.item.active:nth-child(7) ~ .active-circle {
+.item.active:nth-child(7)~.active-circle {
   left: 738px !important;
 }
 
@@ -203,7 +197,7 @@ onMounted(() => {
   color: rgb(65 65 255) !important;
 }
 
-.item.active:nth-child(8) ~ .active-circle {
+.item.active:nth-child(8)~.active-circle {
   left: 860px !important;
 }
 
@@ -211,7 +205,7 @@ onMounted(() => {
   color: rgb(123, 31, 162) !important;
 }
 
-.item.active:nth-child(9) ~ .active-circle {
+.item.active:nth-child(9)~.active-circle {
   left: 977px !important;
 }
 

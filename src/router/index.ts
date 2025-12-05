@@ -1,29 +1,29 @@
-import { createRouter, createWebHistory } from 'vue-router'
-const FosterCare = () => import('@/views/FosterCare.vue')
-const routes = [
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+
+const routes: RouteRecordRaw[] = [
   // 寄养首页
   {
-    path: '/foster-care',
+    path: '/',
     name: 'fosterCare',
-    component: FosterCare,
+    component: () => import('@/views/FosterCare.vue'),
   },
   // 寄养详情
   {
     path: '/foster-detail/:id',
     name: 'fosterDetail',
-    component: import('@/views/FosterDetail.vue'),
+    component: () => import('@/views/FosterDetail.vue'),
   },
   // 寄养预订
   {
     path: '/foster-book/:fosterId/:packageId',
     name: 'fosterBook',
-    component: import('@/views/FosterBook.vue'),
+    component: () => import('@/views/FosterBook.vue'),
   },
   //寄养方管理
   {
     path: '/foster-manage',
     name: 'fosterManage',
-    component: import('@/views/FosterManage.vue'),
+    component: () => import('@/views/FosterManage.vue'),
   },
   // 电商的首页
   {

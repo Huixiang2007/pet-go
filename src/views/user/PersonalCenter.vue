@@ -442,11 +442,11 @@ import { ref, onMounted, nextTick, watch, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 // import axios from 'axios'
-import request from '../utils/request'
-import AddressSelect from '../components/AddressSelect.vue'
-import provincesData from 'china-division/dist/provinces.json'
-import citiesData from 'china-division/dist/cities.json'
-import districtsData from 'china-division/dist/areas.json'
+import request from '@/utils/request'
+import AddressSelect from '@/components/common/CaptchaLoad.vue'
+import provincesData from 'china-division/dist/provinces.json';
+import citiesData from 'china-division/dist/cities.json';
+import districtsData from 'china-division/dist/areas.json';
 declare global {
   interface Window {
     layui: any // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -643,7 +643,7 @@ onMounted(() => {
     passwordForm.value.email = userInfo.value.email
     // 初始化表单验证
     if (window.layui) {
-      window.layui.use(['form', 'layer'], (form: any) => {
+      window.layui.use(['form', 'layer'], (form: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
 
         form.verify({
           password: function (value: string) {
@@ -652,11 +652,13 @@ onMounted(() => {
             if (!passwordReg.test(value)) {
               return '密码需8-20位，包含大小写字母、数字和特殊字符'
             }
+               return undefined
           },
           confirmPassword: function (value: string) {
             if (value !== passwordForm.value.newPassword) {
               return '两次输入的密码不一致'
             }
+               return undefined
           },
           idCard: function (value: string) {
             // 简单的身份证验证正则
@@ -664,12 +666,14 @@ onMounted(() => {
             if (!idCardReg.test(value)) {
               return '请输入正确的身份证号码'
             }
+               return undefined
           },
           phone: function (value: string) {
             const phoneReg = /^1[3-9]\d{9}$/
             if (!phoneReg.test(value)) {
               return '请输入正确的手机号码'
             }
+               return undefined
           },
           verificationCode: function (value: string) {
             if (!value) {
@@ -678,6 +682,7 @@ onMounted(() => {
             if (value.length !== 6) {
               return '验证码长度应为6位'
             }
+               return undefined
           },
         })
 
@@ -701,6 +706,7 @@ onMounted(() => {
               // 验证失败，不执行修改密码逻辑
               return false
             }
+               return undefined
           })
           return false
         })
@@ -775,7 +781,7 @@ const sendVerificationCode = async () => {
       ElMessage.error(response.msg || '发送验证码失败，请稍后重试')
       isSendingCode.value = false
     }
-  } catch (error: any) {
+  } catch (error: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
 
     ElMessage.error('发送验证码失败，请稍后重试')
     isSendingCode.value = false
@@ -867,7 +873,7 @@ const getUserInfo = async () => {
       }
       // 重新渲染表单
       if (window.layui) {
-        window.layui.use('form', (form: any) => {
+        window.layui.use('form', (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
 
           form.render()
         })
@@ -1071,7 +1077,7 @@ const deleteAddress = (id: string) => {
           ElMessage.success('地址删除成功!')
           getAddressList()
         }
-      } catch (error: any) {
+      } catch (error: any) {   // eslint-disable-line @typescript-eslint/no-explicit-any
 
         console.error('删除失败:', error)
         ElMessage.error('删除失败，请稍后重试')
@@ -1150,7 +1156,7 @@ const cancelEdit = () => {
   formData.value = { ...userInfo.value }
 
   if (window.layui) {
-    window.layui.use('form', (form: any) => {
+    window.layui.use('form', (form: any) => {  // eslint-disable-line @typescript-eslint/no-explicit-any
 
       form.render()
     })
@@ -1182,7 +1188,7 @@ const cancelWord = () => {
   }
 
   if (window.layui) {
-    window.layui.use('form', (form: any) => {
+    window.layui.use('form', (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
 
       form.render()
     })
@@ -1340,7 +1346,7 @@ const saveBaseInfo = async () => {
     } else {
       ElMessage.error(response.msg || '保存失败，请稍后重试')
     }
-  } catch (error: any) {
+  } catch (error: any) {//eslint-disable-line @typescript-eslint/no-explicit-any
 
     showMessage('error', error.message || '保存失败，请稍后重试')
   } finally {

@@ -6,7 +6,9 @@
       <SellerManNav />
       <div class="flex-1 overflow-auto p-4">
         <div class="bg-white rounded-lg p-4 shadow-sm">
-          <div class="flex flex-row justify-between items-center border-b border-gray-200 px-4 py-3 mb-3">
+          <div
+            class="flex flex-row justify-between items-center border-b border-gray-200 px-4 py-3 mb-3"
+          >
             <div class="text-lg font-bold text-gray-800">用户管理</div>
             <div class="flex flex-row gap-3">
               <el-input
@@ -31,29 +33,36 @@
               background: '#f5f5f5',
               color: '#606266',
               fontWeight: '500',
-              borderBottom: '1px solid #e0e0e0'
+              borderBottom: '1px solid #e0e0e0',
             }"
           >
-            <el-table-column prop="id" label="用户id"  />
+            <el-table-column prop="id" label="用户id" />
             <el-table-column prop="name" label="姓名" />
-            <el-table-column prop="phone" label="电话"  />
-            <el-table-column prop="count" label="下单次数"  />
+            <el-table-column prop="phone" label="电话" />
+            <el-table-column prop="count" label="下单次数" />
 
-            <el-table-column prop="status" label="订单状态" >
+            <el-table-column prop="status" label="订单状态">
               <template #default="scope">
-                <el-tag
-                  :type="getStatusTagType(scope.row.status)"
-                  size="small"
-                >
+                <el-tag :type="getStatusTagType(scope.row.status)" size="small">
                   {{ scope.row.status }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="操作" >
+            <el-table-column label="操作">
               <template #default>
                 <div class="flex gap-3">
-                  <el-button size="mini" type="text" class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors">查看</el-button>
-                  <el-button size="mini" type="text" class="text-orange-500 hover:text-orange-700 hover:bg-orange-50 transition-colors">拉黑</el-button>
+                  <el-button
+                    size="mini"
+                    type="text"
+                    class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors"
+                    >查看</el-button
+                  >
+                  <el-button
+                    size="mini"
+                    type="text"
+                    class="text-orange-500 hover:text-orange-700 hover:bg-orange-50 transition-colors"
+                    >拉黑</el-button
+                  >
                 </div>
               </template>
             </el-table-column>
@@ -67,9 +76,9 @@
             </template>
           </el-table>
 
-
           <div class="px-4 py-3 border-t border-gray-200 flex justify-between items-center mt-3">
-            <div class="text-sm text-gray-500">共 {{ tableData.length }} 条记录</div>  <!-- 动态显示实际数据量 -->
+            <div class="text-sm text-gray-500">共 {{ tableData.length }} 条记录</div>
+            <!-- 动态显示实际数据量 -->
             <el-pagination
               layout="prev, pager, next"
               :total="120"
@@ -90,21 +99,24 @@ import { ref } from 'vue'
 const input = ref('')
 
 interface TableRow {
-  id: string;
-  name: string;
-  phone: string;
-  status: string;
-  count:string;
-  operation: string;
+  id: string
+  name: string
+  phone: string
+  status: string
+  count: string
+  operation: string
 }
-
 
 const getStatusTagType = (status: string) => {
   switch (status) {
-    case '正常': return 'warning'
-    case '已拉黑': return 'danger'
-    case '待收货': return 'info'
-    default: return ''
+    case '正常':
+      return 'warning'
+    case '已拉黑':
+      return 'danger'
+    case '待收货':
+      return 'info'
+    default:
+      return ''
   }
 }
 
@@ -115,15 +127,15 @@ const tableData: TableRow[] = [
     phone: '18888888888',
     status: '正常',
     count: '5',
-    operation: '查看详情'
+    operation: '查看详情',
   },
- {
+  {
     id: '20160502',
     name: '王小虎',
     phone: '18888888888',
     status: '正常',
     count: '5',
-    operation: '查看详情'
+    operation: '查看详情',
   },
   {
     id: '20160501',
@@ -131,15 +143,15 @@ const tableData: TableRow[] = [
     phone: '18888888888',
     status: '待收货',
     count: '5',
-    operation: '查看详情'
+    operation: '查看详情',
   },
- {
+  {
     id: '20160502',
     name: '王小虎',
     phone: '18888888888',
     status: '正常',
     count: '5',
-    operation: '查看详情'
+    operation: '查看详情',
   },
 ]
 </script>

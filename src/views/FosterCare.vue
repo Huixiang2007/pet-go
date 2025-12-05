@@ -137,21 +137,21 @@
                             <div class="infinite-list-wrapper" style="overflow: auto">
                                 <ul v-infinite-scroll="load" class="list" :infinite-scroll-disabled="disabled"
                                     :infinite-scroll-immediate="false" style="list-style: none; margin: 0; padding: 0;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 16px;
-        margin-bottom: 16px;
-      ">
+                                    display: grid;
+                                    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                                    gap: 16px;
+                                    margin-bottom: 16px;
+                                    ">
                                     <li v-for="foster in fosterHomes" :key="foster.id" @click="focusOnMarker(foster)"
                                         class="list-item border border-blue-100 rounded-xl p-4 hover:shadow-md transition-all duration-300 bg-blue-50/30 hover:bg-blue-50/50 cursor-pointer">
                                         <div style="
-        border: 1px solid #e0f0ff;
-        border-radius: 16px;
-        padding: 16px;
-        background-color: rgba(224, 240, 255, 0.15);
-        transition: all 0.3s ease;
-        cursor: pointer;
-      ">
+                                          border: 1px solid #e0f0ff;
+                                          border-radius: 16px;
+                                          padding: 16px;
+                                          background-color: rgba(224, 240, 255, 0.15);
+                                           transition: all 0.3s ease;
+                                            cursor: pointer;
+                                           ">
                                             <div class="flex flex-col">
 
                                                 <!-- 上面 -->
@@ -246,7 +246,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, nextTick, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElLoading, } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import AMapLoader from "@amap/amap-jsapi-loader";
@@ -334,8 +334,7 @@ interface FosterHome {
 }
 
 
-// 防抖计时器
-let debounceTimer: number = 0
+
 
 // 获取用户家庭住址
 const getUserHomeAddress = async () => {
@@ -626,10 +625,9 @@ const handleFilterChange = () => {
 
 // 半径变化（防抖处理）
 const handleRadiusInput = () => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        handleRadiusConfirm(); // 防抖后执行请求
-    }, 500);
+
+    handleRadiusConfirm(); // 防抖后执行请求
+
 };
 const handleRadiusConfirm = () => {
     currentPage.value = 1;
@@ -700,10 +698,7 @@ onMounted(() => {
     });
 });
 
-// 清理防抖计时器
-onUnmounted(() => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-});
+
 </script>
 
 <style lang="scss" scoped>

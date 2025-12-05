@@ -1,9 +1,9 @@
 <template>
   <div class="captcha-container">
-    <canvas 
+    <canvas
       ref="captchaCanvasRef"
-      :width="width" 
-      :height="height" 
+      :width="width"
+      :height="height"
       @click="refreshCaptcha"
       class="captcha-canvas"
     ></canvas>
@@ -18,12 +18,12 @@ export default defineComponent({
   props: {
     width: {
       type: Number,
-      default: 120
+      default: 120,
     },
     height: {
       type: Number,
-      default: 38
-    }
+      default: 38,
+    },
   },
   setup() {
     const captchaCanvasRef = ref<HTMLCanvasElement | null>(null)
@@ -42,53 +42,53 @@ export default defineComponent({
     // 绘制验证码到Canvas
     const drawCode = () => {
       if (!captchaCanvasRef.value) return
-      
+
       const canvas = captchaCanvasRef.value
       const ctx = canvas.getContext('2d')
       if (!ctx) return
-      
+
       // 清空画布
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      
+
       // 随机背景色
-      ctx.fillStyle = `rgb(${Math.floor(Math.random()*50+200)}, ${Math.floor(Math.random()*50+200)}, ${Math.floor(Math.random()*50+200)})`
+      ctx.fillStyle = `rgb(${Math.floor(Math.random() * 50 + 200)}, ${Math.floor(Math.random() * 50 + 200)}, ${Math.floor(Math.random() * 50 + 200)})`
       ctx.fillRect(0, 0, canvas.width, canvas.height)
-      
+
       // 生成并绘制验证码
       correctCode = getRandomCode()
       ctx.font = 'bold 20px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      
+
       // 每个字符随机颜色和位置
       for (let i = 0; i < 4; i++) {
-        ctx.fillStyle = `rgb(${Math.floor(Math.random()*100)}, ${Math.floor(Math.random()*100)}, ${Math.floor(Math.random()*100)})`
+        ctx.fillStyle = `rgb(${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100)})`
         ctx.save()
-        ctx.translate((canvas.width / 4) * i + (canvas.width / 8), canvas.height / 2)
+        ctx.translate((canvas.width / 4) * i + canvas.width / 8, canvas.height / 2)
         ctx.rotate((Math.random() - 0.5) * 0.4)
         ctx.fillText(correctCode[i], 0, 0)
         ctx.restore()
       }
-      
+
       // 绘制干扰线
       for (let i = 0; i < 3; i++) {
-        ctx.strokeStyle = `rgb(${Math.floor(Math.random()*150)}, ${Math.floor(Math.random()*150)}, ${Math.floor(Math.random()*150)})`
+        ctx.strokeStyle = `rgb(${Math.floor(Math.random() * 150)}, ${Math.floor(Math.random() * 150)}, ${Math.floor(Math.random() * 150)})`
         ctx.beginPath()
         ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height)
         ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height)
         ctx.stroke()
       }
-      
+
       // 绘制干扰点
       for (let i = 0; i < 20; i++) {
-        ctx.fillStyle = `rgb(${Math.floor(Math.random()*200)}, ${Math.floor(Math.random()*200)}, ${Math.floor(Math.random()*200)})`
+        ctx.fillStyle = `rgb(${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)}, ${Math.floor(Math.random() * 200)})`
         ctx.beginPath()
         ctx.arc(
           Math.random() * canvas.width,
           Math.random() * canvas.height,
           Math.random() * 2,
           0,
-          Math.PI * 2
+          Math.PI * 2,
         )
         ctx.fill()
       }
@@ -104,7 +104,6 @@ export default defineComponent({
       return input === correctCode
     }
 
-    
     const getCurrentCode = () => {
       return correctCode
     }
@@ -117,9 +116,9 @@ export default defineComponent({
       captchaCanvasRef,
       refreshCaptcha,
       validateCaptcha,
-      getCurrentCode
+      getCurrentCode,
     }
-  }
+  },
 })
 </script>
 

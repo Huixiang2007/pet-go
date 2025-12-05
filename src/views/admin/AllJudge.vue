@@ -7,10 +7,10 @@
         </div>
       </template>
       <div class="filter-item">
-        <el-input 
-          v-model="listQuery.keyword" 
-          placeholder="请输入关键词" 
-          style="width: 200px;" 
+        <el-input
+          v-model="listQuery.keyword"
+          placeholder="请输入关键词"
+          style="width: 200px"
           prefix-icon="el-icon-search"
           clearable
         />
@@ -24,56 +24,26 @@
           <span>评价列表</span>
         </div>
       </template>
-      
-      <el-table
-        :data="list"
-        border
-        style="width: 100%">
-        <el-table-column
-          prop="id"
-          label="ID"
-          width="80">
-        </el-table-column>
-        <el-table-column
-          prop="username"
-          label="用户名"
-          width="120">
-        </el-table-column>
-        <el-table-column
-          prop="content"
-          label="评价内容">
-        </el-table-column>
-        <el-table-column
-          prop="rating"
-          label="评分"
-          width="100">
+
+      <el-table :data="list" border style="width: 100%">
+        <el-table-column prop="id" label="ID" width="80"> </el-table-column>
+        <el-table-column prop="username" label="用户名" width="120"> </el-table-column>
+        <el-table-column prop="content" label="评价内容"> </el-table-column>
+        <el-table-column prop="rating" label="评分" width="100">
           <template #default="scope">
-            <el-rate
-              v-model="scope.row.rating"
-              disabled
-              show-score
-              text-color="#ff9900">
-            </el-rate>
+            <el-rate v-model="scope.row.rating" disabled show-score text-color="#ff9900"> </el-rate>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="createTime"
-          label="创建时间"
-          width="180">
-        </el-table-column>
-        <el-table-column
-          label="操作"
-          width="150"
-          align="center">
+        <el-table-column prop="createTime" label="创建时间" width="180"> </el-table-column>
+        <el-table-column label="操作" width="150" align="center">
           <template #default="scope">
-            <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
-      
+
       <div class="pagination-container">
         <el-pagination
           @size-change="handleSizeChange"
@@ -82,7 +52,8 @@
           :page-sizes="[10, 20, 30, 50]"
           :page-size="listQuery.pageSize"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
+          :total="total"
+        >
         </el-pagination>
       </div>
     </el-card>
@@ -106,7 +77,7 @@ const total = ref(0)
 const listQuery = reactive({
   pageNum: 1,
   pageSize: 10,
-  keyword: ''
+  keyword: '',
 })
 
 const handleFilter = () => {

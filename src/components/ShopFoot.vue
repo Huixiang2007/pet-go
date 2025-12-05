@@ -1,5 +1,5 @@
 <template>
-     <footer class="bg-[#333333] text-white py-8">
+  <footer class="bg-[#333333] text-white py-8">
     <div class="mx-auto px-4">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div>
@@ -56,11 +56,8 @@
 </template>
 
 <script lang="ts">
-
 export default {
   name: 'ShopFoot',
 }
 </script>
-<style>
-
-</style>
+<style></style>

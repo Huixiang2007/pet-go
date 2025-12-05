@@ -7,8 +7,12 @@
 
           <div class="title">
             <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
-            <span v-for="(char, index) in titleRegisterChars" :key="index"
-              :style="{ animationDelay: `${index * 100}ms` }" class="char">
+            <span
+              v-for="(char, index) in titleRegisterChars"
+              :key="index"
+              :style="{ animationDelay: `${index * 100}ms` }"
+              class="char"
+            >
               {{ char }}
             </span>
           </div>
@@ -18,8 +22,13 @@
           <div class="layui-form-item">
             <div class="layui-row">
               <div class="layui-col-xs7">
-                <ConfirmCode v-model="form.email" placeholder="QQ邮箱" :is-sending="isSending"
-                  @send="SendVerificationCode" ref="ConfirmCodeRef" />
+                <ConfirmCode
+                  v-model="form.email"
+                  placeholder="QQ邮箱"
+                  :is-sending="isSending"
+                  @send="SendVerificationCode"
+                  ref="ConfirmCodeRef"
+                />
               </div>
             </div>
           </div>
@@ -28,9 +37,18 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-vercode"></i>
               </div>
-              <input type="text" name="vercode" value="" v-model="form.vercode"
-                @input="handleInput('vercode', $event.target.value)" lay-verify="required" placeholder="验证码"
-                lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" />
+              <input
+                type="text"
+                name="vercode"
+                value=""
+                v-model="form.vercode"
+                @input="handleInput('vercode', $event.target.value)"
+                lay-verify="required"
+                placeholder="验证码"
+                lay-reqtext="请填写验证码"
+                autocomplete="off"
+                class="layui-input"
+              />
             </div>
           </div>
           <div class="layui-form-item">
@@ -38,9 +56,19 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-              <input type="password" name="password" value="" lay-verify="required|password" v-model="form.password"
-                @input="handleInput('password', $event.target.value)" placeholder="密码" autocomplete="off"
-                class="layui-input" id="reg-password" lay-affix="eye" />
+              <input
+                type="password"
+                name="password"
+                value=""
+                lay-verify="required|password"
+                v-model="form.password"
+                @input="handleInput('password', $event.target.value)"
+                placeholder="密码"
+                autocomplete="off"
+                class="layui-input"
+                id="reg-password"
+                lay-affix="eye"
+              />
             </div>
           </div>
           <div class="layui-form-item">
@@ -48,9 +76,19 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-              <input type="password" name="confirmPassword" value="" lay-verify="required|confirmPassword"
-                v-model="form.confirm" @input="handleInput('confirm', $event.target.value)" placeholder="确认密码"
-                autocomplete="off" class="layui-input" lay-affix="eye" id="confirm-password" />
+              <input
+                type="password"
+                name="confirmPassword"
+                value=""
+                lay-verify="required|confirmPassword"
+                v-model="form.confirm"
+                @input="handleInput('confirm', $event.target.value)"
+                placeholder="确认密码"
+                autocomplete="off"
+                class="layui-input"
+                lay-affix="eye"
+                id="confirm-password"
+              />
             </div>
           </div>
           <div class="layui-form-item">
@@ -58,15 +96,30 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-username"></i>
               </div>
-              <input type="text" name="nickname" value="" lay-verify="required|nickname" placeholder="账号"
-                v-model="form.name" @input="handleInput('name', $event.target.value)" autocomplete="off"
-                class="layui-input" lay-affix="clear" />
+              <input
+                type="text"
+                name="nickname"
+                value=""
+                lay-verify="required|nickname"
+                placeholder="账号"
+                v-model="form.name"
+                @input="handleInput('name', $event.target.value)"
+                autocomplete="off"
+                class="layui-input"
+                lay-affix="clear"
+              />
             </div>
           </div>
           <div class="layui-form-item">
             <div class="agreement-item">
-              <input v-model="isAgreed" @change="handleCheck" type="checkbox" id="agree" class="agreement-checkbox"
-                style="display: block" />
+              <input
+                v-model="isAgreed"
+                @change="handleCheck"
+                type="checkbox"
+                id="agree"
+                class="agreement-checkbox"
+                style="display: block"
+              />
               <label class="agreement-label">
                 我已阅读并同意<span class="agreement-link" @click="toProtocal">用户服务协议</span>
               </label>
@@ -76,7 +129,12 @@
             </p>
           </div>
           <div class="layui-form-item">
-            <button class="layui-btn btn-donate" lay-submit lay-filter="demo-reg" @click="handleRegister">
+            <button
+              class="layui-btn btn-donate"
+              lay-submit
+              lay-filter="demo-reg"
+              @click="handleRegister"
+            >
               注册
             </button>
           </div>
@@ -94,7 +152,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useRegisterStore,RegisterForm } from '../../stores/register'
+import { useRegisterStore, RegisterForm } from '../../stores/register'
 import ConfirmCode from '../../components/ConfirmCode.vue'
 const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> | null>(null)
 const registerStore = useRegisterStore()
@@ -118,7 +176,7 @@ const handleInput = (key: keyof RegisterForm, value: string) => {
   registerStore.setField(key, value)
 }
 // 定时器管理（避免内存泄漏）
-let hideErrorTimer :NodeJS.Timeout | null = null
+let hideErrorTimer: NodeJS.Timeout | null = null
 
 /**
  * 处理协议勾选状态变化
@@ -127,13 +185,13 @@ const handleCheck = () => {
   // 勾选时立即隐藏错误提示
   if (isAgreed.value) {
     showError.value = false
- if (hideErrorTimer) clearTimeout(hideErrorTimer)
+    if (hideErrorTimer) clearTimeout(hideErrorTimer)
     return
   }
 
   // 未勾选时显示错误提示并定时隐藏
   showError.value = true
-  if (hideErrorTimer) clearTimeout(hideErrorTimer)// 清除旧定时器，防止多次触发
+  if (hideErrorTimer) clearTimeout(hideErrorTimer) // 清除旧定时器，防止多次触发
   hideErrorTimer = setTimeout(() => {
     showError.value = false
     hideErrorTimer = null // 清空定时器引用
@@ -242,8 +300,9 @@ onMounted(() => {
 
   if (window.layui) {
     isRegister.value = true
-    window.layui.use(['form', 'layer', 'util'], function (form:any ) {// eslint-disable-line @typescript-eslint/no-explicit-any
-      const  $ = window.layui.$
+    window.layui.use(['form', 'layer', 'util'], function (form: any) {
+      // eslint-disable-line @typescript-eslint/no-explicit-any
+      const $ = window.layui.$
 
       form.config.verifyOnBlur = true
       // 自定义验证规则
@@ -268,14 +327,14 @@ onMounted(() => {
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/, // 正则表达式
           '密码需8-20位，包含大小写字母、数字和特殊字符',
         ],
-        confirmPassword: function (value:string) {
+        confirmPassword: function (value: string) {
           const passwordValue = $('#reg-password').val()
           if (value !== passwordValue) {
             return '两次密码输入不一致'
           }
         },
       })
-      $('#reg-password').on('blur', function (this:HTMLElement) {
+      $('#reg-password').on('blur', function (this: HTMLElement) {
         const $this = $(this)
         $this.attr('lay-verify', 'password')
         form.validate(this) // 触发当前输入框的验证
@@ -286,9 +345,9 @@ onMounted(() => {
       let isForcedBlur = false
       $('#confirm-password')
         .off('blur')
-        .on('blur', function (this:HTMLElement) {
+        .on('blur', function (this: HTMLElement) {
           const $this = $(this)
-      
+
           if (isForcedBlur) {
             isForcedBlur = false // 重置标志
             return
@@ -316,7 +375,7 @@ onMounted(() => {
 
       // 提交事件
       form.on('submit(demo-reg)', function () {
-       // 获取表单字段值
+        // 获取表单字段值
 
         // 是否勾选同意
         if (!isAgreed.value) {
@@ -368,10 +427,12 @@ const toProtocal = () => {
   font-weight: 500;
   transition: 0.8s;
   background-size: 280% auto;
-  background-image: linear-gradient(325deg,
-      var(--btn-bg-2) 0%,
-      var(--btn-bg-1) 55%,
-      var(--btn-bg-2) 90%);
+  background-image: linear-gradient(
+    325deg,
+    var(--btn-bg-2) 0%,
+    var(--btn-bg-1) 55%,
+    var(--btn-bg-2) 90%
+  );
   border: none;
   border-radius: var(--radii);
   color: var(--btn-bg-color);
@@ -589,12 +650,12 @@ span {
 }
 
 /* 未勾选状态按钮样式 */
-.agreement-checkbox:not(:checked)+.agreement-label+.goLogin-btn {
+.agreement-checkbox:not(:checked) + .agreement-label + .goLogin-btn {
   background-color: #cccccc;
   cursor: not-allowed;
 }
 
-.agreement-checkbox:not(:checked)+.agreement-label+.goLogin-btn:hover {
+.agreement-checkbox:not(:checked) + .agreement-label + .goLogin-btn:hover {
   background-color: #cccccc;
 }
 
@@ -637,7 +698,6 @@ span {
 
 /* 定义脉冲动画 */
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;

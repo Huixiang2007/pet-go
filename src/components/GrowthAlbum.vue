@@ -2,7 +2,11 @@
   <div class="growth-album">
     <!-- 成长记录列表 -->
     <div class="growth-records">
-      <div v-for="(record, index) in pet.growthRecords" :key="index" class="growth-record cute-card">
+      <div
+        v-for="(record, index) in pet.growthRecords"
+        :key="index"
+        class="growth-record cute-card"
+      >
         <div class="record-header">
           <h4 class="record-age">🎯 {{ record.age }}</h4>
           <!-- <el-button type="danger" icon="Delete" size="small" @click="deleteGrowthRecord(index)" class="cute-btn">
@@ -14,8 +18,12 @@
         <div v-if="record.photos && record.photos.length" class="photos">
           <h5>📷 照片</h5>
           <div class="photos-grid">
-            <div v-for="(photo, pIndex) in record.photos" :key="pIndex" class="photo-item"
-              @click="viewPhoto(record.age, pIndex)">
+            <div
+              v-for="(photo, pIndex) in record.photos"
+              :key="pIndex"
+              class="photo-item"
+              @click="viewPhoto(record.age, pIndex)"
+            >
               <img :src="photo.src" :alt="`${record.age}的照片`" />
             </div>
           </div>
@@ -38,7 +46,12 @@
     </div>
 
     <!-- 图片查看器 -->
-    <el-dialog v-model="photoViewerVisible" :title="`${currentPhotoAge} - 照片`" width="60%" class="cute-dialog">
+    <el-dialog
+      v-model="photoViewerVisible"
+      :title="`${currentPhotoAge} - 照片`"
+      width="60%"
+      class="cute-dialog"
+    >
       <div class="photo-viewer">
         <img :src="currentPhoto" class="viewer-image" />
         <div v-if="currentPhotoDescription" class="photo-description">
@@ -50,95 +63,95 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from 'vue'
 // import { ElMessage, ElMessageBox } from 'element-plus';
 // import { Delete, Plus } from '@element-plus/icons-vue';
 enum PetGender {
   Male = 1,
   Female = 0,
-};
+}
 enum SterilizationStatus {
   Neutered = 1, // 已绝育
   NotNeutered = 0, // 未绝育
 }
-type DateString = `${number}-${number}-${number}`;
+type DateString = `${number}-${number}-${number}`
 interface HealthRecords {
   // 疫苗
   vaccine: Array<{
-    type: string,
-    date: DateString,
+    type: string
+    date: DateString
     nextReminder?: DateString
-  }>;
+  }>
   // 驱虫
   deworming: Array<{
-    medicine: string,
-    date: string,
+    medicine: string
+    date: string
     nextReminder?: string
   }>
   //病历
   medical: Array<{
-    hospital: string,
-    diagnosis: string,//诊断
-    medicine: string,
+    hospital: string
+    diagnosis: string //诊断
+    medicine: string
     date: string
   }>
 }
 interface Photos {
-  src: string,
-  description: string,
+  src: string
+  description: string
   date: DateString
 }
 interface GrowthRecords {
-  age: string,
+  age: string
   photos: Photos[]
-};
+}
 
 interface Pet {
-  id: number,
-  userId: number,
-  name: string,
-  type: string,
-  breed: string,
-  avatar: string,
-  gender: PetGender,
-  birthday: DateString,
-  age: string,
-  weight: number,
-  sterilization?: SterilizationStatus,
-  healthStatus?: string,
-  description?: string,
-  specialNotes?: string,
-  characterTags?: string[],
-  healthRecords?: HealthRecords,
+  id: number
+  userId: number
+  name: string
+  type: string
+  breed: string
+  avatar: string
+  gender: PetGender
+  birthday: DateString
+  age: string
+  weight: number
+  sterilization?: SterilizationStatus
+  healthStatus?: string
+  description?: string
+  specialNotes?: string
+  characterTags?: string[]
+  healthRecords?: HealthRecords
   growthRecords?: GrowthRecords[]
 }
 interface Props {
-  pet: Pet;
+  pet: Pet
 }
 
-const props = defineProps<Props>();
-console.log(props.pet);
+const props = defineProps<Props>()
+console.log(props.pet)
 // const emit = defineEmits<{
 //   'add-record': [];
 // }>();
 
-const photoViewerVisible = ref(false);
-const currentPhotoAge = ref('');
-const currentPhotoIndex = ref(0);
-const currentPhoto = ref('');
-const currentPhotoDescription = ref('');
+const photoViewerVisible = ref(false)
+const currentPhotoAge = ref('')
+const currentPhotoIndex = ref(0)
+const currentPhoto = ref('')
+const currentPhotoDescription = ref('')
 // 查看照片
 const viewPhoto = (age: string, index: number) => {
-  if (!props.pet.growthRecords) return;
-  const record = props.pet.growthRecords.find(r => r.age === age);
+  if (!props.pet.growthRecords) return
+  const record = props.pet.growthRecords.find((r) => r.age === age)
   if (record && record.photos[index]) {
-    currentPhotoAge.value = age;
-    currentPhotoIndex.value = index;
-    currentPhoto.value = record.photos[index].src;
-    currentPhotoDescription.value = record.photos[index].description;
-    photoViewerVisible.value = true;
+    currentPhotoAge.value = age
+    currentPhotoIndex.value = index
+    currentPhoto.value = record.photos[index].src
+    currentPhotoDescription.value = record.photos[index].description
+    photoViewerVisible.value = true
   }
-};
+}
 
 // 删除成长记录
 // const deleteGrowthRecord = async (index: number) => {
@@ -179,8 +192,8 @@ const viewPhoto = (age: string, index: number) => {
 
 .growth-record {
   padding: 15px;
-  background: linear-gradient(135deg, #FFF9C4 0%, #FFECB3 100%);
-  border: 2px dashed #FFD54F;
+  background: linear-gradient(135deg, #fff9c4 0%, #ffecb3 100%);
+  border: 2px dashed #ffd54f;
 }
 
 .record-header {
@@ -191,13 +204,13 @@ const viewPhoto = (age: string, index: number) => {
 }
 
 .record-age {
-  color: #FF6F00;
+  color: #ff6f00;
   margin: 0;
   font-size: 1.1rem;
 }
 
 .record-description {
-  color: #5D4037;
+  color: #5d4037;
   margin: 0 0 12px 0;
   line-height: 1.4;
 }
@@ -209,7 +222,7 @@ const viewPhoto = (age: string, index: number) => {
 
 .milestones h5,
 .photos h5 {
-  color: #FF6F00;
+  color: #ff6f00;
   margin: 0 0 8px 0;
   font-size: 0.9rem;
 }
@@ -221,10 +234,10 @@ const viewPhoto = (age: string, index: number) => {
 }
 
 .milestone-tag {
-  background: linear-gradient(135deg, #FFE0B2 0%, #FFCC80 100%);
+  background: linear-gradient(135deg, #ffe0b2 0%, #ffcc80 100%);
   border: none;
   border-radius: 12px;
-  color: #E65100;
+  color: #e65100;
   font-size: 0.8rem;
 }
 
@@ -270,7 +283,7 @@ const viewPhoto = (age: string, index: number) => {
 
 .empty-state h3 {
   margin: 0 0 8px 0;
-  color: #FF69B4;
+  color: #ff69b4;
 }
 
 .empty-state p {
@@ -305,11 +318,11 @@ const viewPhoto = (age: string, index: number) => {
 }
 
 .growth-records::-webkit-scrollbar-thumb {
-  background: #FFB6C1;
+  background: #ffb6c1;
   border-radius: 3px;
 }
 
 .growth-records::-webkit-scrollbar-thumb:hover {
-  background: #FF69B4;
+  background: #ff69b4;
 }
 </style>

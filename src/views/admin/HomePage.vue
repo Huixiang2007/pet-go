@@ -16,8 +16,7 @@
       </el-header>
       <!-- 内容区域 -->
       <el-main class="content-container">
-    <Compete/>
-      
+        <Compete />
       </el-main>
     </div>
   </div>
@@ -37,12 +36,12 @@ const sidebarOpened = ref(true)
 $sidebar-bg: #252d3a;
 $header-height: 60px;
 .el-select--small .el-select__wrapper {
-    font-size: 14px;
-    gap: 4px;
-    line-height: 20px;
-    min-height: 39px;
-    max-width: 318px;
-    padding: 2px 8px;
+  font-size: 14px;
+  gap: 4px;
+  line-height: 20px;
+  min-height: 39px;
+  max-width: 318px;
+  padding: 2px 8px;
 }
 .app-container {
   display: flex;

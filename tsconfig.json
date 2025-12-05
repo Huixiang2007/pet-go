@@ -1,52 +1,55 @@
 {
-  "files": [],
-  "references": [
-    {
-       "extends": "@tsconfig/node22/tsconfig.json",
-  "include": [
-    "vite.config.*",
-    "vitest.config.*",
-    "cypress.config.*",
-    "nightwatch.conf.*",
-    "playwright.config.*",
-    "eslint.config.*"
-  ],
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
-    "noEmit": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
-  "resolveJsonModule": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "types": ["@types/node"]
-  }
-    },
-    {
-      "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/**/*.d.ts"],
-  "exclude": ["src/**/__tests__/*"],
-  "compilerOptions": {
-      "resolveJsonModule": true,
-    "composite": true,
-    "strict": true,
-    "typeRoots": ["./node_modules/@types", "./src/types"],
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    /* 全局基础配置 */
     "baseUrl": ".",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "paths": {
       "@/*": ["./src/*"]
     },
-   
-  }
-    }
-  ],
-  "compilerOptions": {
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": false,
+
+    /* 严格类型检查 */
+    "strict": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* 类型路径 */
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node"],
+
+    /* 编译目标 */
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    /* 构建优化 */
+    "noEmit": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+
+    /* Vue适配 */
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "allowJs": true,
+    "sourceMap": true
+  },
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/**/*.d.ts"],
+  "exclude": ["src/**/__tests__/*", "dist", "node_modules"],
+
+  "ts-node": {
+    "compilerOptions": {
+      "module": "ESNext",
+      "moduleResolution": "Bundler",
+      "types": ["node"],
       "resolveJsonModule": true,
-    "baseUrl": ".", // 基础路径
-    "paths": {
-      "@/*": ["src/*"] // 映射 @/* 到 src/*
-    }
+      "noEmit": true
+    },
+    "include": ["vite.config.*", "vitest.config.*", "eslint.config.*"],
+    "exclude": ["node_modules"]
   }
 }

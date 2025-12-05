@@ -7,10 +7,10 @@
         </div>
       </template>
       <div class="filter-item">
-        <el-input 
-          v-model="listQuery.keyword" 
-          placeholder="请输入订单号/用户名" 
-          style="width: 200px;" 
+        <el-input
+          v-model="listQuery.keyword"
+          placeholder="请输入订单号/用户名"
+          style="width: 200px"
           prefix-icon="el-icon-search"
           clearable
         />
@@ -24,11 +24,8 @@
           <span>订单列表</span>
         </div>
       </template>
-      
-      <el-table
-        :data="orderList"
-        border
-        style="width: 100%">
+
+      <el-table :data="orderList" border style="width: 100%">
         <el-table-column label="订单号" prop="id" align="center"></el-table-column>
         <el-table-column label="用户" prop="username" align="center"></el-table-column>
         <el-table-column label="金额" prop="amount" align="center"></el-table-column>
@@ -56,17 +53,17 @@ interface Order {
 }
 
 const listQuery = ref({
-  keyword: ''
+  keyword: '',
 })
 
 const orderList = ref<Order[]>([
   {
     id: '20210901001',
     username: '张三',
-    amount: 299.00,
+    amount: 299.0,
     createTime: '2021-09-01 12:30:00',
-    status: '已完成'
-  }
+    status: '已完成',
+  },
 ])
 
 const handleFilter = () => {
@@ -98,8 +95,6 @@ const handleView = (index: number, row: Order) => {
 }
 </style>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

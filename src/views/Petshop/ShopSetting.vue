@@ -7,7 +7,9 @@
 
       <div class="flex-1 overflow-auto p-4 ml-1 md:p-6">
         <div class="bg-white rounded-xl shadow-sm p-6 md:p-8 max-w-5xl mx-auto">
-          <h1 class="text-2xl font-bold text-gray-800 mb-8 text-center text-[#f77e21]">店铺信息设置</h1>
+          <h1 class="text-2xl font-bold text-gray-800 mb-8 text-center text-[#f77e21]">
+            店铺信息设置
+          </h1>
 
           <form class="space-y-8" @submit.prevent="saveShopSetting">
             <!-- 商铺基本信息 -->
@@ -61,8 +63,11 @@
                     商铺头像
                   </label>
                   <div class="flex flex-col gap-3">
-                    <div v-if="previewAvatar" class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 relative group">
-                      <img :src="previewAvatar" alt="商铺头像" class="w-full h-full object-cover">
+                    <div
+                      v-if="previewAvatar"
+                      class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 relative group"
+                    >
+                      <img :src="previewAvatar" alt="商铺头像" class="w-full h-full object-cover" />
                       <button
                         type="button"
                         class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -71,13 +76,24 @@
                         <i class="fa fa-times text-xs"></i>
                       </button>
                     </div>
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
-                      <label for="shop-avatar-file" class="cursor-pointer flex flex-col items-center justify-center">
+                    <div
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer"
+                    >
+                      <label
+                        for="shop-avatar-file"
+                        class="cursor-pointer flex flex-col items-center justify-center"
+                      >
                         <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                         <span class="text-gray-600">点击重新上传商铺头像</span>
                         <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
                       </label>
-                      <input type="file" class="hidden" id="shop-avatar-file" accept="image/*" @change="handleAvatarUpload" />
+                      <input
+                        type="file"
+                        class="hidden"
+                        id="shop-avatar-file"
+                        accept="image/*"
+                        @change="handleAvatarUpload"
+                      />
                     </div>
                   </div>
                 </div>
@@ -88,8 +104,15 @@
                     营业执照照片
                   </label>
                   <div class="flex flex-col gap-3">
-                    <div v-if="previewLicense" class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
-                      <img :src="previewLicense" alt="营业执照" class="w-full h-full object-cover">
+                    <div
+                      v-if="previewLicense"
+                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group"
+                    >
+                      <img
+                        :src="previewLicense"
+                        alt="营业执照"
+                        class="w-full h-full object-cover"
+                      />
                       <button
                         type="button"
                         class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -98,13 +121,24 @@
                         <i class="fa fa-times text-xs"></i>
                       </button>
                     </div>
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
-                      <label for="business-license-file" class="cursor-pointer flex flex-col items-center justify-center">
+                    <div
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer"
+                    >
+                      <label
+                        for="business-license-file"
+                        class="cursor-pointer flex flex-col items-center justify-center"
+                      >
                         <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                         <span class="text-gray-600">点击重新上传营业执照</span>
                         <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
                       </label>
-                      <input type="file" class="hidden" id="business-license-file" accept="image/*" @change="handleLicenseUpload" />
+                      <input
+                        type="file"
+                        class="hidden"
+                        id="business-license-file"
+                        accept="image/*"
+                        @change="handleLicenseUpload"
+                      />
                     </div>
                   </div>
                 </div>
@@ -117,8 +151,15 @@
                     身份证正面
                   </label>
                   <div class="flex flex-col gap-3">
-                    <div v-if="previewIdCardFront" class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
-                      <img :src="previewIdCardFront" alt="身份证正面" class="w-full h-full object-cover">
+                    <div
+                      v-if="previewIdCardFront"
+                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group"
+                    >
+                      <img
+                        :src="previewIdCardFront"
+                        alt="身份证正面"
+                        class="w-full h-full object-cover"
+                      />
                       <button
                         type="button"
                         class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -127,13 +168,24 @@
                         <i class="fa fa-times text-xs"></i>
                       </button>
                     </div>
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
-                      <label for="id-card-front-file" class="cursor-pointer flex flex-col items-center justify-center">
+                    <div
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer"
+                    >
+                      <label
+                        for="id-card-front-file"
+                        class="cursor-pointer flex flex-col items-center justify-center"
+                      >
                         <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                         <span class="text-gray-600">点击重新上传身份证正面</span>
                         <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
                       </label>
-                      <input type="file" class="hidden" id="id-card-front-file" accept="image/*" @change="handleIdCardFrontUpload" />
+                      <input
+                        type="file"
+                        class="hidden"
+                        id="id-card-front-file"
+                        accept="image/*"
+                        @change="handleIdCardFrontUpload"
+                      />
                     </div>
                   </div>
                 </div>
@@ -142,8 +194,15 @@
                     身份证反面
                   </label>
                   <div class="flex flex-col gap-3">
-                    <div v-if="previewIdCardBack" class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
-                      <img :src="previewIdCardBack" alt="身份证反面" class="w-full h-full object-cover">
+                    <div
+                      v-if="previewIdCardBack"
+                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group"
+                    >
+                      <img
+                        :src="previewIdCardBack"
+                        alt="身份证反面"
+                        class="w-full h-full object-cover"
+                      />
                       <button
                         type="button"
                         class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -152,13 +211,24 @@
                         <i class="fa fa-times text-xs"></i>
                       </button>
                     </div>
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
-                      <label for="id-card-back-file" class="cursor-pointer flex flex-col items-center justify-center">
+                    <div
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer"
+                    >
+                      <label
+                        for="id-card-back-file"
+                        class="cursor-pointer flex flex-col items-center justify-center"
+                      >
                         <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                         <span class="text-gray-600">点击重新上传身份证反面</span>
                         <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
                       </label>
-                      <input type="file" class="hidden" id="id-card-back-file" accept="image/*" @change="handleIdCardBackUpload" />
+                      <input
+                        type="file"
+                        class="hidden"
+                        id="id-card-back-file"
+                        accept="image/*"
+                        @change="handleIdCardBackUpload"
+                      />
                     </div>
                   </div>
                 </div>
@@ -236,7 +306,9 @@
                     class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white"
                   >
                     <option value="">请选择</option>
-                    <option v-for="value in provinceList" :key="value.id" :value="value.id">{{ value.name }}</option>
+                    <option v-for="value in provinceList" :key="value.id" :value="value.id">
+                      {{ value.name }}
+                    </option>
                   </select>
                 </div>
 
@@ -253,7 +325,9 @@
                     required
                   >
                     <option value="">请选择</option>
-                    <option v-for="city in cityList" :key="city.id" :value="city.id">{{ city.name }}</option>
+                    <option v-for="city in cityList" :key="city.id" :value="city.id">
+                      {{ city.name }}
+                    </option>
                   </select>
                 </div>
                 <div class="space-y-2">
@@ -268,7 +342,11 @@
                     required
                   >
                     <option value="">请选择</option>
-                    <option v-for="(district, index) in districtList" :key="index" :value="district">
+                    <option
+                      v-for="(district, index) in districtList"
+                      :key="index"
+                      :value="district"
+                    >
                       {{ district }}
                     </option>
                   </select>
@@ -286,7 +364,7 @@
                   placeholder="请输入详细地址"
                   v-model="addressInfo.detail"
                   required
-                >
+                />
               </div>
             </div>
 
@@ -329,7 +407,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted,  type Ref } from 'vue'
+import { ref, onMounted, type Ref } from 'vue'
 
 // 定义数据类型
 interface Province {
@@ -347,19 +425,19 @@ interface City {
 const shopInfo = ref({
   name: '小明官方旗舰店',
   type: '3',
-  desc: '本店主营宠物食品、宠物玩具、宠物用品等，专注为宠物提供高品质的产品和服务，欢迎各位铲屎官选购！'
+  desc: '本店主营宠物食品、宠物玩具、宠物用品等，专注为宠物提供高品质的产品和服务，欢迎各位铲屎官选购！',
 })
 
 // 拥有者信息（模拟回显数据）
 const ownerInfo = ref({
   name: '王小明',
   phone: '18888888888',
-  email: 'xiaoming@example.com'
+  email: 'xiaoming@example.com',
 })
 
 // 地址信息（模拟回显数据）
 const addressInfo = ref({
-  detail: '北京市海淀区中关村大街1号'
+  detail: '北京市海淀区中关村大街1号',
 })
 
 // 图片预览相关
@@ -378,23 +456,47 @@ const isSubmitting = ref(false)
 
 // 模拟城市数据
 const provinceList: Province[] = [
-  { id: 1, name: '北京市', city: [{ id: 101, name: '北京市', district: ['东城区', '西城区', '海淀区', '朝阳区'] }] },
-  { id: 2, name: '上海市', city: [{ id: 201, name: '上海市', district: ['黄浦区', '浦东新区', '静安区', '徐汇区'] }] },
-  { id: 3, name: '天津市', city: [{ id: 301, name: '天津市', district: ['和平区', '南开区', '东丽区'] }] },
-  { id: 4, name: '重庆市', city: [{ id: 401, name: '重庆市', district: ['江北区', '九龙坡区', '渝北区'] }] },
-  { id: 5, name: '河北省', city: [
-    { id: 501, name: '石家庄市', district: ['长安区', '桥西区', '裕华区'] },
-    { id: 502, name: '唐山市', district: ['路南区', '路北区', '丰南区'] }
-  ] },
-  { id: 6, name: '山西省', city: [
-    { id: 601, name: '太原市', district: ['小店区', '迎泽区', '杏花岭区'] },
-    { id: 602, name: '大同市', district: ['平城区', '云冈区', '新荣区'] }
-  ] }
+  {
+    id: 1,
+    name: '北京市',
+    city: [{ id: 101, name: '北京市', district: ['东城区', '西城区', '海淀区', '朝阳区'] }],
+  },
+  {
+    id: 2,
+    name: '上海市',
+    city: [{ id: 201, name: '上海市', district: ['黄浦区', '浦东新区', '静安区', '徐汇区'] }],
+  },
+  {
+    id: 3,
+    name: '天津市',
+    city: [{ id: 301, name: '天津市', district: ['和平区', '南开区', '东丽区'] }],
+  },
+  {
+    id: 4,
+    name: '重庆市',
+    city: [{ id: 401, name: '重庆市', district: ['江北区', '九龙坡区', '渝北区'] }],
+  },
+  {
+    id: 5,
+    name: '河北省',
+    city: [
+      { id: 501, name: '石家庄市', district: ['长安区', '桥西区', '裕华区'] },
+      { id: 502, name: '唐山市', district: ['路南区', '路北区', '丰南区'] },
+    ],
+  },
+  {
+    id: 6,
+    name: '山西省',
+    city: [
+      { id: 601, name: '太原市', district: ['小店区', '迎泽区', '杏花岭区'] },
+      { id: 602, name: '大同市', district: ['平城区', '云冈区', '新荣区'] },
+    ],
+  },
 ]
 
 // 地址选择相关状态
 const selectedProvince = ref<string>('1') // 默认选中北京市
-const selectedCity = ref<string>('101')   // 默认选中北京市
+const selectedCity = ref<string>('101') // 默认选中北京市
 const selectedDistrict = ref<string>('海淀区') // 默认选中海淀区
 const cityList = ref<City[]>([])
 const districtList = ref<string[]>([])
@@ -403,9 +505,9 @@ const districtList = ref<string[]>([])
 const handleProvinceChange = () => {
   selectedCity.value = ''
   selectedDistrict.value = ''
-  const currentProv = provinceList.find(p => p.id === Number(selectedProvince.value))
+  const currentProv = provinceList.find((p) => p.id === Number(selectedProvince.value))
   if (currentProv) {
-    cityList.value = currentProv.city.map(c => ({ id: c.id, name: c.name, district: c.district }))
+    cityList.value = currentProv.city.map((c) => ({ id: c.id, name: c.name, district: c.district }))
   } else {
     cityList.value = []
   }
@@ -414,9 +516,9 @@ const handleProvinceChange = () => {
 // 城市切换逻辑
 const handleCityChange = () => {
   selectedDistrict.value = ''
-  const currentProv = provinceList.find(p => p.id === Number(selectedProvince.value))
+  const currentProv = provinceList.find((p) => p.id === Number(selectedProvince.value))
   if (currentProv) {
-    const currentCity = currentProv.city.find(c => c.id === Number(selectedCity.value))
+    const currentCity = currentProv.city.find((c) => c.id === Number(selectedCity.value))
     if (currentCity) {
       districtList.value = currentCity.district
     } else {
@@ -451,10 +553,10 @@ const handleIdCardFrontUpload = (e: Event) => handleFileUpload(e, previewIdCardF
 const handleIdCardBackUpload = (e: Event) => handleFileUpload(e, previewIdCardBack)
 
 // 清除预览图
-const clearAvatar = () => previewAvatar.value = ''
-const clearLicense = () => previewLicense.value = ''
-const clearIdCardFront = () => previewIdCardFront.value = ''
-const clearIdCardBack = () => previewIdCardBack.value = ''
+const clearAvatar = () => (previewAvatar.value = '')
+const clearLicense = () => (previewLicense.value = '')
+const clearIdCardFront = () => (previewIdCardFront.value = '')
+const clearIdCardBack = () => (previewIdCardBack.value = '')
 
 // 表单验证逻辑
 // 验证商铺名称（非空 + 长度）
@@ -510,19 +612,19 @@ const saveShopSetting = async () => {
         province: selectedProvince.value,
         city: selectedCity.value,
         district: selectedDistrict.value,
-        detail: addressInfo.value.detail
+        detail: addressInfo.value.detail,
       },
       // 图片信息可后续对接后端上传接口
       imageInfo: {
         avatar: previewAvatar.value,
         license: previewLicense.value,
         idCardFront: previewIdCardFront.value,
-        idCardBack: previewIdCardBack.value
-      }
+        idCardBack: previewIdCardBack.value,
+      },
     }
 
     // 模拟接口请求（延迟1.5秒）
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    await new Promise((resolve) => setTimeout(resolve, 1500))
     console.log('保存店铺设置：', formData)
     alert('店铺设置保存成功！')
   } catch (error) {

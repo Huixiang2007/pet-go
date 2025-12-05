@@ -17,7 +17,7 @@ export const useRegisterStore = defineStore('register', {
       email: '',
       vercode: '',
       password: '',
-      confirm: '', 
+      confirm: '',
       name: '',
     },
   }),
@@ -34,7 +34,7 @@ export const useRegisterStore = defineStore('register', {
         email: '',
         vercode: '',
         password: '',
-        confirm: '', 
+        confirm: '',
         name: '',
       }
     },

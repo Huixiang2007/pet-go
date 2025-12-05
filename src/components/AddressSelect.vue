@@ -28,32 +28,32 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from 'vue'
 // 导入china-division数据
-import provincesData from 'china-division/dist/provinces.json';
-import citiesData from 'china-division/dist/cities.json';
-import districtsData from 'china-division/dist/areas.json';
+import provincesData from 'china-division/dist/provinces.json'
+import citiesData from 'china-division/dist/cities.json'
+import districtsData from 'china-division/dist/areas.json'
 
 // 定义地区数据类型接口
 interface Area {
-  code: string;
-  name: string;
+  code: string
+  name: string
 }
 
 interface City extends Area {
-  provinceCode: string;
+  provinceCode: string
 }
 
 interface District extends Area {
-  cityCode: string;
+  cityCode: string
 }
 
 interface Address {
-  id: string | number;
-  province: string;
-  city: string;
-  district: string;
-  [key: string]: any;// eslint-disable-line @typescript-eslint/no-explicit-any
+  id: string | number
+  province: string
+  city: string
+  district: string
+  [key: string]: any // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 export default defineComponent({
@@ -64,14 +64,15 @@ export default defineComponent({
       default: () => ({
         province: '',
         city: '',
-        district: ''
+        district: '',
       }),
-      validator: (value: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
-        return ['province', 'city', 'district'].every(key =>
-          Object.prototype.hasOwnProperty.call(value, key)
-        );
-      }
-    }
+      validator: (value: any) => {
+        // eslint-disable-line @typescript-eslint/no-explicit-any
+        return ['province', 'city', 'district'].every((key) =>
+          Object.prototype.hasOwnProperty.call(value, key),
+        )
+      },
+    },
   },
   emits: ['update:modelValue'],
   data() {
@@ -89,136 +90,119 @@ export default defineComponent({
         province: '',
         city: '',
         district: '',
-
       },
       // 编辑相关状态
       editingAddressId: null as string | number | null,
-      showAddressForm: false
-    };
+      showAddressForm: false,
+    }
   },
   watch: {
     // 监听modelValue变化并更新选择状态
     modelValue: {
       handler(newValue: { province?: string; city?: string; district?: string }) {
         if (newValue) {
-          this.selectedProvince = newValue.province || '';
-          this.selectedCity = newValue.city || '';
-          this.selectedDistrict = newValue.district || '';
+          this.selectedProvince = newValue.province || ''
+          this.selectedCity = newValue.city || ''
+          this.selectedDistrict = newValue.district || ''
 
           // 更新联动选项
           if (this.selectedProvince) {
             this.cities = (citiesData as City[]).filter(
-              city => city.provinceCode === this.selectedProvince
-            );
+              (city) => city.provinceCode === this.selectedProvince,
+            )
           }
 
           if (this.selectedCity) {
             this.districts = (districtsData as District[]).filter(
-              district => district.cityCode === this.selectedCity
-            );
+              (district) => district.cityCode === this.selectedCity,
+            )
           }
         }
       },
       immediate: true,
-      deep: true
-    }
+      deep: true,
+    },
   },
   methods: {
     // 处理省份选择变化
     handleProvinceChange(e: Event) {
-      const target = e.target as HTMLSelectElement;
-      const provinceCode = target.value;
-      this.selectedProvince = provinceCode;
-      this.selectedCity = '';
-      this.selectedDistrict = '';
+      const target = e.target as HTMLSelectElement
+      const provinceCode = target.value
+      this.selectedProvince = provinceCode
+      this.selectedCity = ''
+      this.selectedDistrict = ''
 
       // 筛选对应城市
-      this.cities = (citiesData as City[]).filter(
-        city => city.provinceCode === provinceCode
-      );
+      this.cities = (citiesData as City[]).filter((city) => city.provinceCode === provinceCode)
 
       // 更新地址表单
-      this.addressForm.province = (provincesData as Area[]).find(
-        p => p.code === provinceCode
-      )?.name || '';
-      this.addressForm.city = '';
-      this.addressForm.district = '';
+      this.addressForm.province =
+        (provincesData as Area[]).find((p) => p.code === provinceCode)?.name || ''
+      this.addressForm.city = ''
+      this.addressForm.district = ''
 
       // 触发更新事件
-      this.emitUpdateModelValue();
+      this.emitUpdateModelValue()
     },
 
     // 处理城市选择变化
     handleCityChange(e: Event) {
-      const target = e.target as HTMLSelectElement;
-      const cityCode = target.value;
-      this.selectedCity = cityCode;
-      this.selectedDistrict = '';
+      const target = e.target as HTMLSelectElement
+      const cityCode = target.value
+      this.selectedCity = cityCode
+      this.selectedDistrict = ''
 
       // 筛选对应区县
       this.districts = (districtsData as District[]).filter(
-        district => district.cityCode === cityCode
-      );
+        (district) => district.cityCode === cityCode,
+      )
 
       // 更新地址表单
-      this.addressForm.city = (citiesData as City[]).find(
-        c => c.code === cityCode
-      )?.name || '';
-      this.addressForm.district = '';
+      this.addressForm.city = (citiesData as City[]).find((c) => c.code === cityCode)?.name || ''
+      this.addressForm.district = ''
 
       // 触发更新事件
-      this.emitUpdateModelValue();
+      this.emitUpdateModelValue()
     },
 
     // 处理区县选择变化
     handleDistrictChange(e: Event) {
-      const target = e.target as HTMLSelectElement;
-      const districtCode = target.value;
-      this.selectedDistrict = districtCode;
+      const target = e.target as HTMLSelectElement
+      const districtCode = target.value
+      this.selectedDistrict = districtCode
 
       // 更新地址表单
-      this.addressForm.district = (districtsData as District[]).find(
-        d => d.code === districtCode
-      )?.name || '';
+      this.addressForm.district =
+        (districtsData as District[]).find((d) => d.code === districtCode)?.name || ''
 
       // 触发更新事件
-      this.emitUpdateModelValue();
+      this.emitUpdateModelValue()
     },
 
     // 编辑地址时回显地区信息
     editAddress(address: Address) {
-      this.addressForm = { ...address };
+      this.addressForm = { ...address }
 
       // 查找对应的地区编码
-      const province = (provincesData as Area[]).find(
-        p => p.name === address.province
-      );
+      const province = (provincesData as Area[]).find((p) => p.name === address.province)
       if (province) {
-        this.selectedProvince = province.code;
-        this.cities = (citiesData as City[]).filter(
-          city => city.provinceCode === province.code
-        );
+        this.selectedProvince = province.code
+        this.cities = (citiesData as City[]).filter((city) => city.provinceCode === province.code)
 
-        const city = (citiesData as City[]).find(
-          c => c.name === address.city
-        );
+        const city = (citiesData as City[]).find((c) => c.name === address.city)
         if (city) {
-          this.selectedCity = city.code;
-          this.districts = (districtsData as District[]).filter(
-            d => d.cityCode === city.code
-          );
+          this.selectedCity = city.code
+          this.districts = (districtsData as District[]).filter((d) => d.cityCode === city.code)
 
-          const district = (districtsData as District[]).find(
-            d => d.name === address.district
-          );
+          const district = (districtsData as District[]).find((d) => d.name === address.district)
           if (district) {
-            this.selectedDistrict = district.code;
+            this.selectedDistrict = district.code
           }
         }
       }
 
-      this.editingAddressId = address.id;
-      this.showAddressForm = true;
+      this.editingAddressId = address.id
+      this.showAddressForm = true
     },
 
     // 重置地址表单时清空选择
@@ -228,13 +212,13 @@ export default defineComponent({
         province: '',
         city: '',
         district: '',
-      };
+      }
       // 重置选择器状态
-      this.selectedProvince = '';
-      this.selectedCity = '';
-      this.selectedDistrict = '';
-      this.cities = [];
-      this.districts = [];
+      this.selectedProvince = ''
+      this.selectedCity = ''
+      this.selectedDistrict = ''
+      this.cities = []
+      this.districts = []
     },
 
     // 统一触发modelValue更新
@@ -242,11 +226,11 @@ export default defineComponent({
       this.$emit('update:modelValue', {
         province: this.selectedProvince,
         city: this.selectedCity,
-        district: this.selectedDistrict
-      });
-    }
-  }
-});
+        district: this.selectedDistrict,
+      })
+    },
+  },
+})
 </script>
 
 <style scoped>

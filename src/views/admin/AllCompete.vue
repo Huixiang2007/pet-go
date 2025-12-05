@@ -69,6 +69,7 @@
         <div class="chart-header">
           <div class="chart-title">订单趋势（近30天）</div>
           <el-select
+          style="--el-select-width: 67%;"
             v-model="chartType"
             placeholder="选择类型"
             size="small"
@@ -157,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, toRefs } from 'vue'
+import { ref} from 'vue'
 
 // 仅为样式展示的静态数据
 const todayOrderCount = ref(128)
@@ -171,7 +172,7 @@ const chartType = ref('order')
 </script>
 <script lang="ts">
 export default {
-  name: 'Dashboard'
+  name: 'DashBoard'
 }
 </script>
 <style scoped lang="scss">

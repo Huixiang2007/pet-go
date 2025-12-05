@@ -130,10 +130,7 @@
 <script  setup lang="ts">
 import { ref } from 'vue'
 // 导入所需图标（根据你的 Element 版本调整，Element Plus 需手动导入）
-import { 
-  Menu, Search, Moon, Bell, Check, User, Lock, 
-  ArrowDown, ArrowUp 
-} from '@element-plus/icons-vue'
+
 interface NotificationItem {
   type: string
   title: string
@@ -164,7 +161,7 @@ const getIconComponent = (type: string) => {
 </script>
 <script lang="ts">
 export default {
-  name: 'Header' // 名字随便填，核心是触发导出
+  name: 'userHeader' // 名字随便填，核心是触发导出
 }
 </script>
 <style scoped lang="scss">

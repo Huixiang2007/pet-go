@@ -150,7 +150,7 @@ const routes = [
   {
     path: '/login',
     name: 'petLogin',
-    component: () => import('@/views/EnterPet/login.vue'),
+    component: () => import('@/views/EnterPet/LoginPet.vue'),
     meta: { title: '欢迎登录 PetGo' },
   },
   {
@@ -174,7 +174,7 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: () => import('@/views/EnterPet/Register.vue'),
+    component: () => import('@/views/EnterPet/RegisterPet.vue'),
     meta: { title: '欢迎注册 PetGo' },
   },
 
@@ -182,7 +182,7 @@ const routes = [
   {
     path: '/protocal',
     name: 'protocal',
-    component: () => import('@/views/EnterPet/Protocal.vue'),
+    component: () => import('@/views/EnterPet/ProtocalPage.vue'),
     meta: { title: '用户协议' },
   },
   //找回密码
@@ -210,7 +210,7 @@ const routes = [
       {
         path: 'dashboard',
         name: 'dashboard',
-        component: () => import('@/views/admin/Data.vue'),
+        component: () => import('@/views/admin/AllData.vue'),
         meta: {
           title: '数据概览',
         },
@@ -219,7 +219,7 @@ const routes = [
       {
         path: 'user',
         name: 'user',
-        component: () => import('@/views/admin/User.vue'),
+        component: () => import('@/views/admin/AllUser.vue'),
         meta: {
           title: '用户管理',
           icon: 'el-icon-user',
@@ -237,7 +237,7 @@ const routes = [
           {
             path: 'audit',
             name: 'fosterAudit',
-            component: () => import('@/views/admin/Judge.vue'),
+            component: () => import('@/views/admin/AllJudge.vue'),
             meta: {
               title: '服务审核',
             },
@@ -245,7 +245,7 @@ const routes = [
           {
             path: 'orders',
             name: 'fosterOrder',
-            component: () => import('@/views/admin/Order.vue'),
+            component: () => import('@/views/admin/AllOrder.vue'),
             meta: {
               title: '寄养订单',
             },

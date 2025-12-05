@@ -1,26 +1,8 @@
 <template>
   <NavBar />
-  <div class="bg-gradient-to-b from-amber-50 to-orange-50 min-h-screen pt-6 flex flex-col items-center">
+  <div class="bg-gradient-to-b from-amber-50 to-orange-50 min-h-screen pt-24 flex flex-col items-center">
     <div class="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col sm:flex-row items-center justify-between py-6 gap-4">
-        <div class="flex items-center">
-          <img src="https://picsum.photos/id/237/80/80" alt="PetGo Logo" class="h-14 w-14 rounded-full shadow-md hover:scale-105 transition-transform" />
-          <span class="ml-3 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-500 hover:to-amber-400 transition-all">
-            PetGo
-          </span>
-        </div>
 
-        <div class="flex-1 max-w-lg w-full">
-          <div class="relative">
-            <input
-              type="text"
-              placeholder="搜索狗粮/猫罐/宠物玩具..."
-              class="w-full py-3 pl-12 pr-4 rounded-full border-2 border-amber-200 focus:border-orange-400 focus:ring-2 focus:ring-orange-200 outline-none transition-all shadow-sm"
-            >
-            <i class="fa fa-search absolute left-5 top-1/2 transform -translate-y-1/2 text-orange-500 text-lg"></i>
-          </div>
-        </div>
-      </div>
 
       <div class="bg-white rounded-full shadow-sm py-2 px-4 mb-6 flex items-center gap-3 overflow-hidden">
         <marquee behavior="scroll" direction="left" scrollamount="3" class="text-sm text-orange-600">

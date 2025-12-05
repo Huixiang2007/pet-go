@@ -1,8 +1,11 @@
 <template>
   <main class="mx-auto px-4 py-8 bg-white">
     <div class="flex items-center ml-[56px]">
-      <img src="https://picsum.photos/id/237/80/80" alt="PetGo Logo" class="h-12 w-12" />
       <span class="ml-2 text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-500">PetGo</span>
+      <router-link to="/shop" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
+        <i class="fas fa-sign-out-alt text-gray-700"></i>
+        <span class="hidden sm:inline ml-1 text-sm text-gray-600">退出</span>
+      </router-link>
       <!-- 搜索框 -->
       <div class="hidden md:flex justify-center items-center flex-1 max-w-md mx-8">
         <div class="relative w-full">
@@ -167,7 +170,8 @@
           <div class="lg:fixed h-[100vh] w-[430px] py-5 pl-2 mt-[-112px] pr-[6rem] overflow-auto">
             <div>
               <div class="flex items-center justify-between">
-                <div class="text-sm text-gray-500">{{ product.shopName }}</div>
+                <div @click="goStore"
+                 class="text-sm text-gray-500">{{ product.shopName }}</div>
               </div>
               <h1 class="mt-4 text-2xl font-bold">{{ product.title}}</h1>
 
@@ -276,6 +280,8 @@
 import axios from 'axios'
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 interface MediaItem { //定义媒体资源
   type: 'image' | 'video'
   src: string
@@ -439,7 +445,6 @@ const productDetail = () => {
     console.log('接口返回数据:', res)
     const productNew = res.data.data
     product.value = productNew
-
     const imageList = productNew.images?.split(',') || []
     const mainImage = productNew.mainImage || imageList[0] || ""
 
@@ -495,7 +500,11 @@ const productDetail = () => {
     console.log('错误详情:', err.response.data)
   })
 }
-
+const goStore = () => {
+  router.push({
+    path: '/Store'
+  })
+}
 
 function selectSkuOption(specName: string, option: string) {
   selectedOptions.value[specName] = option

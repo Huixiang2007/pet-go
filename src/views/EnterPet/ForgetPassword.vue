@@ -126,11 +126,11 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '../../utils/request'
 
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 
 declare global {
   interface Window {
-    layui: any
+    layui: any// eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 
@@ -145,7 +145,7 @@ const titleEmailChars = '身份验证'.split('')
 const titleResetChars = '重置密码'.split('')
 const isSendingCode = ref(false)
 const timer = ref<number | null>(null)
-let layer: any
+let layer: any// eslint-disable-line @typescript-eslint/no-explicit-any
 
 // 表单数据
 const formData = ref({
@@ -174,7 +174,7 @@ const toLogin = () => {
 
 const renderLayuiForm = () => {
   if (window.layui) {
-    window.layui.use(['form'], (form: any) => {
+    window.layui.use(['form'], (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
       // 延迟一小段时间确保 DOM 已更新
       setTimeout(() => {
         form.render()
@@ -234,7 +234,7 @@ const sendCaptcha = async () => {
     } else {
       ElMessage.error(response.msg || '发送验证码失败，请稍后重试')
     }
-  } catch (error: any) {
+  } catch (error: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
     errorMessage.value = error.response?.data?.message || '发送验证码失败，请重试'
     console.error('发送验证码失败:', error)
   }
@@ -336,8 +336,8 @@ const resetPassword = async () => {
       else{
         ElMessage.error(response.msg || '密码重置失败，请重试')
       }  
-  } catch (error) {
-   
+  }finally{
+
   }
 }
 
@@ -346,7 +346,7 @@ onMounted(() => {
    
   if (window.layui) {
     isResetPassword.value = true
-    window.layui.use(['form', 'layer'], (form: any, layerInstance: any) => {
+    window.layui.use(['form', 'layer'], (form: any, layerInstance: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
       layer = layerInstance
       // 扩展验证规则
       form.verify({

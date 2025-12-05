@@ -719,7 +719,7 @@ onMounted(() => {
   watch(currentTab, () => {
     nextTick(() => {
       if (window.layui) {
-        window.layui.use('form', (form: any// eslint-disable-line @typescript-eslint/no-explicit-any
+        window.layui.use('form', (form: any
 
         ) => {
 

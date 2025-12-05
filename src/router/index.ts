@@ -150,7 +150,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'petLogin',
-    component: () => import('@/views/EnterPet/LoginPet.vue'),
+    component: () => import('@/views/enterPet/LoginPet.vue'),
     meta: { title: '欢迎登录 PetGo' },
   },
   {
@@ -174,7 +174,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/register',
     name: 'register',
-    component: () => import('@/views/EnterPet/RegisterPet.vue'),
+    component: () => import('@/views/enterPet/RegisterPet.vue'),
     meta: { title: '欢迎注册 PetGo' },
   },
 
@@ -182,21 +182,21 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/protocal',
     name: 'protocal',
-    component: () => import('@/views/EnterPet/ProtocalPage.vue'),
+    component: () => import('@/views/enterPet/ProtocalPage.vue'),
     meta: { title: '用户协议' },
   },
   //找回密码
   {
     path: '/forget',
     name: 'forget',
-    component: () => import('@/views/EnterPet/ForgetPassword.vue'),
+    component: () => import('@/views/enterPet/ForgetPassword.vue'),
     meta: { title: '找回密码' },
   },
   //个人中心
   {
     path: '/person',
     name: 'PersonalCenter',
-    component: () => import('@/views/PersonalCenter.vue'),
+    component: () => import('@/views/user/PersonalCenter.vue'),
     meta: { title: '个人中心' },
   },
   //后台管理
@@ -211,7 +211,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'dashboard',
         name: 'dashboard',
-        component: () => import('@/views/admin/AllCompete.vue'),
+        component: () => import('@/views/admin/components/AllCompete.vue'),
         meta: {
           title: '数据概览',
         },
@@ -220,7 +220,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'user',
         name: 'user',
-        component: () => import('@/views/admin/AllUser.vue'),
+        component: () => import('@/views/admin/components/AllUser.vue'),
         meta: {
           title: '用户管理',
           icon: 'el-icon-user',
@@ -238,7 +238,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'audit',
             name: 'fosterAudit',
-            component: () => import('@/views/admin/AllJudge.vue'),
+            component: () => import('@/views/admin/components/AllJudge.vue'),
             meta: {
               title: '服务审核',
             },
@@ -246,7 +246,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'orders',
             name: 'fosterOrder',
-            component: () => import('@/views/admin/AllOrder.vue'),
+            component: () => import('@/views/admin/components/AllOrder.vue'),
             meta: {
               title: '寄养订单',
             },

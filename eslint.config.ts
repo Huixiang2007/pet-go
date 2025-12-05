@@ -17,6 +17,7 @@ export default defineConfigWithVueTs(
       '@typescript-eslint/no-implicit-any': 'off',
       'vue/no-explicit-any': 'off',
     },
+  
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),

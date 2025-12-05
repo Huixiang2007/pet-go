@@ -428,8 +428,8 @@ import { ref, onMounted, nextTick, watch, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 // import axios from 'axios'
-import request from '../utils/request'
-import AddressSelect from '../components/AddressSelect.vue'
+import request from '@/utils/request'
+import AddressSelect from '@/components/common/CaptchaLoad.vue'
 import provincesData from 'china-division/dist/provinces.json';
 import citiesData from 'china-division/dist/cities.json';
 import districtsData from 'china-division/dist/areas.json';

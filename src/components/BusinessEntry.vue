@@ -26,21 +26,19 @@
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none bg-white"
                 required>
                <option value="" class="text-gray-400">请选择店铺类型</option>
-  <option value="INDIVIDUAL_STORE">个人店</option> <!-- 对应后端枚举 -->
-  <option value="ENTERPRISE_STORE">企业店</option> <!-- 对应后端枚举 -->
-  <option value="FLAGSHIP_STORE">旗舰店</option> <!-- 对应后端枚举 -->
+  <option value="个人店">个人店</option>
+  <option value="企业店">企业店</option>
+  <option value="旗舰店">旗舰店</option>
               </select>
             </div>
           </div>
 
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- 商铺头像上传（修复预览） -->
             <div class="space-y-2">
               <label class="block text-sm font-medium text-gray-700">
                 商铺头像 <span class="text-red-500">*</span>
               </label>
-              <!-- 修复1：变量名错误（imagepreviews → imagePreviews），且关联当前字段shopAvatar -->
               <div v-if="imagePreviews.shopAvatar" class="mb-2">
                 <img
                   :src="imagePreviews.shopAvatar"
@@ -61,12 +59,12 @@
               </FileUpload>
             </div>
 
-            <!-- 营业执照上传（修复预览） -->
+
             <div class="space-y-2">
               <label class="block text-sm font-medium text-gray-700">
                 营业执照照片 <span class="text-red-500">*</span>
               </label>
-              <!-- 修复2：关联当前字段businessLicense，而非复用shopAvatar -->
+
               <div v-if="imagePreviews.businessLicense" class="mb-2">
                 <img
                   :src="imagePreviews.businessLicense"
@@ -124,13 +122,12 @@
               placeholder="请输入联系人邮箱" required />
           </div>
 
-          <!-- 身份证正反面上传（修复预览） -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
             <div class="space-y-2">
               <label class="block text-sm font-medium text-gray-700">
                 身份证正面 <span class="text-red-500">*</span>
               </label>
-              <!-- 修复3：关联当前字段idCardFront -->
+
               <div v-if="imagePreviews.idCardFront" class="mb-2">
                 <img
                   :src="imagePreviews.idCardFront"
@@ -155,7 +152,7 @@
               <label class="block text-sm font-medium text-gray-700">
                 身份证反面 <span class="text-red-500">*</span>
               </label>
-              <!-- 修复4：关联当前字段idCardBack -->
+
               <div v-if="imagePreviews.idCardBack" class="mb-2">
                 <img
                   :src="imagePreviews.idCardBack"
@@ -251,6 +248,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 // 导入组件
 import AddressSelect from './AddressSelect.vue'
+import FileUpload from './FileUpload.vue'
 // 导入地区数据
 import provincesData from 'china-division/dist/provinces.json'
 import citiesData from 'china-division/dist/cities.json'
@@ -287,7 +285,6 @@ const form = reactive({
   address: '',
   description: ''
 })
-
 // 监听地址对象变化，同步到表单
 watch(addressObject, (newValue) => {
   form.province = newValue.province
@@ -322,11 +319,6 @@ const addressDisplayText = computed(() => {
   } catch (error) {
     console.error('地址名称转换失败:', error)
   }
-
-  // 调试信息
-  console.log('地址编码:', addressObject.value)
-  console.log('转换名称:', { provinceName, cityName, districtName })
-
   return [provinceName, cityName, districtName].filter(Boolean).join(' - ')
 })
 
@@ -349,9 +341,10 @@ const imageData = ref({
   otherDocs: ''
 })
 // 文件上传处理函数 - 修改为存储base64字符串
-const handleFileChange = async (dataUrl: string, type: keyof typeof imageData.value) => {
+const handleFileChange = async (dataUrl:string, type: keyof typeof imageData.value) => {
   try {
     if (dataUrl && dataUrl.startsWith('data:image/')) {
+
       // 直接存储base64字符串
       imageData.value[type] = dataUrl
       ElMessage.success(`${getFieldName(type)}上传成功`)
@@ -458,7 +451,6 @@ const submitForm = async () => {
 const userId = Number(localStorage.getItem('userId'))
 
     const data={
-      userId:userId,
       shopName:form.shopName,
       shopType:form.shopType,
 

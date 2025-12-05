@@ -142,6 +142,7 @@ const handleDrop = async (e: DragEvent) => {
     const files = Array.from(e.dataTransfer?.files || [])
     await processFiles(files)
 }
+
 // 处理文件列表
 const processFiles = async (files: File[]) => {
     // 过滤并限制数量
@@ -181,6 +182,7 @@ const processFiles = async (files: File[]) => {
     if (uploadedUrls.length > 0) {
         emit('upload-success', uploadedUrls)
     }
+}
 
 // 验证文件
 const validateFile = (file: File): boolean => {
@@ -249,7 +251,6 @@ watch(() => props.disabled, (newVal) => {
         fileInput.value = undefined
     }
 })
-}
 </script>
 
 <style scoped>
@@ -292,4 +293,5 @@ watch(() => props.disabled, (newVal) => {
     margin: 0 auto;
 }
 </style>
+
 

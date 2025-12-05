@@ -14,15 +14,16 @@
       <div class="bg-white rounded-2xl shadow-lg px-6 sm:px-10 py-4 mb-8">
         <div class="flex flex-col md:flex-row items-center gap-8">
           <div class="shop-avatar w-28 h-28 rounded-full overflow-hidden border-4 border-orange-100 shadow-lg hover:scale-105 transition-transform">
-            <img src="https://picsum.photos/id/169/120/120?petshop" alt="店铺头像" class="w-full h-full object-cover hover:scale-110">
+            <img :src="shopItem.shopAvatar" alt="店铺头像" class="w-full h-full object-cover hover:scale-110">
           </div>
-          <div class="shop-detail text-center md:text-left flex-1">
+          <div class="shop-detail text-center md:text-left flex-1 flex flex-row justify-between">
+            <div>
             <h2 class="text-2xl sm:text-3xl font-bold mb-4 flex items-center justify-center md:justify-start gap-3">
-              PetGo优品生活馆
-              <span class="text-xs bg-orange-500 text-white px-2 py-1 rounded-full shadow-sm">官方认证</span>
+            {{ shopItem.shopName }}
+              <span class="text-xs bg-orange-500 text-white px-2 py-1 rounded-full shadow-sm">{{ shopItem.shopType }}</span>
             </h2>
             <div class="shop-rating flex flex-wrap items-center justify-center md:justify-start gap-4 mb-4">
-              <div class="rating-score text-3xl font-bold text-orange-600">4.9</div>
+              <div class="rating-score text-3xl font-bold text-orange-600">{{ shopItem.creditScore }}分</div>
               <div class="rating-star text-amber-500 text-lg">
                 <i class="fa fa-star"></i>
                 <i class="fa fa-star"></i>
@@ -33,15 +34,16 @@
               <div class="rating-text text-gray-600">超99%用户满意</div>
             </div>
             <div class="shop-meta text-gray-600 text-sm mb-5 flex flex-wrap justify-center md:justify-start gap-4">
-              <span class="flex items-center gap-1"><i class="fa fa-calendar text-orange-500"></i>开店时间：2020-05-20</span>
-              <span class="flex items-center gap-1"><i class="fa fa-truck text-orange-500"></i>配送范围：全国包邮</span>
+              <span class="flex items-center gap-1"><i class="fa fa-calendar text-orange-500"></i>开店时间：{{ shopItem.openTime }}</span>
+              <span class="flex items-center gap-1"><i class="fa fa-truck text-orange-500"></i>{{ shopItem.status }}</span>
             </div>
             <p class="shop-desc text-gray-600 leading-relaxed mb-6 max-w-2xl mx-auto md:mx-0">
-              PetGo优品生活馆专注于高品质宠物食品、宠物玩具、洗护用品的销售，精选全球优质宠物用品，坚持“宠物至上，品质为先”的经营理念，为毛孩子提供健康、安全的专属好物！
-            </p>
-            <div class="shop-btn flex justify-center md:justify-start gap-4">
+              {{ shopItem.description }}
+            </p></div>
+            <div>
+            <div class="shop-btn flex mt-20 justify-center md:justify-start gap-4">
               <button class="bg-white text-orange-500 px-6 py-2 rounded-full text-sm border-2 border-orange-500 hover:bg-orange-50 transition-all active:scale-95">联系客服</button>
-            </div>
+            </div></div>
           </div>
         </div>
       </div>
@@ -110,8 +112,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-console.log(111)
+import { ref ,onMounted} from 'vue'
+import { useRoute } from 'vue-router'
+import axios from 'axios'
+const router = useRoute()
+const shopid = router.query.id
+
+
 // 定义更详细的商品数据结构
 interface Product {
   id: string | number
@@ -259,7 +266,43 @@ const products = ref<Product[]>([
     isNew: true
   }
 ])
+interface shop {
+  shopName: string;
+  shopAvatar: string;
+  shopType: string;
+  description: string;
+  status: string;
+  openTime: string;
+  creditScore: string;
+}
+const shopItem = ref<shop>({
+  shopName: '',
+  shopAvatar: '',
+  shopType: '',
+  description: '',
+  status: '',
+  openTime: '',
+  creditScore: ''
+})
 
+const getstore=()=>{
+  axios.request({
+    url: `/server/api/shop/shops/detail/${shopid}`,
+    method: 'GET'
+    }).then(res => {
+      console.log('接口返回数据:', res)
+      const store = res.data.data
+      shopItem.value = store
+      console.log('接口返回数据:', store)
+    })
+  .catch(err => {
+    console.log('接口返回错误:', err)
+    console.log('接口返回数据:', err.response.data)
+  })
+}
+onMounted(() => {
+  getstore()
+})
 
 </script>
 

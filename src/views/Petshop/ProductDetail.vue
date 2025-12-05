@@ -1,21 +1,7 @@
 <template>
+  <NavBar />
   <main class="mx-auto px-4 py-8 bg-white">
-    <div class="flex items-center ml-[56px]">
-      <span class="ml-2 text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-500">PetGo</span>
-      <router-link to="/shop" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
-        <i class="fas fa-sign-out-alt text-gray-700"></i>
-        <span class="hidden sm:inline ml-1 text-sm text-gray-600">退出</span>
-      </router-link>
-      <!-- 搜索框 -->
-      <div class="hidden md:flex justify-center items-center flex-1 max-w-md mx-8">
-        <div class="relative w-full">
-          <input type="text" placeholder="搜索宠物用品..." class="w-full py-2 pl-10 pr-4 rounded-full border border-[#f5a623]">
-          <i class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#f5a623]"></i>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mt-12">
       <div class="product-grid grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 md:p-8">
         <div class="lg:col-span-2">
           <div class="flex gap-4">
@@ -166,12 +152,12 @@
         </div>
 
         <!-- 右侧信息 -->
-        <div class="lg:block lg:col-span-1">
+        <div class="lg:block lg:col-span-1 mt-20">
           <div class="lg:fixed h-[100vh] w-[430px] py-5 pl-2 mt-[-112px] pr-[6rem] overflow-auto">
             <div>
               <div class="flex items-center justify-between">
                 <div @click="goStore"
-                 class="text-sm text-gray-500">{{ product.shopName }}</div>
+                 class="text-sm text-gray-500 cursor-pointer border-b border-gray-200 pb-2 hover:text-orange-600">{{ product.shopName }}</div>
               </div>
               <h1 class="mt-4 text-2xl font-bold">{{ product.title}}</h1>
 
@@ -282,6 +268,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 const router = useRouter()
+const shopId= ref('')
 interface MediaItem { //定义媒体资源
   type: 'image' | 'video'
   src: string
@@ -445,6 +432,7 @@ const productDetail = () => {
     console.log('接口返回数据:', res)
     const productNew = res.data.data
     product.value = productNew
+    shopId.value = productNew.shopId
     const imageList = productNew.images?.split(',') || []
     const mainImage = productNew.mainImage || imageList[0] || ""
 
@@ -502,7 +490,10 @@ const productDetail = () => {
 }
 const goStore = () => {
   router.push({
-    path: '/Store'
+    path: '/Store',
+    query: {
+      id: shopId.value
+    }
   })
 }
 

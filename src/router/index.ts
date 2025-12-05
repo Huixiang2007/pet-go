@@ -116,6 +116,11 @@ const routes = [
     name: '/ShopSetting',
     component: () => import('@/views/Petshop/ShopSetting.vue'),
   },
+      {
+    path: '/join-us',
+    name: '/JoinUs',
+    component: () => import('@/views/JoinUs.vue'),
+  },
   {
     path: '/add-product',
     name: 'addProduct',

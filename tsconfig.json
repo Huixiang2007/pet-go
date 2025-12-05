@@ -65,6 +65,11 @@
   "compilerOptions": {
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+   /* 严格类型检查 */
+    "strict": false,
+     "noImplicitAny": false,
+     "noImplicitReturns": false,
+  "noFallthroughCasesInSwitch": true,
 
     "module": "ESNext",
     "moduleResolution": "Bundler",

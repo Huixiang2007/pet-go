@@ -66,10 +66,23 @@
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
    /* 严格类型检查 */
+
+    /* 全局基础配置 */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": false,
+
+    /* 严格类型检查 */
     "strict": false,
-     "noImplicitAny": false,
-     "noImplicitReturns": false,
-  "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false, //允许any类型
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": true,
 
     "module": "ESNext",
     "moduleResolution": "Bundler",

@@ -449,7 +449,7 @@ import citiesData from 'china-division/dist/cities.json';
 import districtsData from 'china-division/dist/areas.json';
 declare global {
   interface Window {
-    layui: any // eslint-disable-line @typescript-eslint/no-explicit-any
+    layui: any
   }
 }
 
@@ -476,7 +476,7 @@ const realNameInfo = ref({
   idCardBack: '',
 })
 const isMessageShowing = ref(false)
-const currentMessageInstance = ref<any>(null) // eslint-disable-line @typescript-eslint/no-explicit-any
+const currentMessageInstance = ref<any>(null)
 // 身份证号脱敏处理
 const maskIdCard = (idCard: string) => {
   if (!idCard) return ''
@@ -781,7 +781,7 @@ const sendVerificationCode = async () => {
       ElMessage.error(response.msg || '发送验证码失败，请稍后重试')
       isSendingCode.value = false
     }
-  } catch (error: any) {// eslint-disable-line @typescript-eslint/no-explicit-any
+  } catch (error) {
 
     ElMessage.error('发送验证码失败，请稍后重试')
     isSendingCode.value = false
@@ -970,7 +970,7 @@ const saveAddress = async () => {
       detailAddress: addressForm.value.detailAddress,
       isDefault: addressForm.value.isDefault ? 0 : 1,
     }
-    let response: any // eslint-disable-line @typescript-eslint/no-explicit-any
+    let response: any
     if (editingAddressId.value) {
       // 编辑地址
 

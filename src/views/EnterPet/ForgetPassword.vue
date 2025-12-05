@@ -3,20 +3,12 @@
     <!-- 使用响应式变量控制容器类名 -->
     <div class="demo-login forPicture" :class="{ 'right-panel-active': isRightPanelActive }">
       <!-- 验证邮箱表单（原form1） -->
-      <form
-        class="layui-form demo-login-container forPicture__form forPicture--signin"
-        v-if="step === 1"
-        @submit.prevent="handleFirstFormSubmit"
-      >
+      <form class="layui-form demo-login-container forPicture__form forPicture--signin" v-if="step === 1">
         <div class="container">
           <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
           <div class="title">
-            <span
-              v-for="(char, index) in titleEmailChars"
-              :key="index"
-              :style="{ animationDelay: `${index * 100}ms` }"
-              class="char"
-            >
+            <span v-for="(char, index) in titleEmailChars" :key="index" :style="{ animationDelay: `${index * 100}ms` }"
+              class="char">
               {{ char }}
             </span>
           </div>
@@ -29,17 +21,8 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-email"></i>
               </div>
-              <input
-                type="text"
-                name="email"
-                v-model="formData.email"
-                lay-verify="required|email"
-                placeholder="QQ邮箱"
-                lay-reqtext="请输入QQ邮箱"
-                autocomplete="off"
-                class="layui-input"
-                lay-affix="clear"
-              />
+              <input type="text" name="email" v-model="formData.email" lay-verify="required|email" placeholder="QQ邮箱"
+                lay-reqtext="请输入QQ邮箱" autocomplete="off" class="layui-input" lay-affix="clear" />
             </div>
           </div>
 
@@ -50,27 +33,13 @@
                   <div class="layui-input-prefix">
                     <i class="layui-icon layui-icon-vercode"></i>
                   </div>
-                  <input
-                    type="text"
-                    name="captcha"
-                    v-model="formData.captcha"
-                    lay-verify="required"
-                    placeholder="验证码"
-                    lay-reqtext="请填写验证码"
-                    autocomplete="off"
-                    class="layui-input"
-                    lay-affix="clear"
-                  />
+                  <input type="text" name="captcha" v-model="formData.captcha" lay-verify="required" placeholder="验证码"
+                    lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" lay-affix="clear" />
                 </div>
               </div>
               <div class="layui-col-xs5">
-                <button
-                  type="button"
-                  class="layui-btn"
-                  :disabled="countdown > 0"
-                  @click="sendCaptcha"
-                  style="margin-left: 10px"
-                >
+                <button type="button" class="layui-btn" :disabled="countdown > 0" @click="sendCaptcha"
+                  style="margin-left: 10px">
                   {{ countdown > 0 ? `${countdown}s后重发` : '获取验证码' }}
                 </button>
               </div>
@@ -90,20 +59,12 @@
       </form>
 
       <!-- 重置密码表单（原form2） -->
-      <form
-        class="layui-form demo-login-container forPicture__form forPicture--signup"
-        @submit.prevent="handleSecondFormSubmit"
-        v-if="step === 2"
-      >
+      <form class="layui-form demo-login-container forPicture__form forPicture--signup" v-if="step === 2">
         <div class="container">
           <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
           <div class="title">
-            <span
-              v-for="(char, index) in titleResetChars"
-              :key="index"
-              :style="{ animationDelay: `${index * 100}ms` }"
-              class="char"
-            >
+            <span v-for="(char, index) in titleResetChars" :key="index" :style="{ animationDelay: `${index * 100}ms` }"
+              class="char">
               {{ char }}
             </span>
           </div>
@@ -114,17 +75,8 @@
             <div class="layui-input-prefix">
               <i class="layui-icon layui-icon-password"></i>
             </div>
-            <input
-              type="password"
-              name="newPassword"
-              v-model="formData.newPassword"
-              lay-verify="required"
-              placeholder="新密码"
-              lay-reqtext="请填写新密码"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="eye"
-            />
+            <input type="password" name="newPassword" v-model="formData.newPassword" lay-verify="required"
+              placeholder="新密码" lay-reqtext="请填写新密码" autocomplete="off" class="layui-input" lay-affix="eye" />
           </div>
         </div>
 
@@ -133,17 +85,8 @@
             <div class="layui-input-prefix">
               <i class="layui-icon layui-icon-password"></i>
             </div>
-            <input
-              type="password"
-              name="confirmPassword"
-              v-model="formData.confirmPassword"
-              lay-verify="required"
-              placeholder="确认新密码"
-              lay-reqtext="请确认新密码"
-              autocomplete="off"
-              class="layui-input"
-              lay-affix="eye"
-            />
+            <input type="password" name="confirmPassword" v-model="formData.confirmPassword" lay-verify="required"
+              placeholder="确认新密码" lay-reqtext="请确认新密码" autocomplete="off" class="layui-input" lay-affix="eye" />
           </div>
         </div>
 
@@ -155,15 +98,10 @@
           <button class="layui-btn btn-donate" @click="resetPassword">重置密码</button>
         </div>
 
-        <div
-          class="layui-form-item demo-login-other"
-          style="display: flex; justify-content: space-between"
-          v-if="step === 2"
-        >
+        <div class="layui-form-item demo-login-other" style="display: flex; justify-content: space-between"
+          v-if="step === 2">
           <span @click="toLogin" class="register">返回登录</span>
-          <span @click="togglePanel" class="backEmail register" style="margin-left: auto"
-            >返回身份认证</span
-          >
+          <span @click="togglePanel" class="backEmail register" style="margin-left: auto">返回身份认证</span>
         </div>
       </form>
 
@@ -187,7 +125,7 @@ import { ElMessage } from 'element-plus'
 
 declare global {
   interface Window {
-    layui: any // eslint-disable-line @typescript-eslint/no-explicit-any
+    layui: any
   }
 }
 
@@ -202,7 +140,7 @@ const titleEmailChars = '身份验证'.split('')
 const titleResetChars = '重置密码'.split('')
 const isSendingCode = ref(false)
 const timer = ref<number | null>(null)
-let layer: any // eslint-disable-line @typescript-eslint/no-explicit-any
+let layer: any
 
 // 表单数据
 const formData = ref({
@@ -231,7 +169,7 @@ const toLogin = () => {
 const renderLayuiForm = () => {
   if (window.layui) {
     window.layui.use(['form'], (form: any) => {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+
       // 延迟一小段时间确保 DOM 已更新
       setTimeout(() => {
         form.render()
@@ -288,7 +226,7 @@ const sendCaptcha = async () => {
       ElMessage.error(response.msg || '发送验证码失败，请稍后重试')
     }
   } catch (error: any) {
-    // eslint-disable-line @typescript-eslint/no-explicit-any
+
     errorMessage.value = error.response?.data?.message || '发送验证码失败，请重试'
     console.error('发送验证码失败:', error)
   }
@@ -396,7 +334,7 @@ onMounted(() => {
   if (window.layui) {
     isResetPassword.value = true
     window.layui.use(['form', 'layer'], (form: any, layerInstance: any) => {
-      // eslint-disable-line @typescript-eslint/no-explicit-any
+
       layer = layerInstance
       // 扩展验证规则
       form.verify({
@@ -458,6 +396,7 @@ onUnmounted(() => {
   color: #999;
   margin: 0;
 }
+
 .error-message {
   /* 间距控制：与上方元素保持距离 */
   margin-top: 0.5rem;
@@ -497,6 +436,7 @@ onUnmounted(() => {
 
 /* 定义脉冲动画 */
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;
@@ -515,7 +455,7 @@ onUnmounted(() => {
 }
 
 /* 保持原有样式不变 */
-.layui-form-checkbox[lay-skin='primary'] > div {
+.layui-form-checkbox[lay-skin='primary']>div {
   margin-top: 0.5px !important;
 }
 
@@ -533,12 +473,10 @@ onUnmounted(() => {
   font-weight: 500;
   transition: 0.8s;
   background-size: 280% auto;
-  background-image: linear-gradient(
-    325deg,
-    var(--btn-bg-2) 0%,
-    var(--btn-bg-1) 55%,
-    var(--btn-bg-2) 90%
-  );
+  background-image: linear-gradient(325deg,
+      var(--btn-bg-2) 0%,
+      var(--btn-bg-1) 55%,
+      var(--btn-bg-2) 90%);
   border: none;
   border-radius: var(--radii);
   color: var(--btn-bg-color);
@@ -767,6 +705,7 @@ body {
 }
 
 @keyframes show {
+
   0%,
   49.99% {
     opacity: 0;

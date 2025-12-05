@@ -169,7 +169,7 @@
                                                         <div class="flex justify-between items-start">
                                                             <h3 class="font-bold text-lg text-gray-800">{{
                                                                 foster.name
-                                                                }}
+                                                            }}
                                                             </h3>
                                                             <span
                                                                 class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs">
@@ -182,15 +182,15 @@
                                                                 class="mr-2"></el-rate>
                                                             <span class="text-sm text-gray-600">({{
                                                                 foster.reviewCount
-                                                                }})</span>
+                                                            }})</span>
                                                         </div>
                                                         <p class="text-gray-600 text-sm mt-1 truncate">{{
                                                             foster.address
-                                                            }}
+                                                        }}
                                                         </p>
                                                         <div class="flex justify-between items-center mt-2">
                                                             <span class="text-blue-500 font-bold">{{ foster.price
-                                                                }}元/天</span>
+                                                            }}元/天</span>
                                                             <div class="flex items-center">
                                                                 <span class="text-xs text-gray-500 mr-2"
                                                                     v-if="currentLocation.lat">
@@ -263,10 +263,10 @@ declare global {
 
 // 地图相关
 const mapContainer = ref<HTMLElement>()
-let map: any = null//eslint-disable-line @typescript-eslint/no-explicit-any
-let markers: any = [] //eslint-disable-line @typescript-eslint/no-explicit-any
-let geocoder: any | null = null //eslint-disable-line @typescript-eslint/no-explicit-any
-let AMapInstance: any | null = null //eslint-disable-line @typescript-eslint/no-explicit-any
+let map: any = null
+let markers: any = []
+let geocoder: any | null = null
+let AMapInstance: any | null = null
 const mapLoadError = ref('')
 
 // 用户家庭住址相关
@@ -432,7 +432,7 @@ const initMap = () => {
         key: "f9a61d8c1043186ca29b9675925160ff",
         version: "2.0",
         plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder"],
-    }).then((AMap: any //eslint-disable-line @typescript-eslint/no-explicit-any
+    }).then((AMap: any
     ) => {
         AMapInstance = AMap;
 
@@ -466,7 +466,7 @@ const updateMapMarkers = () => {
     if (!map) return;
 
     // 清除现有标记
-    markers.forEach((marker: any //eslint-disable-line @typescript-eslint/no-explicit-any
+    markers.forEach((marker: any
 
     ) => marker.remove && marker.remove());
     markers = [];
@@ -533,7 +533,7 @@ const fitMapToMarkers = () => {
 
     // 收集所有标记的经纬度
     const bounds = new AMapInstance.Bounds();
-    markers.forEach((marker: any //eslint-disable-line @typescript-eslint/no-explicit-any
+    markers.forEach((marker: any
 
     ) => {
         bounds.extend(marker.getPosition());

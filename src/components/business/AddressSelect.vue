@@ -53,7 +53,7 @@ interface Address {
   province: string
   city: string
   district: string
-  [key: string]: any // eslint-disable-line @typescript-eslint/no-explicit-any
+  [key: string]: any
 }
 
 export default defineComponent({
@@ -67,7 +67,7 @@ export default defineComponent({
         district: '',
       }),
       validator: (value: any) => {
-        // eslint-disable-line @typescript-eslint/no-explicit-any
+
         return ['province', 'city', 'district'].every((key) =>
           Object.prototype.hasOwnProperty.call(value, key),
         )

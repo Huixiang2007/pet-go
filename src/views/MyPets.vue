@@ -137,9 +137,9 @@
               <div class="detail-tabs-container cute-card" @wheel="handleWheel">
                 <el-tabs v-model="activeTabs[pet.id]" class="detail-tabs">
                   <!-- 健康档案 -->
-                  <el-tab-pane label="🏥 健康档案" name="health">
+                  <!-- <el-tab-pane label="🏥 健康档案" name="health">
                     <HealthRecords :pet="pet" />
-                  </el-tab-pane>
+                  </el-tab-pane> -->
 
                   <!-- 成长记录 -->
                   <el-tab-pane label="📸 成长记录" name="growth">

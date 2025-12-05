@@ -102,7 +102,10 @@ const clearFiles = () => {
     fileList.value = []
 }
 defineExpose({
-    clearFiles
+    clearFiles,
+    removeFile(index: number) {
+        fileList.value.splice(index, 1)
+    }
 })
 // 创建隐藏的file input
 const createFileInput = () => {
@@ -142,8 +145,65 @@ const handleDrop = async (e: DragEvent) => {
     const files = Array.from(e.dataTransfer?.files || [])
     await processFiles(files)
 }
+// 上传单个文件
+const uploadFile = async (file: File): Promise<string> => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const response = await request(
+        props.uploadUrl,
+        'POST',
+        formData,
+    )
+
+    return response.data
+}
+// 删除文件
+const removeFile = (index: number) => {
+    fileList.value.splice(index, 1)
+    emit('file-change', fileList.value)
+}
 // 处理文件列表
 const processFiles = async (files: File[]) => {
+    // 验证文件
+    const validateFile = (file: File): boolean => {
+        // 大小验证
+        if (file.size > props.maxSizeMB * 1024 * 1024) {
+            ElMessage(
+                {
+                    message: `文件大小不能超过${props.maxSizeMB}MB`,
+                    type: 'error',
+                    duration: 3000
+                }
+            )
+
+            return false
+        }
+
+        // 类型验证
+        const acceptTypes = props.accept.split(',').map(t => t.trim())
+        const fileExt = '.' + file.name.split('.').pop()?.toLowerCase()
+        const fileType = file.type.toLowerCase()
+
+        const isValid = acceptTypes.some(type => {
+            if (type === '*/*') return true
+            if (type.endsWith('/*')) return fileType.startsWith(type.split('/')[0] + '/')
+            return fileType === type || fileExt === type
+        })
+
+        if (!isValid) {
+            ElMessage(
+                {
+                    message: `文件"${file.name}"格式不支持，请上传${props.acceptDescription}文件`,
+                    type: 'error',
+                    duration: 3000
+                }
+            )
+            return false
+        }
+
+        return true
+    }
     // 过滤并限制数量
     const validFiles = files
         .filter(file => validateFile(file))
@@ -182,73 +242,19 @@ const processFiles = async (files: File[]) => {
         emit('upload-success', uploadedUrls)
     }
 
-// 验证文件
-const validateFile = (file: File): boolean => {
-    // 大小验证
-    if (file.size > props.maxSizeMB * 1024 * 1024) {
-        ElMessage(
-            {
-                message: `文件大小不能超过${props.maxSizeMB}MB`,
-                type: 'error',
-                duration: 3000
-            }
-        )
 
-        return false
-    }
 
-    // 类型验证
-    const acceptTypes = props.accept.split(',').map(t => t.trim())
-    const fileExt = '.' + file.name.split('.').pop()?.toLowerCase()
-    const fileType = file.type.toLowerCase()
 
-    const isValid = acceptTypes.some(type => {
-        if (type === '*/*') return true
-        if (type.endsWith('/*')) return fileType.startsWith(type.split('/')[0] + '/')
-        return fileType === type || fileExt === type
+
+
+
+    // 清理
+    watch(() => props.disabled, (newVal) => {
+        if (newVal && fileInput.value) {
+            fileInput.value.remove()
+            fileInput.value = undefined
+        }
     })
-
-    if (!isValid) {
-        ElMessage(
-            {
-                message: `文件"${file.name}"格式不支持，请上传${props.acceptDescription}文件`,
-                type: 'error',
-                duration: 3000
-            }
-        )
-        return false
-    }
-
-    return true
-}
-
-// 上传单个文件
-const uploadFile = async (file: File): Promise<string> => {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    const response = await request(
-        props.uploadUrl,
-        'POST',
-        formData,
-    )
-
-    return response.data
-}
-
-// 删除文件
-const removeFile = (index: number) => {
-    fileList.value.splice(index, 1)
-    emit('file-change', fileList.value)
-}
-
-// 清理
-watch(() => props.disabled, (newVal) => {
-    if (newVal && fileInput.value) {
-        fileInput.value.remove()
-        fileInput.value = undefined
-    }
-})
 }
 </script>
 
@@ -292,4 +298,3 @@ watch(() => props.disabled, (newVal) => {
     margin: 0 auto;
 }
 </style>
-

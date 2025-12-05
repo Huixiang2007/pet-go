@@ -3,18 +3,16 @@
         <el-tabs v-model="activeHealthTab" type="border-card">
             <el-tab-pane label="💉 疫苗记录" name="vaccine">
                 <!-- 向子组件传递数据records和列配置columes -->
-                <RecordTable :records="pet.healthRecords?.vaccine" :columns="vaccineColumns"
-                    @add-record="addRecord('vaccine')" @edit-record="editRecord()" />
+                <RecordTable :columns="vaccineColumns" @add-record="addRecord('vaccine')" @edit-record="editRecord()" />
             </el-tab-pane>
 
             <el-tab-pane label="🧼 驱虫记录" name="deworming">
-                <RecordTable :records="pet.healthRecords?.deworming" :columns="dewormingColumns"
-                    @add-record="addRecord('deworming')" @edit-record="editRecord()" />
+                <RecordTable :columns="dewormingColumns" @add-record="addRecord('deworming')"
+                    @edit-record="editRecord()" />
             </el-tab-pane>
 
             <el-tab-pane label="🏥 病历记录" name="medical">
-                <RecordTable :records="pet.healthRecords?.medical" :columns="medicalColumns"
-                    @add-record="addRecord('medical')" @edit-record="editRecord()" />
+                <RecordTable :columns="medicalColumns" @add-record="addRecord('medical')" @edit-record="editRecord()" />
             </el-tab-pane>
         </el-tabs>
     </div>

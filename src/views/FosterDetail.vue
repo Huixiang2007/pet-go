@@ -10,7 +10,6 @@
 
                 <div class="">
 
-
                     <!-- 基本信息卡片 -->
                     <div class="cute-card p-6 bg-white mb-6">
                         <div class="flex flex-col md:flex-row gap-6">
@@ -90,15 +89,15 @@
                                 <!-- 基本信息 -->
                                 <div class="flex justify-between items-start mb-3">
                                     <div>
-                                        <h4 class="font-semibold text-blue-500 text-lg">{{ packageItem.name }}</h4>
+                                        <h4 class="font-semibold text-blue-500 text-lg">{{ packageItem.title }}</h4>
                                         <p class="text-gray-600 text-sm mt-1">{{ packageItem.description }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <div class="text-2xl font-bold text-blue-500">{{ packageItem.price }}<span
+                                        <div class="text-2xl font-bold text-blue-500">{{ packageItem.basePrice }}<span
                                                 class="text-base font-normal">元/天</span></div>
                                         <div class="text-sm"
-                                            :class="packageItem.availableSpots > 0 ? 'text-green-500' : 'text-red-500'">
-                                            {{ packageItem.availableSpots > 0 ? `剩余${packageItem.availableSpots}个名额` :
+                                            :class="packageItem.maxPets > 0 ? 'text-green-500' : 'text-red-500'">
+                                            {{ packageItem.maxPets > 0 ? `剩余${packageItem.maxPets}个名额` :
                                                 '已满' }}
                                         </div>
                                     </div>
@@ -108,10 +107,10 @@
                                 <div class="mb-3">
                                     <div class="text-sm text-gray-600 mb-2">套餐包含：</div>
                                     <div class="flex flex-wrap gap-2">
-                                        <span v-for="feature in packageItem.features" :key="feature"
+                                        <!-- <span v-for="feature in packageItem.features" :key="feature"
                                             class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs">
                                             {{ feature }}
-                                        </span>
+                                        </span> -->
                                     </div>
                                 </div>
 
@@ -121,14 +120,14 @@
                                         <i class="el-icon-guide mr-2 text-blue-400"></i>
                                         <span class="text-gray-600">宠物类型：{{ packageItem.petTypes.join('、') }}</span>
                                     </div>
-                                    <div class="flex items-center">
+                                    <!-- <div class="flex items-center">
                                         <i class="el-icon-time mr-2 text-blue-400"></i>
                                         <span class="text-gray-600">服务时间：{{ packageItem.serviceHours }}</span>
-                                    </div>
+                                    </div> -->
                                 </div>
                                 <!-- 点击预约 -->
                                 <div class="mt-2 flex justify-end ">
-                                    <button class="cute-btn px-8" :disabled="packageItem.availableSpots === 0"
+                                    <button class="cute-btn px-8" :disabled="packageItem.maxPets === 0"
                                         @click="goToBooking(packageItem)">
                                         <i class="el-icon-date mr-2"></i>
                                         立即预订
@@ -165,10 +164,10 @@
                         </div>
 
                         <!-- 评价列表 - 无限滚动 -->
-                        <div class="space-y-6" v-infinite-scroll="loadMoreReviews" infinite-scroll-distance="100">
+                        <!-- <div class="space-y-6" v-infinite-scroll="loadMoreReviews" infinite-scroll-distance="100">
                             <div v-for="review in displayedReviews" :key="review.id"
                                 class="border-b border-blue-100 pb-6 last:border-0">
-                                <!-- 主评论 -->
+                                
                                 <div class="flex justify-between items-start mb-3">
                                     <div class="flex items-center">
                                         <img :src="review.avatar" class="w-10 h-10 rounded-full mr-3">
@@ -186,14 +185,14 @@
 
                                 <p class="text-gray-700 mb-3">{{ review.content }}</p>
 
-                                <!-- 评价图片 -->
+                                
                                 <div v-if="review.images.length > 0" class="grid grid-cols-3 gap-2 mb-3">
                                     <img v-for="(img, index) in review.images" :key="index" :src="img"
                                         class="w-full h-24 object-cover rounded-lg cursor-pointer"
                                         @click="showImagePreview(review.images, index)">
                                 </div>
 
-                                <!-- 评价标签 -->
+                                
                                 <div class="flex flex-wrap gap-1 mb-3">
                                     <el-tag v-for="tag in review.tags" :key="tag" type="info" size="small"
                                         class="rounded-full">
@@ -201,7 +200,7 @@
                                     </el-tag>
                                 </div>
 
-                                <!-- 评论操作 -->
+                               
                                 <div class="flex items-center text-sm text-gray-500">
                                     <span class="mr-4 cursor-pointer hover:text-blue-500"
                                         @click="toggleReply(review.id)">
@@ -212,7 +211,7 @@
                                     </span>
                                 </div>
 
-                                <!-- 回复框 -->
+                                
                                 <div v-if="activeReply === review.id" class="mt-3 ml-12">
                                     <el-input v-model="replyContent" placeholder="写下你的回复..." class="mb-2"
                                         type="textarea" :rows="2"></el-input>
@@ -224,7 +223,7 @@
                                     </div>
                                 </div>
 
-                                <!-- 子评论 -->
+                               
                                 <div v-if="review.replies && review.replies.length > 0" class="mt-4 ml-12 space-y-4">
                                     <div v-for="reply in review.replies" :key="reply.id"
                                         class="bg-gray-50 rounded-lg p-3">
@@ -246,7 +245,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- 加载状态 -->
                         <div v-if="loadingReviews" class="text-center py-4">
@@ -254,10 +253,10 @@
                             <span class="text-gray-500 ml-2">加载中...</span>
                         </div>
 
-                        <div v-if="!hasMoreReviews && displayedReviews.length > 0"
+                        <!-- <div v-if="!hasMoreReviews && displayedReviews.length > 0"
                             class="text-center py-4 text-gray-500">
                             没有更多评价了
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -269,14 +268,11 @@
     </div>
 </template>
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ref, reactive, onMounted } from 'vue'
+// import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 import { useBookingStore } from '@/stores/booking'
-// 路由返回
-const goBack = () => {
-    window.history.back()
-}
+
 
 // 寄养家庭数据
 const fosterHome = reactive({
@@ -305,36 +301,39 @@ const fosterHome = reactive({
     servicePackages: [
         {
             id: 1,
-            type: 'basic',
-            name: '基础寄养套餐',
-            price: 120,
-            availableSpots: 3,
+
+            title: '基础寄养套餐',
+            basePrice: 120,
+            maxPets: 10,
+            serviceType: 1,
             description: '适合短期寄养的基础服务',
             petTypes: ['猫', '狗'],
-            serviceHours: '24小时照顾',
-            features: ['每日两次遛狗', '定时喂食', '基础清洁', '日常互动', '定期照片反馈']
+
+
         },
         {
             id: 2,
-            type: 'premium',
-            name: '尊享寄养套餐',
-            price: 180,
-            availableSpots: 2,
-            description: '包含更多个性化服务的优质套餐',
+
+            title: '基础寄养套餐',
+            basePrice: 120,
+            maxPets: 10,
+            serviceType: 1,
+
+            description: '适合短期寄养的基础服务',
             petTypes: ['猫', '狗'],
-            serviceHours: '24小时专业照顾',
-            features: ['专属活动空间', '个性化饮食', '美容护理', '视频互动', '健康监测']
+
         },
         {
-            id: 4,
-            type: 'holiday',
-            name: '节假日套餐',
-            price: 220,
-            availableSpots: 0,
-            description: '节假日专属服务，提供更贴心的照顾',
+            id: 3,
+
+            title: '基础寄养套餐',
+            basePrice: 120,
+            maxPets: 10,
+            serviceType: 1,
+
+            description: '适合短期寄养的基础服务',
             petTypes: ['猫', '狗'],
-            serviceHours: '24小时加强照顾',
-            features: ['增加遛狗次数', '节日加餐', '专属玩具', '节日摄影', '特别活动']
+
         }
     ],
     contact: {
@@ -342,25 +341,34 @@ const fosterHome = reactive({
         phone: '15037347372'
     }
 })
-const showContactModal = ref(false)
 const showImageDialog = ref(false)
 const previewImage = ref('')
 
 // ==================== 评价系统 ====================
-const activeReply = ref('')
-const replyContent = ref('')
+// const activeReply = ref('')
+// const replyContent = ref('')
 const loadingReviews = ref(false)
-const hasMoreReviews = ref(true)
-const pageSize = 5
-const currentPage = ref(0)
-const displayedReviews = ref<any[]>([])
+// const hasMoreReviews = ref(true)
+// const pageSize = 5
+// const currentPage = ref(0)
+// const displayedReviews = ref<Review[]>([])
 
 
 //套餐选择
 const router = useRouter();
 const route = useRoute();
 const bookingStore = useBookingStore();
-const goToBooking = (packageItem: any) => {
+interface PackageItem {
+    id: number
+    title: string
+    basePrice: number
+    description: string
+    petTypes: string[]
+    maxPets: number
+    serviceType: number
+}
+
+const goToBooking = (packageItem: PackageItem) => {
     // 保存到store
     console.log('保存到store', packageItem);
     const fosterHomeId = route.params.id;
@@ -391,122 +399,122 @@ const ratingDetails = ref([
 ])
 
 // 模拟评价数据
-const allReviews = [
-    {
-        id: '1',
-        userName: '王小姐',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100',
-        petType: '柯基',
-        packageType: '尊享寄养套餐',
-        rating: 5,
-        content: '非常满意！工作人员很专业，每天都会发视频和照片，让我很放心。环境也很干净整洁，下次还会选择这里！',
-        images: [
-            'https://images.unsplash.com/photo-1552053831-71594a27632d?w=200',
-            'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=200'
-        ],
-        tags: ['环境干净', '服务贴心', '专业负责'],
-        likes: 12,
-        date: '2024-01-15',
-        replies: [
-            {
-                id: '1-1',
-                userName: '蓝海宠物乐园',
-                avatar: 'https://images.unsplash.com/photo-1560743641-3914f2c45636?w=100',
-                content: '感谢您的认可！我们会继续努力为每只宠物提供最好的服务。',
-                date: '2024-01-16',
-                isOwner: true
-            }
-        ]
-    },
-    {
-        id: '2',
-        userName: '李先生',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
-        petType: '布偶猫',
-        packageType: '基础寄养套餐',
-        rating: 4,
-        content: '猫咪在这里住得很开心，工作人员对猫咪很有耐心。环境舒适，价格合理，推荐！',
-        images: [
-            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200'
-        ],
-        tags: ['环境干净', '性价比高'],
-        likes: 8,
-        date: '2024-01-12',
-        replies: []
-    }
-]
+// const allReviews = [
+//     {
+//         id: '1',
+//         userName: '王小姐',
+//         avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100',
+//         petType: '柯基',
+//         packageType: '尊享寄养套餐',
+//         rating: 5,
+//         content: '非常满意！工作人员很专业，每天都会发视频和照片，让我很放心。环境也很干净整洁，下次还会选择这里！',
+//         images: [
+//             'https://images.unsplash.com/photo-1552053831-71594a27632d?w=200',
+//             'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=200'
+//         ],
+//         tags: ['环境干净', '服务贴心', '专业负责'],
+//         likes: 12,
+//         date: '2024-01-15',
+//         replies: [
+//             {
+//                 id: '1-1',
+//                 userName: '蓝海宠物乐园',
+//                 avatar: 'https://images.unsplash.com/photo-1560743641-3914f2c45636?w=100',
+//                 content: '感谢您的认可！我们会继续努力为每只宠物提供最好的服务。',
+//                 date: '2024-01-16',
+//                 isOwner: true
+//             }
+//         ]
+//     },
+//     {
+//         id: '2',
+//         userName: '李先生',
+//         avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
+//         petType: '布偶猫',
+//         packageType: '基础寄养套餐',
+//         rating: 4,
+//         content: '猫咪在这里住得很开心，工作人员对猫咪很有耐心。环境舒适，价格合理，推荐！',
+//         images: [
+//             'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200'
+//         ],
+//         tags: ['环境干净', '性价比高'],
+//         likes: 8,
+//         date: '2024-01-12',
+//         replies: []
+//     }
+// ]
 
-const loadMoreReviews = () => {
-    if (loadingReviews.value || !hasMoreReviews.value) return
+// const loadMoreReviews = () => {
+//     if (loadingReviews.value || !hasMoreReviews.value) return
 
-    loadingReviews.value = true
-    setTimeout(() => {
-        const start = currentPage.value * pageSize
-        const end = start + pageSize
-        const newReviews = allReviews.slice(start, end)
+//     loadingReviews.value = true
+//     setTimeout(() => {
+//         const start = currentPage.value * pageSize
+//         const end = start + pageSize
+//         const newReviews = allReviews.slice(start, end)
 
-        if (newReviews.length > 0) {
-            displayedReviews.value.push(...newReviews)
-            currentPage.value++
-        }
+//         if (newReviews.length > 0) {
+//             displayedReviews.value.push(...newReviews)
+//             currentPage.value++
+//         }
 
-        hasMoreReviews.value = newReviews.length === pageSize
-        loadingReviews.value = false
-    }, 1000)
-}
+//         hasMoreReviews.value = newReviews.length === pageSize
+//         loadingReviews.value = false
+//     }, 1000)
+// }
 
-const toggleReply = (reviewId: string) => {
-    activeReply.value = activeReply.value === reviewId ? '' : reviewId
-    if (activeReply.value) {
-        replyContent.value = ''
-    }
-}
+// const toggleReply = (reviewId: string) => {
+//     activeReply.value = activeReply.value === reviewId ? '' : reviewId
+//     if (activeReply.value) {
+//         replyContent.value = ''
+//     }
+// }
 
-const cancelReply = () => {
-    activeReply.value = ''
-    replyContent.value = ''
-}
+// const cancelReply = () => {
+//     activeReply.value = ''
+//     replyContent.value = ''
+// }
 
-const submitReply = (reviewId: string) => {
-    if (!replyContent.value.trim()) {
-        ElMessage.warning('请输入回复内容')
-        return
-    }
+// const submitReply = (reviewId: string) => {
+//     if (!replyContent.value.trim()) {
+//         ElMessage.warning('请输入回复内容')
+//         return
+//     }
 
-    const review = displayedReviews.value.find(r => r.id === reviewId)
-    if (review) {
-        if (!review.replies) {
-            review.replies = []
-        }
-        review.replies.push({
-            id: `${reviewId}-${Date.now()}`,
-            userName: '当前用户',
-            avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
-            content: replyContent.value,
-            date: new Date().toISOString().split('T')[0],
-            isOwner: false
-        })
-        ElMessage.success('回复成功')
-        cancelReply()
-    }
-}
+//     const review = displayedReviews.value.find(r => r.id === reviewId)
+//     if (review) {
+//         if (!review.replies) {
+//             review.replies = []
+//         }
+//         review.replies.push({
+//             id: `${reviewId}-${Date.now()}`,
+//             userName: '当前用户',
+//             avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
+//             content: replyContent.value,
+//             date: new Date().toISOString().split('T')[0],
+//             isOwner: false
+//         })
+//         ElMessage.success('回复成功')
+//         cancelReply()
+//     }
+// }
 
-const toggleLike = (reviewId: string) => {
-    const review = displayedReviews.value.find(r => r.id === reviewId)
-    if (review) {
-        review.likes += 1
-        ElMessage.success('感谢您的认可')
-    }
-}
+// const toggleLike = (reviewId: string) => {
+//     const review = displayedReviews.value.find(r => r.id === reviewId)
+//     if (review) {
+//         review.likes += 1
+//         ElMessage.success('感谢您的认可')
+//     }
+// }
 
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('zh-CN')
-}
+// const formatDate = (dateString: string) => {
+//     return new Date(dateString).toLocaleDateString('zh-CN')
+// }
 
 // ==================== 初始化 ====================
 onMounted(() => {
     // 初始加载评价
-    loadMoreReviews()
+    // loadMoreReviews()
 })
 </script>
 

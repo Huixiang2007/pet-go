@@ -169,8 +169,8 @@ const form = reactive<OrganizationForm>({
     qualificationPhotos: [],
     environmentPhotos: []
 })
-const qualificationRef = ref<any>(null)
-const environmentRef = ref<any>(null)
+const qualificationRef = ref<any>(null) //eslint-disable-line @typescript-eslint/no-explicit-any
+const environmentRef = ref<any>(null) //eslint-disable-line @typescript-eslint/no-explicit-any
 
 // 修复地址同步逻辑
 interface Area {

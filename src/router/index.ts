@@ -164,6 +164,12 @@ const routes = [
     name: 'addPet',
     component: () => import('@/views/AddPet.vue'),
   },
+  //加入我们
+  {
+    path: '/join-us',
+    name: 'joinUs',
+    component: () => import('@/views/JoinUs.vue'),
+  },
   //注册
   {
     path: '/register',

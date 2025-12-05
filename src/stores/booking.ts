@@ -1,22 +1,19 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
 interface PackageItem {
-  id: string
-  name: string
-  price: number
-  availableSpots: number
-  type: string
+  id: number
+  title: string
+  basePrice: number
   description: string
   petTypes: string[]
-  serviceHours: string
-  features: string[]
+  maxPets: number
+  serviceType: number
 }
 
 export const useBookingStore = defineStore('booking', {
   state: () => ({
     selectedPackage: null as PackageItem | null,
-    fosterHome: null as any | null,
-    bookingForm: {} as any,
+    // fosterHome: null as any | null,
+    // bookingForm: {} as any,
   }),
   actions: {
     setSelectedPackage(packageInfo: PackageItem) {
@@ -24,7 +21,7 @@ export const useBookingStore = defineStore('booking', {
     },
     clearBookingData() {
       this.selectedPackage = null
-      this.bookingForm = {}
+      // this.bookingForm = {}
     },
   },
 })

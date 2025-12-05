@@ -24,7 +24,7 @@
     </div>
 </template>
 
-<script setup lang="ts" generic="T">
+<script setup lang="ts">
 import { defineProps, computed } from 'vue';
 type DateString = `${number}-${number}-${number}`;
 interface HealthRecords {
@@ -54,14 +54,14 @@ interface TableColumn {
 }
 //子组件通过definProps接受父组件传递的两个属性:records和columns
 const props = defineProps<{
-    records?: T[];// T 是泛型，由父组件传递的 records 类型推导
+    records?: HealthRecords[];// T 是泛型，由父组件传递的 records 类型推导
     columns: TableColumn[];
 }>();
 
-const emit = defineEmits<{
-    'add-record': [];
-    'edit-record': [index: number];
-}>();
+// const emit = defineEmits<{
+//     'add-record': [];
+//     'edit-record': [index: number];
+// }>();
 console.log(props.records)
 const formattedRecords = computed(() => {
     return props.records?.map(record => {

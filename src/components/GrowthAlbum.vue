@@ -5,9 +5,9 @@
       <div v-for="(record, index) in pet.growthRecords" :key="index" class="growth-record cute-card">
         <div class="record-header">
           <h4 class="record-age">🎯 {{ record.age }}</h4>
-          <el-button type="danger" icon="Delete" size="small" @click="deleteGrowthRecord(index)" class="cute-btn">
+          <!-- <el-button type="danger" icon="Delete" size="small" @click="deleteGrowthRecord(index)" class="cute-btn">
             删除
-          </el-button>
+          </el-button> -->
         </div>
 
         <!-- 照片 -->
@@ -51,8 +51,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { Delete, Plus } from '@element-plus/icons-vue';
+// import { ElMessage, ElMessageBox } from 'element-plus';
+// import { Delete, Plus } from '@element-plus/icons-vue';
 enum PetGender {
   Male = 1,
   Female = 0,
@@ -118,9 +118,9 @@ interface Props {
 
 const props = defineProps<Props>();
 console.log(props.pet);
-const emit = defineEmits<{
-  'add-record': [];
-}>();
+// const emit = defineEmits<{
+//   'add-record': [];
+// }>();
 
 const photoViewerVisible = ref(false);
 const currentPhotoAge = ref('');
@@ -141,24 +141,24 @@ const viewPhoto = (age: string, index: number) => {
 };
 
 // 删除成长记录
-const deleteGrowthRecord = async (index: number) => {
-  try {
-    await ElMessageBox.confirm(
-      '确定要删除这条成长记录吗？',
-      '删除确认',
-      {
-        confirmButtonText: '确定删除',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }
-    );
+// const deleteGrowthRecord = async (index: number) => {
+//   try {
+//     await ElMessageBox.confirm(
+//       '确定要删除这条成长记录吗？',
+//       '删除确认',
+//       {
+//         confirmButtonText: '确定删除',
+//         cancelButtonText: '取消',
+//         type: 'warning'
+//       }
+//     );
 
-    props.pet.growthRecords?.splice(index, 1);
-    ElMessage.success('成长记录删除成功');
-  } catch {
-    // 用户取消删除
-  }
-};
+//     props.pet.growthRecords?.splice(index, 1);
+//     ElMessage.success('成长记录删除成功');
+//   } catch {
+//     // 用户取消删除
+//   }
+// };
 </script>
 
 <style scoped>

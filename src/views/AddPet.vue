@@ -84,7 +84,7 @@
                                         </div>
                                     </el-upload>
                                     <transition name="slide-fade">
-                                        <div
+                                        <div v-if="showUploadTip"
                                             class="bg-gradient-to-r from-pink-50 to-rose-50 border-l-4 border-rose-300 rounded-r-lg p-5 max-w-md shadow-sm">
                                             <div class="flex items-start space-x-3">
 
@@ -135,9 +135,9 @@
                                 <el-form-item label="性别" prop="gender">
                                     <div class="flex space-x-4">
                                         <div class="flex-1" @click="formData.gender = 1">
-                                            <div class="gender-card w-20"
+                                            <div class="gender-card cursor-pointer rounded-2xl p-2 transition-all duration-300 border-2 border-transparent w-20"
                                                 :class="{ 'gender-card-male-active': formData.gender === 1 }">
-                                                <div class="gender-icon"
+                                                <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300 "
                                                     :class="{ 'bg-gradient-to-br from-blue-400 to-cyan-400': formData.gender === 1, 'bg-gradient-to-br from-blue-100 to-cyan-100': formData.gender !== 1 }">
                                                     <el-icon class="text-white text-xl">
                                                         <Male />
@@ -147,9 +147,9 @@
                                             </div>
                                         </div>
                                         <div class="flex-1" @click="formData.gender = 0">
-                                            <div class="gender-card w-20"
+                                            <div class="gender-card cursor-pointer rounded-2xl p-2 transition-all duration-300 border-2 border-transparent w-20"
                                                 :class="{ 'gender-card-active': formData.gender === 0 }">
-                                                <div class="gender-icon"
+                                                <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300"
                                                     :class="{ 'bg-gradient-to-br from-pink-400 to-rose-400': formData.gender === 0, 'bg-gradient-to-br from-pink-100 to-rose-100': formData.gender !== 0 }">
                                                     <el-icon class="text-white text-xl">
                                                         <Female />
@@ -177,7 +177,8 @@
                                         <el-option v-for="status in healthStatusOptions" :key="status.value"
                                             :label="status.label" :value="status.value" :class="status.class">
                                             <span class="flex items-center">
-                                                <span class="status-indicator" :class="status.indicatorClass"></span>
+                                                <span class="w-2 h-2 rounded-full mr-3"
+                                                    :class="status.indicatorClass"></span>
                                                 {{ status.label }}
                                             </span>
                                         </el-option>
@@ -214,7 +215,7 @@
                             </h3>
                         </div>
 
-                        <el-form-item class="personality-section">
+                        <el-form-item class="space-y-6">
                             <div class="space-y-6">
                                 <!-- 已选择标签 -->
                                 <div>
@@ -227,9 +228,11 @@
                                         class="selected-tags-container min-h-20 p-4 rounded-xl bg-gradient-to-br from-pink-50/50 to-rose-50/50 border border-rose-100">
                                         <transition-group name="list" tag="div" class="flex flex-wrap gap-3">
                                             <div v-for="tag in formData.characterTags" :key="tag"
-                                                class="selected-tag group" @click="removeTag(tag)">
-                                                <span class="selected-tag-text">{{ tag }}</span>
-                                                <el-icon class="selected-tag-close">
+                                                class="selected-tag inline-flex items-center px-4 py-2.5 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden group"
+                                                @click="removeTag(tag)">
+                                                <span class="text-rose-700 font-medium text-sm">{{ tag }}</span>
+                                                <el-icon
+                                                    class="ml-2 text-rose-400 hover:text-rose-600 transition-colors duration-200 text-xs opacity-0 group-hover:opacity-100">
                                                     <Close />
                                                 </el-icon>
                                             </div>
@@ -253,7 +256,8 @@
                                         <span class="text-rose-700 font-medium">推荐标签</span>
                                     </div>
                                     <div class="recommended-tags grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                                        <div v-for="tag in defaultTags" :key="tag" class="recommended-tag"
+                                        <div v-for="tag in defaultTags" :key="tag"
+                                            class="recommended-tag px-4 py-3 rounded-xl text-center cursor-pointer transition-all duration-300 flex items-center justify-center"
                                             :class="{ 'recommended-tag-active': formData.characterTags.includes(tag) }"
                                             @click="toggleDefaultTag(tag)">
                                             {{ tag }}
@@ -281,7 +285,8 @@
                                                 {{ 5 - newTag.length }}/5
                                             </div>
                                         </div>
-                                        <el-button @click="addTag" size="large" class="add-tag-btn"
+                                        <el-button @click="addTag" size="large"
+                                            class="px-6 bg-gradient-to-r from-pink-400 to-rose-400 border-none text-white rounded-xl hover:shadow-lg transition-all duration-300"
                                             :disabled="!newTag.trim()">
                                             <el-icon class="mr-1">
                                                 <Plus />
@@ -297,19 +302,22 @@
                     <!-- 操作按钮 -->
                     <div
                         class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-rose-100">
-                        <el-button @click="resetForm" size="large" class="action-btn reset-btn">
+                        <el-button @click="resetForm" size="large"
+                            class="action-btn px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2 reset-btn border-rose-200 text-rose-600 bg-white hover:bg-rose-50 hover:border-rose-300 hover:text-rose-700">
                             <el-icon class="mr-2">
                                 <Refresh />
                             </el-icon>
                             重置表单
                         </el-button>
-                        <el-button @click="goBack" size="large" class="action-btn cancel-btn">
+                        <el-button @click="goBack" size="large"
+                            class="action-btn px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2 cancel-btn border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">
                             <el-icon class="mr-2">
                                 <Close />
                             </el-icon>
                             取消
                         </el-button>
-                        <el-button type="primary" @click="submitForm" size="large" class="action-btn submit-btn"
+                        <el-button type="primary" @click="submitForm" size="large"
+                            class="action-btn px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2 submit-btn"
                             :loading="loading" :disabled="loading">
                             <template #loading>
                                 <el-icon class="is-loading animate-spin mr-2">
@@ -359,9 +367,11 @@
         <transition name="modal-fade">
             <div v-if="showSuccess"
                 class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                <div class="success-modal animate-modal-in">
-                    <div class="success-icon">
-                        <el-icon>
+                <div
+                    class="success-modal bg-white rounded-3xl p-8 max-w-md w-full relative overflow-hidden animate-modal-in">
+                    <div
+                        class="w-24 h-24 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
+                        <el-icon class="text-white text-5xl">
                             <SuccessFilled />
                         </el-icon>
                     </div>
@@ -401,7 +411,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import {
@@ -444,7 +454,7 @@ const showUploadTip = ref(false);
 const showSuccess = ref(false);
 const showProgress = ref(false);
 const progress = ref(0);
-const selectedAnimal = ref('');
+// const selectedAnimal = ref('');
 const animalOptions = [
     {
         value: 'cat',
@@ -587,8 +597,10 @@ const beforeAvatarUpload = (file: File) => {
     }
     return true;
 };
-
-const handleAvatarUpload = (options: any) => {
+interface fileOptions {
+    file: File;
+}
+const handleAvatarUpload = (options: fileOptions) => {
     const file = options.file;
     const reader = new FileReader();
     reader.onloadstart = () => {
@@ -643,6 +655,7 @@ const submitForm = async () => {
         }, 500);
 
     } catch (error) {
+        console.error('AddPet error:', error);
         ElMessage.error('请完善表单信息!');
         showProgress.value = false;
     } finally {
@@ -678,7 +691,7 @@ const goBack = () => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 /* 动画效果 */
 @keyframes modal-in {
     0% {
@@ -698,7 +711,7 @@ const goBack = () => {
 
 /* 性别卡片样式 */
 .gender-card {
-    @apply cursor-pointer rounded-2xl p-2 transition-all duration-300 border-2 border-transparent;
+
     background: linear-gradient(135deg, #ffffff, #fdf2f8);
     box-shadow: 0 4px 12px rgba(244, 114, 182, 0.08);
 }
@@ -720,17 +733,6 @@ const goBack = () => {
     box-shadow: 0 8px 24px rgba(114, 168, 244, 0.2);
 }
 
-.gender-icon {
-    @apply w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300;
-}
-
-.gender-label {
-    @apply text-lg font-semibold transition-colors duration-300;
-}
-
-.gender-desc {
-    @apply transition-colors duration-300;
-}
 
 /* 头像上传器样式 */
 .avatar-uploader :deep(.el-upload) {
@@ -778,16 +780,13 @@ const goBack = () => {
 }
 
 /* 性格标签样式 */
-.personality-section {
-    @apply space-y-6;
-}
 
 .selected-tags-container {
     min-height: 80px;
 }
 
 .selected-tag {
-    @apply inline-flex items-center px-4 py-2.5 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden;
+
     background: linear-gradient(135deg, #fdf2f8, #ffe4e6);
     border: 1px solid #fbcfe8;
 }
@@ -799,16 +798,8 @@ const goBack = () => {
     box-shadow: 0 4px 12px rgba(244, 114, 182, 0.15);
 }
 
-.selected-tag-text {
-    @apply text-rose-700 font-medium text-sm;
-}
-
-.selected-tag-close {
-    @apply ml-2 text-rose-400 hover:text-rose-600 transition-colors duration-200 text-xs opacity-0 group-hover:opacity-100;
-}
-
 .recommended-tag {
-    @apply px-4 py-3 rounded-xl text-center cursor-pointer transition-all duration-300 flex items-center justify-center;
+
     background: linear-gradient(135deg, #ffffff, #fafafa);
     border: 1px solid #f3f4f6;
     color: #6b7280;
@@ -882,10 +873,6 @@ const goBack = () => {
     background: linear-gradient(135deg, #fdf2f8, #ffe4e6);
 }
 
-.status-indicator {
-    @apply w-2 h-2 rounded-full mr-3;
-}
-
 /* 开关样式 */
 .custom-switch:deep(.el-switch__core) {
     border-radius: 12px;
@@ -894,12 +881,12 @@ const goBack = () => {
 
 /* 按钮样式 */
 .action-btn {
-    @apply px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2;
+
     min-width: 140px;
 }
 
 .reset-btn {
-    @apply border-rose-200 text-rose-600 bg-white hover:bg-rose-50 hover:border-rose-300 hover:text-rose-700;
+
     box-shadow: 0 4px 12px rgba(244, 114, 182, 0.08);
 }
 
@@ -908,9 +895,6 @@ const goBack = () => {
     box-shadow: 0 8px 20px rgba(244, 114, 182, 0.15);
 }
 
-.cancel-btn {
-    @apply border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700;
-}
 
 .submit-btn {
     background: linear-gradient(135deg, #f472b6, #ec4899);
@@ -927,10 +911,6 @@ const goBack = () => {
 
 .submit-btn:active:not(.is-disabled) {
     transform: translateY(0);
-}
-
-.add-tag-btn {
-    @apply px-6 bg-gradient-to-r from-pink-400 to-rose-400 border-none text-white rounded-xl hover:shadow-lg transition-all duration-300;
 }
 
 .add-tag-btn:hover:not(.is-disabled) {
@@ -956,16 +936,13 @@ const goBack = () => {
 
 /* 成功弹窗 */
 .success-modal {
-    @apply bg-white rounded-3xl p-8 max-w-md w-full relative overflow-hidden;
+
     box-shadow: 0 25px 50px rgba(244, 114, 182, 0.2);
 }
 
-.success-icon {
-    @apply w-24 h-24 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl;
-}
 
 .success-icon .el-icon {
-    @apply text-white text-5xl;
+    @apply ;
 }
 
 .success-content {

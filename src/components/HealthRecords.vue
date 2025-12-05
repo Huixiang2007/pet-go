@@ -4,17 +4,17 @@
             <el-tab-pane label="💉 疫苗记录" name="vaccine">
                 <!-- 向子组件传递数据records和列配置columes -->
                 <RecordTable :records="pet.healthRecords?.vaccine" :columns="vaccineColumns"
-                    @add-record="addRecord('vaccine')" @edit-record="editRecord('vaccine', $event)" />
+                    @add-record="addRecord('vaccine')" @edit-record="editRecord()" />
             </el-tab-pane>
 
             <el-tab-pane label="🧼 驱虫记录" name="deworming">
                 <RecordTable :records="pet.healthRecords?.deworming" :columns="dewormingColumns"
-                    @add-record="addRecord('deworming')" @edit-record="editRecord('deworming', $event)" />
+                    @add-record="addRecord('deworming')" @edit-record="editRecord()" />
             </el-tab-pane>
 
             <el-tab-pane label="🏥 病历记录" name="medical">
                 <RecordTable :records="pet.healthRecords?.medical" :columns="medicalColumns"
-                    @add-record="addRecord('medical')" @edit-record="editRecord('medical', $event)" />
+                    @add-record="addRecord('medical')" @edit-record="editRecord()" />
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -89,7 +89,7 @@ interface Pet {
 const props = defineProps<{
     pet: Pet;
 }>();
-
+console.log(props.pet);
 const activeHealthTab = ref('vaccine');
 
 // 表格列定义
@@ -118,7 +118,7 @@ const addRecord = (type: string) => {
 };
 
 // 编辑记录
-const editRecord = (type: string, index: number) => {
-    ElMessage.info(`编辑${type}记录功能开发中...`);
+const editRecord = () => {
+
 };
 </script>

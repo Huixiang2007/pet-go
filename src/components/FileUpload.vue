@@ -96,7 +96,7 @@ const fileInput = ref<HTMLInputElement>()
 
 // 计算属性
 const isMaxReached = computed(() => fileList.value.length >= props.maxCount)
-const isImageType = computed(() => props.accept.includes('image'))
+// const isImageType = computed(() => props.accept.includes('image'))
 // 清空内部文件列表
 const clearFiles = () => {
     fileList.value = []

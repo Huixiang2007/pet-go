@@ -2,7 +2,9 @@
   <div class="pet-showcase-app">
     <NavBar />
     <div class="scroll-container" :style="{
+
       transform: `translateY(-${scrollOffset}vh)`,
+      marginTop: '5.5rem',
       transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
     }" @wheel="handleWheel">
       <!-- 轮播图 -->
@@ -101,31 +103,25 @@
                       <!-- <el-tag v-for="tag in pet.characterTags" :key="tag" class="personality-tag" size="small">
                         {{ tag }}
                       </el-tag> -->
-                      <el-tag v-for="tag in pet.characterTags" :key="tag" closable :disable-transitions="false"
+                      <el-tag v-for="tag in pet.characterTags" :key="tag" :disable-transitions="false"
                         @close="handleCloseTag(pet.id, tag)" style=" background-color: #e3f2fd;
-                        color: #2196f3;
+                               color: #2196f3;
                                padding: 0.5rem 0.9rem;
-                        border-radius: 20px;
-                          font-size: 0.9rem;
-                           font-weight: bold;
-                         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-                            display:inline-block;
-                           height:auto;
-    
+                               border-radius: 20px;
+                               font-size: 0.9rem;
+                               font-weight: bold;
+                               box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+                               display:inline-block;
+                               height:auto;
                                font-family: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
-                                margin-bottom:0.9rem;
+                               margin-bottom:0.9rem;
                                  ">
                         {{ tag }}
                       </el-tag>
-                      <el-input v-if="tagInputVisible[pet.id]" v-model="tagInputValue" :ref="setInputRef(pet.id)"
-                        class="w-20" size="default" @keyup.enter="handleInputConfirm(pet.id)"
-                        @blur="handleInputConfirm(pet.id)" style="width:200px;height: 33px" />
-                      <el-button v-else class="button-new-tag" size="default" @click="showAddTagInput(pet.id)">
-                        点击添加
-                      </el-button>
+
                     </div>
                   </div>
-                  <!-- 编辑按钮：悬浮显示 -->
+                  <!-- 编辑按钮-->
                   <div class="edit-btn-container">
                     <el-button icon="Edit" size="small" class="edit-btn cute-btn" @click="openEditDialog(pet)">
                       编辑信息
@@ -248,21 +244,16 @@
 </template>
 
 <script setup lang="ts">
-// @ts-ignore - Cursor 的 TypeScript 检查误报，@/ 别名在 Vite 和 TypeScript 配置中已正确设置
-import FragmentCarousel from '@/components/FragmentCarousel.vue';
-// @ts-ignore - Cursor 的 TypeScript 检查误报
-import NavBar from '@/components/NavBar.vue'
 
-
-import { ref, reactive, onMounted, onUnmounted, computed, nextTick } from 'vue';
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { House, ArrowUp, ArrowDown, Plus, Delete, Male, Female } from '@element-plus/icons-vue';
-import type { InputInstance, TabsPaneContext, FormInstance } from 'element-plus';
-// @ts-ignore - Cursor 的 TypeScript 检查误报
+import { ArrowUp, ArrowDown, Plus, Male, Female } from '@element-plus/icons-vue';
+import type { FormInstance } from 'element-plus';
 import HealthRecords from '@/components/HealthRecords.vue';
-// @ts-ignore - Cursor 的 TypeScript 检查误报
 import GrowthAlbum from '@/components/GrowthAlbum.vue';
+import FragmentCarousel from '@/components/FragmentCarousel.vue';
+import NavBar from '@/components/NavBar.vue'
 enum PetGender {
   Male = 1,
   Female = 0,
@@ -397,61 +388,61 @@ const handleCloseTag = (id: number, tag: string) => {
   characterTags.value?.splice(characterTags.value.indexOf(tag), 1)
 }
 // 显示添加性格输入框
-const tagInputValue = ref('')//输入框绑定的值（新增标签里面的内容）
-const tagInputVisible = ref<Record<number, boolean>>({});
-const InputRef = ref<Record<number, InputInstance | null>>({});//获取 el-input 组件实例的 ref
+// const tagInputValue = ref('')//输入框绑定的值（新增标签里面的内容）
+// const tagInputVisible = ref<Record<number, boolean>>({});
+// const InputRef = ref<Record<number, InputInstance | null>>({});//获取 el-input 组件实例的 ref
 
 // 设置输入框 ref 的辅助函数
-const setInputRef = (id: number) => {
-  return (el: any) => {
-    if (el) {
-      InputRef.value[id] = el as InputInstance
-    }
-  }
-}
+// const setInputRef = (id: number) => {
+//   return (el: any) => {
+//     if (el) {
+//       InputRef.value[id] = el as InputInstance
+//     }
+//   }
+// }
 
-const showAddTagInput = (id: number) => {
-  tagInputVisible.value[id] = true
-  //确保输入框渲染后再聚焦
-  nextTick(() => {
-    const currentInput = InputRef.value[id]
-    if (currentInput) {
-      // 方法1: 尝试使用 Element Plus Input 组件的 focus 方法
-      if (typeof (currentInput as any).focus === 'function') {
-        (currentInput as any).focus()
-      } else {
-        // 方法2: 通过 $el 访问内部的 input 元素
-        const inputElement = currentInput.$el?.querySelector('.el-input__inner') as HTMLInputElement | null
-        if (inputElement) {
-          inputElement.focus()
-        } else {
-          console.error('未找到 .el-input__inner 元素')
-        }
-      }
-    }
-  })
-}
-//确认输入标签
-const handleInputConfirm = (id: number) => {
-  //过滤空值
-  if (!tagInputValue.value.trim()) {
-    tagInputVisible.value[id] = false
-    tagInputValue.value = ''
-    return;
-  }
-  const pet = getPetById(id)
-  if (pet) {
-    //防止undefined
-    if (!pet.characterTags) pet.characterTags = []
-    //避免添加重复的标签
-    if (!pet.characterTags?.includes(tagInputValue.value)) {
-      pet.characterTags.push(tagInputValue.value)
-    }
+// const showAddTagInput = (id: number) => {
+//   tagInputVisible.value[id] = true
+//   //确保输入框渲染后再聚焦
+//   nextTick(() => {
+//     const currentInput = InputRef.value[id]
+//     if (currentInput) {
+//       // 方法1: 尝试使用 Element Plus Input 组件的 focus 方法
+//       if (typeof (currentInput as any).focus === 'function') {
+//         (currentInput as any).focus()
+//       } else {
+//         // 方法2: 通过 $el 访问内部的 input 元素
+//         const inputElement = currentInput.$el?.querySelector('.el-input__inner') as HTMLInputElement | null
+//         if (inputElement) {
+//           inputElement.focus()
+//         } else {
+//           console.error('未找到 .el-input__inner 元素')
+//         }
+//       }
+//     }
+//   })
+// }
+// //确认输入标签
+// const handleInputConfirm = (id: number) => {
+//   //过滤空值
+//   if (!tagInputValue.value.trim()) {
+//     tagInputVisible.value[id] = false
+//     tagInputValue.value = ''
+//     return;
+//   }
+//   const pet = getPetById(id)
+//   if (pet) {
+//     //防止undefined
+//     if (!pet.characterTags) pet.characterTags = []
+//     //避免添加重复的标签
+//     if (!pet.characterTags?.includes(tagInputValue.value)) {
+//       pet.characterTags.push(tagInputValue.value)
+//     }
 
-  }
-  tagInputVisible.value[id] = false
-  tagInputValue.value = ''
-}
+//   }
+//   tagInputVisible.value[id] = false
+//   tagInputValue.value = ''
+// }
 // 获取宠物对应的emoji
 const getPetEmoji = (pet: Pet) => {
   if (pet.breed.includes('金毛')) return '🐕';
@@ -467,7 +458,7 @@ const formatDate = (dateString: string) => {
 
 // 获取健康状态类型
 const getHealthStatusType = (status: string | undefined) => {
-  const statusMap: Record<string, any> = {
+  const statusMap: Record<string, string> = {
     '健康': 'success',
     '良好': 'info',
     '注意': 'warning',
@@ -514,9 +505,9 @@ const newGrowthRecord = ref({
   age: '',
 });
 //添加成长记录对应的图片
-const addGrowthImg = ref({
-  photos: [] as Array<Photos>
-})
+// const addGrowthImg = ref({
+//   photos: [] as Array<Photos>
+// })
 
 // 打开添加成长记录对话框
 const openAddGrowthRecord = (pet: Pet) => {

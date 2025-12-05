@@ -11,7 +11,7 @@
                             <div class="mb-5">
                                 <div class="flex justify-between">
                                     <h3 class="font-semibold text-gray-700 mb-2">你的位置</h3>
-                                    <button class="text-xs text-blue-500" @click="">
+                                    <button class="text-xs text-blue-500">
                                         去修改
                                     </button>
                                 </div>
@@ -253,13 +253,20 @@ import AMapLoader from "@amap/amap-jsapi-loader";
 import NavBar from '@/components/NavBar.vue';
 import { useRouter } from 'vue-router'
 import request from '@/utils/request';
+declare global {
+    interface Window {
+        _AMapSecurityConfig: {
+            securityJsCode: string;
+        };
+    }
+}
 
 // 地图相关
 const mapContainer = ref<HTMLElement>()
-let map: any = null
-let markers: any[] = []
-let geocoder: any = null
-let AMapInstance: any = null
+let map: any = null//eslint-disable-line @typescript-eslint/no-explicit-any
+let markers: any = [] //eslint-disable-line @typescript-eslint/no-explicit-any
+let geocoder: any | null = null //eslint-disable-line @typescript-eslint/no-explicit-any
+let AMapInstance: any | null = null //eslint-disable-line @typescript-eslint/no-explicit-any
 const mapLoadError = ref('')
 
 // 用户家庭住址相关
@@ -295,8 +302,6 @@ const filters = reactive({
 // 排序选项
 const sortOption = ref('comprehensive')
 
-// 所有宠物类型
-const allPetTypes = ref(['猫', '狗', '鱼', '鸟类', '兔子', '蛇', '其他'])
 
 // 搜索关键词
 const searchKeyword = ref('')
@@ -330,7 +335,7 @@ interface FosterHome {
 
 
 // 防抖计时器
-let debounceTimer: any = null
+let debounceTimer: number = 0
 
 // 获取用户家庭住址
 const getUserHomeAddress = async () => {
@@ -357,7 +362,16 @@ const getUserHomeAddress = async () => {
         loading.close();
     }
 }
-
+interface GeocodeResult {
+    geocodes: {
+        location: {
+            lat: number;
+            lng: number;
+        };
+        formattedAddress: string;
+    }[];
+    info: string;
+}
 // 地址转经纬度
 const parseAddressToLatLng = async (address: string) => {
     if (!geocoder) {
@@ -366,9 +380,9 @@ const parseAddressToLatLng = async (address: string) => {
     }
 
     return new Promise((resolve) => {
-        geocoder.getLocation(address, (status: string, result: any) => {
-            if (status === 'complete' && result.geocodes && result.geocodes.length > 0) {
-                const { location, formattedAddress } = result.geocodes[0];
+        geocoder.getLocation(address, (status: string, result: GeocodeResult) => {
+            if (status === 'complete' && result.geocodes != undefined && result.geocodes.length > 0) {
+                const { location, formattedAddress } = result.geocodes[0]!;
                 if (location && !isNaN(location.lat) && !isNaN(location.lng)) {
                     currentLocation.lat = location.lat;
                     currentLocation.lng = location.lng;
@@ -401,6 +415,7 @@ const parseAddressToLatLng = async (address: string) => {
 
 
 // 初始化地图
+
 const initMap = () => {
     if (!mapContainer.value) {
         mapLoadError.value = '地图容器未找到';
@@ -418,7 +433,8 @@ const initMap = () => {
         key: "f9a61d8c1043186ca29b9675925160ff",
         version: "2.0",
         plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder"],
-    }).then((AMap: any) => {
+    }).then((AMap: any //eslint-disable-line @typescript-eslint/no-explicit-any
+    ) => {
         AMapInstance = AMap;
 
         map = new AMap.Map("custom-map-container", {
@@ -439,7 +455,7 @@ const initMap = () => {
 
         ElMessage.success('地图加载成功');
         loading.close();
-    }).catch((err: any) => {
+    }).catch((err) => {
         console.error('地图加载失败:', err);
         mapLoadError.value = `地图加载失败: ${err.message || '请检查API密钥'}`;
         loading.close();
@@ -451,7 +467,9 @@ const updateMapMarkers = () => {
     if (!map) return;
 
     // 清除现有标记
-    markers.forEach(marker => marker.remove && marker.remove());
+    markers.forEach((marker: any //eslint-disable-line @typescript-eslint/no-explicit-any
+
+    ) => marker.remove && marker.remove());
     markers = [];
 
     // 添加用户位置标记
@@ -516,7 +534,9 @@ const fitMapToMarkers = () => {
 
     // 收集所有标记的经纬度
     const bounds = new AMapInstance.Bounds();
-    markers.forEach(marker => {
+    markers.forEach((marker: any //eslint-disable-line @typescript-eslint/no-explicit-any
+
+    ) => {
         bounds.extend(marker.getPosition());
     });
 
@@ -524,7 +544,7 @@ const fitMapToMarkers = () => {
     map.setBounds(bounds, false, [20, 20, 20, 20]);
 };
 // 聚焦到寄养家庭
-const focusOnMarker = (foster: any) => {
+const focusOnMarker = (foster: FosterHome) => {
 
     if (map && foster.lng && foster.lat && !isNaN(foster.lng) && !isNaN(foster.lat)) {
         map.setCenter([foster.lng, foster.lat]);
@@ -669,7 +689,7 @@ const scrollToTop = () => {
 }
 // 查看详情
 const router = useRouter();
-const viewDetails = (foster: any) => {
+const viewDetails = (foster: FosterHome) => {
     router.push({ name: 'fosterDetail', params: { id: foster.id } });
 }
 

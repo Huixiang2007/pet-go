@@ -79,7 +79,7 @@
                                     <div class="files-list">
                                         <div v-for="(file, index) in vaccineFiles" :key="index" class="file-item">
                                             <!-- 图片预览（仅图片文件） -->
-                                            <div v-if="isImageFile(file)" class="file-preview">
+                                            <div v-if="isImageFile(file.file)" class="file-preview">
                                                 <img :src="file.previewUrl" alt="预览图">
                                             </div>
                                             <!-- 文件图标（非图片文件） -->
@@ -219,9 +219,10 @@
                                     </el-icon> 费用明细</h4>
                                 <div class="info-item">
                                     <span class="label">基础费用：</span>
-                                    <span class="value">{{ selectedPackage?.price || 0 }} × {{ calculateStayDays() }} =
+                                    <span class="value">{{ selectedPackage?.basePrice || 0 }} × {{ calculateStayDays()
+                                        }} =
                                         {{
-                                            (selectedPackage?.price || 0) * calculateStayDays() }} 元</span>
+                                            (selectedPackage?.basePrice || 0) * calculateStayDays() }} 元</span>
                                 </div>
 
                                 <div class="info-item total">
@@ -358,7 +359,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, reactive } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { useBookingStore } from '@/stores/booking'
 import { useRoute, onBeforeRouteLeave, useRouter } from 'vue-router'
 
@@ -406,7 +407,6 @@ const myPets = ref([
     { id: 3, name: '小黄', breed: '金毛', age: '3岁' }
 ])
 const selectedPetId = ref<number | null>(null)
-const name = ref('')
 const textarea = ref('')
 
 // 文件上传
@@ -421,7 +421,7 @@ interface UploadFileInfo {
 
 const vaccineFiles = ref<UploadFileInfo[]>([])
 // 判断是否为图片文件
-const isImageFile = (file: any) => {
+const isImageFile = (file: File) => {
     return file.type.startsWith('image/')
 }
 
@@ -440,9 +440,12 @@ const beforeUpload = (file: File) => {
     }
     return true
 }
+interface fileOptions {
+    file: File,
 
+}
 // 自定义本地处理文件
-const handleLocalUpload = (options: any) => {
+const handleLocalUpload = (options: fileOptions) => {
     const file = options.file as File
     // 生成图片预览URL
     const previewUrl = isImageFile(file) ? URL.createObjectURL(file) : ''
@@ -522,10 +525,17 @@ const maxStayDays = computed(() => {
     }
     return Math.min(maxDays, 30)
 })
-
+interface previewDaysOptions {
+    index: number
+    date: string
+    day: number
+    spots: number
+    month: number
+    displayDate: string
+}
 // 预览天数
 const previewDays = computed(() => {
-    const days = []
+    const days: previewDaysOptions[] = []
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -601,7 +611,7 @@ const isDaySelected = (dateStr: string): boolean => {
 
 
 // 预览日期点击
-const onPreviewDayClick = (day: any) => {
+const onPreviewDayClick = (day: previewDaysOptions) => {
     if (day.spots === 0) {
         ElMessage.warning(`${day.displayDate} 已无空位，请选择其他日期`)
         return
@@ -680,7 +690,7 @@ const calculatedPrice = computed(() => {
     const days = calculateStayDays()
     console.log('days', days)
     if (days === 0 || !selectedPackage.value) return 0
-    return (selectedPackage.value.price * days)
+    return (selectedPackage.value.basePrice * days)
 })
 
 // 计算时间
@@ -727,10 +737,10 @@ const canConfirmPayment = computed(() => {
 })
 
 
-const formatDate = (dateStr: string): string => {
-    const date = new Date(dateStr)
-    return `${date.getMonth() + 1}月${date.getDate()}日`
-}
+// const formatDate = (dateStr: string): string => {
+//     const date = new Date(dateStr)
+//     return `${date.getMonth() + 1}月${date.getDate()}日`
+// }
 
 // 步骤控制
 const nextStep = async () => {
@@ -749,6 +759,7 @@ const nextStep = async () => {
         await new Promise(resolve => setTimeout(resolve, 500))
         currentStep.value++
     } catch (error) {
+        console.error(error)
         ElMessage.error('操作失败，请重试')
     } finally {
         processing.value = false
@@ -776,6 +787,7 @@ const confirmPayment = async () => {
         currentStep.value = 5
         ElMessage.success('支付成功！')
     } catch (error) {
+        console.error(error);
         ElMessage.error('支付失败，请重试')
     } finally {
         processing.value = false

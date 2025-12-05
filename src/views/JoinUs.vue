@@ -36,14 +36,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, shallowRef } from 'vue'
+import { ref, shallowRef, type Component } from 'vue'
 import BusinessEntry from '@/components/BusinessEntry.vue'
 import OrganizationEntry from '@/components/OrganizationEntry.vue'
 import FamilyEntry from '@/components/FamilyEntry.vue'
 interface TabItem {
     name: string
     icon: string
-    component: any // 或者更具体的组件类型，如 Component
+    component: Component
 }
 // 选项卡配置
 const tabList: TabItem[] = [
@@ -55,7 +55,7 @@ const tabList: TabItem[] = [
 const activeTab = ref(0)
 
 // 使用 shallowRef 防止不必要的深度响应式转换
-const currentComponent = shallowRef(BusinessEntry)
+const currentComponent = shallowRef<Component>(BusinessEntry)
 
 // 切换选项卡
 const switchTab = (index: number) => {
@@ -64,7 +64,7 @@ const switchTab = (index: number) => {
 }
 
 // 处理子组件事件
-const handleSubmitSuccess = (data: any) => {
+const handleSubmitSuccess = (data: object) => {
     console.log('提交成功:', data)
     alert('申请提交成功！我们将尽快审核')
 }

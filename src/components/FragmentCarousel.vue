@@ -71,8 +71,6 @@ interface Fragment {
 
 // 配置
 const getImageUrl = (name: string) => {
-    // 注意：路径是相对于当前文件的相对路径（假设当前组件在 src/components 下）
-    // @ts-ignore - Cursor 的 TypeScript 检查误报，Vite 环境中 import.meta.url 是支持的
     return new URL(`../assets/${name}`, import.meta.url).href
 }
 const config = reactive<CarouselConfig>({

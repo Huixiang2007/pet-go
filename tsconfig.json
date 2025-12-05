@@ -7,14 +7,5 @@
     {
       "path": "./tsconfig.app.json"
     }
-  ],
-  "compilerOptions": {
-    //  "strict": true,
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-     "baseUrl": ".", // 基础路径（必须加）
-    "paths": {
-      "@/*": ["src/*"] // 告诉 TS @ 对应 src 目录下的所有文件
-    }
-  }
+  ]
 }

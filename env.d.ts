@@ -8,12 +8,12 @@ declare interface ImportMeta {
 // 路径别名类型声明
 declare module '@/components/*' {
   import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
+  const component: DefineComponent<Record<string, never>, Record<string, never>, unknown>
   export default component
 }
 
 declare module '@/views/*' {
   import type { DefineComponent } from 'vue'
-  const component: DefineComponent<{}, {}, any>
+  const component: DefineComponent<Record<string, never>, Record<string, never>, unknown>
   export default component
 }

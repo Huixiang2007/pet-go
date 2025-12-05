@@ -179,7 +179,6 @@ const removeFile = (index: number) => {
 
 // 处理文件列表
 const processFiles = async (files: File[]) => {
-<<<<<<< HEAD
     // 过滤并限制数量
     const validFiles = files
         .filter(file => validateFile(file))

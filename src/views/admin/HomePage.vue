@@ -16,8 +16,8 @@
       </el-header>
       <!-- 内容区域 -->
       <el-main class="content-container">
-        <router-view />
-        <Data />
+    <Compete/>
+      
       </el-main>
     </div>
   </div>
@@ -28,6 +28,7 @@ import { ref } from 'vue'
 // 导入子组件
 import Sidebar from '@/components/Sidebar.vue'
 import Header from '@/components/UserHeader.vue'
+import Compete from './AllCompete.vue'
 // 侧边栏折叠状态（仅为样式服务）
 const sidebarOpened = ref(true)
 </script>
@@ -35,7 +36,14 @@ const sidebarOpened = ref(true)
 <style scoped lang="scss">
 $sidebar-bg: #252d3a;
 $header-height: 60px;
-
+.el-select--small .el-select__wrapper {
+    font-size: 14px;
+    gap: 4px;
+    line-height: 20px;
+    min-height: 39px;
+    max-width: 318px;
+    padding: 2px 8px;
+}
 .app-container {
   display: flex;
   height: 100vh;

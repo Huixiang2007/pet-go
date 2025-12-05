@@ -35,6 +35,9 @@
             <span>{{ item.name }}</span>
           </li>
         </ul>
+         <div class="show-photos">
+              <img src="@/assets/img/catPicture.png" alt="这是展示图片">
+              </div>
       </aside>
 
       <!-- 内容展示区 -->
@@ -96,7 +99,7 @@
               </div>
             </div>
             <div class="show-photo">
-              <img src="@/assets/img/catPicture.png" alt="这是展示图片">
+              <img src="@/assets/img/catPicture3.png" alt="这是展示图片">
               </div>
           </form>
 
@@ -135,14 +138,14 @@
         <div class="layui-input-block info-display">{{ maskIdCard(realNameInfo.idCard) || '未填写' }}</div>
       </div>
       <div class="layui-form-item">
-        <label class="layui-form-label">身份证信息面</label>
+        <label class="layui-form-label" style="width: 114px;">身份证信息面</label>
         <div class="layui-input-block">
           <img v-if="realNameInfo.idCardFront" :src="realNameInfo.idCardFront" class="id-card-img" alt="身份证信息面">
           <span v-else>未上传</span>
         </div>
       </div>
       <div class="layui-form-item">
-        <label class="layui-form-label" >身份证国徽面</label>
+        <label class="layui-form-label" style="width: 114px;">身份证国徽面</label>
         <div class="layui-input-block">
           <img v-if="realNameInfo.idCardBack" :src="realNameInfo.idCardBack" class="id-card-img" alt="身份证国徽面">
           <span v-else>未上传</span>
@@ -310,6 +313,7 @@
 
               </div>
             </div>
+            
           </form>
 
           <!-- 地址管理 -->
@@ -817,18 +821,19 @@ const getUserInfo = async () => {
         email: userData.email,
       }
        if (userData.status) {
+      console.log('实名认证状态:', userData.status)
         realNameInfo.value = {
-          realName: userData.realNameInfo.realName,
-          idCard: userData.realNameInfo.idCard,
-          idCardFront: userData.realNameInfo.idCardFront,
-          idCardBack: userData.realNameInfo.idCardBack
+          realName: userData.realName,
+          idCard: userData.idCard,
+          idCardFront: userData.idCardFront,
+          idCardBack: userData.idCardBack
         }
-      }
+      } 
 
       // 同步更新表单数据
       formData.value = { ...userInfo.value }
       // 设置实名认证状态
-      if (userData.status !== undefined) {
+      if (userData.status) {
         // 根据后端返回的状态设置 realNameStatus
         // 假设后端返回的 status 值含义：
         // 0: 未认证, 1: 审核中, 2: 已认证
@@ -845,6 +850,7 @@ const getUserInfo = async () => {
           default:
             realNameStatus.value = 'unverified'
         }
+      
       }
       // 重新渲染表单
       if (window.layui) {
@@ -1520,6 +1526,14 @@ const logout = () => {
   border: 1px solid #eee;
   border-radius: 4px;
 }
+.show-photos{
+position: absolute;
+    width: 72%;
+    height: 70%;
+    bottom: -29%;
+    right: 17%;
+}
+
 .show-photo{
  position: absolute;
     width: 67%;
@@ -1897,6 +1911,7 @@ const logout = () => {
 
 /* 侧边栏样式 */
 .sidebar {
+  position: relative;
   width: 220px;
   background-color: rgba(255, 255, 255, 0.9);
   padding-top: 1.5rem;

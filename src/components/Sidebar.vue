@@ -4,11 +4,9 @@
     <div class="sidebar-logo">
       <div class="logo-wrapper">
         <el-icon class="logo-icon">
-          <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-            <path d="M2 17l10 5 10-5"></path>
-            <path d="M2 12l10 5 10-5"></path>
-          </svg>
+        
+          <img src="@/assets/img/logo.png" alt="这是图标" class="logo" />
+
         </el-icon>
         <span v-if="sidebarOpened" class="logo-text">PetGo 管理后台</span>
       </div>
@@ -85,13 +83,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { 
-  User, 
-  House, 
-  Shop, 
-  Setting,
-  PieChart  // 导入数据概览图标
-} from '@element-plus/icons-vue'
+
 
 // 路由实例
 const route = useRoute()
@@ -131,6 +123,14 @@ $border-color: #4A3629;      // 边框色
   padding: 0 16px;
   height: 60px;
   border-bottom: 1px solid $border-color;
+}
+.sidebar-logo img{
+  
+    margin-bottom: 20%;
+    margin-right: 14%;
+    max-width: 143%;
+    height: auto;
+
 }
 
 .logo-wrapper {

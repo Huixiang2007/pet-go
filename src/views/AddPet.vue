@@ -39,8 +39,8 @@
                 <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-pink-300 via-rose-300 to-pink-300">
                 </div>
 
-                <el-form :model="formData" :rules="formRules" ref="formRef" label-width="140px" label-position="left"
-                    class="p-8" @submit.prevent="submitForm">
+                <el-form :model="addPetFormData" :rules="formRules" ref="formRef" label-width="140px"
+                    label-position="left" class="p-8" @submit.prevent="submitForm">
                     <!-- 基本信息 -->
                     <div class="mb-10">
                         <div class="flex items-center mb-8">
@@ -62,11 +62,12 @@
                                 <div class="flex flex-col md:flex-row items-start md:items-center gap-8">
                                     <el-upload class="avatar-uploader rounded-full" :show-file-list="false"
                                         :before-upload="beforeAvatarUpload" :http-request="handleAvatarUpload"
-                                        @mouseenter="showUploadTip = true" @mouseleave="showUploadTip = false">
+                                        @mouseenter="showUploadTip = true" @mouseleave="showUploadTip = false"
+                                        :disabled="avatarUploadLoading">
                                         <div class="relative group ">
-                                            <div v-if="formData.avatar"
+                                            <div v-if="addPetFormData.avatar"
                                                 class="relative  border-4 border-pink-100 group-hover:border-pink-300 transition-all duration-400 shadow-lg">
-                                                <img :src="formData.avatar" class="avatar">
+                                                <img :src="addPetFormData.avatar" class="avatar">
                                                 <div
                                                     class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0  duration-300 flex items-end justify-center pb-4">
                                                     <span
@@ -78,7 +79,8 @@
                                                 <el-icon class="avatar-uploader-icon">
                                                     <Plus />
                                                 </el-icon>
-                                                <div class="mt-3 text-sm text-rose-500 font-medium">点击上传</div>
+                                                <div class="mt-3 text-sm text-rose-500 font-medium"> {{
+                                                    avatarUploadLoading ? '上传中...' : '点击上传' }}</div>
                                                 <div class="mt-1 text-xs text-rose-400">支持 JPG/PNG</div>
                                             </div>
                                         </div>
@@ -105,25 +107,25 @@
                             <div class="space-y-6">
                                 <el-form-item label="昵称" prop="name">
 
-                                    <el-input v-model="formData.name" placeholder="请输入宠物昵称" size="large"
+                                    <el-input v-model="addPetFormData.name" placeholder="请输入宠物昵称" size="large"
                                         class="custom-input focus-within:shadow-pink-200/50" />
 
 
                                 </el-form-item>
                                 <el-form-item label="种类" prop="type">
-                                    <el-select v-model="formData.type" placeholder="选择种类"
+                                    <el-select v-model="addPetFormData.type" placeholder="选择种类"
                                         class="focus-within:shadow-pink-200/50">
                                         <el-option v-for="animal in animalOptions" :key="animal.value"
                                             :label="animal.label" :value="animal.value" />
                                     </el-select>
                                 </el-form-item>
                                 <el-form-item label="品种" prop="breed">
-                                    <el-input v-model="formData.breed" placeholder="例如：布偶猫、金毛犬" size="large"
+                                    <el-input v-model="addPetFormData.breed" placeholder="例如：布偶猫、金毛犬" size="large"
                                         class="custom-input focus-within:shadow-pink-200/50" />
                                 </el-form-item>
 
                                 <el-form-item label="生日" prop="birthday">
-                                    <el-date-picker v-model="formData.birthday" type="date" placeholder="选择宠物的生日"
+                                    <el-date-picker v-model="addPetFormData.birthday" type="date" placeholder="选择宠物的生日"
                                         size="large" class="w-full custom-datepicker " format="YYYY年MM月DD日"
                                         value-format="YYYY-MM-DD" placement="bottom" force-popup-direction />
                                 </el-form-item>
@@ -134,11 +136,11 @@
 
                                 <el-form-item label="性别" prop="gender">
                                     <div class="flex space-x-4">
-                                        <div class="flex-1" @click="formData.gender = 1">
+                                        <div class="flex-1" @click="addPetFormData.gender = 1">
                                             <div class="gender-card cursor-pointer rounded-2xl p-2 transition-all duration-300 border-2 border-transparent w-20"
-                                                :class="{ 'gender-card-male-active': formData.gender === 1 }">
+                                                :class="{ 'gender-card-male-active': addPetFormData.gender === 1 }">
                                                 <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300 "
-                                                    :class="{ 'bg-gradient-to-br from-blue-400 to-cyan-400': formData.gender === 1, 'bg-gradient-to-br from-blue-100 to-cyan-100': formData.gender !== 1 }">
+                                                    :class="{ 'bg-gradient-to-br from-blue-400 to-cyan-400': addPetFormData.gender === 1, 'bg-gradient-to-br from-blue-100 to-cyan-100': addPetFormData.gender !== 1 }">
                                                     <el-icon class="text-white text-xl">
                                                         <Male />
                                                     </el-icon>
@@ -146,11 +148,11 @@
 
                                             </div>
                                         </div>
-                                        <div class="flex-1" @click="formData.gender = 0">
+                                        <div class="flex-1" @click="addPetFormData.gender = 0">
                                             <div class="gender-card cursor-pointer rounded-2xl p-2 transition-all duration-300 border-2 border-transparent w-20"
-                                                :class="{ 'gender-card-active': formData.gender === 0 }">
+                                                :class="{ 'gender-card-active': addPetFormData.gender === 0 }">
                                                 <div class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300"
-                                                    :class="{ 'bg-gradient-to-br from-pink-400 to-rose-400': formData.gender === 0, 'bg-gradient-to-br from-pink-100 to-rose-100': formData.gender !== 0 }">
+                                                    :class="{ 'bg-gradient-to-br from-pink-400 to-rose-400': addPetFormData.gender === 0, 'bg-gradient-to-br from-pink-100 to-rose-100': addPetFormData.gender !== 0 }">
                                                     <el-icon class="text-white text-xl">
                                                         <Female />
                                                     </el-icon>
@@ -163,7 +165,7 @@
 
                                 <el-form-item label="体重" prop="weight">
                                     <div class="flex items-center space-x-3">
-                                        <el-input-number v-model="formData.weight" :min="0" :max="100" :step="0.1"
+                                        <el-input-number v-model="addPetFormData.weight" :min="0" :max="100" :step="0.1"
                                             controls-position="right" size="large" class="flex-1 custom-number" />
                                         <span class="text-rose-600 font-medium min-w-[40px]">kg</span>
 
@@ -172,7 +174,7 @@
 
                                 <!-- 健康状态  -->
                                 <el-form-item label="健康状态" prop="healthStatus">
-                                    <el-select v-model="formData.healthStatus" placeholder="选择健康状态" size="large"
+                                    <el-select v-model="addPetFormData.healthStatus" placeholder="选择健康状态" size="large"
                                         class="w-full health-select" :teleported="false" :popper-append-to-body="false">
                                         <el-option v-for="status in healthStatusOptions" :key="status.value"
                                             :label="status.label" :value="status.value" :class="status.class">
@@ -187,11 +189,11 @@
 
                                 <el-form-item label="绝育状态" prop="neutered">
                                     <div class="flex items-center space-x-4">
-                                        <el-switch v-model="formData.sterilization"
-                                            :active-text="formData.sterilization ? '已绝育' : '未绝育'" size="large"
+                                        <el-switch v-model="addPetFormData.sterilization"
+                                            :active-text="addPetFormData.sterilization ? '已绝育' : '未绝育'" size="large"
                                             class="custom-switch"
-                                            :active-color="formData.sterilization ? '#f472b6' : '#e5e7eb'" inline-prompt
-                                            :active-icon="Check" :inactive-icon="Close"
+                                            :active-color="addPetFormData.sterilization ? '#f472b6' : '#e5e7eb'"
+                                            inline-prompt :active-icon="Check" :inactive-icon="Close"
                                             style="--el-switch-on-color: #f472b6;" />
 
                                     </div>
@@ -221,13 +223,14 @@
                                 <div>
                                     <div class="flex items-center mb-4">
 
-                                        <span class="text-rose-700 font-medium">已选择标签（{{ formData.characterTags.length
-                                        }}/8）</span>
+                                        <span class="text-rose-700 font-medium">已选择标签（{{
+                                            addPetFormData.characterTags.length
+                                            }}/8）</span>
                                     </div>
                                     <div
                                         class="selected-tags-container min-h-20 p-4 rounded-xl bg-gradient-to-br from-pink-50/50 to-rose-50/50 border border-rose-100">
                                         <transition-group name="list" tag="div" class="flex flex-wrap gap-3">
-                                            <div v-for="tag in formData.characterTags" :key="tag"
+                                            <div v-for="tag in addPetFormData.characterTags" :key="tag"
                                                 class="selected-tag inline-flex items-center px-4 py-2.5 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden group"
                                                 @click="removeTag(tag)">
                                                 <span class="text-rose-700 font-medium text-sm">{{ tag }}</span>
@@ -236,7 +239,7 @@
                                                     <Close />
                                                 </el-icon>
                                             </div>
-                                            <div v-if="formData.characterTags.length === 0"
+                                            <div v-if="addPetFormData.characterTags.length === 0"
                                                 class="text-rose-300 italic flex items-center h-20 w-full justify-center">
                                                 <el-icon class="mr-2">
                                                     <Plus />
@@ -258,10 +261,11 @@
                                     <div class="recommended-tags grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                                         <div v-for="tag in defaultTags" :key="tag"
                                             class="recommended-tag px-4 py-3 rounded-xl text-center cursor-pointer transition-all duration-300 flex items-center justify-center"
-                                            :class="{ 'recommended-tag-active': formData.characterTags.includes(tag) }"
+                                            :class="{ 'recommended-tag-active': addPetFormData.characterTags.includes(tag) }"
                                             @click="toggleDefaultTag(tag)">
                                             {{ tag }}
-                                            <el-icon v-if="formData.characterTags.includes(tag)" class="ml-1 text-xs">
+                                            <el-icon v-if="addPetFormData.characterTags.includes(tag)"
+                                                class="ml-1 text-xs">
                                                 <Check />
                                             </el-icon>
                                         </div>
@@ -377,7 +381,7 @@
                     </div>
                     <div class="success-content text-center">
                         <h3 class="success-title text-3xl font-bold text-rose-800 mb-2">添加成功！</h3>
-                        <p class="success-message text-rose-600 mb-8">{{ formData.name || '您的宠物' }} 已加入家庭</p>
+                        <p class="success-message text-rose-600 mb-8">{{ addPetFormData.name || '您的宠物' }} 已加入家庭</p>
                         <div class="success-actions flex flex-col sm:flex-row gap-3 justify-center">
                             <el-button @click="goToPetDetail"
                                 class="success-btn primary px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 sm:flex-none bg-gradient-to-r from-pink-400 to-rose-400 text-white border-none hover:shadow-lg">
@@ -436,8 +440,10 @@ import {
 
     Edit
 } from '@element-plus/icons-vue';
-import request from '../utils/request';
+import request from '@/utils/request';
+// import { fi } from 'element-plus/es/locales.mjs';
 interface PetFormData {
+    id: number;
     userId: number;
     name: string;
     type: string;
@@ -450,7 +456,13 @@ interface PetFormData {
     sterilization: boolean;
     healthStatus: string;
 }
+// interface UploadResponse {
+//     code: number;
+//     data: string;
+//     msg: string;
+//     level: null;
 
+// }
 const router = useRouter();
 const formRef = ref<FormInstance>();
 const loading = ref(false);
@@ -509,7 +521,8 @@ const healthStatusOptions = [
 // 表单数据
 const userId = localStorage.getItem('userId');
 console.log('AddPet userId:', userId);
-const formData = reactive<PetFormData>({
+const addPetFormData = reactive<PetFormData>({
+    id: 0,
     userId: Number(userId),
     name: '',
     breed: '',
@@ -546,16 +559,16 @@ const formRules: FormRules = {
 
 // 切换默认标签
 const toggleDefaultTag = (tag: string) => {
-    const index = formData.characterTags.indexOf(tag);
+    const index = addPetFormData.characterTags.indexOf(tag);
     if (index > -1) {
-        formData.characterTags.splice(index, 1);
+        addPetFormData.characterTags.splice(index, 1);
         ElMessage.info(`已移除标签：${tag}`);
     } else {
-        if (formData.characterTags.length >= 8) {
+        if (addPetFormData.characterTags.length >= 8) {
             ElMessage.warning('最多只能添加8个标签');
             return;
         }
-        formData.characterTags.push(tag);
+        addPetFormData.characterTags.push(tag);
         ElMessage.success(`已添加标签：${tag}`);
     }
 };
@@ -563,8 +576,8 @@ const toggleDefaultTag = (tag: string) => {
 // 添加标签
 const addTag = () => {
     const tag = newTag.value.trim();
-    if (tag && !formData.characterTags.includes(tag)) {
-        if (formData.characterTags.length >= 8) {
+    if (tag && !addPetFormData.characterTags.includes(tag)) {
+        if (addPetFormData.characterTags.length >= 8) {
             ElMessage.warning('最多只能添加8个标签');
             return;
         }
@@ -572,7 +585,7 @@ const addTag = () => {
             ElMessage.warning('标签长度不能超过5个字符');
             return;
         }
-        formData.characterTags.push(tag);
+        addPetFormData.characterTags.push(tag);
         newTag.value = '';
         ElMessage.success('标签添加成功！');
     }
@@ -580,13 +593,13 @@ const addTag = () => {
 
 // 移除标签
 const removeTag = (tag: string) => {
-    const index = formData.characterTags.indexOf(tag);
+    const index = addPetFormData.characterTags.indexOf(tag);
     if (index > -1) {
-        formData.characterTags.splice(index, 1);
+        addPetFormData.characterTags.splice(index, 1);
         ElMessage.info(`已移除标签：${tag}`);
     }
 };
-
+const avatarUploadLoading = ref(false);
 // 头像上传处理
 const beforeAvatarUpload = (file: File) => {
     const isJPGOrPNG = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/gif';
@@ -605,20 +618,36 @@ const beforeAvatarUpload = (file: File) => {
 interface fileOptions {
     file: File;
 }
-const handleAvatarUpload = (options: fileOptions) => {
+const handleAvatarUpload = async (options: fileOptions) => {
     const file = options.file;
-    const reader = new FileReader();
-    reader.onloadstart = () => {
-        ElMessage.info('正在上传头像...');
-    };
-    reader.onload = (e) => {
-        formData.avatar = e.target?.result as string;
-        ElMessage.success('头像上传成功!');
-    };
-    reader.onerror = () => {
+
+    // ElMessage.info('正在上传头像...');
+    avatarUploadLoading.value = true;
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await request(
+            '/server/api/file/upload',
+            'POST',
+            formData
+        );
+        console.log(response.data)
+        if (response.code === 0) {
+            ElMessage.success('头像上传成功!');
+            addPetFormData.avatar = response.data.url;
+        } else {
+            ElMessage.error('头像上传失败，请重试!');
+
+        }
+    } catch (error) {
+        console.error(error);
         ElMessage.error('头像上传失败，请重试!');
-    };
-    reader.readAsDataURL(file);
+    } finally {
+        avatarUploadLoading.value = false;
+    }
+
+
+
 };
 
 // 模拟进度条
@@ -647,7 +676,7 @@ const submitForm = async () => {
         const response = await request(
             '/server/api/pet/add',
             'POST',
-            formData
+            addPetFormData
         );
         console.log('AddPet response:', response);
         clearInterval(progressInterval);
@@ -672,7 +701,7 @@ const submitForm = async () => {
 const resetForm = () => {
     if (formRef.value) {
         formRef.value.resetFields();
-        formData.characterTags = ['活泼'];
+        addPetFormData.characterTags = ['活泼'];
         ElMessage.info('表单已重置');
     }
 };

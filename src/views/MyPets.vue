@@ -8,11 +8,11 @@
       transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
     }" @wheel="handleWheel">
       <!-- 轮播图 -->
-      <div id="carousel-container">
+      <div id="carousel-container" class="section">
         <FragmentCarousel />
       </div>
       <!-- 每个宠物的全屏卡片 -->
-      <div v-for="(pet, index) in pets" :key="pet.id" class="pet-fullscreen-card" :data-index='index'>
+      <div v-for="(pet, index) in pets" :key="pet.id" class="pet-fullscreen-card section" :data-index='index'>
         <!-- 宠物详情内容 -->
         <div class="pet-content">
           <!-- 顶部导航 -->
@@ -358,23 +358,15 @@ const handleWheel = (e: WheelEvent) => {
   if (e.ctrlKey) {
     return;
   }
-  const target = e.target as HTMLElement;
-  const container = target.closest('.cute-card') as HTMLElement;
 
-  if (container) {
-    // 在中间区域滚动，阻止事件传播到外层
-    console.log('在内部')
-    // e.stopPropagation();
-    return;
+  console.log('在外部')
+  e.preventDefault();
+  if (e.deltaY > 0) {
+    scrollToNextScreen()
   } else {
-    console.log('在外部')
-    e.preventDefault();
-    if (e.deltaY > 0) {
-      scrollToNextScreen()
-    } else {
-      scrollToPrevScreen();
-    }
+    scrollToPrevScreen();
   }
+
 
 }
 //根据id寻找宠物对象
@@ -1262,4 +1254,12 @@ onUnmounted(() => {
     bottom: 10px;
   }
 }
-</style>
+
+// ::-webkit-scrollbar {
+//   width: 0;
+//   /* 垂直滚动条宽度设为0 */
+//   height: 0;
+//   /* 水平滚动条高度设为0 */
+//   display: none;
+//   /* 直接隐藏 */
+// }</style>

@@ -1,16 +1,26 @@
 // 声明 window 上的 layui 全局变量
-export {}
+export { Window }
 declare interface Window {
-  layui: any
+  layui: any //eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
-// 声明 layui 模块的类型（若需要更精确的类型，可进一步完善）
-declare const layui: {
-  use: (modules: string[], callback: (...modules: any[]) => void) => void
-  form: {
-    on: (event: string, callback: (data: { field: Record<string, string> }) => void) => void
-  }
-  layer: {
-    alert: (content: any, options?: any) => void
+// 声明 layui 全局变量的类型
+declare global {
+  const layui: {
+    use: (
+      modules: string[],
+      callback: (
+        ...modules: any[] //eslint-disable-line @typescript-eslint/no-explicit-any
+      ) => void,
+    ) => void
+    form: {
+      on: (event: string, callback: (data: { field: Record<string, string> }) => void) => void
+    }
+    layer: {
+      alert: (
+        content: any, //eslint-disable-line @typescript-eslint/no-explicit-any
+        options?: any, //eslint-disable-line @typescript-eslint/no-explicit-any
+      ) => void
+    }
   }
 }

@@ -222,7 +222,7 @@
                                     <div class="flex items-center mb-4">
 
                                         <span class="text-rose-700 font-medium">已选择标签（{{ formData.characterTags.length
-                                            }}/8）</span>
+                                        }}/8）</span>
                                     </div>
                                     <div
                                         class="selected-tags-container min-h-20 p-4 rounded-xl bg-gradient-to-br from-pink-50/50 to-rose-50/50 border border-rose-100">
@@ -375,17 +375,19 @@
                             <SuccessFilled />
                         </el-icon>
                     </div>
-                    <div class="success-content">
-                        <h3 class="success-title">添加成功！</h3>
-                        <p class="success-message">{{ formData.name || '您的宠物' }} 已加入家庭</p>
-                        <div class="success-actions">
-                            <el-button @click="goToPetDetail" class="success-btn primary">
+                    <div class="success-content text-center">
+                        <h3 class="success-title text-3xl font-bold text-rose-800 mb-2">添加成功！</h3>
+                        <p class="success-message text-rose-600 mb-8">{{ formData.name || '您的宠物' }} 已加入家庭</p>
+                        <div class="success-actions flex flex-col sm:flex-row gap-3 justify-center">
+                            <el-button @click="goToPetDetail"
+                                class="success-btn primary px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 sm:flex-none bg-gradient-to-r from-pink-400 to-rose-400 text-white border-none hover:shadow-lg">
                                 <el-icon class="mr-2">
                                     <View />
                                 </el-icon>
                                 查看详情
                             </el-button>
-                            <el-button @click="addAnother" class="success-btn secondary">
+                            <el-button @click="addAnother"
+                                class="success-btn secondary px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 sm:flex-none border-rose-200 text-rose-600 bg-white hover:bg-rose-50">
                                 <el-icon class="mr-2">
                                     <Plus />
                                 </el-icon>
@@ -393,14 +395,17 @@
                             </el-button>
                         </div>
                     </div>
-                    <div class="success-decoration">
-                        <el-icon class="decoration-1">
+                    <div class="success-decoration absolute inset-0 pointer-events-none">
+                        <el-icon
+                            class="decoration-1 absolute text-rose-200 text-3xl top-4 left-4 animate-[float_3s_ease-in-out_infinite]">
                             <Star />
                         </el-icon>
-                        <el-icon class="decoration-2">
+                        <el-icon
+                            class="decoration-2 absolute text-rose-200 text-2xl top-10 right-6 animate-[float_3s_ease-in-out_infinite_0.5s]">
                             <Star />
                         </el-icon>
-                        <el-icon class="decoration-3">
+                        <el-icon
+                            class="decoration-3 absolute text-rose-200 text-xl bottom-8 left-10 animate-[float_3s_ease-in-out_infinite_1s]">
                             <Star />
                         </el-icon>
                     </div>
@@ -941,58 +946,19 @@ const goBack = () => {
 }
 
 
-.success-icon .el-icon {
-    @apply ;
-}
-
-.success-content {
-    @apply text-center;
-}
-
-.success-title {
-    @apply text-3xl font-bold text-rose-800 mb-2;
-}
-
-.success-message {
-    @apply text-rose-600 mb-8;
-}
-
-.success-actions {
-    @apply flex flex-col sm:flex-row gap-3 justify-center;
-}
-
-.success-btn {
-    @apply px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 sm:flex-none;
-}
-
-.success-btn.primary {
-    @apply bg-gradient-to-r from-pink-400 to-rose-400 text-white border-none hover:shadow-lg;
-}
-
-.success-btn.secondary {
-    @apply border-rose-200 text-rose-600 bg-white hover:bg-rose-50;
-}
-
-.success-decoration {
-    @apply absolute inset-0 pointer-events-none;
-}
-
-.success-decoration .el-icon {
-    @apply absolute text-rose-200;
-}
 
 .decoration-1 {
-    @apply text-3xl top-4 left-4;
+
     animation: float 3s ease-in-out infinite;
 }
 
 .decoration-2 {
-    @apply text-2xl top-10 right-6;
+
     animation: float 3s ease-in-out infinite 0.5s;
 }
 
 .decoration-3 {
-    @apply text-xl bottom-8 left-10;
+
     animation: float 3s ease-in-out infinite 1s;
 }
 

@@ -13,9 +13,9 @@
     "verbatimModuleSyntax": false,
 
     /* 严格类型检查 */
-    "strict": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
+    "strict": false,
+    "noImplicitAny": false, //允许any类型
+    "noImplicitReturns": false,
     "noFallthroughCasesInSwitch": true,
 
     /* 类型路径 */

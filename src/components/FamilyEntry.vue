@@ -12,30 +12,17 @@
           <label class="block text-sm font-medium text-gray-700">
             家庭名称 <span class="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            v-model="form.name"
+          <input type="text" v-model="form.name"
             class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-            placeholder="请输入家庭名称/昵称"
-            required
-          />
+            placeholder="请输入家庭名称/昵称" required />
         </div>
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">
             可接待宠物类型 <span class="text-red-500">*</span>
           </label>
-          <el-select
-            v-model="form.petTypes"
-            multiple
-            class="w-full"
-            placeholder="请选择可接待的宠物类型"
-          >
-            <el-option
-              v-for="animal in animalOptions"
-              :key="animal.value"
-              :label="animal.label"
-              :value="animal.label"
-            />
+          <el-select v-model="form.petTypes" multiple class="w-full" placeholder="请选择可接待的宠物类型">
+            <el-option v-for="animal in animalOptions" :key="animal.value" :label="animal.label"
+              :value="animal.label" />
           </el-select>
         </div>
       </div>
@@ -44,13 +31,8 @@
           机构资质证书（支持多张，最多6张）<span class="text-red-500">*</span>
         </label>
 
-        <FileUpload
-          ref="qualificationRef"
-          accept="image/*,.pdf"
-          :max-count="6"
-          accept-description="JPG、PNG、PDF格式"
-          @file-change="(files) => (form.qualificationPhotos = files.map((f) => f.url))"
-        />
+        <FileUpload ref="qualificationRef" accept="image/*,.pdf" :max-count="6" accept-description="JPG、PNG、PDF格式"
+          @file-change="(files) => (form.qualificationPhotos = files.map((f) => f.url))" />
       </div>
     </div>
 
@@ -60,13 +42,8 @@
         环境照片（支持多张，最多6张）<span class="text-red-500">*</span>
       </label>
 
-      <FileUpload
-        ref="environmentRef"
-        accept="image/*"
-        :max-count="6"
-        accept-description="JPG、PNG格式"
-        @file-change="(files) => (form.environmentPhotos = files.map((f) => f.url))"
-      />
+      <FileUpload ref="environmentRef" accept="image/*" :max-count="6" accept-description="JPG、PNG格式"
+        @file-change="(files) => (form.environmentPhotos = files.map((f) => f.url))" />
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -81,13 +58,9 @@
           <label class="block text-sm font-medium text-gray-700">
             详细地址 <span class="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            v-model="form.detailAddress"
+          <input type="text" v-model="form.detailAddress"
             class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-            placeholder="请输入机构详细地址"
-            required
-          />
+            placeholder="请输入机构详细地址" required />
         </div>
       </div>
 
@@ -101,12 +74,9 @@
           <label class="block text-sm font-medium text-gray-700">
             寄样说明 <span class="text-red-500">*</span>
           </label>
-          <textarea
-            v-model="form.description"
+          <textarea v-model="form.description"
             class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
-            placeholder="请输入寄样说明"
-            required
-          ></textarea>
+            placeholder="请输入寄样说明" required></textarea>
         </div>
       </div>
     </div>
@@ -115,9 +85,7 @@
     <div class="mt-8">
       <button
         class="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl hover:from-purple-700 hover:to-purple-600 active:from-purple-800 active:to-purple-700 transition-all shadow-md hover:shadow-lg"
-        type="button"
-        @click="submitForm"
-      >
+        type="button" @click="submitForm">
         提交申请
       </button>
       <p class="text-center text-gray-500 text-sm mt-4">
@@ -179,8 +147,8 @@ const form = reactive<OrganizationForm>({
   qualificationPhotos: [],
   environmentPhotos: [],
 })
-const qualificationRef = ref<any>(null) //eslint-disable-line @typescript-eslint/no-explicit-any
-const environmentRef = ref<any>(null) //eslint-disable-line @typescript-eslint/no-explicit-any
+const qualificationRef = ref<any>(null)
+const environmentRef = ref<any>(null)
 
 // 修复地址同步逻辑
 interface Area {

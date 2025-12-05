@@ -78,11 +78,8 @@
                   <div class="chart-bars">
                     <div v-for="(item, index) in incomeData" :key="index" class="chart-bar">
                       <div class="bar-value">{{ item.value }}</div>
-                      <div
-                        class="bar"
-                        :style="{ height: item.height + '%' }"
-                        :class="{ 'active-bar': item.active }"
-                      ></div>
+                      <div class="bar" :style="{ height: item.height + '%' }" :class="{ 'active-bar': item.active }">
+                      </div>
                       <div class="bar-label">{{ item.label }}</div>
                     </div>
                   </div>
@@ -196,14 +193,8 @@
               <div class="package-header">
                 <div class="package-title-section">
                   <h3 class="package-title">{{ pkg.name }}</h3>
-                  <el-rate
-                    v-model="pkg.rating"
-                    disabled
-                    show-score
-                    text-color="#ff9900"
-                    score-template="{value}"
-                    size="small"
-                  />
+                  <el-rate v-model="pkg.rating" disabled show-score text-color="#ff9900" score-template="{value}"
+                    size="small" />
                 </div>
                 <div class="package-actions">
                   <el-dropdown trigger="click">
@@ -215,21 +206,15 @@
                         <el-dropdown-item @click="editPackage(pkg)">
                           <i class="el-icon-edit"></i>编辑套餐
                         </el-dropdown-item>
-                        <el-dropdown-item
-                          @click="togglePackageStatus(pkg)"
-                          :class="{ 'warning-text': pkg.status === 'active' }"
-                        >
+                        <el-dropdown-item @click="togglePackageStatus(pkg)"
+                          :class="{ 'warning-text': pkg.status === 'active' }">
                           <i class="el-icon-switch-button"></i>
                           {{ pkg.status === 'active' ? '下架套餐' : '上架套餐' }}
                         </el-dropdown-item>
                         <el-dropdown-item @click="viewPackageStats(pkg)">
                           <i class="el-icon-data-line"></i>查看数据
                         </el-dropdown-item>
-                        <el-dropdown-item
-                          @click="deletePackage(pkg.id)"
-                          divided
-                          class="danger-text"
-                        >
+                        <el-dropdown-item @click="deletePackage(pkg.id)" divided class="danger-text">
                           <i class="el-icon-delete"></i>删除套餐
                         </el-dropdown-item>
                       </el-dropdown-menu>
@@ -297,50 +282,24 @@
     </div>
 
     <!-- 添加/编辑套餐对话框 -->
-    <el-dialog
-      :title="dialogTitle"
-      v-model="packageDialogVisible"
-      width="600px"
-      class="package-dialog"
-    >
+    <el-dialog :title="dialogTitle" v-model="packageDialogVisible" width="600px" class="package-dialog">
       <el-form :model="packageForm" :rules="packageRules" ref="packageFormRef" label-width="100px">
         <el-tabs v-model="activeTab">
           <!-- 基本信息 -->
           <el-tab-pane label="基本信息" name="basic">
             <el-form-item label="套餐名称" prop="name">
-              <el-input
-                v-model="packageForm.name"
-                placeholder="请输入套餐名称，如：基础营养套餐"
-                maxlength="20"
-                show-word-limit
-              />
+              <el-input v-model="packageForm.name" placeholder="请输入套餐名称，如：基础营养套餐" maxlength="20" show-word-limit />
             </el-form-item>
             <el-form-item label="套餐描述" prop="description">
-              <el-input
-                v-model="packageForm.description"
-                type="textarea"
-                :rows="2"
-                placeholder="简要描述套餐特点"
-                maxlength="100"
-                show-word-limit
-              />
+              <el-input v-model="packageForm.description" type="textarea" :rows="2" placeholder="简要描述套餐特点"
+                maxlength="100" show-word-limit />
             </el-form-item>
             <el-form-item label="服务时长" prop="serviceTime">
               <el-input v-model="packageForm.serviceTime" placeholder="如：24小时照顾" />
             </el-form-item>
             <el-form-item label="宠物类型" prop="petTypes">
-              <el-select
-                v-model="packageForm.petTypes"
-                multiple
-                placeholder="请选择适合的宠物类型"
-                style="width: 100%"
-              >
-                <el-option
-                  v-for="item in petTypeOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                />
+              <el-select v-model="packageForm.petTypes" multiple placeholder="请选择适合的宠物类型" style="width: 100%">
+                <el-option v-for="item in petTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
           </el-tab-pane>
@@ -348,43 +307,23 @@
           <!-- 价格与名额 -->
           <el-tab-pane label="价格设置" name="price">
             <el-form-item label="价格（元/天）" prop="price">
-              <el-input-number
-                v-model="packageForm.price"
-                :min="0"
-                :step="10"
-                controls-position="right"
-                style="width: 200px"
-              />
+              <el-input-number v-model="packageForm.price" :min="0" :step="10" controls-position="right"
+                style="width: 200px" />
               <span class="form-tip">建议定价在80-300元之间</span>
             </el-form-item>
             <el-form-item label="原价（可选）">
-              <el-input-number
-                v-model="packageForm.originalPrice"
-                :min="0"
-                :step="10"
-                controls-position="right"
-                style="width: 200px"
-              />
+              <el-input-number v-model="packageForm.originalPrice" :min="0" :step="10" controls-position="right"
+                style="width: 200px" />
               <span class="form-tip">设置原价可显示折扣</span>
             </el-form-item>
             <el-form-item label="名额限制" prop="quota">
-              <el-input-number
-                v-model="packageForm.quota"
-                :min="1"
-                :max="100"
-                controls-position="right"
-                style="width: 200px"
-              />
+              <el-input-number v-model="packageForm.quota" :min="1" :max="100" controls-position="right"
+                style="width: 200px" />
               <span class="form-tip">同时可服务的最大宠物数量</span>
             </el-form-item>
             <el-form-item label="上架状态">
-              <el-switch
-                v-model="packageForm.status"
-                active-value="active"
-                inactive-value="inactive"
-                active-text="立即上架"
-                inactive-text="暂不上架"
-              />
+              <el-switch v-model="packageForm.status" active-value="active" inactive-value="inactive" active-text="立即上架"
+                inactive-text="暂不上架" />
             </el-form-item>
           </el-tab-pane>
 
@@ -393,23 +332,11 @@
             <el-form-item label="服务特色" prop="features">
               <div class="features-editor">
                 <div class="features-list">
-                  <div
-                    v-for="(feature, index) in packageForm.features"
-                    :key="index"
-                    class="feature-item"
-                  >
-                    <el-input
-                      v-model="packageForm.features[index]"
-                      placeholder="请输入服务内容"
-                      style="width: 80%; margin-right: 10px"
-                    />
-                    <el-button
-                      type="danger"
-                      size="small"
-                      circle
-                      @click="removeFeature(index)"
-                      :disabled="packageForm.features.length <= 1"
-                    >
+                  <div v-for="(feature, index) in packageForm.features" :key="index" class="feature-item">
+                    <el-input v-model="packageForm.features[index]" placeholder="请输入服务内容"
+                      style="width: 80%; margin-right: 10px" />
+                    <el-button type="danger" size="small" circle @click="removeFeature(index)"
+                      :disabled="packageForm.features.length <= 1">
                       <i class="el-icon-minus"></i>
                     </el-button>
                   </div>
@@ -420,14 +347,8 @@
               </div>
             </el-form-item>
             <el-form-item label="注意事项">
-              <el-input
-                v-model="packageForm.notes"
-                type="textarea"
-                :rows="3"
-                placeholder="可填写服务限制、特殊要求等"
-                maxlength="200"
-                show-word-limit
-              />
+              <el-input v-model="packageForm.notes" type="textarea" :rows="3" placeholder="可填写服务限制、特殊要求等"
+                maxlength="200" show-word-limit />
             </el-form-item>
           </el-tab-pane>
         </el-tabs>
@@ -449,49 +370,27 @@
           <el-input v-model="shopForm.name" placeholder="请输入店铺名称" />
         </el-form-item>
         <el-form-item label="店铺描述" prop="description">
-          <el-input
-            v-model="shopForm.description"
-            type="textarea"
-            :rows="3"
-            placeholder="简要描述您的店铺特色"
-          />
+          <el-input v-model="shopForm.description" type="textarea" :rows="3" placeholder="简要描述您的店铺特色" />
         </el-form-item>
         <el-form-item label="联系方式" prop="contact">
           <el-input v-model="shopForm.contact" placeholder="请输入联系电话或微信" />
         </el-form-item>
         <el-form-item label="营业时间" prop="businessHours">
-          <el-time-picker
-            v-model="shopForm.businessHours"
-            is-range
-            range-separator="至"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
-            placeholder="选择营业时间"
-            style="width: 100%"
-          />
+          <el-time-picker v-model="shopForm.businessHours" is-range range-separator="至" start-placeholder="开始时间"
+            end-placeholder="结束时间" placeholder="选择营业时间" style="width: 100%" />
         </el-form-item>
         <el-form-item label="服务地址" prop="address">
           <el-input v-model="shopForm.address" placeholder="请输入详细地址" />
         </el-form-item>
         <el-form-item label="店铺封面">
-          <el-upload
-            class="avatar-uploader"
-            action="#"
-            :show-file-list="false"
-            :on-change="handleAvatarChange"
-            :auto-upload="false"
-          >
+          <el-upload class="avatar-uploader" action="#" :show-file-list="false" :on-change="handleAvatarChange"
+            :auto-upload="false">
             <img v-if="shopForm.coverImage" :src="shopForm.coverImage" class="avatar" />
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
         <el-form-item label="特色标签">
-          <el-select
-            v-model="shopForm.tags"
-            multiple
-            placeholder="选择店铺特色标签"
-            style="width: 100%"
-          >
+          <el-select v-model="shopForm.tags" multiple placeholder="选择店铺特色标签" style="width: 100%">
             <el-option v-for="tag in shopTagOptions" :key="tag" :label="tag" :value="tag" />
           </el-select>
         </el-form-item>
@@ -857,6 +756,7 @@ const savePackage = async () => {
       saving.value = false
     }, 500)
   } catch (error) {
+    console.error(error)
     saving.value = false
   }
 }
@@ -890,6 +790,7 @@ const saveShopInfo = async () => {
       savingShop.value = false
     }, 500)
   } catch (error) {
+    console.error(error)
     savingShop.value = false
   }
 }

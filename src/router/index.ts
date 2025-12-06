@@ -320,7 +320,7 @@ const router = createRouter({
  */
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.meta.requiresAuth ?? false
-  const isLogin = !!localStorage.getItem('AuthToken')
+  const isLogin = !!localStorage.getItem('authToken')
   if (requiresAuth && !isLogin) {
     ElMessage.warning('请先登录后再访问')
     // 跳转到登录页，并记录当前页面路径（登录后可返回）

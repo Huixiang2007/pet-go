@@ -12,7 +12,7 @@
         <div class="flex items-center justify-between pb-4 border-b border-gray-100">
           <div>
             <h1 class="text-md font-bold text-gray-700">搜索结果</h1>
-            <span class="text-gray-500 text-sm">找到{{ products.total }}件相关商品</span>
+            <span class="text-gray-500 text-sm">找到{{ productsTotal }}件相关商品</span>
           </div>
 
           <div class="flex items-center justify-center px-6">
@@ -266,6 +266,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
+const productsTotal = ref(0)
 
 
 const filters = ref({
@@ -359,7 +360,7 @@ const SearchProducts = () => {
       idLoading.value = false
       const newSearchProducts = res.data.data?.list || []
       products.value = [...products.value, ...newSearchProducts]
-      products.value.total = res.data.data.total || 0
+      productsTotal.value = res.data.data.total || 0
 
       if (newSearchProducts.length < pageSize.value) {
         hasmore.value = false

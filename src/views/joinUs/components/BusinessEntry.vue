@@ -473,10 +473,6 @@ const submitForm = async () => {
         console.log('提交失败:', error.response.data)
         ElMessage.error('提交失败，请稍后重试。')
       })
-      .finally(() => {
-        // 重置提交状态
-        isSubmitting.value = true
-      })
   } catch (error) {
     // 处理错误
     console.log('提交失败:', error)

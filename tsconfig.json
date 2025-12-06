@@ -53,7 +53,7 @@
   //   "exclude": ["node_modules"]
   // }
 
-  "extends": "@tsconfig/node22/tsconfig.json",
+"extends": "@tsconfig/node22/tsconfig.json",
   "include": [
     "vite.config.*",
     "vitest.config.*",

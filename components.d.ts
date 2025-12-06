@@ -11,10 +11,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AddressSelect: typeof import('./src/components/AddressSelect.vue')['default']
+    AddressSelect: typeof import('./src/components/business/AddressSelect.vue')['default']
     BusinessEntry: typeof import('./src/components/BusinessEntry.vue')['default']
-    CaptchaLoad: typeof import('./src/components/CaptchaLoad.vue')['default']
-    ConfirmCode: typeof import('./src/components/ConfirmCode.vue')['default']
+    CaptchaLoad: typeof import('./src/components/common/CaptchaLoad.vue')['default']
+    ConfirmCode: typeof import('./src/components/common/ConfirmCode.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -68,10 +68,10 @@ declare module 'vue' {
     RecordTable: typeof import('./src/components/RecordTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SellerManHeader: typeof import('./src/components/SellerManHeader.vue')['default']
-    SellerManNav: typeof import('./src/components/SellerManNav.vue')['default']
-    ShopCategoryNav: typeof import('./src/components/ShopCategoryNav.vue')['default']
-    ShopFoot: typeof import('./src/components/ShopFoot.vue')['default']
+    SellerManHeader: typeof import('./src/components/common/SellerManHeader.vue')['default']
+    SellerManNav: typeof import('./src/components/common/SellerManNav.vue')['default']
+    ShopCategoryNav: typeof import('./src/components/common/ShopCategoryNav.vue')['default']
+    ShopFoot: typeof import('./src/components/common/ShopFoot.vue')['default']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
     UserHeader: typeof import('./src/components/UserHeader.vue')['default']
   }

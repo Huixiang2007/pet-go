@@ -25,9 +25,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 // 导入子组件
-import Sidebar from '@/components/Sidebar.vue'
-import Header from '@/components/UserHeader.vue'
-import Compete from './components/AllCompete.vue'
+import Sidebar from '@/views/admin/components/Sidebar.vue'
+import Header from '@/views/admin/components/UserHeader.vue'
+import Compete from '@/views/admin/components/AllCompete.vue'
 // 侧边栏折叠状态（仅为样式服务）
 const sidebarOpened = ref(true)
 </script>

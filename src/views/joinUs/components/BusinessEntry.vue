@@ -25,10 +25,10 @@
               <select id="shop-type" v-model="form.shopType"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none bg-white"
                 required>
-               <option value="" class="text-gray-400">请选择店铺类型</option>
-  <option value="个人店">个人店</option>
-  <option value="企业店">企业店</option>
-  <option value="旗舰店">旗舰店</option>
+                <option value="" class="text-gray-400">请选择店铺类型</option>
+                <option value="个人店">个人店</option>
+                <option value="企业店">企业店</option>
+                <option value="旗舰店">旗舰店</option>
               </select>
             </div>
           </div>
@@ -214,7 +214,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 // 导入组件
 import AddressSelect from '@/components/business/AddressSelect.vue'
-import FileUpload from '@/components/FileUpload.vue'
+import FileUpload from '@/components/common/FileUpload.vue'
 
 // 导入地区数据
 import provincesData from 'china-division/dist/provinces.json'
@@ -312,7 +312,7 @@ const imageData = ref({
   otherDocs: '',
 })
 // 文件上传处理函数 - 修改为存储base64字符串
-const handleFileChange = async (dataUrl:string, type: keyof typeof imageData.value) => {
+const handleFileChange = async (dataUrl: string, type: keyof typeof imageData.value) => {
   try {
     if (dataUrl && dataUrl.startsWith('data:image/')) {
 

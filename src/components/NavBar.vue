@@ -16,7 +16,9 @@
       }"></div>
     </div>
     <div>
-      <el-button type="warning" plain size="default" class="ml-1" @click="login">登录</el-button>
+      <el-button v-if="!isLogin" type="warning" plain size="default" class="ml-1" @click="login">登录</el-button>
+      <el-button else="isLogin" type="warning" plain size="default" class="ml-1" @click="goToPerson">个人中心</el-button>
+
     </div>
   </div>
 </template>
@@ -101,7 +103,10 @@ const activeIndex = ref(0)
 const activeBgColor = ref(navItems.value[0]?.bgColor)
 const isAnimating = ref(false)
 const router = useRouter()
-
+const isLogin = localStorage.getItem('AuthToken') ? true : false
+const goToPerson = () => {
+  router.push({ path: '/personal' })
+}
 // 设置活跃项
 const setActive = (index: number, bgColor: string) => {
   activeIndex.value = index

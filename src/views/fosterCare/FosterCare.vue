@@ -11,7 +11,7 @@
                             <div class="mb-5">
                                 <div class="flex justify-between">
                                     <h3 class="font-semibold text-gray-700 mb-2">你的位置</h3>
-                                    <button class="text-xs text-blue-500">
+                                    <button class="text-xs text-blue-500" @click="goToPerson">
                                         去修改
                                     </button>
                                 </div>
@@ -261,6 +261,11 @@ declare global {
     }
 }
 
+const router = useRouter();
+
+const goToPerson = () => {
+    router.push({ path: '/person' })
+}
 // 地图相关
 const mapContainer = ref<HTMLElement>()
 let map: any = null
@@ -528,6 +533,7 @@ const updateMapMarkers = () => {
     });
     fitMapToMarkers();
 }
+
 const fitMapToMarkers = () => {
     if (!map || markers.length === 0) return;
 
@@ -686,7 +692,7 @@ const scrollToTop = () => {
     }
 }
 // 查看详情
-const router = useRouter();
+
 const viewDetails = (foster: FosterHome) => {
     router.push({ name: 'fosterDetail', params: { id: foster.id } });
 }

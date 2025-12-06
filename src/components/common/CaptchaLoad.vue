@@ -12,9 +12,15 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue'
+// 定义组件暴露的方法类型
+// type CaptchaExposed = {
+//   refreshCaptcha: () => void
+//   validateCaptcha: (input: string) => boolean
+//   getCurrentCode: () => string
+// }
 
 export default defineComponent({
-  name: 'CaptchaPicture',
+  name: 'CaptchaLoad',
   props: {
     width: {
       type: Number,
@@ -25,6 +31,7 @@ export default defineComponent({
       default: 38,
     },
   },
+
   setup() {
     const captchaCanvasRef = ref<HTMLCanvasElement | null>(null)
     let correctCode = '1111'
@@ -111,13 +118,14 @@ export default defineComponent({
     onMounted(() => {
       drawCode()
     })
-
-    return {
+        return {
       captchaCanvasRef,
-      refreshCaptcha,
-      validateCaptcha,
-      getCurrentCode,
+      refreshCaptcha,   // 暴露给父组件的方法
+      validateCaptcha,  // 暴露给父组件的方法
+      getCurrentCode    // 暴露给父组件的方法
     }
+
+    
   },
 })
 </script>

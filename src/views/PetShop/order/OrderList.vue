@@ -47,7 +47,7 @@
               <div class="border-t border-gray-100">
                 <nav class="p-2">
                   <a
-                    href="/petCart"
+                    href="/pet-cart"
                     class="flex items-center px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-all mb-1"
                   >
                     <i class="fa fa-shopping-cart w-5 text-center mr-3"></i>
@@ -115,11 +115,11 @@
                 <p class="text-gray-500 mb-6 max-w-md mx-auto">
                   您还没有相关订单，快去挑选心仪的商品吧～
                 </p>
-                <button
+                <router-link to="/petShop" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg transition-colors">
                   class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg transition-colors"
                 >
                   去逛逛
-                </button>
+                </router-link>
               </div>
               <div v-else class="space-y-4">
                 <OrderCard v-for="value in filteredOrders" :key="value.id" :order="value" />

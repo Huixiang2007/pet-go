@@ -41,8 +41,7 @@
               <div v-if="imagePreviews.shopAvatar" class="mb-2">
                 <img :src="imagePreviews.shopAvatar" class="max-w-full max-h-40 object-contain rounded" alt="商铺头像预览" />
               </div>
-              <FileUpload :preview-image="imagePreviews.shopAvatar" accept="image/*"
-                @file-change="handleFileChange($event, 'shopAvatar')">
+              <FileUpload :preview-image="imagePreviews.shopAvatar" accept="image/*">
                 <template #default>
                   <i class="fa fa-cloud-upload text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传商铺头像</span>
@@ -61,8 +60,7 @@
                 <img :src="imagePreviews.businessLicense" class="max-w-full max-h-40 object-contain rounded"
                   alt="营业执照预览" />
               </div>
-              <FileUpload :preview-image="imagePreviews.businessLicense" accept="image/*"
-                @file-change="handleFileChange($event, 'businessLicense')">
+              <FileUpload :preview-image="imagePreviews.businessLicense" accept="image/*">
                 <template #default>
                   <i class="fa fa-file-image-o text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传营业执照</span>
@@ -118,8 +116,7 @@
                 <img :src="imagePreviews.idCardFront" class="max-w-full max-h-40 object-contain rounded"
                   alt="身份证正面预览" />
               </div>
-              <FileUpload :preview-image="imagePreviews.idCardFront" accept="image/*"
-                @file-change="handleFileChange($event, 'idCardFront')">
+              <FileUpload :preview-image="imagePreviews.idCardFront" accept="image/*">
                 <template #default>
                   <i class="fa fa-id-card-o text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传身份证正面</span>
@@ -136,8 +133,7 @@
               <div v-if="imagePreviews.idCardBack" class="mb-2">
                 <img :src="imagePreviews.idCardBack" class="max-w-full max-h-40 object-contain rounded" alt="身份证反面预览" />
               </div>
-              <FileUpload :preview-image="imagePreviews.idCardBack" accept="image/*"
-                @file-change="handleFileChange($event, 'idCardBack')">
+              <FileUpload :preview-image="imagePreviews.idCardBack" accept="image/*">
                 <template #default>
                   <i class="fa fa-id-card text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传身份证反面</span>
@@ -294,16 +290,16 @@ const addressDisplayText = computed(() => {
 })
 
 // 辅助函数：获取字段中文名称
-const getFieldName = (type: string): string => {
-  const names: Record<string, string> = {
-    shopAvatar: '商铺头像',
-    businessLicense: '营业执照',
-    idCardFront: '身份证正面',
-    idCardBack: '身份证反面',
-    otherDocs: '其他证件',
-  }
-  return names[type] || type
-}
+// const getFieldName = (type: string): string => {
+//   const names: Record<string, string> = {
+//     shopAvatar: '商铺头像',
+//     businessLicense: '营业执照',
+//     idCardFront: '身份证正面',
+//     idCardBack: '身份证反面',
+//     otherDocs: '其他证件',
+//   }
+//   return names[type] || type
+// }
 const imageData = ref({
   shopAvatar: '',
   businessLicense: '',
@@ -312,24 +308,24 @@ const imageData = ref({
   otherDocs: '',
 })
 // 文件上传处理函数 - 修改为存储base64字符串
-const handleFileChange = async (dataUrl: string, type: keyof typeof imageData.value) => {
-  try {
-    if (dataUrl && dataUrl.startsWith('data:image/')) {
+// const handleFileChange = async (dataUrl: string, type: keyof typeof imageData.value) => {
+//   try {
+//     if (dataUrl && dataUrl.startsWith('data:image/')) {
 
-      // 直接存储base64字符串
-      imageData.value[type] = dataUrl
-      ElMessage.success(`${getFieldName(type)}上传成功`)
-    } else {
-      // 清除无效上传
-      imageData.value[type] = ''
-      ElMessage.error(`${getFieldName(type)}格式错误，请重新上传`)
-    }
-  } catch (error) {
-    console.error(`处理${getFieldName(type)}时出错:`, error)
-    imageData.value[type] = ''
-    ElMessage.error(`${getFieldName(type)}处理失败，请重试`)
-  }
-}
+//       // 直接存储base64字符串
+//       imageData.value[type] = dataUrl
+//       ElMessage.success(`${getFieldName(type)}上传成功`)
+//     } else {
+//       // 清除无效上传
+//       imageData.value[type] = ''
+//       ElMessage.error(`${getFieldName(type)}格式错误，请重新上传`)
+//     }
+//   } catch (error) {
+//     console.error(`处理${getFieldName(type)}时出错:`, error)
+//     imageData.value[type] = ''
+//     ElMessage.error(`${getFieldName(type)}处理失败，请重试`)
+//   }
+// }
 
 // 表单验证函数
 const validateForm = (): boolean => {

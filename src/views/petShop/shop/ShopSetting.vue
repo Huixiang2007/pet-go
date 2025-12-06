@@ -7,7 +7,7 @@
 
       <div class="flex-1 overflow-auto p-4 ml-1 md:p-6">
         <div class="bg-white rounded-xl shadow-sm p-6 md:p-8 max-w-5xl mx-auto">
-          <h1 class="text-2xl font-bold text-gray-800 mb-8 text-center text-[#f77e21]">
+          <h1 class="text-2xl font-bold  mb-8 text-center text-[#f77e21]">
             店铺信息设置
           </h1>
 
@@ -25,15 +25,9 @@
                   <label for="shop-name" class="block text-sm font-medium text-gray-700">
                     商铺名称 <span class="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    id="shop-name"
+                  <input type="text" id="shop-name"
                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                    placeholder="请输入商铺名称"
-                    required
-                    v-model="shopInfo.name"
-                    @blur="validateShopName"
-                  />
+                    placeholder="请输入商铺名称" required v-model="shopInfo.name" @blur="validateShopName" />
                   <p v-if="shopNameError" class="text-xs text-red-500 mt-1">{{ shopNameError }}</p>
                 </div>
 
@@ -42,12 +36,9 @@
                   <label for="shop-type" class="block text-sm font-medium text-gray-700">
                     店铺类型 <span class="text-red-500">*</span>
                   </label>
-                  <select
-                    id="shop-type"
+                  <select id="shop-type"
                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white"
-                    required
-                    v-model="shopInfo.type"
-                  >
+                    required v-model="shopInfo.type">
                     <option value="" class="text-gray-400">请选择店铺类型</option>
                     <option value="1">个人店</option>
                     <option value="2">企业店</option>
@@ -63,37 +54,24 @@
                     商铺头像
                   </label>
                   <div class="flex flex-col gap-3">
-                    <div
-                      v-if="previewAvatar"
-                      class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 relative group"
-                    >
+                    <div v-if="previewAvatar"
+                      class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 relative group">
                       <img :src="previewAvatar" alt="商铺头像" class="w-full h-full object-cover" />
-                      <button
-                        type="button"
+                      <button type="button"
                         class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="clearAvatar"
-                      >
+                        @click="clearAvatar">
                         <i class="fa fa-times text-xs"></i>
                       </button>
                     </div>
                     <div
-                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer"
-                    >
-                      <label
-                        for="shop-avatar-file"
-                        class="cursor-pointer flex flex-col items-center justify-center"
-                      >
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
+                      <label for="shop-avatar-file" class="cursor-pointer flex flex-col items-center justify-center">
                         <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                         <span class="text-gray-600">点击重新上传商铺头像</span>
                         <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
                       </label>
-                      <input
-                        type="file"
-                        class="hidden"
-                        id="shop-avatar-file"
-                        accept="image/*"
-                        @change="handleAvatarUpload"
-                      />
+                      <input type="file" class="hidden" id="shop-avatar-file" accept="image/*"
+                        @change="handleAvatarUpload" />
                     </div>
                   </div>
                 </div>
@@ -104,41 +82,25 @@
                     营业执照照片
                   </label>
                   <div class="flex flex-col gap-3">
-                    <div
-                      v-if="previewLicense"
-                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group"
-                    >
-                      <img
-                        :src="previewLicense"
-                        alt="营业执照"
-                        class="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
+                    <div v-if="previewLicense"
+                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
+                      <img :src="previewLicense" alt="营业执照" class="w-full h-full object-cover" />
+                      <button type="button"
                         class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="clearLicense"
-                      >
+                        @click="clearLicense">
                         <i class="fa fa-times text-xs"></i>
                       </button>
                     </div>
                     <div
-                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer"
-                    >
-                      <label
-                        for="business-license-file"
-                        class="cursor-pointer flex flex-col items-center justify-center"
-                      >
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
+                      <label for="business-license-file"
+                        class="cursor-pointer flex flex-col items-center justify-center">
                         <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                         <span class="text-gray-600">点击重新上传营业执照</span>
                         <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
                       </label>
-                      <input
-                        type="file"
-                        class="hidden"
-                        id="business-license-file"
-                        accept="image/*"
-                        @change="handleLicenseUpload"
-                      />
+                      <input type="file" class="hidden" id="business-license-file" accept="image/*"
+                        @change="handleLicenseUpload" />
                     </div>
                   </div>
                 </div>
@@ -151,41 +113,24 @@
                     身份证正面
                   </label>
                   <div class="flex flex-col gap-3">
-                    <div
-                      v-if="previewIdCardFront"
-                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group"
-                    >
-                      <img
-                        :src="previewIdCardFront"
-                        alt="身份证正面"
-                        class="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
+                    <div v-if="previewIdCardFront"
+                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
+                      <img :src="previewIdCardFront" alt="身份证正面" class="w-full h-full object-cover" />
+                      <button type="button"
                         class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="clearIdCardFront"
-                      >
+                        @click="clearIdCardFront">
                         <i class="fa fa-times text-xs"></i>
                       </button>
                     </div>
                     <div
-                      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer"
-                    >
-                      <label
-                        for="id-card-front-file"
-                        class="cursor-pointer flex flex-col items-center justify-center"
-                      >
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
+                      <label for="id-card-front-file" class="cursor-pointer flex flex-col items-center justify-center">
                         <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                         <span class="text-gray-600">点击重新上传身份证正面</span>
                         <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
                       </label>
-                      <input
-                        type="file"
-                        class="hidden"
-                        id="id-card-front-file"
-                        accept="image/*"
-                        @change="handleIdCardFrontUpload"
-                      />
+                      <input type="file" class="hidden" id="id-card-front-file" accept="image/*"
+                        @change="handleIdCardFrontUpload" />
                     </div>
                   </div>
                 </div>
@@ -194,41 +139,24 @@
                     身份证反面
                   </label>
                   <div class="flex flex-col gap-3">
-                    <div
-                      v-if="previewIdCardBack"
-                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group"
-                    >
-                      <img
-                        :src="previewIdCardBack"
-                        alt="身份证反面"
-                        class="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
+                    <div v-if="previewIdCardBack"
+                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
+                      <img :src="previewIdCardBack" alt="身份证反面" class="w-full h-full object-cover" />
+                      <button type="button"
                         class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="clearIdCardBack"
-                      >
+                        @click="clearIdCardBack">
                         <i class="fa fa-times text-xs"></i>
                       </button>
                     </div>
                     <div
-                      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer"
-                    >
-                      <label
-                        for="id-card-back-file"
-                        class="cursor-pointer flex flex-col items-center justify-center"
-                      >
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
+                      <label for="id-card-back-file" class="cursor-pointer flex flex-col items-center justify-center">
                         <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
                         <span class="text-gray-600">点击重新上传身份证反面</span>
                         <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
                       </label>
-                      <input
-                        type="file"
-                        class="hidden"
-                        id="id-card-back-file"
-                        accept="image/*"
-                        @change="handleIdCardBackUpload"
-                      />
+                      <input type="file" class="hidden" id="id-card-back-file" accept="image/*"
+                        @change="handleIdCardBackUpload" />
                     </div>
                   </div>
                 </div>
@@ -246,28 +174,17 @@
                   <label for="contact-name" class="block text-sm font-medium text-gray-700">
                     拥有者姓名 <span class="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    id="contact-name"
+                  <input type="text" id="contact-name"
                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                    placeholder="请输入拥有者姓名"
-                    required
-                    v-model="ownerInfo.name"
-                  />
+                    placeholder="请输入拥有者姓名" required v-model="ownerInfo.name" />
                 </div>
                 <div class="space-y-2">
                   <label for="contact-phone" class="block text-sm font-medium text-gray-700">
                     拥有者电话 <span class="text-red-500">*</span>
                   </label>
-                  <input
-                    type="tel"
-                    id="contact-phone"
+                  <input type="tel" id="contact-phone"
                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                    placeholder="请输入拥有者电话"
-                    required
-                    v-model="ownerInfo.phone"
-                    @blur="validatePhone"
-                  />
+                    placeholder="请输入拥有者电话" required v-model="ownerInfo.phone" @blur="validatePhone" />
                   <p v-if="phoneError" class="text-xs text-red-500 mt-1">{{ phoneError }}</p>
                 </div>
               </div>
@@ -275,15 +192,9 @@
                 <label for="contact-email" class="block text-sm font-medium text-gray-700">
                   拥有者邮箱 <span class="text-red-500">*</span>
                 </label>
-                <input
-                  type="email"
-                  id="contact-email"
+                <input type="email" id="contact-email"
                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                  placeholder="请输入拥有者邮箱"
-                  required
-                  v-model="ownerInfo.email"
-                  @blur="validateEmail"
-                />
+                  placeholder="请输入拥有者邮箱" required v-model="ownerInfo.email" @blur="validateEmail" />
                 <p v-if="emailError" class="text-xs text-red-500 mt-1">{{ emailError }}</p>
               </div>
             </div>
@@ -299,12 +210,8 @@
                   <label for="province" class="block text-sm font-medium text-gray-700">
                     所在省份 <span class="text-red-500">*</span>
                   </label>
-                  <select
-                    id="province"
-                    v-model="selectedProvince"
-                    @change="handleProvinceChange"
-                    class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white"
-                  >
+                  <select id="province" v-model="selectedProvince" @change="handleProvinceChange"
+                    class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white">
                     <option value="">请选择</option>
                     <option v-for="value in provinceList" :key="value.id" :value="value.id">
                       {{ value.name }}
@@ -316,14 +223,9 @@
                   <label for="city" class="block text-sm font-medium text-gray-700">
                     所在城市 <span class="text-red-500">*</span>
                   </label>
-                  <select
-                    id="city"
-                    v-model="selectedCity"
-                    @change="handleCityChange"
-                    :disabled="!cityList.length"
+                  <select id="city" v-model="selectedCity" @change="handleCityChange" :disabled="!cityList.length"
                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white"
-                    required
-                  >
+                    required>
                     <option value="">请选择</option>
                     <option v-for="city in cityList" :key="city.id" :value="city.id">
                       {{ city.name }}
@@ -334,19 +236,11 @@
                   <label for="district" class="block text-sm font-medium text-gray-700">
                     所在区县 <span class="text-red-500">*</span>
                   </label>
-                  <select
-                    id="district"
-                    v-model="selectedDistrict"
-                    :disabled="!districtList.length"
+                  <select id="district" v-model="selectedDistrict" :disabled="!districtList.length"
                     class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white"
-                    required
-                  >
+                    required>
                     <option value="">请选择</option>
-                    <option
-                      v-for="(district, index) in districtList"
-                      :key="index"
-                      :value="district"
-                    >
+                    <option v-for="(district, index) in districtList" :key="index" :value="district">
                       {{ district }}
                     </option>
                   </select>
@@ -357,14 +251,9 @@
                 <label for="address" class="block text-sm font-medium text-gray-700">
                   详细地址 <span class="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  id="address"
+                <input type="text" id="address"
                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                  placeholder="请输入详细地址"
-                  v-model="addressInfo.detail"
-                  required
-                />
+                  placeholder="请输入详细地址" v-model="addressInfo.detail" required />
               </div>
             </div>
 
@@ -378,13 +267,9 @@
                 <label for="shop-desc" class="block text-sm font-medium text-gray-700">
                   商铺介绍 <span class="text-red-500">*</span>
                 </label>
-                <textarea
-                  id="shop-desc"
+                <textarea id="shop-desc"
                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
-                  placeholder="请输入商铺介绍（如经营品类、店铺特色等）"
-                  required
-                  v-model="shopInfo.desc"
-                ></textarea>
+                  placeholder="请输入商铺介绍（如经营品类、店铺特色等）" required v-model="shopInfo.desc"></textarea>
                 <p class="text-xs text-gray-400 mt-1">最多输入500个字符</p>
               </div>
             </div>
@@ -392,9 +277,7 @@
             <div class="mt-8">
               <button
                 class="w-full py-3 bg-[#f77e21] text-white font-medium rounded-lg hover:bg-[#e67010] active:bg-[#d56300] transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                type="submit"
-                :disabled="isSubmitting"
-              >
+                type="submit" :disabled="isSubmitting">
                 <i v-if="isSubmitting" class="fa fa-spinner fa-spin"></i>
                 <span>{{ isSubmitting ? '保存中...' : '保存店铺设置' }}</span>
               </button>
@@ -638,7 +521,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 img {
   object-fit: cover;
 }
@@ -654,6 +536,7 @@ button:disabled {
   .grid-cols-1 md:grid-cols-2 {
     grid-template-columns: 1fr;
   }
+
   .grid-cols-1 md:grid-cols-3 {
     grid-template-columns: 1fr;
   }

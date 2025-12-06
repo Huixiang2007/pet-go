@@ -28,9 +28,9 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-vercode"></i>
               </div>
-              <input type="text" name="vercode" value="" v-model="form.vercode"
-                @input="handleInput('vercode', $event.target.value)" lay-verify="required" placeholder="验证码"
-                lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" />
+              <input type="text" name="vercode" v-model="form.vercode"
+                @input="(e) => handleInput('vercode', (e.target as HTMLInputElement)?.value || '')" lay-verify="required"
+                placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" />
             </div>
           </div>
           <div class="layui-form-item">
@@ -38,9 +38,9 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-              <input type="password" name="password" value="" lay-verify="required|password" v-model="form.password"
-                @input="handleInput('password', $event.target.value)" placeholder="密码" autocomplete="off"
-                class="layui-input" id="reg-password" lay-affix="eye" />
+              <input type="password" name="password" lay-verify="required|password" v-model="form.password"
+                @input="(e) => handleInput('password', (e.target as HTMLInputElement)?.value || '')" placeholder="密码"
+                autocomplete="off" class="layui-input" id="reg-password" lay-affix="eye" />
             </div>
           </div>
           <div class="layui-form-item">
@@ -48,8 +48,8 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-              <input type="password" name="confirmPassword" value="" lay-verify="required|confirmPassword"
-                v-model="form.confirm" @input="handleInput('confirm', $event.target.value)" placeholder="确认密码"
+              <input type="password" name="confirmPassword" lay-verify="required|confirmPassword" v-model="form.confirm"
+                @input="(e) => handleInput('confirm', (e.target as HTMLInputElement)?.value || '')" placeholder="确认密码"
                 autocomplete="off" class="layui-input" lay-affix="eye" id="confirm-password" />
             </div>
           </div>
@@ -58,8 +58,8 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-username"></i>
               </div>
-              <input type="text" name="nickname" value="" lay-verify="required|nickname" placeholder="账号"
-                v-model="form.name" @input="handleInput('name', $event.target.value)" autocomplete="off"
+              <input type="text" name="nickname" lay-verify="required|nickname" placeholder="账号" v-model="form.name"
+                @input="(e) => handleInput('name', (e.target as HTMLInputElement)?.value || '')" autocomplete="off"
                 class="layui-input" lay-affix="clear" />
             </div>
           </div>
@@ -94,9 +94,14 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useRegisterStore, RegisterForm } from '@/stores/register'
-import ConfirmCode from '@/components/ConfirmCode.vue'
-const ConfirmCodeRef =  ref<InstanceType<typeof ConfirmCode> & ConfirmCodeExposed | null>(null);
+import { useRegisterStore } from '@/stores/register'
+import type { RegisterForm } from '@/stores/register'
+import ConfirmCode from '@/components/common/ConfirmCode.vue'
+interface ConfirmCodeExposed {
+  startCountdown: () => void;
+  // 其他需要的方法/属性也可以加在这里
+}
+const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> & ConfirmCodeExposed | null>(null);
 const registerStore = useRegisterStore()
 const router = useRouter()
 const route = useRoute()
@@ -119,10 +124,7 @@ const handleInput = (key: keyof RegisterForm, value: string) => {
 }
 // 定时器管理（避免内存泄漏）
 let hideErrorTimer: NodeJS.Timeout | null = null
-interface ConfirmCodeExposed {
-  startCountdown: () => void;
-  // 其他需要的方法/属性也可以加在这里
-}
+
 /**
  * 处理协议勾选状态变化
  */
@@ -162,9 +164,8 @@ const handleRegister = async () => {
     }, 3000)
     return
   }
-
   try {
-   
+
 
     // 调用注册接口
     const response = await axios.post(

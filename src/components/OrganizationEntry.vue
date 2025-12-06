@@ -113,7 +113,7 @@
 import { ref, reactive } from 'vue'
 import request from '@/utils/request'
 import FileUpload from '@/components/FileUpload.vue'
-import AddressSelect from '@/components/AddressSelect.vue'
+import AddressSelect from '@/components/business/AddressSelect.vue'
 // 引入Element Plus的消息提示组件（根据实际UI库替换）
 import { ElMessage } from 'element-plus'
 import provincesData from 'china-division/dist/provinces.json'

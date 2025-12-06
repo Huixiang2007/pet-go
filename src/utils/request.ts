@@ -22,7 +22,6 @@ service.interceptors.request.use(
 //处理响应类型
 //明确后端返回的数据结构，并让request返回Data<T>类型
 type Data<T = any> = {
-  // eslint-disable-line @typescript-eslint/no-explicit-any
   code: number
   msg: string
   data: T
@@ -127,7 +126,7 @@ service.interceptors.response.use(
 //axios中的ts认为data有的，但是响应拦截器实际去掉了
 //再次对请求方法进行封装
 
-const request = <T = any>( // eslint-disable-line @typescript-eslint/no-explicit-any
+const request = <T = any>(
   //参数
   url: string,
   method: Method,

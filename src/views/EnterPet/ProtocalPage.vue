@@ -197,8 +197,9 @@ import { ref } from 'vue'
 
 const router = useRouter()
 const isAgreed = ref(false)
-
-// 确认按钮逻辑（返回注册页并执行后续操作）
+const handleAgreeChange = (e: Event) => {
+  isAgreed.value = (e.target as HTMLInputElement).checked;
+};// 确认按钮逻辑（返回注册页并执行后续操作）
 const handleConfirm = () => {
   // 返回注册页
   router.push({

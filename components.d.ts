@@ -15,6 +15,8 @@ declare module 'vue' {
     BusinessEntry: typeof import('./src/components/BusinessEntry.vue')['default']
     CaptchaLoad: typeof import('./src/components/common/CaptchaLoad.vue')['default']
     ConfirmCode: typeof import('./src/components/common/ConfirmCode.vue')['default']
+    ElAside: typeof import('element-plus/es')['ElAside']
+    ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']

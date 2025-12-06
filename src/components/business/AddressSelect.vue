@@ -18,7 +18,8 @@
       </select>
 
       <select v-model="selectedDistrict" @change="handleDistrictChange" :disabled="!selectedCity">
-        <option value="">请选择区县</option>
+        <option value="">请选择区县
+        </option>
         <option :value="district.code" v-for="district in districts" :key="district.code">
           {{ district.name }}
         </option>

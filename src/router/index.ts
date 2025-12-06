@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 const routes: RouteRecordRaw[] = [
   // 寄养首页
@@ -230,6 +230,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'foster',
         name: 'foster',
+        redirect: 'admin/foster/audit',
         meta: {
           title: '寄养服务管理',
           icon: 'el-icon-house',
@@ -264,11 +265,16 @@ const router = createRouter({
 /**
  * 路由导航守卫
  */
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
   if (to.meta.title) {
     document.title = to.meta.title as string
   }
-  next()
+  if (to.path === '/login') {
+    return true
+  }
+
+  // 已登录 → 允许访问
+  return true
 })
 
 export default router

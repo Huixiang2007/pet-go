@@ -15,22 +15,22 @@
         class="bg-white rounded-xl shadow-md p-6 md:p-8 transition-all duration-300 hover:shadow-lg"
       >
         <form @submit.prevent="handleSubmit" class="space-y-8">
-
+          <!-- 基本信息组件 -->
           <ProductBasicInfo
             v-model:form="productForm"
           />
 
+          <!-- 图片上传组件 -->
           <ProductImageUpload
             v-model:mainImage="productForm.mainImage"
             v-model:imagesList="productForm.imagesList"
             v-model:videoUrl="productForm.videoUrl"
           />
 
-
+          <!-- SKU配置组件 -->
           <ProductSkuConfig
             v-model:skuList="skuList"
           />
-
 
           <div class="flex justify-end space-x-4 pt-6 border-t border-yellow-100">
             <el-button
@@ -83,6 +83,7 @@ import ProductBasicInfo from './components/ProductBasicInfo.vue'
 import ProductImageUpload from './components/ProductImageUpload.vue'
 import ProductSkuConfig from './components/ProductSkuConfig.vue'
 
+// 商品表单接口
 interface ProductForm {
   productSn: string
   title: string
@@ -101,6 +102,7 @@ interface ProductForm {
   warrantyTip: string
 }
 
+// SKU项接口
 export interface SkuItem {
   skuSn: string
   specJson: string
@@ -113,6 +115,7 @@ export interface SkuItem {
   volume: number
 }
 
+// 商品表单数据
 const productForm = reactive<ProductForm>({
   productSn: '',
   title: '',
@@ -131,6 +134,7 @@ const productForm = reactive<ProductForm>({
   warrantyTip: ''
 })
 
+// SKU列表
 const skuList = ref<SkuItem[]>([
   {
     skuSn: '',
@@ -145,11 +149,16 @@ const skuList = ref<SkuItem[]>([
   }
 ])
 
+// 提交状态
 const isSubmitting = ref(false)
+// 消息显示状态
 const showMessage = ref(false)
+// 消息内容
 const message = ref('')
+// 消息类型
 const messageType = ref<'success' | 'error'>('success')
 
+// 显示消息提示
 const showToastMessage = (msg: string, type: 'success' | 'error' = 'success') => {
   message.value = msg
   messageType.value = type
@@ -178,33 +187,32 @@ const validateForm = (): boolean => {
 }
 
 // 提交表单
-const handleSubmit = async () => {
+const handleSubmit = () => {
   if (!validateForm() || isSubmitting.value) return
   isSubmitting.value = true
-
-  try {
     const submitData = {
       ...productForm,
       images: productForm.imagesList.join(','),
       skus: skuList.value
     }
-    axios.request({
+
+  axios.request({
       url: '/server/api/product/add',
       method: 'POST',
       data: submitData
-    }).then(response => {
-    if (response.data.success) {
-      showToastMessage('商品添加成功！')
-      handleReset()
-    } else {
-      showToastMessage(`商品添加失败：${response.data.msg}`, 'error')
-    }
-    }).catch(error => {
-      console.log('提交失败:', error.response.data)
-      ElMessage.error('提交失败，请稍后重试。')
     })
-  }
+.then(response => {
+      showToastMessage('商品添加成功！')
+      console.log('商品添加成功:', response.data)
+      handleReset()
+})
+.catch(error => {
+      console.log('提交失败:', error.response?.data)
+      showToastMessage('提交失败，请稍后重试。', 'error')
+
+  })
 }
+
 // 重置表单
 const handleReset = () => {
   if (confirm('确定要重置表单吗？所有已填写内容将被清空。')) {

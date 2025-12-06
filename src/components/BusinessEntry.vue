@@ -273,8 +273,8 @@ import { reactive, ref, computed, watch } from 'vue'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 // 导入组件
-import AddressSelect from './AddressSelect.vue'
-import FileUpload from './FileUpload.vue'
+import AddressSelect from '@/components/business/AddressSelect.vue'
+import FileUpload from '@/components/FileUpload.vue'
 // 导入地区数据
 import provincesData from 'china-division/dist/provinces.json'
 import citiesData from 'china-division/dist/cities.json'

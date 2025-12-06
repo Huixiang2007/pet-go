@@ -72,19 +72,13 @@ const routes : RouteRecordRaw[] = [
   {
     path: '/search',
     name: 'Search',
-    component: () => import('@/views/petShop/shop/SearchProduct.vue'),
+    component: () => import('@/views/petShop/product/SearchProduct.vue'),
   },
   // 店铺
   {
     path: '/store',
     name: 'Store',
     component: () => import('@/views/petShop/shop/ShopStore.vue'),
-  },
-  // 注册店铺
-  {
-    path: '/store-register',
-    name: 'StoreRegister',
-    component: () => import('@/views/petShop/shop/SellerRegisition.vue'),
   },
   // 订单管理
   {
@@ -103,13 +97,13 @@ const routes : RouteRecordRaw[] = [
   {
     path: '/coupon-management',
     name: 'CouponManagement',
-    component: () => import('@/views/petShop/coupon/CouponManagement.vue'),
+    component: () => import('@/views/petShop/marketing/CouponManagement.vue'),
   },
   // 商品管理
   {
     path: '/seller-item-manager',
     name: 'SellerItemManager',
-    component: () => import('@/views/petShop/shop/SellerItemMana.vue'),
+    component: () => import('@/views/petShop/product/SellerItemMana.vue'),
   },
   // 店铺设置
   {

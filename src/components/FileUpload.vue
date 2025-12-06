@@ -113,7 +113,7 @@ const fileInput = ref<HTMLInputElement>()
 
 // 计算属性
 const isMaxReached = computed(() => fileList.value.length >= props.maxCount)
-// const isImageType = computed(() => props.accept.includes('image'))
+
 // 清空内部文件列表
 const clearFiles = () => {
   fileList.value = []
@@ -124,6 +124,7 @@ defineExpose({
     fileList.value.splice(index, 1)
   },
 })
+
 // 创建隐藏的file input
 const createFileInput = () => {
   const input = document.createElement('input')
@@ -162,6 +163,7 @@ const handleDrop = async (e: DragEvent) => {
   const files = Array.from(e.dataTransfer?.files || [])
   await processFiles(files)
 }
+
 // 上传单个文件
 const uploadFile = async (file: File): Promise<string> => {
   const formData = new FormData()
@@ -171,91 +173,18 @@ const uploadFile = async (file: File): Promise<string> => {
 
   return response.data
 }
+
 // 删除文件
 const removeFile = (index: number) => {
   fileList.value.splice(index, 1)
   emit('file-change', fileList.value)
 }
 
-// 处理文件列表
+// 处理文件列表（仅保留这一个processFiles函数）
 const processFiles = async (files: File[]) => {
-    // 过滤并限制数量
-    const validFiles = files
-        .filter(file => validateFile(file))
-        .slice(0, props.maxCount - fileList.value.length)
-
-    if (validFiles.length === 0) return
-
-    // 上传文件
-    const uploadedUrls: string[] = []
-    for (const file of validFiles) {
-        try {
-            const url = await uploadFile(file)
-            uploadedUrls.push(url)
-
-            // 添加到预览列表
-            fileList.value.push({
-                name: file.name,
-                url,
-                isImage: file.type.startsWith('image/')
-            })
-        } catch (error) {
-            console.error(`文件${file.name}上传失败:`, error)
-            ElMessage(
-                {
-                    message: `文件${file.name}上传失败，请重试`,
-                    type: 'error',
-                    duration: 3000
-                }
-            )
-        }
-    }
-
-    // 触发事件
-    emit('file-change', fileList.value)
-    if (uploadedUrls.length > 0) {
-        emit('upload-success', uploadedUrls)
-    }
-}
-
-// 验证文件
-const validateFile = (file: File): boolean => {
-    // 大小验证
-    if (file.size > props.maxSizeMB * 1024 * 1024) {
-      ElMessage({
-        message: `文件大小不能超过${props.maxSizeMB}MB`,
-        type: 'error',
-        duration: 3000,
-      })
-
-      return false
-    }
-
-    // 类型验证
-    const acceptTypes = props.accept.split(',').map((t) => t.trim())
-    const fileExt = '.' + file.name.split('.').pop()?.toLowerCase()
-    const fileType = file.type.toLowerCase()
-
-    const isValid = acceptTypes.some((type) => {
-      if (type === '*/*') return true
-      if (type.endsWith('/*')) return fileType.startsWith(type.split('/')[0] + '/')
-      return fileType === type || fileExt === type
-    })
-
-    if (!isValid) {
-      ElMessage({
-        message: `文件"${file.name}"格式不支持，请上传${props.acceptDescription}文件`,
-        type: 'error',
-        duration: 3000,
-      })
-      return false
-    }
-
-    return true
-  }
   // 过滤并限制数量
   const validFiles = files
-    .filter((file) => validateFile(file))
+    .filter(file => validateFile(file))
     .slice(0, props.maxCount - fileList.value.length)
 
   if (validFiles.length === 0) return
@@ -271,15 +200,17 @@ const validateFile = (file: File): boolean => {
       fileList.value.push({
         name: file.name,
         url,
-        isImage: file.type.startsWith('image/'),
+        isImage: file.type.startsWith('image/')
       })
     } catch (error) {
       console.error(`文件${file.name}上传失败:`, error)
-      ElMessage({
-        message: `文件${file.name}上传失败，请重试`,
-        type: 'error',
-        duration: 3000,
-      })
+      ElMessage(
+        {
+          message: `文件${file.name}上传失败，请重试`,
+          type: 'error',
+          duration: 3000
+        }
+      )
     }
   }
 
@@ -288,18 +219,55 @@ const validateFile = (file: File): boolean => {
   if (uploadedUrls.length > 0) {
     emit('upload-success', uploadedUrls)
   }
+}
 
-  // 清理
-  watch(
-    () => props.disabled,
-    (newVal) => {
-      if (newVal && fileInput.value) {
-        fileInput.value.remove()
-        fileInput.value = undefined
+// 验证文件
+const validateFile = (file: File): boolean => {
+  // 大小验证
+  if (file.size > props.maxSizeMB * 1024 * 1024) {
+    ElMessage({
+      message: `文件大小不能超过${props.maxSizeMB}MB`,
+      type: 'error',
+      duration: 3000,
+    })
+
+    return false
+  }
+
+  // 类型验证
+  const acceptTypes = props.accept.split(',').map((t) => t.trim())
+  const fileExt = '.' + file.name.split('.').pop()?.toLowerCase()
+  const fileType = file.type.toLowerCase()
+
+  const isValid = acceptTypes.some((type) => {
+    if (type === '*/*') return true
+    if (type.endsWith('/*')) return fileType.startsWith(type.split('/')[0] + '/')
+    return fileType === type || fileExt === type
+  })
+
+  if (!isValid) {
+    ElMessage({
+      message: `文件"${file.name}"格式不支持，请上传${props.acceptDescription}文件`,
+      type: 'error',
+      duration: 3000,
+    })
+    return false
+  }
+
+  return true
+}
+
+// 移动到根作用域（组件初始化时执行）
+watch(
+  () => props.disabled,
+  (newVal) => {
+    if (newVal && fileInput.value) {
+      fileInput.value.remove()
+      fileInput.value = undefined
     }
-})
+  }
+)
 </script>
-
 <style scoped>
 .file-upload-wrapper {
   position: relative;

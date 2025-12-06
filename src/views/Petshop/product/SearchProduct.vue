@@ -21,9 +21,10 @@
             >
               筛选状态
             </button>
-            <!-- 价格排序按钮 - 新增点击事件和动态箭头 -->
+
+            <!-- 价格排序按钮 - 适配sortType -->
             <button
-              @click="togglePriceSort"
+              @click="changeSortType('price')"
               class="px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 mr-2 transition-all hover:border-[#f5a623] hover:text-[#f5a623] flex items-center gap-1"
             >
               <i class="fa fa-money-check-alt"></i>
@@ -31,20 +32,30 @@
               <div class="flex flex-col items-center justify-center relative mx-2">
                 <i
                   class="fa fa-angle-up absolute"
-                  :class="sortColumn === 'currentPrice' && sortIsAsc ? 'opacity-100' : 'opacity-0'"
+                  :class="sortType === 1 ? 'opacity-100' : 'opacity-0'"
                 ></i>
                 <i
                   class="fa fa-angle-down absolute"
-                  :class="sortColumn === 'currentPrice' && !sortIsAsc ? 'opacity-100' : 'opacity-0'"
+                  :class="sortType === 2 ? 'opacity-100' : 'opacity-0'"
                 ></i>
               </div>
             </button>
-
             <button
-              class="px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 transition-all hover:border-[#f5a623] hover:text-[#f5a623] flex items-center gap-1"
+              @click="changeSortType('sales')"
+              class="px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 mr-2 transition-all hover:border-[#f5a623] hover:text-[#f5a623] flex items-center gap-1"
             >
-              区间
-              <i class="fa fa-angle-down"></i>
+              <i class="fa fa-bar-chart"></i>
+              销量
+              <div class="flex flex-col items-center justify-center relative mx-2">
+                <i
+                  class="fa fa-angle-up absolute"
+                  :class="sortType === 3 ? 'opacity-100' : 'opacity-0'"
+                ></i>
+                <i
+                  class="fa fa-angle-down absolute"
+                  :class="sortType === 4 ? 'opacity-100' : 'opacity-0'"
+                ></i>
+              </div>
             </button>
 
             <button
@@ -72,6 +83,7 @@
               >
               品牌选择
             </button>
+
             <!-- 地区选择弹窗 -->
             <div
               v-if="showRegionModal"
@@ -122,6 +134,7 @@
                 </div>
               </div>
             </div>
+
             <!-- 品牌选择弹窗 -->
             <div
               v-if="showBrandModal"
@@ -264,17 +277,8 @@ const filters = ref({
   region: '' // 选中的地区
 })
 
-const sortColumn = ref('') // 排序
-const sortIsAsc = ref(true) // 是否升序
-// 组装排序参数
-const getSortItemList = () => {
-  return [
-    {
-      isAsc: sortIsAsc.value,
-      column: "222"
-    }
-  ]
-}
+// 排序类型（后端要求：1-价格升序/2-价格降序/3-销量升序/4-销量降序）
+const sortType = ref<number>(0) // 0表示未选择排序
 
 // 滚动相关状态
 const scrollY = ref(0)
@@ -287,11 +291,9 @@ const filterBrand = ref(false)
 const selectedRegion = ref('')
 const selectedCity = ref('')
 
-
 const regions = ref<string[]>([])
 const brandList = ref<string[]>([])
 const selectedBrands = ref<string[]>([])
-
 
 const currentPage = ref(1)
 const hasmore = ref(true)
@@ -317,10 +319,28 @@ const productsDeatil = (id: string) => {
   })
 }
 
+// 切换排序类型（price/sales）
+const changeSortType = (type: 'price' | 'sales') => {
+  if (type === 'price') {
+    // 价格排序：当前是升序则切换为降序，否则默认升序
+    sortType.value = sortType.value === 1 ? 2 : 1
+  } else if (type === 'sales') {
+    // 销量排序：当前是升序则切换为降序，否则默认升序
+    sortType.value = sortType.value === 3 ? 4 : 3
+  }
+  // 重置分页并重新搜索
+  resetSearchState()
+  SearchProducts()
+}
 
 const SearchProducts = () => {
   if (idLoading.value || !hasmore.value) return
 
+  console.log("搜索商品请求参数:")
+  console.log("title:", filters.value.title)
+  console.log("brandName:", filters.value.brandName)
+  console.log("region:", filters.value.region)
+  console.log("sortType:", sortType.value)
 
   idLoading.value = true
   axios
@@ -331,12 +351,14 @@ const SearchProducts = () => {
         pageNum: currentPage.value,
         pageSize: pageSize.value,
         title: filters.value.title,
-        sortItemList: getSortItemList()
+        brandNameList: filters.value.brandName,
+        region: filters.value.region,
+        sortType: sortType.value // 新增排序类型参数（后端要求的整数）
+        // 移除原有无效的sortItemList参数
       },
     })
-    .then((res:any) => {
-      console.log("商品搜索请求参数:")
-          console.log(res)
+    .then((res: any) => {
+      console.log("商品搜索响应:", res)
       idLoading.value = false
       const newSearchProducts = res.data.data?.list || []
       products.value = [...products.value, ...newSearchProducts]
@@ -359,30 +381,21 @@ const resetSearchState = () => {
   idLoading.value = false
 }
 
-// 价格排序切换
-const togglePriceSort = () => {
-  if (sortColumn.value !== 'currentPrice') {
-    sortColumn.value = 'currentPrice'
-    sortIsAsc.value = true
-  } else {
-    sortIsAsc.value = !sortIsAsc.value
-  }
-  resetSearchState()
-  SearchProducts()
-}
-
 const clearAllFilters = () => {
+  // 重置筛选条件
   filters.value = {
     title: '',
     brandName: [],
     region: ''
   }
-  sortColumn.value = ''
-  sortIsAsc.value = true
+  // 重置排序类型
+  sortType.value = 0
+  // 重置选择状态
   selectedBrands.value = []
   selectedRegion.value = ''
   filterBrand.value = false
   filterRegion.value = false
+  // 重置分页并重新搜索
   resetSearchState()
   SearchProducts()
 }
@@ -392,8 +405,7 @@ watch(
   () => route.query.keyword,
   (newValue) => {
     filters.value.title = (newValue as string) || ''
-    console.log("当前关键词:")
-    console.log(filters.value.title)
+    console.log("当前关键词:", filters.value.title)
     resetSearchState()
     SearchProducts()
   },
@@ -407,9 +419,8 @@ const getBrands = () => {
       url: '/server/api/shop/product/add/brand',
       method: 'GET',
     })
-    .then((res:any) => {
-      console.log("获取品牌列表请求参数:")
-          console.log(res)
+    .then((res: any) => {
+      console.log("品牌列表响应:", res)
       brandList.value = res.data.data || []
     })
     .catch((error) => {
@@ -428,9 +439,8 @@ const getRegions = () => {
         page: 1,
       },
     })
-    .then((res:any) => {
-      console.log("获取地区列表请求参数:")
-      console.log(res)
+    .then((res: any) => {
+      console.log("地区列表响应:", res)
       regions.value = res.data.data || []
       if (regions.value.length > 0 && regions.value[0] !== '全部') {
         regions.value.unshift('全部')
@@ -455,7 +465,6 @@ const selectRegion = (region: string) => {
   selectedRegion.value = region === '全部' ? '' : region
   selectedCity.value = ''
 }
-
 
 const resetRegion = () => {
   selectedRegion.value = ''
@@ -513,11 +522,9 @@ const scrollToTop = () => {
 </script>
 
 <style scoped>
-
 .shadow-xl {
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
-
 
 .animate-fade-in {
   animation: fadeIn 0.3s ease-in-out;
@@ -533,7 +540,6 @@ const scrollToTop = () => {
     transform: translateY(0);
   }
 }
-
 
 .line-clamp-1 {
   overflow: hidden;

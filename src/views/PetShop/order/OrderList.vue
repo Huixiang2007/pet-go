@@ -186,10 +186,10 @@
 </template>
 
 <script setup lang="ts">
-import OrderCard from '@/views/Petshop/OrderCard.vue'
-import { type Order } from '@/views/Petshop/OrderCard.vue'
-import Coupons from '@/views/Petshop/MyCoupons.vue'
-import Comments from '@/views/Petshop/MyComments.vue'
+import OrderCard from './components/OrderCard.vue'
+import { type Order } from './components/OrderCard.vue'
+import Coupons from '../marketing/MyCoupons.vue'
+import Comments from '../comment/MyComments.vue'
 import { ref, computed } from 'vue'
 
 // 筛选状态

@@ -12,7 +12,7 @@
         <div class="flex items-center justify-between pb-4 border-b border-gray-100">
           <div>
             <h1 class="text-md font-bold text-gray-700">搜索结果</h1>
-            <span class="text-gray-500 text-sm">找到{{ products.length }}件相关商品</span>
+            <span class="text-gray-500 text-sm">找到{{ products.total }}件相关商品</span>
           </div>
 
           <div class="flex items-center justify-center px-6">
@@ -22,7 +22,6 @@
               筛选状态
             </button>
 
-            <!-- 价格排序按钮 - 适配sortType -->
             <button
               @click="changeSortType('price')"
               class="px-5 py-2 text-gray-600 font-medium text-sm rounded-md border border-gray-200 mr-2 transition-all hover:border-[#f5a623] hover:text-[#f5a623] flex items-center gap-1"
@@ -84,7 +83,6 @@
               品牌选择
             </button>
 
-            <!-- 地区选择弹窗 -->
             <div
               v-if="showRegionModal"
               class="fixed inset-0 bg-black/50 flex items-center justify-center z-[5000]"
@@ -135,7 +133,6 @@
               </div>
             </div>
 
-            <!-- 品牌选择弹窗 -->
             <div
               v-if="showBrandModal"
               class="fixed inset-0 bg-black/50 flex items-center justify-center z-[5000]"
@@ -270,14 +267,14 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
-// 统一筛选条件管理
+
 const filters = ref({
   title: '', // 搜索关键词
-  brandName: [] as string[], // 选中的品牌
+  brandName: '' ,// 选中的品牌
   region: '' // 选中的地区
 })
 
-// 排序类型（后端要求：1-价格升序/2-价格降序/3-销量升序/4-销量降序）
+// 排序类型（1-价格升序/2-价格降序/3-销量升序/4-销量降序）
 const sortType = ref<number>(0) // 0表示未选择排序
 
 // 滚动相关状态
@@ -290,10 +287,10 @@ const filterRegion = ref(false)
 const filterBrand = ref(false)
 const selectedRegion = ref('')
 const selectedCity = ref('')
+const selectedBrands = ref('')
 
 const regions = ref<string[]>([])
 const brandList = ref<string[]>([])
-const selectedBrands = ref<string[]>([])
 
 const currentPage = ref(1)
 const hasmore = ref(true)
@@ -310,7 +307,8 @@ interface Products {
   currentPrice: number
   originalPrice: number
   warrantyTip: string
-  title: string
+  title: string,
+  total: number,
 }
 
 const productsDeatil = (id: string) => {
@@ -319,7 +317,7 @@ const productsDeatil = (id: string) => {
   })
 }
 
-// 切换排序类型（price/sales）
+// 切换排序类型
 const changeSortType = (type: 'price' | 'sales') => {
   if (type === 'price') {
     // 价格排序：当前是升序则切换为降序，否则默认升序
@@ -353,8 +351,7 @@ const SearchProducts = () => {
         title: filters.value.title,
         brandNameList: filters.value.brandName,
         region: filters.value.region,
-        sortType: sortType.value // 新增排序类型参数（后端要求的整数）
-        // 移除原有无效的sortItemList参数
+        sortType: sortType.value // 新增排序类型参数
       },
     })
     .then((res: any) => {
@@ -362,6 +359,8 @@ const SearchProducts = () => {
       idLoading.value = false
       const newSearchProducts = res.data.data?.list || []
       products.value = [...products.value, ...newSearchProducts]
+      products.value.total = res.data.data.total || 0
+
       if (newSearchProducts.length < pageSize.value) {
         hasmore.value = false
       } else {
@@ -385,13 +384,13 @@ const clearAllFilters = () => {
   // 重置筛选条件
   filters.value = {
     title: '',
-    brandName: [],
+    brandName: '',
     region: ''
   }
-  // 重置排序类型
+
   sortType.value = 0
-  // 重置选择状态
-  selectedBrands.value = []
+
+  selectedBrands.value = ''
   selectedRegion.value = ''
   filterBrand.value = false
   filterRegion.value = false
@@ -400,7 +399,7 @@ const clearAllFilters = () => {
   SearchProducts()
 }
 
-// 关键词监听
+
 watch(
   () => route.query.keyword,
   (newValue) => {
@@ -454,7 +453,7 @@ const getRegions = () => {
 // 品牌筛选确认
 const confirmBrands = () => {
   filters.value.brandName = selectedBrands.value
-  filterBrand.value = selectedBrands.value.length > 0
+  filterBrand.value = !!selectedBrands.value
   showBrandModal.value = false
   resetSearchState()
   SearchProducts()
@@ -474,8 +473,8 @@ const resetRegion = () => {
 }
 
 const resetBrands = () => {
-  selectedBrands.value = []
-  filters.value.brandName = []
+  selectedBrands.value = ''
+  filters.value.brandName = ''
   filterBrand.value = false
 }
 

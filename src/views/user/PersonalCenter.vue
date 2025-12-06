@@ -19,6 +19,9 @@
         </div>
       </div>
       <div class="header-actions">
+         <button class="layui-btn layui-btn-primary newColor" @click="gotoHome">
+          <i class="layui-icon layui-icon-logout"></i> 回到主页
+        </button>
         <button class="layui-btn layui-btn-primary" @click="logout">
           <i class="layui-icon layui-icon-logout"></i> 退出登录
         </button>
@@ -1464,6 +1467,10 @@ const logout = () => {
     },
   )
 }
+
+const gotoHome = () => {
+  router.push('/foster-care')
+}
 </script>
 
 
@@ -1551,7 +1558,9 @@ const logout = () => {
     bottom: 6%;
     right: 15%;
 }
-
+:deep(.layui-form-label) {
+    width:87px;
+}
 
 :deep(.layui-form-radio:hover>*, .layui-form-radioed, .layui-form-radioed>i) {
     color: #fd9860;
@@ -1773,6 +1782,15 @@ const logout = () => {
   padding: 1rem 2rem;
   background-color: rgba(255, 255, 255, 0.8);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.newColor{
+  border-color: #419fe6;
+  color: #419fe6;
+}
+.newColor:hover{
+ 
+  border-color: #417fe6;
+  color: #417fe6;
 }
 
 .user-info {

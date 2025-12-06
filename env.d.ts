@@ -7,7 +7,6 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
-
 // 更精确的Vue组件模块声明
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
@@ -27,4 +26,3 @@ declare module '@/views/*' {
   const component: DefineComponent<Record<string, never>, Record<string, never>, unknown>
   export default component
 } /// <reference types="vite/client" />
-

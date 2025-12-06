@@ -28,9 +28,9 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-vercode"></i>
               </div>
-              <input type="text" name="vercode" value="" v-model="form.vercode"
-                @input="handleInput('vercode', $event.target.value)" lay-verify="required" placeholder="验证码"
-                lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" />
+              <input type="text" name="vercode" v-model="form.vercode" @input="handleInput('vercode')"
+                lay-verify="required" placeholder="验证码" value="" lay-reqtext="请填写验证码" autocomplete="off"
+                class="layui-input" />
             </div>
           </div>
           <div class="layui-form-item">
@@ -39,8 +39,8 @@
                 <i class="layui-icon layui-icon-password"></i>
               </div>
               <input type="password" name="password" value="" lay-verify="required|password" v-model="form.password"
-                @input="handleInput('password', $event.target.value)" placeholder="密码" autocomplete="off"
-                class="layui-input" id="reg-password" lay-affix="eye" />
+                @input="handleInput('password')" placeholder="密码" autocomplete="off" class="layui-input"
+                id="reg-password" lay-affix="eye" />
             </div>
           </div>
           <div class="layui-form-item">
@@ -59,7 +59,7 @@
                 <i class="layui-icon layui-icon-username"></i>
               </div>
               <input type="text" name="nickname" value="" lay-verify="required|nickname" placeholder="账号"
-                v-model="form.name" @input="handleInput('name', $event.target.value)" autocomplete="off"
+                v-model="form.name" @input="(e) => handleInput('name', e.target.value || '')" autocomplete="off"
                 class="layui-input" lay-affix="clear" />
             </div>
           </div>
@@ -95,7 +95,7 @@ import { ElMessage } from 'element-plus'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useRegisterStore, RegisterForm } from '../../stores/register'
-import ConfirmCode from '../../components/ConfirmCode.vue'
+import ConfirmCode from '@/components/common/ConfirmCode.vue'
 const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> | null>(null)
 const registerStore = useRegisterStore()
 const router = useRouter()
@@ -159,10 +159,8 @@ const handleRegister = async () => {
     }, 3000)
     return
   }
-
   try {
-    console.log('wobeidianl')
-    console.log(ConfirmCodeRef.value.startCountdown())
+
     // 调用注册接口
     const response = await axios.post(
       '/server/api/user/register',

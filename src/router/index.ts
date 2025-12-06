@@ -5,25 +5,25 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'fosterCare',
-    component: () => import('@/views/FosterCare.vue'),
+    component: () => import('@/views/fosterCare/FosterCare.vue'),
   },
   // 寄养详情
   {
     path: '/foster-detail/:id',
     name: 'fosterDetail',
-    component: () => import('@/views/FosterDetail.vue'),
+    component: () => import('@/views/fosterCare/FosterDetail.vue'),
   },
   // 寄养预订
   {
     path: '/foster-book/:fosterId/:packageId',
     name: 'fosterBook',
-    component: () => import('@/views/FosterBook.vue'),
+    component: () => import('@/views/fosterCare/FosterBook.vue'),
   },
   //寄养方管理
   {
     path: '/foster-manage',
     name: 'fosterManage',
-    component: () => import('@/views/FosterManage.vue'),
+    component: () => import('@/views/fosterCare/FosterManage.vue'),
   },
   // 电商的首页
   {
@@ -156,19 +156,19 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/my-pets',
     name: 'myPets',
-    component: () => import('@/views/MyPets.vue'),
+    component: () => import('@/views/myPets/MyPets.vue'),
   },
 
   {
     path: '/add-pet',
     name: 'addPet',
-    component: () => import('@/views/AddPet.vue'),
+    component: () => import('@/views/myPets/AddPet.vue'),
   },
   //加入我们
   {
     path: '/join-us',
     name: 'joinUs',
-    component: () => import('@/views/JoinUs.vue'),
+    component: () => import('@/views/joinUs/JoinUs.vue'),
   },
   //注册
   {

@@ -14,25 +14,17 @@
               <label for="shop-name" class="block text-sm font-medium text-gray-700">
                 商铺名称 <span class="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="shop-name"
-                v-model="form.shopName"
+              <input type="text" id="shop-name" v-model="form.shopName"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                placeholder="请输入商铺名称"
-                required
-              />
+                placeholder="请输入商铺名称" required />
             </div>
             <div class="space-y-2">
               <label for="shop-type" class="block text-sm font-medium text-gray-700">
                 店铺类型 <span class="text-red-500">*</span>
               </label>
-              <select
-                id="shop-type"
-                v-model="form.shopType"
+              <select id="shop-type" v-model="form.shopType"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none bg-white"
-                required
-              >
+                required>
                 <option value="" class="text-gray-400">请选择店铺类型</option>
                 <option value="INDIVIDUAL_STORE">个人店</option>
                 <!-- 对应后端枚举 -->
@@ -52,17 +44,10 @@
               </label>
               <!-- 修复1：变量名错误（imagepreviews → imagePreviews），且关联当前字段shopAvatar -->
               <div v-if="imagePreviews.shopAvatar" class="mb-2">
-                <img
-                  :src="imagePreviews.shopAvatar"
-                  class="max-w-full max-h-40 object-contain rounded"
-                  alt="商铺头像预览"
-                />
+                <img :src="imagePreviews.shopAvatar" class="max-w-full max-h-40 object-contain rounded" alt="商铺头像预览" />
               </div>
-              <FileUpload
-                :preview-image="imagePreviews.shopAvatar"
-                accept="image/*"
-                @file-change="handleFileChange($event, 'shopAvatar')"
-              >
+              <FileUpload :preview-image="imagePreviews.shopAvatar" accept="image/*"
+                @file-change="handleFileChange($event, 'shopAvatar')">
                 <template #default>
                   <i class="fa fa-cloud-upload text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传商铺头像</span>
@@ -78,17 +63,11 @@
               </label>
               <!-- 修复2：关联当前字段businessLicense，而非复用shopAvatar -->
               <div v-if="imagePreviews.businessLicense" class="mb-2">
-                <img
-                  :src="imagePreviews.businessLicense"
-                  class="max-w-full max-h-40 object-contain rounded"
-                  alt="营业执照预览"
-                />
+                <img :src="imagePreviews.businessLicense" class="max-w-full max-h-40 object-contain rounded"
+                  alt="营业执照预览" />
               </div>
-              <FileUpload
-                :preview-image="imagePreviews.businessLicense"
-                accept="image/*"
-                @file-change="handleFileChange($event, 'businessLicense')"
-              >
+              <FileUpload :preview-image="imagePreviews.businessLicense" accept="image/*"
+                @file-change="handleFileChange($event, 'businessLicense')">
                 <template #default>
                   <i class="fa fa-file-image-o text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传营业执照</span>
@@ -111,27 +90,17 @@
               <label for="contact-name" class="block text-sm font-medium text-gray-700">
                 联系人姓名 <span class="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="contact-name"
-                v-model="form.contactName"
+              <input type="text" id="contact-name" v-model="form.contactName"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                placeholder="请输入联系人姓名"
-                required
-              />
+                placeholder="请输入联系人姓名" required />
             </div>
             <div class="space-y-2">
               <label for="contact-phone" class="block text-sm font-medium text-gray-700">
                 联系人电话 <span class="text-red-500">*</span>
               </label>
-              <input
-                type="tel"
-                id="contact-phone"
-                v-model="form.contactPhone"
+              <input type="tel" id="contact-phone" v-model="form.contactPhone"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-                placeholder="请输入联系人电话"
-                required
-              />
+                placeholder="请输入联系人电话" required />
             </div>
           </div>
 
@@ -139,14 +108,9 @@
             <label for="contact-email" class="block text-sm font-medium text-gray-700">
               联系人邮箱 <span class="text-red-500">*</span>
             </label>
-            <input
-              type="email"
-              id="contact-email"
-              v-model="form.contactEmail"
+            <input type="email" id="contact-email" v-model="form.contactEmail"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-              placeholder="请输入联系人邮箱"
-              required
-            />
+              placeholder="请输入联系人邮箱" required />
           </div>
 
           <!-- 身份证正反面上传（修复预览） -->
@@ -157,17 +121,11 @@
               </label>
               <!-- 修复3：关联当前字段idCardFront -->
               <div v-if="imagePreviews.idCardFront" class="mb-2">
-                <img
-                  :src="imagePreviews.idCardFront"
-                  class="max-w-full max-h-40 object-contain rounded"
-                  alt="身份证正面预览"
-                />
+                <img :src="imagePreviews.idCardFront" class="max-w-full max-h-40 object-contain rounded"
+                  alt="身份证正面预览" />
               </div>
-              <FileUpload
-                :preview-image="imagePreviews.idCardFront"
-                accept="image/*"
-                @file-change="handleFileChange($event, 'idCardFront')"
-              >
+              <FileUpload :preview-image="imagePreviews.idCardFront" accept="image/*"
+                @file-change="handleFileChange($event, 'idCardFront')">
                 <template #default>
                   <i class="fa fa-id-card-o text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传身份证正面</span>
@@ -182,17 +140,10 @@
               </label>
               <!-- 修复4：关联当前字段idCardBack -->
               <div v-if="imagePreviews.idCardBack" class="mb-2">
-                <img
-                  :src="imagePreviews.idCardBack"
-                  class="max-w-full max-h-40 object-contain rounded"
-                  alt="身份证反面预览"
-                />
+                <img :src="imagePreviews.idCardBack" class="max-w-full max-h-40 object-contain rounded" alt="身份证反面预览" />
               </div>
-              <FileUpload
-                :preview-image="imagePreviews.idCardBack"
-                accept="image/*"
-                @file-change="handleFileChange($event, 'idCardBack')"
-              >
+              <FileUpload :preview-image="imagePreviews.idCardBack" accept="image/*"
+                @file-change="handleFileChange($event, 'idCardBack')">
                 <template #default>
                   <i class="fa fa-id-card text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传身份证反面</span>
@@ -222,14 +173,9 @@
             <label for="address" class="block text-sm font-medium text-gray-700">
               详细地址 <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              id="address"
-              v-model="form.address"
+            <input type="text" id="address" v-model="form.address"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-              placeholder="请输入详细地址"
-              required
-            />
+              placeholder="请输入详细地址" required />
           </div>
         </div>
 
@@ -244,12 +190,9 @@
             <label class="block text-sm font-medium text-gray-700">
               商铺介绍 <span class="text-red-500">*</span>
             </label>
-            <textarea
-              v-model="form.description"
+            <textarea v-model="form.description"
               class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
-              placeholder="请输入商铺介绍"
-              required
-            ></textarea>
+              placeholder="请输入商铺介绍" required></textarea>
           </div>
         </div>
 
@@ -257,10 +200,7 @@
         <div class="mt-8">
           <button
             class="w-full py-4 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl hover:from-purple-700 hover:to-purple-600 active:from-purple-800 active:to-purple-700 transition-all shadow-md hover:shadow-lg"
-            type="button"
-            @click="submitForm"
-            :disabled="isSubmitting"
-          >
+            type="button" @click="submitForm" :disabled="isSubmitting">
             <span v-if="!isSubmitting">提交申请</span>
             <span v-if="isSubmitting"> <i class="fa fa-spinner fa-spin mr-2"></i>提交中... </span>
           </button>
@@ -279,7 +219,7 @@ import { reactive, ref, computed, watch } from 'vue'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 // 导入组件
-import AddressSelect from './AddressSelect.vue'
+import AddressSelect from '@/components/business/AddressSelect.vue'
 // 导入地区数据
 import provincesData from 'china-division/dist/provinces.json'
 import citiesData from 'china-division/dist/cities.json'

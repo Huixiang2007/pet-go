@@ -1,29 +1,24 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 py-8 relative overflow-hidden"
-  >
+  <div class="min-h-screen bg-gradient-to-br from-pink-50 via-rose-50 to-purple-50 py-8 relative overflow-hidden">
     <!-- 装饰元素 -->
     <div
-      class="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-pink-100 to-rose-100 rounded-full filter blur-3xl opacity-40 -translate-x-32 -translate-y-32"
-    ></div>
+      class="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-pink-100 to-rose-100 rounded-full filter blur-3xl opacity-40 -translate-x-32 -translate-y-32">
+    </div>
     <div
-      class="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tr from-pink-100 to-purple-100 rounded-full filter blur-3xl opacity-40 translate-x-32 translate-y-32"
-    ></div>
+      class="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tr from-pink-100 to-purple-100 rounded-full filter blur-3xl opacity-40 translate-x-32 translate-y-32">
+    </div>
     <div
-      class="absolute top-1/3 left-1/3 w-32 h-32 bg-gradient-to-r from-pink-200 to-rose-200 rounded-full filter blur-2xl opacity-20 animate-pulse"
-    ></div>
+      class="absolute top-1/3 left-1/3 w-32 h-32 bg-gradient-to-r from-pink-200 to-rose-200 rounded-full filter blur-2xl opacity-20 animate-pulse">
+    </div>
 
     <div class="container mx-auto px-4 max-w-4xl relative z-10">
       <!-- 顶部导航 -->
-      <div
-        class="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-4"
-      >
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-4">
         <div class="flex items-center space-x-4">
           <div>
             <h1 class="text-3xl font-bold text-rose-800 flex items-center">
               <span
-                class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-400 rounded-xl mr-3 shadow-md"
-              >
+                class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-400 rounded-xl mr-3 shadow-md">
                 <el-icon class="text-white text-xl cursor-pointer" @click="goBack">
                   <ArrowLeft />
                 </el-icon>
@@ -36,29 +31,18 @@
 
       <!-- 表单区域 -->
       <el-card
-        class="shadow-xl rounded-3xl border-none bg-white/95 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:shadow-2xl border border-rose-50"
-      >
-        <div
-          class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-pink-300 via-rose-300 to-pink-300"
-        ></div>
+        class="shadow-xl rounded-3xl border-none bg-white/95 backdrop-blur-sm overflow-hidden transition-all duration-500 hover:shadow-2xl border border-rose-50">
+        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-pink-300 via-rose-300 to-pink-300"></div>
 
-        <el-form
-          :model="addPetFormData"
-          :rules="formRules"
-          ref="formRef"
-          label-width="140px"
-          label-position="left"
-          class="p-8"
-          @submit.prevent="submitForm"
-        >
+        <el-form :model="addPetFormData" :rules="formRules" ref="formRef" label-width="140px" label-position="left"
+          class="p-8" @submit.prevent="submitForm">
           <!-- 基本信息 -->
           <div class="mb-10">
             <div class="flex items-center mb-8">
               <!-- <div class="w-3 h-10 bg-gradient-to-b from-pink-400 to-rose-400 rounded-r-lg mr-4"></div> -->
               <h3 class="text-2xl font-bold text-rose-800 flex items-center">
                 <span
-                  class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-pink-100 to-rose-100 rounded-lg mr-3"
-                >
+                  class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-pink-100 to-rose-100 rounded-lg mr-3">
                   <el-icon class="text-rose-500">
                     <User />
                   </el-icon>
@@ -71,33 +55,20 @@
               <!-- 头像上传 -->
               <el-form-item label="宠物头像" prop="avatar" class="lg:col-span-2">
                 <div class="flex flex-col md:flex-row items-start md:items-center gap-8">
-                  <el-upload
-                    class="avatar-uploader rounded-full"
-                    :show-file-list="false"
-                    :before-upload="beforeAvatarUpload"
-                    :http-request="handleAvatarUpload"
-                    @mouseenter="showUploadTip = true"
-                    @mouseleave="showUploadTip = false"
-                    :disabled="avatarUploadLoading"
-                  >
+                  <el-upload class="avatar-uploader rounded-full" :show-file-list="false"
+                    :before-upload="beforeAvatarUpload" :http-request="handleAvatarUpload"
+                    @mouseenter="showUploadTip = true" @mouseleave="showUploadTip = false"
+                    :disabled="avatarUploadLoading">
                     <div class="relative group">
-                      <div
-                        v-if="addPetFormData.avatar"
-                        class="relative border-4 border-pink-100 group-hover:border-pink-300 transition-all duration-400 shadow-lg"
-                      >
+                      <div v-if="addPetFormData.avatar"
+                        class="relative border-4 border-pink-100 group-hover:border-pink-300 transition-all duration-400 shadow-lg">
                         <img :src="addPetFormData.avatar" class="avatar" />
                         <div
-                          class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 duration-300 flex items-end justify-center pb-4"
-                        >
-                          <span class="text-white text-sm bg-black/40 px-3 py-1 rounded-full"
-                            >更换头像</span
-                          >
+                          class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 duration-300 flex items-end justify-center pb-4">
+                          <span class="text-white text-sm bg-black/40 px-3 py-1 rounded-full">更换头像</span>
                         </div>
                       </div>
-                      <div
-                        v-else
-                        class="avatar-uploader-placeholder transition-all duration-400 shadow-md"
-                      >
+                      <div v-else class="avatar-uploader-placeholder transition-all duration-400 shadow-md">
                         <el-icon class="avatar-uploader-icon">
                           <Plus />
                         </el-icon>
@@ -109,10 +80,8 @@
                     </div>
                   </el-upload>
                   <transition name="slide-fade">
-                    <div
-                      v-if="showUploadTip"
-                      class="bg-gradient-to-r from-pink-50 to-rose-50 border-l-4 border-rose-300 rounded-r-lg p-5 max-w-md shadow-sm"
-                    >
+                    <div v-if="showUploadTip"
+                      class="bg-gradient-to-r from-pink-50 to-rose-50 border-l-4 border-rose-300 rounded-r-lg p-5 max-w-md shadow-sm">
                       <div class="flex items-start space-x-3">
                         <div>
                           <p class="text-rose-700 font-medium mb-1">上传建议</p>
@@ -130,48 +99,24 @@
               <!-- 第一列 -->
               <div class="space-y-6">
                 <el-form-item label="昵称" prop="name">
-                  <el-input
-                    v-model="addPetFormData.name"
-                    placeholder="请输入宠物昵称"
-                    size="large"
-                    class="custom-input focus-within:shadow-pink-200/50"
-                  />
+                  <el-input v-model="addPetFormData.name" placeholder="请输入宠物昵称" size="large"
+                    class="custom-input focus-within:shadow-pink-200/50" />
                 </el-form-item>
                 <el-form-item label="种类" prop="type">
-                  <el-select
-                    v-model="addPetFormData.type"
-                    placeholder="选择种类"
-                    class="focus-within:shadow-pink-200/50"
-                  >
-                    <el-option
-                      v-for="animal in animalOptions"
-                      :key="animal.value"
-                      :label="animal.label"
-                      :value="animal.value"
-                    />
+                  <el-select v-model="addPetFormData.type" placeholder="选择种类" class="focus-within:shadow-pink-200/50">
+                    <el-option v-for="animal in animalOptions" :key="animal.value" :label="animal.label"
+                      :value="animal.value" />
                   </el-select>
                 </el-form-item>
                 <el-form-item label="品种" prop="breed">
-                  <el-input
-                    v-model="addPetFormData.breed"
-                    placeholder="例如：布偶猫、金毛犬"
-                    size="large"
-                    class="custom-input focus-within:shadow-pink-200/50"
-                  />
+                  <el-input v-model="addPetFormData.breed" placeholder="例如：布偶猫、金毛犬" size="large"
+                    class="custom-input focus-within:shadow-pink-200/50" />
                 </el-form-item>
 
                 <el-form-item label="生日" prop="birthday">
-                  <el-date-picker
-                    v-model="addPetFormData.birthday"
-                    type="date"
-                    placeholder="选择宠物的生日"
-                    size="large"
-                    class="w-full custom-datepicker"
-                    format="YYYY年MM月DD日"
-                    value-format="YYYY-MM-DD"
-                    placement="bottom"
-                    force-popup-direction
-                  />
+                  <el-date-picker v-model="addPetFormData.birthday" type="date" placeholder="选择宠物的生日" size="large"
+                    class="w-full custom-datepicker" format="YYYY年MM月DD日" value-format="YYYY-MM-DD" placement="bottom"
+                    force-popup-direction />
                 </el-form-item>
               </div>
 
@@ -182,8 +127,7 @@
                     <div class="flex-1" @click="addPetFormData.gender = 1">
                       <div
                         class="gender-card cursor-pointer rounded-2xl p-2 transition-all duration-300 border-2 border-transparent w-20"
-                        :class="{ 'gender-card-male-active': addPetFormData.gender === 1 }"
-                      >
+                        :class="{ 'gender-card-male-active': addPetFormData.gender === 1 }">
                         <div
                           class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300"
                           :class="{
@@ -191,28 +135,25 @@
                               addPetFormData.gender === 1,
                             'bg-gradient-to-br from-blue-100 to-cyan-100':
                               addPetFormData.gender !== 1,
-                          }"
-                        >
+                          }">
                           <el-icon class="text-white text-xl">
                             <Male />
                           </el-icon>
                         </div>
                       </div>
                     </div>
-                    <div class="flex-1" @click="addPetFormData.gender = 0">
+                    <div class="flex-1" @click="addPetFormData.gender = 1">
                       <div
                         class="gender-card cursor-pointer rounded-2xl p-2 transition-all duration-300 border-2 border-transparent w-20"
-                        :class="{ 'gender-card-active': addPetFormData.gender === 0 }"
-                      >
+                        :class="{ 'gender-card-active': addPetFormData.gender === 1 }">
                         <div
                           class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300"
                           :class="{
                             'bg-gradient-to-br from-pink-400 to-rose-400':
-                              addPetFormData.gender === 0,
+                              addPetFormData.gender === 1,
                             'bg-gradient-to-br from-pink-100 to-rose-100':
-                              addPetFormData.gender !== 0,
-                          }"
-                        >
+                              addPetFormData.gender !== 1,
+                          }">
                           <el-icon class="text-white text-xl">
                             <Female />
                           </el-icon>
@@ -224,41 +165,20 @@
 
                 <el-form-item label="体重" prop="weight">
                   <div class="flex items-center space-x-3">
-                    <el-input-number
-                      v-model="addPetFormData.weight"
-                      :min="0"
-                      :max="100"
-                      :step="0.1"
-                      controls-position="right"
-                      size="large"
-                      class="flex-1 custom-number"
-                    />
+                    <el-input-number v-model="addPetFormData.weight" :min="0" :max="100" :step="0.1"
+                      controls-position="right" size="large" class="flex-1 custom-number" />
                     <span class="text-rose-600 font-medium min-w-[40px]">kg</span>
                   </div>
                 </el-form-item>
 
                 <!-- 健康状态  -->
                 <el-form-item label="健康状态" prop="healthStatus">
-                  <el-select
-                    v-model="addPetFormData.healthStatus"
-                    placeholder="选择健康状态"
-                    size="large"
-                    class="w-full health-select"
-                    :teleported="false"
-                    :popper-append-to-body="false"
-                  >
-                    <el-option
-                      v-for="status in healthStatusOptions"
-                      :key="status.value"
-                      :label="status.label"
-                      :value="status.value"
-                      :class="status.class"
-                    >
+                  <el-select v-model="addPetFormData.healthStatus" placeholder="选择健康状态" size="large"
+                    class="w-full health-select" :teleported="false" :popper-append-to-body="false">
+                    <el-option v-for="status in healthStatusOptions" :key="status.value" :label="status.label"
+                      :value="status.value" :class="status.class">
                       <span class="flex items-center">
-                        <span
-                          class="w-2 h-2 rounded-full mr-3"
-                          :class="status.indicatorClass"
-                        ></span>
+                        <span class="w-2 h-2 rounded-full mr-3" :class="status.indicatorClass"></span>
                         {{ status.label }}
                       </span>
                     </el-option>
@@ -267,17 +187,10 @@
 
                 <el-form-item label="绝育状态" prop="neutered">
                   <div class="flex items-center space-x-4">
-                    <el-switch
-                      v-model="addPetFormData.sterilization"
-                      :active-text="addPetFormData.sterilization ? '已绝育' : '未绝育'"
-                      size="large"
-                      class="custom-switch"
-                      :active-color="addPetFormData.sterilization ? '#f472b6' : '#e5e7eb'"
-                      inline-prompt
-                      :active-icon="Check"
-                      :inactive-icon="Close"
-                      style="--el-switch-on-color: #f472b6"
-                    />
+                    <el-switch v-model="addPetFormData.sterilization"
+                      :active-text="addPetFormData.sterilization ? '已绝育' : '未绝育'" size="large" class="custom-switch"
+                      :active-color="addPetFormData.sterilization ? '#f472b6' : '#e5e7eb'" inline-prompt
+                      :active-icon="Check" :inactive-icon="Close" style="--el-switch-on-color: #f472b6" />
                   </div>
                 </el-form-item>
               </div>
@@ -289,8 +202,7 @@
             <div class="flex items-center mb-8">
               <h3 class="text-2xl font-bold text-rose-800 flex items-center">
                 <span
-                  class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-rose-100 to-pink-100 rounded-lg mr-3"
-                >
+                  class="inline-flex items-center justify-center w-10 h-10 bg-gradient-to-br from-rose-100 to-pink-100 rounded-lg mr-3">
                   <el-icon class="text-rose-500">
                     <MagicStick />
                   </el-icon>
@@ -304,31 +216,22 @@
                 <!-- 已选择标签 -->
                 <div>
                   <div class="flex items-center mb-4">
-                    <span class="text-rose-700 font-medium"
-                      >已选择标签（{{ addPetFormData.characterTags.length }}/8）</span
-                    >
+                    <span class="text-rose-700 font-medium">已选择标签（{{ addPetFormData.characterTags.length }}/8）</span>
                   </div>
                   <div
-                    class="selected-tags-container min-h-20 p-4 rounded-xl bg-gradient-to-br from-pink-50/50 to-rose-50/50 border border-rose-100"
-                  >
+                    class="selected-tags-container min-h-20 p-4 rounded-xl bg-gradient-to-br from-pink-50/50 to-rose-50/50 border border-rose-100">
                     <transition-group name="list" tag="div" class="flex flex-wrap gap-3">
-                      <div
-                        v-for="tag in addPetFormData.characterTags"
-                        :key="tag"
+                      <div v-for="tag in addPetFormData.characterTags" :key="tag"
                         class="selected-tag inline-flex items-center px-4 py-2.5 rounded-full transition-all duration-300 cursor-pointer relative overflow-hidden group"
-                        @click="removeTag(tag)"
-                      >
+                        @click="removeTag(tag)">
                         <span class="text-rose-700 font-medium text-sm">{{ tag }}</span>
                         <el-icon
-                          class="ml-2 text-rose-400 hover:text-rose-600 transition-colors duration-200 text-xs opacity-0 group-hover:opacity-100"
-                        >
+                          class="ml-2 text-rose-400 hover:text-rose-600 transition-colors duration-200 text-xs opacity-0 group-hover:opacity-100">
                           <Close />
                         </el-icon>
                       </div>
-                      <div
-                        v-if="addPetFormData.characterTags.length === 0"
-                        class="text-rose-300 italic flex items-center h-20 w-full justify-center"
-                      >
+                      <div v-if="addPetFormData.characterTags.length === 0"
+                        class="text-rose-300 italic flex items-center h-20 w-full justify-center">
                         <el-icon class="mr-2">
                           <Plus />
                         </el-icon>
@@ -346,23 +249,14 @@
                     </el-icon>
                     <span class="text-rose-700 font-medium">推荐标签</span>
                   </div>
-                  <div
-                    class="recommended-tags grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3"
-                  >
-                    <div
-                      v-for="tag in defaultTags"
-                      :key="tag"
+                  <div class="recommended-tags grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    <div v-for="tag in defaultTags" :key="tag"
                       class="recommended-tag px-4 py-3 rounded-xl text-center cursor-pointer transition-all duration-300 flex items-center justify-center"
                       :class="{
                         'recommended-tag-active': addPetFormData.characterTags.includes(tag),
-                      }"
-                      @click="toggleDefaultTag(tag)"
-                    >
+                      }" @click="toggleDefaultTag(tag)">
                       {{ tag }}
-                      <el-icon
-                        v-if="addPetFormData.characterTags.includes(tag)"
-                        class="ml-1 text-xs"
-                      >
+                      <el-icon v-if="addPetFormData.characterTags.includes(tag)" class="ml-1 text-xs">
                         <Check />
                       </el-icon>
                     </div>
@@ -379,26 +273,15 @@
                   </div>
                   <div class="flex gap-3">
                     <div class="flex-1 relative">
-                      <el-input
-                        v-model="newTag"
-                        placeholder="输入自定义标签，不超过5个字"
-                        size="large"
-                        @keyup.enter="addTag"
-                        class="custom-input"
-                        :maxlength="5"
-                      />
-                      <div
-                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-rose-300 text-sm"
-                      >
+                      <el-input v-model="newTag" placeholder="输入自定义标签，不超过5个字" size="large" @keyup.enter="addTag"
+                        class="custom-input" :maxlength="5" />
+                      <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-rose-300 text-sm">
                         {{ 5 - newTag.length }}/5
                       </div>
                     </div>
-                    <el-button
-                      @click="addTag"
-                      size="large"
+                    <el-button @click="addTag" size="large"
                       class="px-6 bg-gradient-to-r from-pink-400 to-rose-400 border-none text-white rounded-xl hover:shadow-lg transition-all duration-300"
-                      :disabled="!newTag.trim()"
-                    >
+                      :disabled="!newTag.trim()">
                       <el-icon class="mr-1">
                         <Plus />
                       </el-icon>
@@ -412,36 +295,24 @@
 
           <!-- 操作按钮 -->
           <div
-            class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-rose-100"
-          >
-            <el-button
-              @click="resetForm"
-              size="large"
-              class="action-btn px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2 reset-btn border-rose-200 text-rose-600 bg-white hover:bg-rose-50 hover:border-rose-300 hover:text-rose-700"
-            >
+            class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-rose-100">
+            <el-button @click="resetForm" size="large"
+              class="action-btn px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2 reset-btn border-rose-200 text-rose-600 bg-white hover:bg-rose-50 hover:border-rose-300 hover:text-rose-700">
               <el-icon class="mr-2">
                 <Refresh />
               </el-icon>
               重置表单
             </el-button>
-            <el-button
-              @click="goBack"
-              size="large"
-              class="action-btn px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2 cancel-btn border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
-            >
+            <el-button @click="goBack" size="large"
+              class="action-btn px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2 cancel-btn border-gray-200 text-gray-600 bg-white hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700">
               <el-icon class="mr-2">
                 <Close />
               </el-icon>
               取消
             </el-button>
-            <el-button
-              type="primary"
-              @click="submitForm"
-              size="large"
+            <el-button type="primary" @click="submitForm" size="large"
               class="action-btn px-8 py-3 rounded-xl font-medium transition-all duration-300 border-2 submit-btn"
-              :loading="loading"
-              :disabled="loading"
-            >
+              :loading="loading" :disabled="loading">
               <template #loading>
                 <el-icon class="is-loading animate-spin mr-2">
                   <Loading />
@@ -461,14 +332,11 @@
 
       <!-- 进度提示 -->
       <transition name="slide-fade">
-        <div
-          v-if="showProgress"
-          class="mt-8 bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-rose-200 shadow-lg"
-        >
+        <div v-if="showProgress"
+          class="mt-8 bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-rose-200 shadow-lg">
           <div class="flex items-center mb-4">
             <div
-              class="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-400 rounded-xl flex items-center justify-center mr-3 shadow-md"
-            >
+              class="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-400 rounded-xl flex items-center justify-center mr-3 shadow-md">
               <el-icon class="text-white">
                 <Loading />
               </el-icon>
@@ -478,12 +346,7 @@
                 <span class="text-rose-800 font-medium">正在添加宠物</span>
                 <span class="text-rose-600 font-bold">{{ progress }}%</span>
               </div>
-              <el-progress
-                :percentage="progress"
-                :stroke-width="8"
-                :show-text="false"
-                class="custom-progress"
-              />
+              <el-progress :percentage="progress" :stroke-width="8" :show-text="false" class="custom-progress" />
               <div class="text-rose-500 text-xs mt-2">
                 {{ progressMessages[Math.floor(progress / 25)] }}
               </div>
@@ -495,16 +358,11 @@
 
     <!-- 成功弹窗 -->
     <transition name="modal-fade">
-      <div
-        v-if="showSuccess"
-        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
-      >
-        <div
-          class="success-modal bg-white rounded-3xl p-8 max-w-md w-full relative overflow-hidden animate-modal-in"
-        >
+      <div v-if="showSuccess"
+        class="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="success-modal bg-white rounded-3xl p-8 max-w-md w-full relative overflow-hidden animate-modal-in">
           <div
-            class="w-24 h-24 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
-          >
+            class="w-24 h-24 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl">
             <el-icon class="text-white text-5xl">
               <SuccessFilled />
             </el-icon>
@@ -515,19 +373,15 @@
               {{ addPetFormData.name || '您的宠物' }} 已加入家庭
             </p>
             <div class="success-actions flex flex-col sm:flex-row gap-3 justify-center">
-              <el-button
-                @click="goToPetDetail"
-                class="success-btn primary px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 sm:flex-none bg-gradient-to-r from-pink-400 to-rose-400 text-white border-none hover:shadow-lg"
-              >
+              <el-button @click="goToPetDetail"
+                class="success-btn primary px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 sm:flex-none bg-gradient-to-r from-pink-400 to-rose-400 text-white border-none hover:shadow-lg">
                 <el-icon class="mr-2">
                   <View />
                 </el-icon>
                 查看详情
               </el-button>
-              <el-button
-                @click="addAnother"
-                class="success-btn secondary px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 sm:flex-none border-rose-200 text-rose-600 bg-white hover:bg-rose-50"
-              >
+              <el-button @click="addAnother"
+                class="success-btn secondary px-6 py-3 rounded-xl font-medium transition-all duration-300 flex-1 sm:flex-none border-rose-200 text-rose-600 bg-white hover:bg-rose-50">
                 <el-icon class="mr-2">
                   <Plus />
                 </el-icon>
@@ -537,18 +391,15 @@
           </div>
           <div class="success-decoration absolute inset-0 pointer-events-none">
             <el-icon
-              class="decoration-1 absolute text-rose-200 text-3xl top-4 left-4 animate-[float_3s_ease-in-out_infinite]"
-            >
+              class="decoration-1 absolute text-rose-200 text-3xl top-4 left-4 animate-[float_3s_ease-in-out_infinite]">
               <Star />
             </el-icon>
             <el-icon
-              class="decoration-2 absolute text-rose-200 text-2xl top-10 right-6 animate-[float_3s_ease-in-out_infinite_0.5s]"
-            >
+              class="decoration-2 absolute text-rose-200 text-2xl top-10 right-6 animate-[float_3s_ease-in-out_infinite_0.5s]">
               <Star />
             </el-icon>
             <el-icon
-              class="decoration-3 absolute text-rose-200 text-xl bottom-8 left-10 animate-[float_3s_ease-in-out_infinite_1s]"
-            >
+              class="decoration-3 absolute text-rose-200 text-xl bottom-8 left-10 animate-[float_3s_ease-in-out_infinite_1s]">
               <Star />
             </el-icon>
           </div>
@@ -581,26 +432,21 @@ import {
 import request from '@/utils/request'
 // import { fi } from 'element-plus/es/locales.mjs';
 interface PetFormData {
-  id: number
   userId: number
   name: string
   type: string
   breed: string
   avatar: string
-  gender: 1 | 0
+  gender: 1 | 2
   birthday: string
   weight: number
-  characterTags: string[]
-  sterilization: boolean
+  sterilization: 0 | 1
   healthStatus: string
+  description: string
+  specialNotes: string
+  characterTags: string
 }
-// interface UploadResponse {
-//     code: number;
-//     data: string;
-//     msg: string;
-//     level: null;
 
-// }
 const router = useRouter()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
@@ -609,7 +455,6 @@ const showUploadTip = ref(false)
 const showSuccess = ref(false)
 const showProgress = ref(false)
 const progress = ref(0)
-// const selectedAnimal = ref('');
 const animalOptions = [
   {
     value: 'cat',
@@ -655,7 +500,6 @@ const healthStatusOptions = [
 const userId = localStorage.getItem('userId')
 console.log('AddPet userId:', userId)
 const addPetFormData = reactive<PetFormData>({
-  id: 0,
   userId: Number(userId),
   name: '',
   breed: '',
@@ -664,8 +508,10 @@ const addPetFormData = reactive<PetFormData>({
   gender: 1,
   weight: 0,
   avatar: '',
-  characterTags: ['活泼'],
-  sterilization: false,
+  characterTags: "",
+  description: "",
+  specialNotes: "",
+  sterilization: 0,
   healthStatus: '健康',
 })
 
@@ -682,20 +528,22 @@ const formRules: FormRules = {
     { required: true, message: '请输入宠物体重', trigger: 'blur' },
     { type: 'number', min: 0.1, max: 100, message: '体重应在 0.1-100kg 之间', trigger: 'blur' },
   ],
+  desscription: [{ required: true, message: '请输入宠物描述', trigger: 'blur' }],
+  specialNotes: [{ required: true, message: '请输入特殊说明', trigger: 'blur' }],
 }
 
-// 切换默认标签
+// 切换标签
 const toggleDefaultTag = (tag: string) => {
-  const index = addPetFormData.characterTags.indexOf(tag)
+  const index = addPetFormData.characterTags.split(',').indexOf(tag)
   if (index > -1) {
-    addPetFormData.characterTags.splice(index, 1)
+    addPetFormData.characterTags.split(',')
     ElMessage.info(`已移除标签：${tag}`)
   } else {
-    if (addPetFormData.characterTags.length >= 8) {
+    if (addPetFormData.characterTags.split(',').length >= 8) {
       ElMessage.warning('最多只能添加8个标签')
       return
     }
-    addPetFormData.characterTags.push(tag)
+    addPetFormData.characterTags.split(',').push(tag)
     ElMessage.success(`已添加标签：${tag}`)
   }
 }
@@ -712,7 +560,7 @@ const addTag = () => {
       ElMessage.warning('标签长度不能超过5个字符')
       return
     }
-    addPetFormData.characterTags.push(tag)
+    addPetFormData.characterTags.split(',').push(tag)
     newTag.value = ''
     ElMessage.success('标签添加成功！')
   }
@@ -722,7 +570,7 @@ const addTag = () => {
 const removeTag = (tag: string) => {
   const index = addPetFormData.characterTags.indexOf(tag)
   if (index > -1) {
-    addPetFormData.characterTags.splice(index, 1)
+    addPetFormData.characterTags.split(',').splice(index, 1)
     ElMessage.info(`已移除标签：${tag}`)
   }
 }
@@ -816,7 +664,7 @@ const submitForm = async () => {
 const resetForm = () => {
   if (formRef.value) {
     formRef.value.resetFields()
-    addPetFormData.characterTags = ['活泼']
+    addPetFormData.characterTags = '活泼'
     ElMessage.info('表单已重置')
   }
 }
@@ -1096,6 +944,7 @@ const goBack = () => {
 }
 
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0);

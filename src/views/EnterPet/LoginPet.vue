@@ -3,7 +3,7 @@
     <transition name="box-animation">
       <form class="layui-form demo-login-container" v-if="isLogin">
         <div class="container">
-          <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
+          <img src="@/assets/img/logo.png" alt="这是图标" class="logo" />
 
           <div class="title">
             <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
@@ -354,7 +354,7 @@ const handleLogin = async (formData: LoginForm) => {
       }
 
       showMessage('success', '登录成功，欢迎进入PetGO!')
-      router.push('/person')
+      router.push('/persons')
     } else {
       const errorMsg = response.data.msg
       ElMessage.error(errorMsg)
@@ -493,7 +493,7 @@ body {
 }
 
 .forPicture {
-  background-image: url('../../assets/img/background6.png');
+  background-image: url('@/assets/img/background6.png');
   background-repeat: no-repeat;
   background-size: cover;
   overflow: hidden;

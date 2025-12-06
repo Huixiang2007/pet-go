@@ -65,12 +65,12 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 // 导入子组件
-import PersonalAvatar from './components/PersonalAvatar.vue'
-import PersonalNav from './components/PersonalNav.vue'
-import BaseInfo from './components/BaseInfo.vue'
-import RealNameAuth from './components/RealNameAuth.vue'
-import ChangePassword from './components/ChangePassword.vue'
-import AddressManager from './components/AddressManager.vue'
+import PersonalAvatar from '@/views/userCenter/components/PersonAvatar.vue'
+import PersonalNav from '@/views/userCenter/components/PersonalNav.vue'
+import BaseInfo from '@/views/userCenter/components/BaseInfo.vue'
+import RealNameAuth from '@/views/userCenter/components/RealNameAuth.vue'
+import ChangePassword from '@/views/userCenter/components/ChangePassword.vue'
+import AddressManager from '@/views/userCenter/components/AddressManager.vue'
 
 declare global {
   interface Window {
@@ -78,6 +78,8 @@ declare global {
   }
 }
 
+// 定义组件可以触发的事件
+const emit = defineEmits(['refresh']) 
 // 导航项（供导航组件使用）
 const navItems = [
   { name: '基本信息', icon: 'layui-icon-user' },

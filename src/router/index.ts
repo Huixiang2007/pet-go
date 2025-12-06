@@ -35,7 +35,7 @@ const routes = [
   {
     path: '/pet-cart',
     name: 'petCart',
-    component: () => import('./src/views/petShop/order/PetShopCar.vue'),
+    component: () => import('@/views/petShop/order/PetShopCar.vue'),
   },
   //订单结算
   {
@@ -47,13 +47,13 @@ const routes = [
   {
     path: '/products/:category?',
     name: 'products',
-    component: () => import('@/views/petShop/products/ProductList.vue'),
+    component: () => import('@/views/petShop/product/ProductList.vue'),
   },
   //  商品详情
   {
     path: '/product-detail/:id',
     name: 'productsDetail',
-    component: () => import('@/views/petShop/products/ProductDetail.vue'),
+    component: () => import('@/views/petShop/product/ProductDetail.vue'),
   },
   //  订单列表
   {
@@ -102,7 +102,7 @@ const routes = [
   {
     path: '/coupon-management',
     name: 'CouponManagement',
-    component: () => import('@/views/petShop/marketing/CouponManagement.vue'),
+    component: () => import('@/views/petShop/coupon/CouponManagement.vue'),
   },
   // 商品管理
   {
@@ -115,17 +115,6 @@ const routes = [
     path: '/shop-setting',
     name: '/ShopSetting',
     component: () => import('@/views/petShop/shop/ShopSetting.vue'),
-  },
-      {
-    path: '/join-us',
-    name: '/JoinUs',
-    component: () => import('@/views/JoinUs.vue'),
-  },
-  {
-    path: '/add-product',
-    name: 'addProduct',
-    component: () => import('@/views/petShop/product/AddProduct.vue'),
-    meta: { title: '欢迎注册 PetGo' },
   },
   // 销售分析
   {

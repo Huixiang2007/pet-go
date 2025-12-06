@@ -538,7 +538,7 @@ const handleFileUpload = (e: Event, previewRef: Ref<string>) => {
   // 文件大小限制：5MB
   const maxSize = 5 * 1024 * 1024
   if (file.size > maxSize) {
-    alert('文件大小不能超过5MB，请重新选择！')
+    console.error('文件大小不能超过5MB，请重新选择！')
     target.value = ''
     return
   }
@@ -546,20 +546,18 @@ const handleFileUpload = (e: Event, previewRef: Ref<string>) => {
   previewRef.value = URL.createObjectURL(file)
 }
 
-// 各图片上传的具体实现
+
 const handleAvatarUpload = (e: Event) => handleFileUpload(e, previewAvatar)
 const handleLicenseUpload = (e: Event) => handleFileUpload(e, previewLicense)
 const handleIdCardFrontUpload = (e: Event) => handleFileUpload(e, previewIdCardFront)
 const handleIdCardBackUpload = (e: Event) => handleFileUpload(e, previewIdCardBack)
 
-// 清除预览图
+
 const clearAvatar = () => (previewAvatar.value = '')
 const clearLicense = () => (previewLicense.value = '')
 const clearIdCardFront = () => (previewIdCardFront.value = '')
 const clearIdCardBack = () => (previewIdCardBack.value = '')
 
-// 表单验证逻辑
-// 验证商铺名称（非空 + 长度）
 const validateShopName = () => {
   if (!shopInfo.value.name.trim()) {
     shopNameError.value = '商铺名称不能为空！'
@@ -590,21 +588,19 @@ const validateEmail = () => {
   }
 }
 
-// 保存店铺设置逻辑 + 防重复提交
 const saveShopSetting = async () => {
-  // 先执行表单验证
+
   validateShopName()
   validatePhone()
   validateEmail()
 
-  // 若有验证错误，终止提交
   if (shopNameError.value || phoneError.value || emailError.value) {
     return
   }
 
   isSubmitting.value = true
   try {
-    // 整合所有表单数据
+
     const formData = {
       shopInfo: shopInfo.value,
       ownerInfo: ownerInfo.value,
@@ -614,7 +610,7 @@ const saveShopSetting = async () => {
         district: selectedDistrict.value,
         detail: addressInfo.value.detail,
       },
-      // 图片信息可后续对接后端上传接口
+
       imageInfo: {
         avatar: previewAvatar.value,
         license: previewLicense.value,
@@ -623,19 +619,18 @@ const saveShopSetting = async () => {
       },
     }
 
-    // 模拟接口请求（延迟1.5秒）
+
     await new Promise((resolve) => setTimeout(resolve, 1500))
     console.log('保存店铺设置：', formData)
-    alert('店铺设置保存成功！')
+    console.log('店铺设置保存成功！')
   } catch (error) {
     console.error('保存失败：', error)
-    alert('店铺设置保存失败，请重试！')
+    console.log('店铺设置保存失败，请重试！')
   } finally {
     isSubmitting.value = false
   }
 }
 
-// 页面挂载时初始化地址数据
 onMounted(() => {
   handleProvinceChange()
   handleCityChange()
@@ -643,18 +638,18 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 统一图片预览样式 */
+
 img {
   object-fit: cover;
 }
 
-/* 禁用按钮样式 */
+
 button:disabled {
   background-color: #f9a857 !important;
   cursor: not-allowed;
 }
 
-/* 修复小屏幕下的布局溢出 */
+
 @media (max-width: 768px) {
   .grid-cols-1 md:grid-cols-2 {
     grid-template-columns: 1fr;

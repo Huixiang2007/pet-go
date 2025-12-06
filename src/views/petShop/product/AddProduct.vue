@@ -15,19 +15,19 @@
         class="bg-white rounded-xl shadow-md p-6 md:p-8 transition-all duration-300 hover:shadow-lg"
       >
         <form @submit.prevent="handleSubmit" class="space-y-8">
-          <!-- 基本信息组件 -->
+
           <ProductBasicInfo
             v-model:form="productForm"
           />
 
-          <!-- 图片上传组件 -->
+
           <ProductImageUpload
             v-model:mainImage="productForm.mainImage"
             v-model:imagesList="productForm.imagesList"
             v-model:videoUrl="productForm.videoUrl"
           />
 
-          <!-- SKU配置组件 -->
+
           <ProductSkuConfig
             v-model:skuList="skuList"
           />
@@ -79,7 +79,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import axios from 'axios'
-import ProductBasicInfo from './components/ProductBasicInfo.vue'
+import {ProductBasicInfo } from './components/ProductBasicInfo.vue'
 import ProductImageUpload from './components/ProductImageUpload.vue'
 import ProductSkuConfig from './components/ProductSkuConfig.vue'
 

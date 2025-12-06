@@ -324,11 +324,11 @@ onMounted(() => {
   height: 300px;
 }
 
-::v-deep .el-progress-bar__outer {
+:deep(.el-progress-bar__outer) {
   height: 6px !important;
 }
 
-::v-deep .el-progress-bar__inner {
+:deep(.el-progress-bar__inner) {
   background-color: #f77e21 !important;
 }
 </style>

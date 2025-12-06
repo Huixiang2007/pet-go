@@ -461,27 +461,27 @@ const editRules = ref({
 </script>
 
 <style scoped>
-::v-deep .el-tag--success {
+:deep(.el-tag--success) {
   background-color: #f0f9ff;
   color: #52c41a;
   border-color: #b7eb8f;
 }
-::v-deep .el-tag--info {
+:deep(.el-tag--info) {
   background-color: #e6f7ff;
   color: #1890ff;
   border-color: #91d5ff;
 }
-::v-deep .el-tag--warning {
+:deep(.el-tag--warning) {
   background-color: #fff7e6;
   color: #fa8c16;
   border-color: #ffd591;
 }
-::v-deep .el-tag--danger {
+:deep(.el-tag--danger) {
   background-color: #fff2f0;
   color: #f5222d;
   border-color: #ffccc7;
 }
-::v-deep .el-table__row--striped td {
+:deep(.el-table__row--striped td) {
   background-color: #fafafa !important;
 }
 </style>

@@ -1,26 +1,17 @@
 <template>
   <div class="pet-showcase-app">
     <NavBar />
-    <div
-      class="scroll-container"
-      :style="{
-        transform: `translateY(-${scrollOffset}vh)`,
-        marginTop: '5.5rem',
-        transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-      }"
-      @wheel="handleWheel"
-    >
+    <div class="scroll-container" :style="{
+      transform: `translateY(-${scrollOffset}vh)`,
+      marginTop: '5.5rem',
+      transition: 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+    }" @wheel="handleWheel">
       <!-- 轮播图 -->
       <div id="carousel-container" class="section">
         <FragmentCarousel />
       </div>
       <!-- 每个宠物的全屏卡片 -->
-      <div
-        v-for="(pet, index) in pets"
-        :key="pet.id"
-        class="pet-fullscreen-card section"
-        :data-index="index"
-      >
+      <div v-for="(pet, index) in pets" :key="pet.id" class="pet-fullscreen-card section" :data-index="index">
         <!-- 宠物详情内容 -->
         <div class="pet-content">
           <!-- 顶部导航 -->
@@ -32,13 +23,8 @@
               </div>
             </div>
             <div class="nav-right">
-              <el-button
-                type="danger"
-                icon="Delete"
-                @click="deletePet(pet.id)"
-                class="delete-btn cute-btn"
-                size="default"
-              >
+              <el-button type="danger" icon="Delete" @click="deletePet(pet.id)" class="delete-btn cute-btn"
+                size="default">
                 弃养
               </el-button>
             </div>
@@ -99,11 +85,7 @@
                       <div class="info-content">
                         <div class="info-label">健康状态</div>
                         <div class="info-value">
-                          <el-tag
-                            :type="getHealthStatusType(pet.healthStatus)"
-                            class="cute-tag"
-                            size="small"
-                          >
+                          <el-tag :type="getHealthStatusType(pet.healthStatus)" class="cute-tag" size="small">
                             {{ pet.healthStatus }}
                           </el-tag>
                         </div>
@@ -118,12 +100,8 @@
                       <!-- <el-tag v-for="tag in pet.characterTags" :key="tag" class="personality-tag" size="small">
                         {{ tag }}
                       </el-tag> -->
-                      <el-tag
-                        v-for="tag in pet.characterTags"
-                        :key="tag"
-                        :disable-transitions="false"
-                        @close="handleCloseTag(pet.id, tag)"
-                        style="
+                      <el-tag v-for="tag in pet.characterTags" :key="tag" :disable-transitions="false"
+                        @close="handleCloseTag(pet.id, tag)" style="
                           background-color: #e3f2fd;
                           color: #2196f3;
                           padding: 0.5rem 0.9rem;
@@ -142,20 +120,14 @@
                             Segoe UI Symbol,
                             Noto Color Emoji;
                           margin-bottom: 0.9rem;
-                        "
-                      >
+                        ">
                         {{ tag }}
                       </el-tag>
                     </div>
                   </div>
                   <!-- 编辑按钮-->
                   <div class="edit-btn-container">
-                    <el-button
-                      icon="Edit"
-                      size="small"
-                      class="edit-btn cute-btn"
-                      @click="openEditDialog(pet)"
-                    >
+                    <el-button icon="Edit" size="small" class="edit-btn cute-btn" @click="openEditDialog(pet)">
                       编辑信息
                     </el-button>
                   </div>
@@ -186,37 +158,22 @@
 
     <!-- 导航箭头 -->
     <div class="navigation-arrows">
-      <el-button
-        circle
-        size="small"
-        :disabled="currentScreen === 0"
-        @click="scrollToPrevScreen"
-        class="nav-arrow prev-arrow cute-btn"
-      >
+      <el-button circle size="small" :disabled="currentScreen === 0" @click="scrollToPrevScreen"
+        class="nav-arrow prev-arrow cute-btn">
         <el-icon>
           <ArrowUp />
         </el-icon>
       </el-button>
 
       <div class="nav-dots">
-        <div
-          v-for="(pet, index) in pets"
-          :key="pet.id"
-          class="nav-dot"
-          :class="{ active: currentScreen === index + 1 }"
-          @click="scrollToScreen(index + 1)"
-        >
+        <div v-for="(pet, index) in pets" :key="pet.id" class="nav-dot" :class="{ active: currentScreen === index + 1 }"
+          @click="scrollToScreen(index + 1)">
           <span class="dot-emoji">{{ getPetEmoji(pet) }}</span>
         </div>
       </div>
 
-      <el-button
-        circle
-        size="small"
-        :disabled="currentScreen === pets.length"
-        @click="scrollToNextScreen"
-        class="nav-arrow next-arrow cute-btn"
-      >
+      <el-button circle size="small" :disabled="currentScreen === pets.length" @click="scrollToNextScreen"
+        class="nav-arrow next-arrow cute-btn">
         <el-icon>
           <ArrowDown />
         </el-icon>
@@ -231,12 +188,7 @@
     </el-button>
 
     <!-- 添加成长记录对话框 -->
-    <el-dialog
-      v-model="showAddGrowthDialog"
-      title="📸 添加成长记录"
-      width="500px"
-      class="cute-dialog"
-    >
+    <el-dialog v-model="showAddGrowthDialog" title="📸 添加成长记录" width="500px" class="cute-dialog">
       <el-form :model="newGrowthRecord" label-width="80px">
         <el-form-item label="年龄阶段">
           <el-input v-model="newGrowthRecord.age" placeholder="如：0-1岁、1-2岁" />
@@ -247,32 +199,15 @@
         <el-button type="primary" class="cute-btn">确认添加</el-button>
       </template>
     </el-dialog>
-    <el-dialog
-      v-model="showEditDialog"
-      title="✏️ 编辑宠物信息"
-      width="500px"
-      class="cute-dialog edit-dialog"
-    >
-      <el-form
-        :model="editForm"
-        label-width="100px"
-        class="edit-form"
-        :rules="editRules"
-        ref="editFormRef"
-      >
+    <el-dialog v-model="showEditDialog" title="✏️ 编辑宠物信息" width="500px" class="cute-dialog edit-dialog">
+      <el-form :model="editForm" label-width="100px" class="edit-form" :rules="editRules" ref="editFormRef">
         <el-form-item label="宠物名称" prop="name">
           <el-input v-model="editForm.name" placeholder="输入宠物名字" class="cute-input" />
         </el-form-item>
 
         <el-form-item label="生日" prop="birthday">
-          <el-date-picker
-            v-model="editForm.birthday"
-            type="date"
-            placeholder="选择生日"
-            format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD"
-            class="cute-input"
-          />
+          <el-date-picker v-model="editForm.birthday" type="date" placeholder="选择生日" format="YYYY-MM-DD"
+            value-format="YYYY-MM-DD" class="cute-input" />
         </el-form-item>
 
         <el-form-item label="品种" prop="breed">
@@ -280,13 +215,7 @@
         </el-form-item>
 
         <el-form-item label="体重 (kg)" prop="weight">
-          <el-input
-            v-model="editForm.weight"
-            type="number"
-            placeholder="输入体重"
-            step="0.1"
-            class="cute-input"
-          />
+          <el-input v-model="editForm.weight" type="number" placeholder="输入体重" step="0.1" class="cute-input" />
         </el-form-item>
 
         <el-form-item label="健康状态" prop="healthStatus">
@@ -299,12 +228,7 @@
         </el-form-item>
 
         <el-form-item label="绝育状态">
-          <el-switch
-            v-model="editForm.sterilization"
-            active-text="已绝育"
-            inactive-text="未绝育"
-            active-color="#FF69B4"
-          />
+          <el-switch v-model="editForm.sterilization" active-text="已绝育" inactive-text="未绝育" active-color="#FF69B4" />
         </el-form-item>
       </el-form>
 
@@ -324,9 +248,9 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowUp, ArrowDown, Plus, Male, Female } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
-import HealthRecords from '@/components/HealthRecords.vue'
-import GrowthAlbum from '@/components/GrowthAlbum.vue'
-import FragmentCarousel from '@/components/FragmentCarousel.vue'
+import HealthRecords from '@/views/myPets/components/HealthRecords.vue'
+import GrowthAlbum from '@/views/myPets/components/GrowthAlbum.vue'
+import FragmentCarousel from '@/views/myPets/components/FragmentCarousel.vue'
 import NavBar from '@/components/NavBar.vue'
 enum PetGender {
   Male = 1,
@@ -1064,6 +988,7 @@ onUnmounted(() => {
 
 /* 可爱输入框样式 */
 .cute-input {
+
   :deep(.el-input__inner),
   :deep(.el-select__inner) {
     border-radius: 15px;
@@ -1320,5 +1245,4 @@ onUnmounted(() => {
 //   /* 水平滚动条高度设为0 */
 //   display: none;
 //   /* 直接隐藏 */
-// }
-</style>
+// }</style>

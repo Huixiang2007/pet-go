@@ -1,11 +1,18 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-
+import { ElMessage } from 'element-plus'
 const routes: RouteRecordRaw[] = [
-  // 寄养首页
   {
     path: '/',
+    redirect: '/login',
+  },
+  // 寄养首页
+  {
+    path: '/foster-care',
     name: 'fosterCare',
     component: () => import('@/views/fosterCare/FosterCare.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 寄养详情
   {
@@ -24,24 +31,36 @@ const routes: RouteRecordRaw[] = [
     path: '/foster-manage',
     name: 'fosterManage',
     component: () => import('@/views/fosterCare/FosterManage.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 电商的首页
   {
     path: '/shop',
     name: 'shop',
     component: () => import('@/views/petShop/shop/PetShopView.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 宠物购物车
   {
     path: '/pet-cart',
     name: 'petCart',
     component: () => import('@/views/petShop/order/PetShopCar.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   //订单结算
   {
     path: '/order',
     name: 'order',
     component: () => import('@/views/petShop/order/OrderCheckout.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   //  商品列表（分类）
   {
@@ -60,30 +79,45 @@ const routes: RouteRecordRaw[] = [
     path: '/order-list',
     name: 'OrderList ',
     component: () => import('@/views/petShop/order/OrderList.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   //物流信息
   {
     path: '/package-info',
     name: 'PackageInfo',
     component: () => import('@/views/petShop/server/PackageInfo.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   //  搜索
   {
     path: '/search',
     name: 'Search',
     component: () => import('@/views/petShop/product/SearchProduct.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 店铺
   {
     path: '/store',
     name: 'Store',
     component: () => import('@/views/petShop/shop/ShopStore.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 订单管理
   {
     path: '/seller-order-manager',
     name: 'SellerOrderManager',
     component: () => import('@/views/petShop/order/SellerOrderMana.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 电商用户管理
 
@@ -91,80 +125,110 @@ const routes: RouteRecordRaw[] = [
     path: '/seller-user-manager',
     name: 'SellerUserManager',
     component: () => import('@/views/petShop/user/SellerUserMana.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 优惠卷管理
   {
     path: '/coupon-management',
     name: 'CouponManagement',
     component: () => import('@/views/petShop/marketing/CouponManagement.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 商品管理
   {
     path: '/seller-item-manager',
     name: 'SellerItemManager',
     component: () => import('@/views/petShop/product/SellerItemMana.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 店铺设置
   {
     path: '/shop-setting',
     name: '/ShopSetting',
     component: () => import('@/views/petShop/shop/ShopSetting.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 销售分析
   {
     path: '/analytics',
     name: 'Analytics',
     component: () => import('@/views/petShop/data/SalesAnalytics.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 秒杀
   {
     path: '/flash-sale',
     name: 'FlashSale',
     component: () => import('@/views/petShop/marketing/FlashSale.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   //消息
   {
     path: '/customer-service',
     name: 'CustomerService',
     component: () => import('@/views/petShop/server/CustomerService.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   // 添加商品
   {
     path: '/add-product',
     name: 'AddProduct',
     component: () => import('@/views/petShop/product/AddProduct.vue'),
-    meta: { title: '欢迎注册 PetGo' },
+    meta: { title: '欢迎注册 PetGo', requiresAuth: true },
   },
   //登录
   {
     path: '/login',
     name: 'petLogin',
     component: () => import('@/views/enterPet/LoginPet.vue'),
-    meta: { title: '欢迎登录 PetGo' },
+    meta: { title: '欢迎登录 PetGo', requiresAuth: false },
   },
   {
     path: '/my-pets',
     name: 'myPets',
     component: () => import('@/views/myPets/MyPets.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
 
   {
     path: '/add-pet',
     name: 'addPet',
     component: () => import('@/views/myPets/AddPet.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   //加入我们
   {
     path: '/join-us',
     name: 'joinUs',
     component: () => import('@/views/joinUs/JoinUs.vue'),
+    meta: {
+      requiresAuth: true,
+    },
   },
   //注册
   {
     path: '/register',
     name: 'register',
     component: () => import('@/views/enterPet/RegisterPet.vue'),
-    meta: { title: '欢迎注册 PetGo' },
+    meta: { title: '欢迎注册 PetGo', requiresAuth: false },
   },
 
   //协议
@@ -179,21 +243,21 @@ const routes: RouteRecordRaw[] = [
     path: '/forget',
     name: 'forget',
     component: () => import('@/views/enterPet/ForgetPassword.vue'),
-    meta: { title: '找回密码' },
+    meta: { title: '找回密码', requiresAuth: false },
   },
   //个人中心
   {
     path: '/person',
     name: 'PersonalCenter',
     component: () => import('@/views/user/PersonalCenter.vue'),
-    meta: { title: '个人中心' },
+    meta: { title: '个人中心', requiresAuth: true },
   },
   //后台管理
   {
     path: '/admin',
     name: 'homePage',
     component: () => import('@/views/admin/HomePage.vue'),
-    meta: { title: '后台管理' },
+    meta: { title: '后台管理', requiresAuth: true },
     children: [
       // 数据概览
 
@@ -254,7 +318,20 @@ const router = createRouter({
 /**
  * 路由导航守卫
  */
-router.beforeEach((to) => {
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.meta.requiresAuth ?? false
+  const isLogin = !!localStorage.getItem('AuthToken')
+  if (requiresAuth && !isLogin) {
+    ElMessage.warning('请先登录后再访问')
+    // 跳转到登录页，并记录当前页面路径（登录后可返回）
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }, // 携带要返回的页面路径
+    })
+  } else {
+    // 已登录/无需登录 → 正常访问
+    next()
+  }
   if (to.meta.title) {
     document.title = to.meta.title as string
   }

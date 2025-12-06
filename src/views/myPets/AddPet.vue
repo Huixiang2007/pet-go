@@ -105,7 +105,7 @@
                 <el-form-item label="种类" prop="type">
                   <el-select v-model="addPetFormData.type" placeholder="选择种类" class="focus-within:shadow-pink-200/50">
                     <el-option v-for="animal in animalOptions" :key="animal.value" :label="animal.label"
-                      :value="animal.value" />
+                      :value="animal.label" />
                   </el-select>
                 </el-form-item>
                 <el-form-item label="品种" prop="breed">
@@ -127,7 +127,7 @@
                     <div class="flex-1" @click="addPetFormData.gender = 1">
                       <div
                         class="gender-card cursor-pointer rounded-2xl p-2 transition-all duration-300 border-2 border-transparent w-20"
-                        :class="{ 'gender-card-male-active': addPetFormData.gender === 1 }">
+                        :class="{ 'gender-card-male-active': addPetFormData.gender === 2 }">
                         <div
                           class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-md transition-all duration-300"
                           :class="{
@@ -444,7 +444,7 @@ interface PetFormData {
   healthStatus: string
   description: string
   specialNotes: string
-  characterTags: string
+  characterTags: string[]
 }
 
 const router = useRouter()
@@ -508,9 +508,9 @@ const addPetFormData = reactive<PetFormData>({
   gender: 1,
   weight: 0,
   avatar: '',
-  characterTags: "",
-  description: "",
-  specialNotes: "",
+  characterTags: [],
+  description: "很好的毛",
+  specialNotes: "xxx",
   sterilization: 0,
   healthStatus: '健康',
 })
@@ -528,22 +528,22 @@ const formRules: FormRules = {
     { required: true, message: '请输入宠物体重', trigger: 'blur' },
     { type: 'number', min: 0.1, max: 100, message: '体重应在 0.1-100kg 之间', trigger: 'blur' },
   ],
-  desscription: [{ required: true, message: '请输入宠物描述', trigger: 'blur' }],
-  specialNotes: [{ required: true, message: '请输入特殊说明', trigger: 'blur' }],
+  // description: [{ required: true, message: '请输入宠物描述', trigger: 'blur' }],
+  // specialNotes: [{ required: true, message: '请输入特殊说明', trigger: 'blur' }],
 }
 
 // 切换标签
 const toggleDefaultTag = (tag: string) => {
-  const index = addPetFormData.characterTags.split(',').indexOf(tag)
+  const index = addPetFormData.characterTags.indexOf(tag)
   if (index > -1) {
-    addPetFormData.characterTags.split(',')
+    addPetFormData.characterTags.splice(index, 1)
     ElMessage.info(`已移除标签：${tag}`)
   } else {
-    if (addPetFormData.characterTags.split(',').length >= 8) {
+    if (addPetFormData.characterTags.length >= 8) {
       ElMessage.warning('最多只能添加8个标签')
       return
     }
-    addPetFormData.characterTags.split(',').push(tag)
+    addPetFormData.characterTags.push(tag)
     ElMessage.success(`已添加标签：${tag}`)
   }
 }
@@ -560,7 +560,7 @@ const addTag = () => {
       ElMessage.warning('标签长度不能超过5个字符')
       return
     }
-    addPetFormData.characterTags.split(',').push(tag)
+    addPetFormData.characterTags.push(tag)
     newTag.value = ''
     ElMessage.success('标签添加成功！')
   }
@@ -570,7 +570,7 @@ const addTag = () => {
 const removeTag = (tag: string) => {
   const index = addPetFormData.characterTags.indexOf(tag)
   if (index > -1) {
-    addPetFormData.characterTags.split(',').splice(index, 1)
+    addPetFormData.characterTags.splice(index, 1)
     ElMessage.info(`已移除标签：${tag}`)
   }
 }
@@ -639,9 +639,16 @@ const submitForm = async () => {
   try {
     await formRef.value.validate()
     loading.value = true
+    const submitData = {
+      ...addPetFormData,
 
+      characterTags: addPetFormData.characterTags.join(','),
+      sterilization: addPetFormData.sterilization ? 1 : 0,
+    }
     const progressInterval = simulateProgress()
-    const response = await request('/server/api/pet/add', 'POST', addPetFormData)
+    const response = await request('/server/api/pet/add', 'POST',
+      submitData
+    )
     console.log('AddPet response:', response)
     clearInterval(progressInterval)
     progress.value = 100
@@ -664,7 +671,7 @@ const submitForm = async () => {
 const resetForm = () => {
   if (formRef.value) {
     formRef.value.resetFields()
-    addPetFormData.characterTags = '活泼'
+    addPetFormData.characterTags = ['活泼']
     ElMessage.info('表单已重置')
   }
 }

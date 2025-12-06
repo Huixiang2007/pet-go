@@ -94,9 +94,9 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useRegisterStore, RegisterForm } from '../../stores/register'
-import ConfirmCode from '../../components/ConfirmCode.vue'
-const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> | null>(null)
+import { useRegisterStore, RegisterForm } from '@/stores/register'
+import ConfirmCode from '@/components/ConfirmCode.vue'
+const ConfirmCodeRef =  ref<InstanceType<typeof ConfirmCode> & ConfirmCodeExposed | null>(null);
 const registerStore = useRegisterStore()
 const router = useRouter()
 const route = useRoute()
@@ -119,7 +119,10 @@ const handleInput = (key: keyof RegisterForm, value: string) => {
 }
 // 定时器管理（避免内存泄漏）
 let hideErrorTimer: NodeJS.Timeout | null = null
-
+interface ConfirmCodeExposed {
+  startCountdown: () => void;
+  // 其他需要的方法/属性也可以加在这里
+}
 /**
  * 处理协议勾选状态变化
  */
@@ -161,8 +164,8 @@ const handleRegister = async () => {
   }
 
   try {
-    console.log('wobeidianl')
-    console.log(ConfirmCodeRef.value.startCountdown())
+   
+
     // 调用注册接口
     const response = await axios.post(
       '/server/api/user/register',
@@ -217,7 +220,7 @@ const SendVerificationCode = async (email: string) => {
     if (response.data.code == 0) {
       ElMessage.success('验证码发送成功')
       setTimeout(() => {
-        if (ConfirmCodeRef.value) {
+        if (ConfirmCodeRef.value && typeof ConfirmCodeRef.value.startCountdown === 'function') {
           ConfirmCodeRef.value.startCountdown()
         }
       }, 100)

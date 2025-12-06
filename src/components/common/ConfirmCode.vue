@@ -1,4 +1,3 @@
-<!-- src/components/VerificationCode.vue -->
 <template>
   <div class="verification-code">
     <div class="layui-input-wrap">
@@ -33,7 +32,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, onUnmounted, readonly } from 'vue'
+
+import { defineComponent, ref, computed, watch, onUnmounted, readonly ,defineExpose} from 'vue'
 import { ElMessage } from 'element-plus'
 
 export default defineComponent({
@@ -184,18 +184,18 @@ export default defineComponent({
       }
     })
 
-    return {
-      email,
-      isDisabled,
-      buttonText,
-      handleEmailInput,
-      sendCode,
-      startCountdown,
-      stopCountdown,
-      reset,
-      isSending: readonly(isSending),
-      countdown: readonly(countdown),
-    }
+    defineExpose({
+    email,
+    isDisabled,
+    buttonText,
+    handleEmailInput,
+    sendCode,
+    startCountdown, // 关键：显式暴露这个方法
+    stopCountdown,
+    reset,
+    isSending: readonly(isSending),
+    countdown: readonly(countdown),
+  })
   },
 })
 </script>

@@ -359,9 +359,7 @@
                   </div>
                 </div>
 
-                <!-- <div class="layui-form-item">
-                  <label class="layui-form-label">所在地区</label>
-                  <div class="layui-input-block"> -->
+           
                 <AddressSelect v-model="selectedAddress" />
 
                 <div class="layui-form-item">
@@ -443,7 +441,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 // import axios from 'axios'
 import request from '@/utils/request'
-import AddressSelect from '@/components/common/CaptchaLoad.vue'
+import AddressSelect from '@/components/business/AddressSelect.vue'
 import provincesData from 'china-division/dist/provinces.json';
 import citiesData from 'china-division/dist/cities.json';
 import districtsData from 'china-division/dist/areas.json';
@@ -643,7 +641,7 @@ onMounted(() => {
     passwordForm.value.email = userInfo.value.email
     // 初始化表单验证
     if (window.layui) {
-      window.layui.use(['form', 'layer'], (form: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+      window.layui.use(['form', 'layer'], (form: any) => { 
 
         form.verify({
           password: function (value: string) {
@@ -873,7 +871,7 @@ const getUserInfo = async () => {
       }
       // 重新渲染表单
       if (window.layui) {
-        window.layui.use('form', (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
+        window.layui.use('form', (form: any) => {
 
           form.render()
         })
@@ -1077,7 +1075,7 @@ const deleteAddress = (id: string) => {
           ElMessage.success('地址删除成功!')
           getAddressList()
         }
-      } catch (error: any) {   // eslint-disable-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {  
 
         console.error('删除失败:', error)
         ElMessage.error('删除失败，请稍后重试')
@@ -1156,7 +1154,7 @@ const cancelEdit = () => {
   formData.value = { ...userInfo.value }
 
   if (window.layui) {
-    window.layui.use('form', (form: any) => {  // eslint-disable-line @typescript-eslint/no-explicit-any
+    window.layui.use('form', (form: any) => {  
 
       form.render()
     })
@@ -1188,8 +1186,7 @@ const cancelWord = () => {
   }
 
   if (window.layui) {
-    window.layui.use('form', (form: any) => {// eslint-disable-line @typescript-eslint/no-explicit-any
-
+    window.layui.use('form', (form: any) => {
       form.render()
     })
   }
@@ -1346,7 +1343,7 @@ const saveBaseInfo = async () => {
     } else {
       ElMessage.error(response.msg || '保存失败，请稍后重试')
     }
-  } catch (error: any) {//eslint-disable-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
 
     showMessage('error', error.message || '保存失败，请稍后重试')
   } finally {
@@ -1469,6 +1466,7 @@ const logout = () => {
 }
 </script>
 
+
 <style scoped>
 /* 添加查看材料按钮样式 */
 .view-materials-section {
@@ -1487,6 +1485,8 @@ const logout = () => {
   background-color: #fdf4ef;
 }
 
+
+
 .info-display {
   height: 38px;
   line-height: 38px;
@@ -1504,6 +1504,7 @@ const logout = () => {
   border: 1px solid #eee;
   border-radius: 4px;
 }
+
 
 .submitted-materials {
   margin-top: 20px;
@@ -1527,6 +1528,7 @@ const logout = () => {
   color: #333;
 }
 
+
 .id-card-img {
   max-width: 300px;
   max-height: 200px;
@@ -1534,75 +1536,32 @@ const logout = () => {
   border: 1px solid #eee;
   border-radius: 4px;
 }
-
-.show-photos {
-  position: absolute;
-  width: 72%;
-  height: 70%;
-  bottom: -29%;
-  right: 17%;
+.show-photo{
+    position: absolute;
+    width: 247px;
+    height: 71%;
+       bottom: -12%;
+    left: 136%;
+}
+.show-photos{
+     max-height: 34%;
+    position: absolute;
+    width: 74%;
+    height: 67%;
+    bottom: 6%;
+    right: 15%;
 }
 
-.show-photo {
-  position: absolute;
-  width: 67%;
-  height: 71%;
-  bottom: 8%;
-  right: -89%;
-}
 
-.show-photo img {
-  max-width: 100%;
-  max-height: 300px;
+:deep(.layui-form-radio:hover>*, .layui-form-radioed, .layui-form-radioed>i) {
+    color: #fd9860;
 }
-
-.show-photo-btn {
-  position: absolute;
-  width: 20%;
-  height: 20%;
-  bottom: 10%;
-  right: 10%;
-  background-color: #fff;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-}
-
-.show-photo-btn img {
-  width: 30%;
-  height: 30%;
-}
-
-.show-photo-btn:hover {
-  background-color: #f5f5f5;
-}
-
-.show-photo-btn:active {
-  background-color: #eee;
-}
-
-.show-photo-btn:focus {
-  outline: none;
-}
-
-.show-photo-btn:disabled {
-  cursor: not-allowed;
-}
-
-:deep(.layui-form-radio:hover > *, .layui-form-radioed, .layui-form-radioed > i) {
-  color: #fd9860;
-}
-
 :deep(.layui-form-radioed) {
-  color: #fd9860;
+    color: #fd9860;
 }
-
-:deep(.layui-form-radioed > i) {
-  color: #fd9860;
+:deep(.layui-form-radioed>i) {
+    color: #fd9860;
 }
-
 .address-content {
   color: #666;
   margin-bottom: 1rem;
@@ -1611,7 +1570,6 @@ const logout = () => {
   background-color: #f9f9f9;
   border-radius: 4px;
 }
-
 .empty-address {
   margin-top: 2rem;
   text-align: center;
@@ -1760,7 +1718,6 @@ const logout = () => {
   border-color: #fd9860;
   color: #fd9860;
 }
-
 .btn-edit {
   background-color: #409eff;
   border-color: #409eff;
@@ -1785,7 +1742,6 @@ const logout = () => {
   background-color: #fb7b7b;
   border-color: #fb7b7b;
 }
-
 .layui-btn-primary:hover {
   border-color: #fd9860;
   color: #fd9860;
@@ -1807,14 +1763,6 @@ const logout = () => {
   width: 100%;
   height: 100%;
   cursor: pointer;
-}
-
-.profile-container {
-  min-height: 100vh;
-  background-image: url('../../assets/img/background6.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-  color: #333;
 }
 
 /* 顶部样式 */
@@ -2003,6 +1951,7 @@ const logout = () => {
   margin-bottom: 1.5rem;
 }
 
+
 .btn-save {
   background-color: #fd9860;
   border-color: #fd9860;
@@ -2086,9 +2035,6 @@ const logout = () => {
   background-color: #f5f5f5;
 }
 
-:deep(.layui-form-label) {
-  width: 101px !important;
-}
 
 /* 响应式调整 */
 @media (max-width: 768px) {
@@ -2116,5 +2062,7 @@ const logout = () => {
     border-left: none;
     border-bottom: 3px solid #fd9860;
   }
+
+
 }
 </style>

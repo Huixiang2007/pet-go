@@ -1,6 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory , type RouteRecordRaw } from 'vue-router'
+
 const FosterCare = () => import('@/views/FosterCare.vue')
-const routes = [
+const routes : RouteRecordRaw[] = [
   // 寄养首页
   {
     path: '/foster-care',
@@ -11,19 +12,19 @@ const routes = [
   {
     path: '/foster-detail/:id',
     name: 'fosterDetail',
-    component: import('@/views/FosterDetail.vue'),
+    component: ()=>import('@/views/FosterDetail.vue'),
   },
   // 寄养预订
   {
     path: '/foster-book/:fosterId/:packageId',
     name: 'fosterBook',
-    component: import('@/views/FosterBook.vue'),
+    component: ()=>import('@/views/FosterBook.vue'),
   },
   //寄养方管理
   {
     path: '/foster-manage',
     name: 'fosterManage',
-    component: import('@/views/FosterManage.vue'),
+    component: ()=>import('@/views/FosterManage.vue'),
   },
   // 电商的首页
   {
@@ -225,6 +226,7 @@ const routes = [
       {
         path: 'foster',
         name: 'foster',
+        redirect:'admin/foster/audit',
         meta: {
           title: '寄养服务管理',
           icon: 'el-icon-house',
@@ -259,11 +261,17 @@ const router = createRouter({
 /**
  * 路由导航守卫
  */
-router.beforeEach((to, from, next) => {
+router.beforeEach((to) => {
+
   if (to.meta.title) {
     document.title = to.meta.title as string
   }
-  next()
+  if (to.path === '/login') {
+    return true;
+  }
+
+  // 已登录 → 允许访问
+  return true;
 })
 
 export default router

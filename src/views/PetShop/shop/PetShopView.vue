@@ -1,9 +1,6 @@
 <template>
   <NavBar />
-  <header
-    class="bg-white shadow-md top-[85px] left-0 right-0 z-50"
-    :class="{ shadow: isScrolledPast50 }"
-  >
+  <header class="bg-white shadow-md top-[85px] left-0 right-0 z-50" :class="{ shadow: isScrolledPast50 }">
     <ShopCategoryNav v-model="currentCategory" @categoryChange="handleCategoryChange" />
   </header>
   <div class="min-h-screen pt-1 bg-yellow-50">
@@ -13,44 +10,30 @@
         <div class="carousel bg-white shadow-md rounded-lg overflow-hidden">
           <div class="relative h-80">
             <button
-              class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all z-10 opacity-0 opacity-100"
-              @click="prevSlide"
-            >
+              class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all z-10 opacity-100"
+              @click="prevSlide">
               <i class="fa fa-chevron-left"></i>
             </button>
 
             <!-- 轮播图片 -->
-            <img
-              v-for="(item, index) in carouselItems"
-              :key="index"
-              :src="item.image"
-              :alt="item.title"
-              class="w-full h-full object-cover"
-              :class="{
+            <img v-for="(item, index) in carouselItems" :key="index" :src="item.image" :alt="item.title"
+              class="w-full h-full object-cover" :class="{
                 'opacity-100': currentSlide === index,
                 'opacity-0 absolute inset-0 transition-opacity duration-500':
                   currentSlide !== index,
-              }"
-            />
+              }" />
 
             <!-- 右箭头 -->
             <button
-              class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all z-10 opacity-0 opacity-100"
-              @click="nextSlide"
-            >
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/30 hover:bg-black/50 text-white rounded-full flex items-center justify-center transition-all z-10 opacity-100"
+              @click="nextSlide">
               <i class="fa fa-chevron-right"></i>
             </button>
             <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-              <button
-                v-for="(item, index) in carouselItems"
-                :key="index"
-                class="w-3 h-3 rounded-full"
-                :class="{
-                  'bg-white': currentSlide === index,
-                  'bg-white/50': currentSlide !== index,
-                }"
-                @click="currentSlide = index"
-              ></button>
+              <button v-for="(item, index) in carouselItems" :key="index" class="w-3 h-3 rounded-full" :class="{
+                'bg-white': currentSlide === index,
+                'bg-white/50': currentSlide !== index,
+              }" @click="currentSlide = index"></button>
             </div>
           </div>
         </div>
@@ -58,10 +41,8 @@
 
       <!-- 功能 -->
       <div class="features grid grid-cols-3 gap-3 mt-6">
-        <div
-          @click="FlashSale"
-          class="feature-card bg-red-50 rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer"
-        >
+        <div @click="FlashSale"
+          class="feature-card bg-red-50 rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
           <div class="flex justify-center items-center flex-row ml-[-123px] mt-[-27px] mb-[-35px]">
             <img src="/img/秒杀.gif" alt="秒杀" class="h-[120px] w-[120px]" />
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
@@ -71,25 +52,18 @@
           <h3 class="font-medium text-gray-800 mt-4">爆款秒杀</h3>
           <p class="text-sm text-gray-500 mt-1">万人关注的爆款商品秒杀</p>
         </div>
-        <div
-          @click="aiServer"
-          class="feature-card bg-[#e6f7ff] rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer"
-        >
-          <div
-            class="w-16 h-16 bg-[#aadafa] rounded-full flex items-center justify-center mx-auto mb-3"
-          >
+        <div @click="aiServer"
+          class="feature-card bg-[#e6f7ff] rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+          <div class="w-16 h-16 bg-[#aadafa] rounded-full flex items-center justify-center mx-auto mb-3">
             <i class="fa fa-headphones text-2xl text-[#0288d1]"></i>
           </div>
           <h3 class="font-medium text-gray-800">ai客服</h3>
           <p class="text-sm text-gray-500 mt-1">ai专业客服,科学养宠为TA护航</p>
         </div>
         <div
-          class="feature-card bg-purple-50 rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer"
-        >
-          <div
-            @click="goCart"
-            class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3"
-          >
+          class="feature-card bg-purple-50 rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer">
+          <div @click="goCart"
+            class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <i class="fa fa-truck text-2xl text-purple-600"></i>
           </div>
           <h3 class="font-medium text-gray-800">购物车</h3>
@@ -109,8 +83,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <!-- 优惠券1 -->
           <div
-            class="coupon-edge bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative pl-8 pr-8"
-          >
+            class="coupon-edge bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative pl-8 pr-8">
             <div class="absolute top-3 right-3 text-accent/30">
               <i class="fa fa-paw text-2xl"></i>
             </div>
@@ -120,16 +93,14 @@
             </div>
             <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
             <button
-              class="w-full bg-[#FF7043] hover:bg-[#FF7043]/90 text-white py-2 rounded-full text-sm transition-colors"
-            >
+              class="w-full bg-[#FF7043] hover:bg-[#FF7043]/90 text-white py-2 rounded-full text-sm transition-colors">
               立即领取
             </button>
           </div>
 
           <!-- 优惠券2 -->
           <div
-            class="coupon-edge bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative pl-8 pr-8"
-          >
+            class="coupon-edge bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative pl-8 pr-8">
             <div class="absolute top-3 right-3 text-accent/30">
               <i class="fa fa-paw text-2xl"></i>
             </div>
@@ -139,16 +110,14 @@
             </div>
             <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
             <button
-              class="w-full bg-[#FF7043] hover:bg-[#FF7043]/90 text-white py-2 rounded-full text-sm transition-colors"
-            >
+              class="w-full bg-[#FF7043] hover:bg-[#FF7043]/90 text-white py-2 rounded-full text-sm transition-colors">
               立即领取
             </button>
           </div>
 
           <!-- 优惠券3 -->
           <div
-            class="coupon-edge bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative pl-8 pr-8"
-          >
+            class="coupon-edge bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-300 relative pl-8 pr-8">
             <div class="absolute top-3 right-3 text-accent/30">
               <i class="fa fa-paw text-2xl"></i>
             </div>
@@ -158,8 +127,7 @@
             </div>
             <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
             <button
-              class="w-full bg-[#FF7043] hover:bg-[#FF7043]/90 text-white py-2 rounded-full text-sm transition-colors"
-            >
+              class="w-full bg-[#FF7043] hover:bg-[#FF7043]/90 text-white py-2 rounded-full text-sm transition-colors">
               立即领取
             </button>
           </div>
@@ -167,8 +135,7 @@
 
         <!-- 底部信息栏 -->
         <div
-          class="flex flex-col md:flex-row items-center justify-between py-2 px-6 bg-white rounded-2xl mt-2 border-t border-gray-100"
-        >
+          class="flex flex-col md:flex-row items-center justify-between py-2 px-6 bg-white rounded-2xl mt-2 border-t border-gray-100">
           <div class="flex items-center mb-3 md:mb-0">
             <div class="w-10 h-5 rounded-full flex items-center justify-center mr-3">
               <i class="fas fa-paw text-[#333333]"></i>
@@ -178,8 +145,7 @@
           <div class="flex gap-3">
             <button
               class="bg-[#bbdefb] text-[#333333] text-xs px-4 py-2 rounded-full transition-all duration-300 hover:bg-blue-200"
-              @click="popupVisible = true"
-            >
+              @click="popupVisible = true">
               查看规则
             </button>
           </div>
@@ -193,18 +159,12 @@
           </h2>
         </div>
         <div class="grid grid-cols-4 gap-4">
-          <div
-            v-for="product in products"
-            :key="product.id"
+          <div v-for="product in products" :key="product.id"
             class="product-card bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow"
-            @click="productsDeatil(product.id)"
-          >
+            @click="productsDeatil(product.id)">
             <div class="w-full h-64 bg-gray-50 overflow-hidden">
-              <img
-                :src="product.mainImage"
-                :alt="product.title"
-                class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-              />
+              <img :src="product.mainImage" :alt="product.title"
+                class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
             </div>
 
             <div class="p-4">
@@ -224,8 +184,7 @@
                   <span class="text-xs text-gray-400 ml-2">{{ product.warrantyTip }}</span>
                 </div>
                 <button
-                  class="w-9 h-9 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors"
-                >
+                  class="w-9 h-9 hover:bg-[#FF7043]/20 rounded-full flex items-center justify-center transition-colors">
                   <i class="fa fa-shopping-cart text-[#FF7043] text-[16px]"></i>
                 </button>
               </div>
@@ -237,10 +196,7 @@
     </div>
   </div>
   <!-- 弹窗 -->
-  <div
-    v-if="popupVisible"
-    class="popup-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-  >
+  <div v-if="popupVisible" class="popup-overlay fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div class="popup-content bg-white rounded-lg w-1/2 max-h-[80vh] overflow-auto p-6">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-bold text-gray-800">优惠规则</h2>
@@ -254,13 +210,9 @@
     </div>
   </div>
   <!-- 返回顶部按钮 -->
-  <img
-    v-show="showBackToTop"
-    @click="scrollToTop"
-    class="fixed bottom-6 right-4 z-50 w-20 h-20 hover:scale-105 transition-transform"
-    aria-label="回到顶部"
-    src="/img/火箭.gif"
-  />
+  <img v-show="showBackToTop" @click="scrollToTop"
+    class="fixed bottom-6 right-4 z-50 w-20 h-20 hover:scale-105 transition-transform" aria-label="回到顶部"
+    src="/img/火箭.gif" />
 </template>
 
 <script setup lang="ts">
@@ -417,9 +369,11 @@ onBeforeUnmount(() => {
   margin: 0px auto;
   padding: 20px;
 }
+
 .container {
   max-width: 100%;
 }
+
 .top-section {
   margin-bottom: 20px;
 }
@@ -438,6 +392,7 @@ onBeforeUnmount(() => {
 .category-btn {
   cursor: pointer;
 }
+
 .carousel {
   flex: 1;
 }
@@ -469,12 +424,15 @@ onBeforeUnmount(() => {
 .popup-content {
   animation: slideUp 0.3s;
 }
+
 .coupon-shadow {
   border-top: 3px solid #ffb83f;
 }
+
 .coupon-edge {
   position: relative;
 }
+
 .coupon-edge::before,
 .coupon-edge::after {
   content: '';
@@ -486,14 +444,17 @@ onBeforeUnmount(() => {
   background-size: 16px 24px;
   background-repeat: repeat-y;
 }
+
 .coupon-edge::before {
   left: -8px;
   background-image: radial-gradient(circle at 8px 12px, transparent 6px, #ff7043 7px);
 }
+
 .coupon-edge::after {
   right: -8px;
   background-image: radial-gradient(circle at 0 12px, transparent 6px, #ff7043 7px);
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -502,6 +463,7 @@ onBeforeUnmount(() => {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -512,6 +474,7 @@ onBeforeUnmount(() => {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;

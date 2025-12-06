@@ -11,10 +11,10 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AddressSelect: typeof import('./src/components/AddressSelect.vue')['default']
+    AddressSelect: typeof import('./src/components/business/AddressSelect.vue')['default']
     BusinessEntry: typeof import('./src/components/BusinessEntry.vue')['default']
-    CaptchaLoad: typeof import('./src/components/CaptchaLoad.vue')['default']
-    ConfirmCode: typeof import('./src/components/ConfirmCode.vue')['default']
+    CaptchaLoad: typeof import('./src/components/common/CaptchaLoad.vue')['default']
+    ConfirmCode: typeof import('./src/components/common/ConfirmCode.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']

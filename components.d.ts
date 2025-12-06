@@ -58,7 +58,7 @@ declare module 'vue' {
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     FamilyEntry: typeof import('./src/components/FamilyEntry.vue')['default']
-    FileUpload: typeof import('./src/components/FileUpload.vue')['default']
+    FileUpload: typeof import('./src/components/common/FileUpload.vue')['default']
     FlashSaleProduct: typeof import('./src/components/FlashSaleProduct.vue')['default']
     FragmentCarousel: typeof import('./src/components/FragmentCarousel.vue')['default']
     GrowthAlbum: typeof import('./src/components/GrowthAlbum.vue')['default']

@@ -1,20 +1,20 @@
 <template>
   <form class="space-y-8">
-    <!-- 机构基本信息 -->
+    <!-- 家庭基本信息 -->
     <div class="space-y-4">
       <div class="flex items-center border-b border-purple-100 pb-2">
-        <i class="fa fa-building text-purple-600 text-xl mr-3"></i>
-        <h2 class="text-xl font-semibold text-gray-800">机构基本信息</h2>
+        <i class="fa fa-home text-purple-600 text-xl mr-3"></i>
+        <h2 class="text-xl font-semibold text-gray-800">家庭基本信息</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">
-            机构名称 <span class="text-red-500">*</span>
+            家庭名称 <span class="text-red-500">*</span>
           </label>
           <input type="text" v-model="form.name"
             class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400"
-            placeholder="请输入机构名称" required />
+            placeholder="请输入家庭名称/昵称" required />
         </div>
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">
@@ -26,8 +26,6 @@
           </el-select>
         </div>
       </div>
-
-      <!-- 机构资质上传（支持多张） -->
       <div class="space-y-2 mt-4">
         <label class="block text-sm font-medium text-gray-700">
           机构资质证书（支持多张，最多6张）<span class="text-red-500">*</span>
@@ -38,8 +36,8 @@
       </div>
     </div>
 
-    <!-- 环境照片上传（支持多张） -->
-    <div class="space-y-2 mt-6">
+    <!-- 家庭环境照片 -->
+    <div class="space-y-2">
       <label class="block text-sm font-medium text-gray-700">
         环境照片（支持多张，最多6张）<span class="text-red-500">*</span>
       </label>
@@ -48,12 +46,11 @@
         @file-change="(files) => (form.environmentPhotos = files.map((f) => f.url))" />
     </div>
 
-    <!-- 机构地址与简介 -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
       <div class="space-y-4">
         <div class="flex items-center border-b border-purple-100 pb-2">
           <i class="fa fa-map-marker text-purple-600 text-xl mr-3"></i>
-          <h2 class="text-lg font-semibold text-gray-800">机构地址</h2>
+          <h2 class="text-lg font-semibold text-gray-800">家庭地址</h2>
         </div>
         <AddressSelect v-model="selectedAddress" @change="handleAddressChange" />
 
@@ -70,16 +67,16 @@
       <div class="space-y-4">
         <div class="flex items-center border-b border-purple-100 pb-2">
           <i class="fa fa-info-circle text-purple-600 text-xl mr-3"></i>
-          <h2 class="text-lg font-semibold text-gray-800">机构简介</h2>
+          <h2 class="text-lg font-semibold text-gray-800">寄养说明</h2>
         </div>
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700">
-            机构介绍 <span class="text-red-500">*</span>
+            寄样说明 <span class="text-red-500">*</span>
           </label>
           <textarea v-model="form.description"
             class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-300 focus:border-purple-400 transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
-            placeholder="请输入机构介绍" required></textarea>
+            placeholder="请输入寄样说明" required></textarea>
         </div>
       </div>
     </div>
@@ -91,30 +88,17 @@
         type="button" @click="submitForm">
         提交申请
       </button>
-      <p class="text-center text-gray-500 text-sm mt-4">提交后将在1-3个工作日内审核</p>
-    </div>
-    <div v-if="isSuccess" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div class="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-xl transform transition-all">
-        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="fa fa-check text-2xl text-green-500"></i>
-        </div>
-        <h3 class="text-xl font-semibold text-gray-800 mb-2">提交成功！</h3>
-        <p class="text-gray-600 mb-6">我们将在1-3个工作日内审核，请保持电话畅通</p>
-        <button class="px-6 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
-          @click="isSuccess = false">
-          确定
-        </button>
-      </div>
+      <p class="text-center text-gray-500 text-sm mt-4">
+        提交后将在1-3个工作日内审核，请保持电话畅通
+      </p>
     </div>
   </form>
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import request from '@/utils/request'
-import FileUpload from '@/components/FileUpload.vue'
-import AddressSelect from '@/components/business/AddressSelect.vue'
-// 引入Element Plus的消息提示组件（根据实际UI库替换）
+import FileUpload from '@/components/common/FileUpload.vue'
 import { ElMessage } from 'element-plus'
 import provincesData from 'china-division/dist/provinces.json'
 import citiesData from 'china-division/dist/cities.json'
@@ -129,7 +113,6 @@ const animalOptions = [
   { value: 'snake', label: '蛇' },
   { value: 'other', label: '其他' },
 ]
-
 const selectedAddress = ref({
   province: '',
   city: '',
@@ -152,7 +135,7 @@ interface OrganizationForm {
 }
 
 const form = reactive<OrganizationForm>({
-  providerType: '机构',
+  providerType: '个人',
   name: '',
   description: '',
   province: '',
@@ -206,13 +189,13 @@ const handleAddressChange = () => {
 // 表单验证
 const validateForm = (): boolean => {
   const requiredFields = [
-    { value: form.name, field: '机构名称' },
+    { value: form.name, field: '家庭名称' },
     { value: form.petTypes.length > 0, field: '可接待宠物类型' },
     { value: form.province, field: '省份' },
     { value: form.city, field: '城市' },
     { value: form.district, field: '区域' },
     { value: form.detailAddress, field: '详细地址' },
-    { value: form.description, field: '机构介绍' },
+    { value: form.description, field: '寄养说明' },
   ]
 
   for (const field of requiredFields) {
@@ -229,7 +212,7 @@ const validateForm = (): boolean => {
 
   // 验证文件上传
   if (form.qualificationPhotos.length === 0) {
-    ElMessage.error('请至少上传1张机构资质证书！')
+    ElMessage.error('请至少上传1张资质证书！')
 
     return false
   }
@@ -290,16 +273,3 @@ const submitForm = async () => {
   }
 }
 </script>
-<style scoped>
-.fixed.inset-0 {
-  backdrop-filter: blur(2px);
-}
-
-.rounded-2xl {
-  border-radius: 16px;
-}
-
-.shadow-xl {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-</style>

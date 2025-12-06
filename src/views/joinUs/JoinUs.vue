@@ -2,12 +2,9 @@
   <div id="app">
     <NavBar />
     <div
-      class="min-h-screen bg-gradient-to-b from-purple-50 to-white flex justify-center items-start py-8 px-4 pt-16 mt-6"
-    >
+      class="min-h-screen bg-gradient-to-b from-purple-50 to-white flex justify-center items-start py-8 px-4 pt-16 mt-6">
       <!-- 主容器 -->
-      <div
-        class="w-full max-w-5xl bg-white rounded-3xl shadow-lg overflow-hidden border border-purple-100"
-      >
+      <div class="w-full max-w-5xl bg-white rounded-3xl shadow-lg overflow-hidden border border-purple-100">
         <!-- 顶部标题栏 -->
         <div class="bg-gradient-to-r from-purple-600 to-purple-400 py-8 px-8 text-white">
           <h1 class="text-[32px] font-bold text-center">加入我们 · 成为合作伙伴</h1>
@@ -16,17 +13,12 @@
 
         <!-- 选项卡切换 -->
         <div class="flex border-b border-purple-100 bg-purple-50">
-          <button
-            v-for="(item, index) in tabList"
-            :key="index"
-            :class="[
-              'flex-1 py-4 px-4 text-center font-medium transition-all',
-              activeTab === index
-                ? 'text-purple-700 border-b-2 border-purple-500'
-                : 'text-gray-500 hover:text-purple-600',
-            ]"
-            @click="switchTab(index)"
-          >
+          <button v-for="(item, index) in tabList" :key="index" :class="[
+            'flex-1 py-4 px-4 text-center font-medium transition-all',
+            activeTab === index
+              ? 'text-purple-700 border-b-2 border-purple-500'
+              : 'text-gray-500 hover:text-purple-600',
+          ]" @click="switchTab(index)">
             <i class="fa mr-2" :class="item.icon"></i>
             {{ item.name }}
           </button>
@@ -35,11 +27,8 @@
         <!-- 动态加载对应的组件 -->
         <div class="p-8">
           <keep-alive>
-            <component
-              :is="currentComponent"
-              @submit-success="handleSubmitSuccess"
-              @validation-error="handleValidationError"
-            />
+            <component :is="currentComponent" @submit-success="handleSubmitSuccess"
+              @validation-error="handleValidationError" />
           </keep-alive>
         </div>
       </div>
@@ -49,9 +38,9 @@
 
 <script lang="ts" setup>
 import { ref, shallowRef, type Component } from 'vue'
-import BusinessEntry from '@/components/BusinessEntry.vue'
-import OrganizationEntry from '@/components/OrganizationEntry.vue'
-import FamilyEntry from '@/components/FamilyEntry.vue'
+import BusinessEntry from '@/views/joinUs/components/BusinessEntry.vue'
+import OrganizationEntry from '@/views/joinUs/components/OrganizationEntry.vue'
+import FamilyEntry from '@/views/joinUs/components/FamilyEntry.vue'
 interface TabItem {
   name: string
   icon: string

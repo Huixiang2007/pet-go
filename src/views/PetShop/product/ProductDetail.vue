@@ -1,30 +1,8 @@
 <template>
+  <NavBar />
   <main class="mx-auto px-4 py-8 bg-white">
-    <div class="flex items-center ml-[56px]">
-      <span
-        class="ml-2 text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-green-500"
-        >PetGo</span
-      >
-      <router-link to="/shop" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
-        <i class="fas fa-sign-out-alt text-gray-700"></i>
-        <span class="hidden sm:inline ml-1 text-sm text-gray-600">退出</span>
-      </router-link>
-      <!-- 搜索框 -->
-      <div class="hidden md:flex justify-center items-center flex-1 max-w-md mx-8">
-        <div class="relative w-full">
-          <input
-            type="text"
-            placeholder="搜索宠物用品..."
-            class="w-full py-2 pl-10 pr-4 rounded-full border border-[#f5a623]"
-          />
-          <i
-            class="fa fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#f5a623]"
-          ></i>
-        </div>
-      </div>
-    </div>
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mt-12">
 
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
       <div class="product-grid grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 md:p-8">
         <div class="lg:col-span-2">
           <div class="flex gap-4">
@@ -33,7 +11,7 @@
               <div
                 v-for="(item, i) in mediaList"
                 :key="i"
-                class="thumb cursor-pointer rounded-md border overflow-hidden relative"
+                class="thumb cursor-pointer rounded-md  overflow-hidden relative"
                 :class="activeMediaIndex === i ? 'ring-2 ring-orange-400' : ''"
                 @click="switchMedia(i)"
               >
@@ -182,132 +160,132 @@
         </div>
 
         <!-- 右侧信息 -->
-        <div class="lg:block lg:col-span-1">
-          <div class="lg:fixed h-[100vh] w-[430px] py-5 pl-2 mt-[-112px] pr-[6rem] overflow-auto">
-            <div>
-              <div class="flex items-center justify-between">
-                <div @click="goStore" class="text-sm text-gray-500">{{ product.shopName }}</div>
-              </div>
-              <h1 class="mt-4 text-2xl font-bold">{{ product.title }}</h1>
+      <div class="lg:block lg:col-span-1 mt-20 mb-5">
+  <div class="lg:fixed lg:w-[calc(100%-2rem)] max-w-[430px] py-5 px-4 mt-0 lg:mt-[-112px] overflow-auto max-h-[calc(100vh-4rem)]">
+    <div>
+      <div class="flex items-center justify-between">
+        <div @click="goStore"
+             class="text-sm text-gray-500 cursor-pointer border-b border-gray-200 pb-2 hover:text-orange-600 whitespace-nowrap overflow-hidden text-ellipsis"
+        >{{ product.shopName }}</div>
+      </div>
 
-              <div class="flex items-center gap-3 mt-3">
-                <div class="flex items-center text-yellow-400">
-                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i
-                  ><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
-                </div>
-                <div class="text-sm text-gray-500">
-                  {{ product.productScore || 0 }} · {{ product.reviewCount || 0 }}评价
-                </div>
-              </div>
-            </div>
+      <h1 class="mt-4 text-2xl font-bold break-words">{{ product.title }}</h1>
 
-            <!-- 价格区域 -->
-            <div class="bg-gray-100 p-4 rounded-lg mt-3 mb-3">
-              <div class="flex flex-col items-baseline gap-4">
-                <div class="text-sm text-gray-400">活动价</div>
-                <div class="text-3xl font-bold text-orange-500">
-                  ¥{{ selectedSku.price || product.currentPrice || 0 }}
-                </div>
-                <div class="text-sm text-gray-400 line-through">
-                  ¥{{ product.marketPrice || 0 }}
-                </div>
-                <div class="text-xs py-0.5 rounded bg-orange-50 text-orange-600">
-                  直降{{ product.marketPrice - product.currentPrice }}元
-                </div>
-              </div>
-              <div class="mt-2 text-sm text-gray-500">{{ '无可用优惠券' }}</div>
-            </div>
-
-            <!-- SKU规格选择区 -->
-            <div v-if="specGroups.length > 0">
-              <div v-for="(group, groupIndex) in specGroups" :key="groupIndex" class="mb-5">
-                <h3 class="text-sm font-medium text-gray-600 mb-2">{{ group.name }}</h3>
-                <div class="flex gap-3 flex-wrap">
-                  <button
-                    v-for="(option, optIndex) in group.options"
-                    :key="optIndex"
-                    @click="selectSkuOption(group.name, option)"
-                    :class="{
-                      'border-2 border-orange-400 bg-orange-50':
-                        selectedOptions[group.name] === option,
-                      'border border-gray-200 hover:border-gray-400':
-                        selectedOptions[group.name] !== option,
-                    }"
-                    class="px-4 py-2 rounded-md text-sm transition-colors"
-                  >
-                    {{ option }}
-                  </button>
-                </div>
-              </div>
-
-              <!-- 已选规格显示 -->
-              <div v-if="Object.keys(selectedOptions).length > 0" class="mb-5">
-                <h3 class="text-sm font-medium text-gray-600 mb-2">已选</h3>
-                <div class="text-sm text-gray-500">
-                  <span v-for="(value, key) in selectedOptions" :key="key" class="mr-3"
-                    >{{ key }}: {{ value }}</span
-                  >
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h3 class="text-sm font-medium text-gray-600 mb-2">数量</h3>
-              <div class="flex items-center w-32 border border-gray-200 rounded-md">
-                <button
-                  @click="decrease"
-                  class="w-10 h-10 text-gray-500 hover:text-orange-500"
-                  :disabled="qty <= 1"
-                >
-                  <i class="fa fa-minus"></i>
-                </button>
-                <input
-                  id="qty"
-                  type="number"
-                  v-model.number="qty"
-                  min="1"
-                  class="w-12 h-10 text-center border-x border-gray-200 focus:outline-none"
-                  :max="selectedSku.stock"
-                />
-                <button
-                  @click="increase"
-                  class="w-10 h-10 text-gray-500 hover:text-orange-500"
-                  :disabled="qty >= selectedSku.stock"
-                >
-                  <i class="fa fa-plus"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="mt-3 text-sm text-gray-500">
-              库存：<span class="text-green-600">{{ selectedSku.stock || 999 }}</span> 件
-            </div>
-
-            <div class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-100 mt-4">
-              <button
-                id="addCart"
-                class="flex-1 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors flex items-center justify-center"
-                :disabled="!isSkuSelected || selectedSku.stock <= 0"
-              >
-                <i class="fa fa-shopping-cart mr-2"></i> 加入购物车
-              </button>
-              <button
-                id="buyNow"
-                class="flex-1 py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors flex items-center justify-center"
-                :disabled="!isSkuSelected || selectedSku.stock <= 0"
-              >
-                <i class="fa fa-bolt mr-2"></i> 立即购买
-              </button>
-            </div>
-
-            <div class="text-sm text-gray-500 pt-4 border-t border-gray-100 flex flex-wrap gap-3">
-              <div class="flex items-center gap-2">
-                <i class="fa fa-check-circle text-orange-500"></i
-                >{{ product.warrantyTip || '正品保障' }}
-              </div>
-            </div>
-          </div>
+      <div class="flex items-center gap-3 mt-3 flex-wrap">
+        <div class="flex items-center text-yellow-400">
+          <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i
+          ><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
         </div>
+        <div class="text-sm text-gray-500">
+          {{ product.productScore || 0 }} · {{ product.reviewCount || 0 }}评价
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gray-100 p-4 rounded-lg mt-3 mb-3 w-full">
+      <div class="flex flex-col items-baseline gap-4">
+        <div class="text-sm text-gray-400">活动价</div>
+        <div class="text-3xl font-bold text-orange-500">
+          ¥{{ selectedSku.price || product.currentPrice || 0 }}
+        </div>
+        <div class="text-sm text-gray-400 line-through">
+          ¥{{ product.marketPrice || 0 }}
+        </div>
+        <div class="text-xs py-0.5 rounded bg-orange-50 text-orange-600">
+          直降{{ (product.marketPrice - product.currentPrice) || 0 }}元
+        </div>
+      </div>
+      <div class="mt-2 text-sm text-gray-500">{{ '无可用优惠券' }}</div>
+    </div>
+
+    <div v-if="specGroups.length > 0" class="w-full">
+      <div v-for="(group, groupIndex) in specGroups" :key="groupIndex" class="mb-5">
+        <h3 class="text-sm font-medium text-gray-600 mb-2">{{ group.name }}</h3>
+        <div class="flex gap-3 flex-wrap">
+          <button
+            v-for="(option, optIndex) in group.options"
+            :key="optIndex"
+            @click="selectSkuOption(group.name, option)"
+            :class="{
+              'border-2 border-orange-400 bg-orange-50':
+                selectedOptions[group.name] === option,
+              'border border-gray-200 hover:border-gray-400':
+                selectedOptions[group.name] !== option,
+            }"
+            class="px-4 py-2 rounded-md text-sm transition-colors whitespace-nowrap"
+          >
+            {{ option }}
+          </button>
+        </div>
+      </div>
+
+      <div v-if="Object.keys(selectedOptions).length > 0" class="mb-5">
+        <h3 class="text-sm font-medium text-gray-600 mb-2">已选</h3>
+        <div class="text-sm text-gray-500 flex flex-wrap gap-2">
+          <span v-for="(value, key) in selectedOptions" :key="key" class="mr-1"
+          >{{ key }}: {{ value }}</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full">
+      <h3 class="text-sm font-medium text-gray-600 mb-2">数量</h3>
+      <div class="flex items-center w-32 border border-gray-200 rounded-md">
+        <button
+          @click="decrease"
+          class="w-10 h-10 text-gray-500 hover:text-orange-500"
+          :disabled="qty <= 1"
+        >
+          <i class="fa fa-minus"></i>
+        </button>
+        <input
+          id="qty"
+          type="number"
+          v-model.number="qty"
+          min="1"
+          class="w-12 h-10 text-center border-x border-gray-200 focus:outline-none"
+          :max="selectedSku.stock"
+        />
+        <button
+          @click="increase"
+          class="w-10 h-10 text-gray-500 hover:text-orange-500"
+          :disabled="qty >= selectedSku.stock"
+        >
+          <i class="fa fa-plus"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-3 text-sm text-gray-500">
+      库存：<span class="text-green-600">{{ selectedSku.stock || 999 }}</span> 件
+    </div>
+
+    <div class="flex flex-col sm:flex-row gap-3 pt-4 pr-[4.5rem] border-t border-gray-100 mt-4 ">
+      <button
+        id="addCart"
+        class="w-full sm:flex-1 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors flex items-center justify-center"
+        :disabled="!isSkuSelected || selectedSku.stock <= 0"
+      >
+        <i class="fa fa-shopping-cart mr-2"></i> 加入购物车
+      </button>
+      <button
+        id="buyNow"
+        class="w-full sm:flex-1 py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors flex items-center justify-center"
+        :disabled="!isSkuSelected || selectedSku.stock <= 0"
+      >
+        <i class="fa fa-bolt mr-2"></i> 立即购买
+      </button>
+    </div>
+
+    <div class="text-sm text-gray-500 pt-4 border-t border-gray-100 flex flex-wrap gap-3 w-full mb-6">
+      <div class="flex items-center gap-2 whitespace-nowrap">
+        <i class="fa fa-check-circle text-orange-500"></i
+        >{{ product.warrantyTip || '正品保障' }}
+      </div>
+    </div>
+  </div>
+</div>
       </div>
     </div>
   </main>
@@ -319,8 +297,8 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 const router = useRouter()
-interface MediaItem {
-  //定义媒体资源
+const shopId= ref('')
+interface MediaItem { //定义媒体资源
   type: 'image' | 'video'
   src: string
   thumbSrc: string
@@ -485,20 +463,20 @@ const isSkuSelected = computed(() => {
 })
 
 const productDetail = () => {
-  axios
-    .request({
-      url: '/server/api/shop/product/detail/' + id,
-      method: 'GET',
-      params: {
-        id: id,
-      },
-    })
-    .then((res) => {
-      console.log('接口返回数据:', res)
-      const productNew = res.data.data
-      product.value = productNew
-      const imageList = productNew.images?.split(',') || []
-      const mainImage = productNew.mainImage || imageList[0] || ''
+  axios.request({
+    url: "/server/api/shop/product/detail/" + id,
+    method: 'GET',
+    params: {
+      id: id
+    }
+  })
+  .then((res: any) => {
+    console.log('接口返回数据:', res)
+    const productNew = res.data.data
+    product.value = productNew
+    shopId.value = productNew.shopId
+    const imageList = productNew.images?.split(',') || []
+    const mainImage = productNew.mainImage || imageList[0] || ""
 
       // 初始化媒体列表
       mediaList.value = [
@@ -560,6 +538,10 @@ const productDetail = () => {
 const goStore = () => {
   router.push({
     path: '/Store',
+    query: {
+      id: shopId.value
+    }
+
   })
 }
 

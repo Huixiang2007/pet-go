@@ -252,6 +252,13 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/user/PersonalCenter.vue'),
     meta: { title: '个人中心', requiresAuth: true },
   },
+    //个人中心组件版
+  {
+    path: '/persons',
+    name: 'PersonalCenter',
+    component: () => import('@/views/userCenter/PersonCenter.vue'),
+    meta: { title: '个人中心' },
+  },
   //后台管理
   {
     path: '/admin',

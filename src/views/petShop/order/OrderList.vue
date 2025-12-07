@@ -188,8 +188,8 @@
 <script setup lang="ts">
 import OrderCard from './components/OrderCard.vue'
 import { type Order } from './components/OrderCard.vue'
-import Coupons from '../marketing/MyCoupons.vue'
-import Comments from '../comment/MyComments.vue'
+import Coupons from './components/MyCoupons.vue'
+import Comments from './components/MyComments.vue'
 import { ref, computed } from 'vue'
 
 // 筛选状态

@@ -330,7 +330,7 @@ const handleLogin = async (formData: LoginForm) => {
 
       showMessage('success', '登录成功，欢迎进入PetGO!')
       const redirect = router.currentRoute.value.query.redirect as string;
-      router.push(redirect || '/person');
+      router.push(redirect || '/foster-care');
     } else {
       const errorMsg = response.msg
       ElMessage.error(errorMsg)

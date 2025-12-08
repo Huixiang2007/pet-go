@@ -210,7 +210,7 @@ import { ArrowUp, ArrowDown, Plus, Male, Female } from '@element-plus/icons-vue'
 import HealthRecords from '@/views/myPets/components/health-records/HealthRecords.vue'
 import GrowthAlbum from '@/views/myPets/components/GrowthAlbum.vue'
 import FragmentCarousel from '@/views/myPets/components/FragmentCarousel.vue'
-import NavBar from '@/components/NavBar.vue'
+import NavBar from '@/components/common/NavBar.vue'
 enum PetGender {
   Male = 1,
   Female = 0,

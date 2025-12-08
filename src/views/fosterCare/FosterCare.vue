@@ -169,7 +169,7 @@
                                                         <div class="flex justify-between items-start">
                                                             <h3 class="font-bold text-lg text-gray-800">{{
                                                                 foster.name
-                                                            }}
+                                                                }}
                                                             </h3>
                                                             <span
                                                                 class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs">
@@ -182,15 +182,15 @@
                                                                 class="mr-2"></el-rate>
                                                             <span class="text-sm text-gray-600">({{
                                                                 foster.reviewCount
-                                                            }})</span>
+                                                                }})</span>
                                                         </div>
                                                         <p class="text-gray-600 text-sm mt-1 truncate">{{
                                                             foster.address
-                                                        }}
+                                                            }}
                                                         </p>
                                                         <div class="flex justify-between items-center mt-2">
                                                             <span class="text-blue-500 font-bold">{{ foster.price
-                                                            }}元/天</span>
+                                                                }}元/天</span>
                                                             <div class="flex items-center">
                                                                 <span class="text-xs text-gray-500 mr-2"
                                                                     v-if="currentLocation.lat">
@@ -250,7 +250,7 @@ import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { ElMessage, ElLoading, } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import AMapLoader from "@amap/amap-jsapi-loader";
-import NavBar from '@/components/NavBar.vue';
+import NavBar from '@/components/common/NavBar.vue';
 import { useRouter } from 'vue-router'
 import request from '@/utils/request';
 declare global {

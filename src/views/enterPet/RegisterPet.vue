@@ -29,8 +29,8 @@
                 <i class="layui-icon layui-icon-vercode"></i>
               </div>
               <input type="text" name="vercode" v-model="form.vercode"
-                @input="(e) => handleInput('vercode', (e.target?.value || ''))" lay-verify="required"
-                placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" />
+                @input="(e) => handleInput('vercode', (e.target as HTMLInputElement)?.value || '')"
+                lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" />
             </div>
           </div>
           <div class="layui-form-item">
@@ -39,7 +39,7 @@
                 <i class="layui-icon layui-icon-password"></i>
               </div>
               <input type="password" name="password" lay-verify="required|password" v-model="form.password"
-                @input="(e) => handleInput('password', (e.target?.value || ''))" placeholder="密码"
+                @input="(e) => handleInput('password', (e.target as HTMLInputElement)?.value || '')" placeholder="密码"
                 autocomplete="off" class="layui-input layui-input-password" id="reg-password" lay-affix="eye" />
             </div>
           </div>
@@ -49,7 +49,7 @@
                 <i class="layui-icon layui-icon-password"></i>
               </div>
               <input type="password" name="confirmPassword" lay-verify="required|confirmPassword" v-model="form.confirm"
-                @input="(e) => handleInput('confirm', (e.target?.value || ''))" placeholder="确认密码"
+                @input="(e) => handleInput('confirm', (e.target as HTMLInputElement)?.value || '')" placeholder="确认密码"
                 autocomplete="off" class="layui-input layui-input-password" lay-affix="eye" id="confirm-password" />
             </div>
           </div>
@@ -59,14 +59,14 @@
                 <i class="layui-icon layui-icon-username"></i>
               </div>
               <input type="text" name="nickname" lay-verify="required|nickname" placeholder="账号" v-model="form.name"
-                @input="(e) => handleInput('name', (e.target?.value || ''))" autocomplete="off"
+                @input="(e) => handleInput('name', (e.target as HTMLInputElement)?.value || '')" autocomplete="off"
                 class="layui-input" lay-affix="clear" />
             </div>
           </div>
           <div class="layui-form-item">
             <div class="agreement-item">
               <input v-model="isAgreed" @change="handleCheck" type="checkbox" id="agree" class="agreement-checkbox"
-                style="display: block"  lay-ignore/>
+                style="display: block" lay-ignore />
               <label class="agreement-label">
                 我已阅读并同意<span class="agreement-link" @click="toProtocal">用户服务协议</span>
               </label>
@@ -113,7 +113,7 @@ const isSending = ref(false)
 declare global {
   interface Window {
     layui: any
-     $: typeof jQuery; // 关联 jQuery 类型
+    $: typeof jQuery; // 关联 jQuery 类型
   }
 }
 // 响应式状态管理
@@ -172,18 +172,18 @@ const handleRegister = async () => {
     // 调用注册接口
     const response = await request(
       '/server/api/user/register',
-      'POST',      
-        {
-          email: form.email,
-          code: form.vercode,
-          password: form.password,
-          account: form.name,
-        },
+      'POST',
       {
-         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        email: form.email,
+        code: form.vercode,
+        password: form.password,
+        account: form.name,
+      },
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 
-      
-      }    )
+
+      })
     console.log(response)
     if (response.code === 0) {
       const { token, userId } = response.data
@@ -195,7 +195,7 @@ const handleRegister = async () => {
       // 注册成功后清空表单并跳转到登录页
       registerStore.clearForm()
       router.push('/foster-care')
-    } 
+    }
   } catch (error) {
     ElMessage.error('注册失败: ' + (error as Error).message)
   }
@@ -213,10 +213,10 @@ const SendVerificationCode = async (email: string) => {
       isSending.value = true
     }
 
-     const response = await request('/server/api/user/sendCode', 'POST', { email:  email }, {
+    const response = await request('/server/api/user/sendCode', 'POST', { email: email }, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
-   
+
     console.log(response)
     if (response.code == 0) {
       ElMessage.success('验证码发送成功')
@@ -230,7 +230,7 @@ const SendVerificationCode = async (email: string) => {
     }
   } catch (error) {
     ElMessage.error('发送验证码失败: ' + (error as Error).message)
-  } 
+  }
 }
 
 /**
@@ -242,7 +242,7 @@ onMounted(() => {
   if (window.layui) {
     isRegister.value = true
     window.layui.use(['form', 'layer', 'util'], function (form: any) {
-  setTimeout(() => {
+      setTimeout(() => {
         form.render()
       }, 100)
 
@@ -276,73 +276,73 @@ onMounted(() => {
           }
         },
       })
-    let isClickEye = false;
+      let isClickEye = false;
 
-// 监听小眼睛点击事件（阻止 blur 验证）
-$(document).on('mousedown', '.layui-icon-eye-invisible,.layui-icon-eye', function(e) {
-  isClickEye = true;
-    e.stopPropagation();
-  e.preventDefault();
-  // 延迟重置标记（避免影响后续正常 blur）
-  setTimeout(() => {
-    isClickEye = false;
-  }, 100);
-});
+      // 监听小眼睛点击事件（阻止 blur 验证）
+      $(document).on('mousedown', '.layui-icon-eye-invisible,.layui-icon-eye', function (e) {
+        isClickEye = true;
+        e.stopPropagation();
+        e.preventDefault();
+        // 延迟重置标记（避免影响后续正常 blur）
+        setTimeout(() => {
+          isClickEye = false;
+        }, 100);
+      });
       $('#reg-password').on('blur', function (this: HTMLElement) {
         if (isClickEye) {
-    isClickEye = false; // 重置标记
-    return;
-  }
-      
-      const $this = $(this)
+          isClickEye = false; // 重置标记
+          return;
+        }
+
+        const $this = $(this)
         const value = $this.val()?.toString().trim() || '';
-        
+
         // 如果输入框为空，则不进行验证，允许失去焦点
-        if (!value) { 
+        if (!value) {
           return
         }
-   
+
         $this.attr('lay-verify', 'password')
         const isValid = form.validate(this)
-        
+
 
         if (!isValid) {
           setTimeout(() => {
             this.focus()
           }, 10)
         }
-        
+
       })
 
       // 为确认密码框添加防重复验证机制
-     
+
       $('#confirm-password')
         .off('blur')
         .on('blur', function (this: HTMLElement) {
-              if (isClickEye) {
-      isClickEye = false;
-      return;
-    }
+          if (isClickEye) {
+            isClickEye = false;
+            return;
+          }
 
           const $this = $(this)
-           const value = $this.val()?.toString().trim() || '';
+          const value = $this.val()?.toString().trim() || '';
           // 如果输入框为空，则不进行验证，允许失去焦点
           if (!value) {
-         
+
             return
           }
-             $this.attr('lay-verify', 'confirmPassword')
+          $this.attr('lay-verify', 'confirmPassword')
           const isValid = form.validate(this)
-          
+
           // 如果验证失败，聚焦回输入框
           if (!isValid) {
             setTimeout(() => {
               this.focus()
             }, 10)
           }
-          
-        
-  
+
+
+
         })
 
       // 提交事件

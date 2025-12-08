@@ -13,21 +13,15 @@
               <div class="flex-1">
                 <div class="flex justify-between items-start mb-4">
                   <h1 class="text-2xl font-bold text-blue-500">{{ fosterHome.name }}</h1>
-                  <span
-                    class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium"
-                  >
+                  <span class="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">
                     {{ fosterHome.type }}
                   </span>
                 </div>
 
                 <!-- 评分 -->
                 <div class="flex items-center mb-4">
-                  <el-rate
-                    v-model="fosterHome.rating"
-                    disabled
-                    :colors="['#4A90E2', '#4A90E2', '#4A90E2']"
-                    class="mr-2"
-                  ></el-rate>
+                  <el-rate v-model="fosterHome.rating" disabled :colors="['#4A90E2', '#4A90E2', '#4A90E2']"
+                    class="mr-2"></el-rate>
                   <span class="text-blue-500 font-bold text-lg">{{ fosterHome.rating }}</span>
                   <span class="text-gray-500 ml-2">({{ fosterHome.reviewCount }}条评价)</span>
                 </div>
@@ -42,12 +36,8 @@
                 <div class="mb-4">
                   <h3 class="font-semibold text-gray-700 mb-2">资质认证</h3>
                   <div class="flex flex-wrap gap-2">
-                    <el-tag
-                      v-for="cert in fosterHome.certifications"
-                      :key="cert.type"
-                      :type="cert.verified ? 'success' : 'info'"
-                      class="rounded-full"
-                    >
+                    <el-tag v-for="cert in fosterHome.certifications" :key="cert.type"
+                      :type="cert.verified ? 'success' : 'info'" class="rounded-full">
                       <i :class="cert.icon" class="mr-1"></i>
                       {{ cert.name }}
                       <i v-if="cert.verified" class="el-icon-success ml-1"></i>
@@ -75,17 +65,11 @@
           <div class="cute-card p-6 bg-white mb-6">
             <h2 class="text-xl font-bold text-blue-500 mb-4">环境展示</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <div
-                v-for="(image, index) in fosterHome.images"
-                :key="index"
+              <div v-for="(image, index) in fosterHome.images" :key="index"
                 class="aspect-square rounded-xl overflow-hidden cursor-pointer border-2 border-blue-200 hover:border-blue-400 transition-all"
-                @click="showImagePreview(fosterHome.images, index)"
-              >
-                <img
-                  :src="image"
-                  :alt="`环境照片${index + 1}`"
-                  class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                />
+                @click="showImagePreview(fosterHome.images, index)">
+                <img :src="image" :alt="`环境照片${index + 1}`"
+                  class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
               </div>
             </div>
           </div>
@@ -94,11 +78,8 @@
             <h2 class="text-xl font-bold text-blue-500 mb-4">服务套餐</h2>
 
             <div class="grid grid-cols-1 gap-4">
-              <div
-                v-for="packageItem in fosterHome.servicePackages"
-                :key="packageItem.id"
-                class="border-2 border-blue-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer"
-              >
+              <div v-for="packageItem in fosterHome.servicePackages" :key="packageItem.id"
+                class="border-2 border-blue-200 rounded-xl p-4 hover:shadow-md transition-all cursor-pointer">
                 <!-- 基本信息 -->
                 <div class="flex justify-between items-start mb-3">
                   <div>
@@ -109,10 +90,7 @@
                     <div class="text-2xl font-bold text-blue-500">
                       {{ packageItem.basePrice }}<span class="text-base font-normal">元/天</span>
                     </div>
-                    <div
-                      class="text-sm"
-                      :class="packageItem.maxPets > 0 ? 'text-green-500' : 'text-red-500'"
-                    >
+                    <div class="text-sm" :class="packageItem.maxPets > 0 ? 'text-green-500' : 'text-red-500'">
                       {{ packageItem.maxPets > 0 ? `剩余${packageItem.maxPets}个名额` : '已满' }}
                     </div>
                   </div>
@@ -133,9 +111,7 @@
                 <div class="grid grid-cols-2 gap-3 text-sm">
                   <div class="flex items-center">
                     <i class="el-icon-guide mr-2 text-blue-400"></i>
-                    <span class="text-gray-600"
-                      >宠物类型：{{ packageItem.petTypes.join('、') }}</span
-                    >
+                    <span class="text-gray-600">宠物类型：{{ packageItem.petTypes.join('、') }}</span>
                   </div>
                   <!-- <div class="flex items-center">
                                         <i class="el-icon-time mr-2 text-blue-400"></i>
@@ -144,11 +120,7 @@
                 </div>
                 <!-- 点击预约 -->
                 <div class="mt-2 flex justify-end">
-                  <button
-                    class="cute-btn px-8"
-                    :disabled="packageItem.maxPets === 0"
-                    @click="goToBooking(packageItem)"
-                  >
+                  <button class="cute-btn px-8" :disabled="packageItem.maxPets === 0" @click="goToBooking(packageItem)">
                     <i class="el-icon-date mr-2"></i>
                     立即预订
                   </button>
@@ -167,30 +139,16 @@
                 <div class="text-center md:text-left mb-4 md:mb-0">
                   <div class="text-4xl font-bold text-blue-500">{{ fosterHome.rating }}</div>
                   <div class="text-gray-600">综合评分</div>
-                  <el-rate
-                    v-model="fosterHome.rating"
-                    disabled
-                    :colors="['#4A90E2', '#4A90E2', '#4A90E2']"
-                    class="mt-1"
-                  ></el-rate>
+                  <el-rate v-model="fosterHome.rating" disabled :colors="['#4A90E2', '#4A90E2', '#4A90E2']"
+                    class="mt-1"></el-rate>
                   <div class="text-gray-500 text-sm mt-1">{{ fosterHome.reviewCount }}条评价</div>
                 </div>
 
                 <div class="flex-1 md:px-8">
-                  <div
-                    v-for="item in ratingDetails"
-                    :key="item.name"
-                    class="flex items-center mb-2"
-                  >
+                  <div v-for="item in ratingDetails" :key="item.name" class="flex items-center mb-2">
                     <span class="w-20 text-gray-600 text-sm">{{ item.name }}</span>
-                    <el-rate
-                      v-model="item.score"
-                      disabled
-                      show-score
-                      :colors="['#4A90E2', '#4A90E2', '#4A90E2']"
-                      class="flex-1"
-                      score-template="{value}"
-                    ></el-rate>
+                    <el-rate v-model="item.score" disabled show-score :colors="['#4A90E2', '#4A90E2', '#4A90E2']"
+                      class="flex-1" score-template="{value}"></el-rate>
                   </div>
                 </div>
               </div>
@@ -305,6 +263,7 @@ import { ref, reactive, onMounted } from 'vue'
 // import { ElMessage } from 'element-plus'
 import { useRouter, useRoute } from 'vue-router'
 import { useBookingStore } from '@/stores/booking'
+import NavBar from '@/components/common/NavBar.vue';
 
 // 寄养家庭数据
 const fosterHome = reactive({

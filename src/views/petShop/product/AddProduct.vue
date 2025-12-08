@@ -11,47 +11,29 @@
         </p>
       </div>
 
-      <div
-        class="bg-white rounded-xl shadow-md p-6 md:p-8 transition-all duration-300 hover:shadow-lg"
-      >
+      <div class="bg-white rounded-xl shadow-md p-6 md:p-8 transition-all duration-300 hover:shadow-lg">
         <form @submit.prevent="handleSubmit" class="space-y-8">
 
-          <ProductBasicInfo
-            v-model:form="productForm"
-          />
+          <ProductBasicInfo v-model:form="productForm" />
 
 
-          <ProductImageUpload
-            v-model:mainImage="productForm.mainImage"
-            v-model:imagesList="productForm.imagesList"
-            v-model:videoUrl="productForm.videoUrl"
-          />
+          <ProductImageUpload v-model:mainImage="productForm.mainImage" v-model:imagesList="productForm.imagesList"
+            v-model:videoUrl="productForm.videoUrl" />
 
 
-          <ProductSkuConfig
-            v-model:skuList="skuList"
-          />
+          <ProductSkuConfig v-model:skuList="skuList" />
 
           <div class="flex justify-end space-x-4 pt-6 border-t border-yellow-100">
-            <el-button
-              size="default"
-              type="primary"
-              @click="handleReset"
-              class="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-none"
-            >
+            <el-button size="default" type="primary" @click="handleReset"
+              class="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-none">
               <template #icon>
                 <i class="fa fa-refresh mr-1"></i>
               </template>
               重置
             </el-button>
 
-            <el-button
-              size="default"
-              type="primary"
-              @click="handleSubmit"
-              class="bg-amber-600 text-white hover:bg-yellow-700 border-none"
-              :loading="isSubmitting"
-            >
+            <el-button size="default" type="primary" @click="handleSubmit"
+              class="bg-amber-600 text-white hover:bg-yellow-700 border-none" :loading="isSubmitting">
               <template #icon>
                 <i class="fa fa-check mr-1"></i>
               </template>
@@ -63,10 +45,8 @@
     </div>
 
     <teleport to="body">
-      <div
-        v-if="showMessage"
-        :class="['fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300', messageType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white']"
-      >
+      <div v-if="showMessage"
+        :class="['fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300', messageType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white']">
         <p class="flex items-center">
           <i :class="messageType === 'success' ? 'fa fa-check-circle mr-2' : 'fa fa-exclamation-circle mr-2'"></i>
           {{ message }}
@@ -79,7 +59,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import axios from 'axios'
-import {ProductBasicInfo } from './components/ProductBasicInfo.vue'
+import ProductBasicInfo from './components/ProductBasicInfo.vue'
 import ProductImageUpload from './components/ProductImageUpload.vue'
 import ProductSkuConfig from './components/ProductSkuConfig.vue'
 
@@ -190,27 +170,27 @@ const validateForm = (): boolean => {
 const handleSubmit = () => {
   if (!validateForm() || isSubmitting.value) return
   isSubmitting.value = true
-    const submitData = {
-      ...productForm,
-      images: productForm.imagesList.join(','),
-      skus: skuList.value
-    }
+  const submitData = {
+    ...productForm,
+    images: productForm.imagesList.join(','),
+    skus: skuList.value
+  }
 
   axios.request({
-      url: '/server/api/product/add',
-      method: 'POST',
-      data: submitData
-    })
-.then(response => {
+    url: '/server/api/product/add',
+    method: 'POST',
+    data: submitData
+  })
+    .then(response => {
       showToastMessage('商品添加成功！')
       console.log('商品添加成功:', response.data)
       handleReset()
-})
-.catch(error => {
+    })
+    .catch(error => {
       console.log('提交失败:', error.response?.data)
       showToastMessage('提交失败，请稍后重试。', 'error')
 
-  })
+    })
 }
 
 // 重置表单
@@ -236,14 +216,17 @@ const handleReset = () => {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #fffbeb;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #fde68a;
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #fbbf24;
 }

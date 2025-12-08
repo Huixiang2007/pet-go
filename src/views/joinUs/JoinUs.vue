@@ -41,6 +41,8 @@ import { ref, shallowRef, type Component } from 'vue'
 import BusinessEntry from '@/views/joinUs/components/BusinessEntry.vue'
 import OrganizationEntry from '@/views/joinUs/components/OrganizationEntry.vue'
 import FamilyEntry from '@/views/joinUs/components/FamilyEntry.vue'
+import NavBar from '@/components/common/NavBar.vue';
+
 interface TabItem {
   name: string
   icon: string

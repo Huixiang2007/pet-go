@@ -105,7 +105,7 @@ const isAnimating = ref(false)
 const router = useRouter()
 
 const goToPerson = () => {
-  router.push({ path: '/personal' })
+  router.push({ path: '/persons' })
 }
 // 设置活跃项
 const setActive = (index: number, bgColor: string) => {

@@ -2,11 +2,7 @@
   <div class="growth-album">
     <!-- 成长记录列表 -->
     <div class="growth-records">
-      <div
-        v-for="(record, index) in pet.growthRecords"
-        :key="index"
-        class="growth-record cute-card"
-      >
+      <div v-for="(record, index) in pet.growthRecords" :key="index" class="growth-record cute-card">
         <div class="record-header">
           <h4 class="record-age">🎯 {{ record.age }}</h4>
           <!-- <el-button type="danger" icon="Delete" size="small" @click="deleteGrowthRecord(index)" class="cute-btn">
@@ -18,12 +14,8 @@
         <div v-if="record.photos && record.photos.length" class="photos">
           <h5>📷 照片</h5>
           <div class="photos-grid">
-            <div
-              v-for="(photo, pIndex) in record.photos"
-              :key="pIndex"
-              class="photo-item"
-              @click="viewPhoto(record.age, pIndex)"
-            >
+            <div v-for="(photo, pIndex) in record.photos" :key="pIndex" class="photo-item"
+              @click="viewPhoto(record.age, pIndex)">
               <img :src="photo.src" :alt="`${record.age}的照片`" />
             </div>
           </div>
@@ -46,12 +38,7 @@
     </div>
 
     <!-- 图片查看器 -->
-    <el-dialog
-      v-model="photoViewerVisible"
-      :title="`${currentPhotoAge} - 照片`"
-      width="60%"
-      class="cute-dialog"
-    >
+    <el-dialog v-model="photoViewerVisible" :title="`${currentPhotoAge} - 照片`" width="60%" class="cute-dialog">
       <div class="photo-viewer">
         <img :src="currentPhoto" class="viewer-image" />
         <div v-if="currentPhotoDescription" class="photo-description">
@@ -66,70 +53,8 @@
 import { ref } from 'vue'
 // import { ElMessage, ElMessageBox } from 'element-plus';
 // import { Delete, Plus } from '@element-plus/icons-vue';
-enum PetGender {
-  Male = 1,
-  Female = 0,
-}
-enum SterilizationStatus {
-  Neutered = 1, // 已绝育
-  NotNeutered = 0, // 未绝育
-}
-type DateString = `${number}-${number}-${number}`
-interface HealthRecords {
-  // 疫苗
-  vaccine: Array<{
-    type: string
-    date: DateString
-    nextReminder?: DateString
-  }>
-  // 驱虫
-  deworming: Array<{
-    medicine: string
-    date: string
-    nextReminder?: string
-  }>
-  //病历
-  medical: Array<{
-    hospital: string
-    diagnosis: string //诊断
-    medicine: string
-    date: string
-  }>
-}
-interface Photos {
-  src: string
-  description: string
-  date: DateString
-}
-interface GrowthRecords {
-  age: string
-  photos: Photos[]
-}
-
-interface Pet {
-  id: number
-  userId: number
-  name: string
-  type: string
-  breed: string
-  avatar: string
-  gender: PetGender
-  birthday: DateString
-  age: string
-  weight: number
-  sterilization?: SterilizationStatus
-  healthStatus?: string
-  description?: string
-  specialNotes?: string
-  characterTags?: string[]
-  healthRecords?: HealthRecords
-  growthRecords?: GrowthRecords[]
-}
-interface Props {
-  pet: Pet
-}
-
-const props = defineProps<Props>()
+import type { Pet } from '@/types/pet'
+const props = defineProps<{ pet: Pet }>()
 console.log(props.pet)
 // const emit = defineEmits<{
 //   'add-record': [];

@@ -119,7 +119,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import request from '../../utils/request'
+import request from '@/utils/request'
 
 import { ElMessage } from 'element-plus'
 
@@ -596,7 +596,7 @@ body {
   margin: -19px auto 0;
 }
 
-::v-deep .forPicture {
+:deep( .forPicture) {
   background-image: url('../../assets/img/background1.png');
   height: 300px !important;
   background-color: var(--white);
@@ -719,13 +719,11 @@ body {
   }
 }
 
-::v-deep .layui-input {
+:deep(.layui-input){
   height: 40px;
-  /* 可以根据需要调整高度值，默认通常是 38px 左右 */
   line-height: 40px;
-  /* 保持行高与高度一致，使文字垂直居中 */
   font-size: 15px;
-  /* 可选：适当调整字体大小配合高度 */
+
 }
 
 .layui-btn {

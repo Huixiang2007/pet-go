@@ -49,6 +49,7 @@ declare module 'vue' {
     ElSlider: typeof import('element-plus/es')['ElSlider']
     ElStep: typeof import('element-plus/es')['ElStep']
     ElSteps: typeof import('element-plus/es')['ElSteps']
+    ElSubItem: typeof import('element-plus/es')['ElSubItem']
     ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
     ElSwitch: typeof import('element-plus/es')['ElSwitch']
     ElTable: typeof import('element-plus/es')['ElTable']
@@ -65,7 +66,7 @@ declare module 'vue' {
     FragmentCarousel: typeof import('./src/components/FragmentCarousel.vue')['default']
     GrowthAlbum: typeof import('./src/components/GrowthAlbum.vue')['default']
     HealthRecords: typeof import('./src/components/HealthRecords.vue')['default']
-    NavBar: typeof import('./src/components/NavBar.vue')['default']
+    NavBar: typeof import('./src/components/common/NavBar.vue')['default']
     OrganizationEntry: typeof import('./src/components/OrganizationEntry.vue')['default']
     RecordTable: typeof import('./src/components/RecordTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
@@ -75,7 +76,8 @@ declare module 'vue' {
     ShopCategoryNav: typeof import('./src/components/common/ShopCategoryNav.vue')['default']
     ShopFoot: typeof import('./src/components/common/ShopFoot.vue')['default']
     Sidebar: typeof import('./src/components/Sidebar.vue')['default']
-    UserHeader: typeof import('./src/components/UserHeader.vue')['default']
+    UserHeader: typeof import('./src/components/common/UserHeader.vue')['default']
+    UserSidebar: typeof import('./src/components/common/UserSidebar.vue')['default']
   }
   export interface GlobalDirectives {
     vInfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']

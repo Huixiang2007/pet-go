@@ -25,7 +25,7 @@
             <div class="nav-right">
               <el-button type="danger" icon="Delete" @click="deletePet(pet.id)" class="delete-btn cute-btn"
                 size="default">
-                弃养
+                删除
               </el-button>
             </div>
           </div>
@@ -49,7 +49,7 @@
                       </el-tag>
                     </div>
                     <div v-if="pet.sterilization" class="neutered-tag cute-tag">
-                      <el-tag type="success" size="small">🎗️ 已绝育</el-tag>
+                      <el-tag type="success" size="small">🎗️ {{ pet.sterilization }}</el-tag>
                     </div>
                   </div>
                 </div>
@@ -97,11 +97,8 @@
                   <div class="personality-section">
                     <h3 class="section-title">✨ 性格特点</h3>
                     <div class="tags-container">
-                      <!-- <el-tag v-for="tag in pet.characterTags" :key="tag" class="personality-tag" size="small">
-                        {{ tag }}
-                      </el-tag> -->
-                      <el-tag v-for="tag in pet.characterTags" :key="tag" :disable-transitions="false"
-                        @close="handleCloseTag(pet.id, tag)" style="
+
+                      <el-tag v-for="tag in pet.characterTags" :key="tag" :disable-transitions="false" style="
                           background-color: #e3f2fd;
                           color: #2196f3;
                           padding: 0.5rem 0.9rem;
@@ -127,7 +124,7 @@
                   </div>
                   <!-- 编辑按钮-->
                   <div class="edit-btn-container">
-                    <el-button icon="Edit" size="small" class="edit-btn cute-btn" @click="openEditDialog(pet)">
+                    <el-button icon="Edit" size="small" class="edit-btn cute-btn" @click="openEditPage(pet.id)">
                       编辑信息
                     </el-button>
                   </div>
@@ -141,12 +138,12 @@
                 <el-tabs v-model="activeTabs[pet.id]" class="detail-tabs">
                   <!-- 健康档案 -->
                   <el-tab-pane label="🏥 健康档案" name="health">
-                    <HealthRecords :pet="pet" />
+                    <HealthRecords :pet="pet" @update-pet-health="updatePetHealth" />
                   </el-tab-pane>
 
                   <!-- 成长记录 -->
                   <el-tab-pane label="📸 成长记录" name="growth">
-                    <GrowthAlbum :pet="pet" @add-record="openAddGrowthRecord(pet)" />
+                    <GrowthAlbum :pet="pet" />
                   </el-tab-pane>
                 </el-tabs>
               </div>
@@ -188,7 +185,7 @@
     </el-button>
 
     <!-- 添加成长记录对话框 -->
-    <el-dialog v-model="showAddGrowthDialog" title="📸 添加成长记录" width="500px" class="cute-dialog">
+    <!-- <el-dialog v-model="showAddGrowthDialog" title="📸 添加成长记录" width="500px" class="cute-dialog">
       <el-form :model="newGrowthRecord" label-width="80px">
         <el-form-item label="年龄阶段">
           <el-input v-model="newGrowthRecord.age" placeholder="如：0-1岁、1-2岁" />
@@ -198,47 +195,8 @@
         <el-button @click="showAddGrowthDialog = false">取消</el-button>
         <el-button type="primary" class="cute-btn">确认添加</el-button>
       </template>
-    </el-dialog>
-    <el-dialog v-model="showEditDialog" title="✏️ 编辑宠物信息" width="500px" class="cute-dialog edit-dialog">
-      <el-form :model="editForm" label-width="100px" class="edit-form" :rules="editRules" ref="editFormRef">
-        <el-form-item label="宠物名称" prop="name">
-          <el-input v-model="editForm.name" placeholder="输入宠物名字" class="cute-input" />
-        </el-form-item>
+</el-dialog> -->
 
-        <el-form-item label="生日" prop="birthday">
-          <el-date-picker v-model="editForm.birthday" type="date" placeholder="选择生日" format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD" class="cute-input" />
-        </el-form-item>
-
-        <el-form-item label="品种" prop="breed">
-          <el-input v-model="editForm.breed" placeholder="输入品种" class="cute-input" />
-        </el-form-item>
-
-        <el-form-item label="体重 (kg)" prop="weight">
-          <el-input v-model="editForm.weight" type="number" placeholder="输入体重" step="0.1" class="cute-input" />
-        </el-form-item>
-
-        <el-form-item label="健康状态" prop="healthStatus">
-          <el-select v-model="editForm.healthStatus" placeholder="选择健康状态" class="cute-input">
-            <el-option label="健康" value="健康" />
-            <el-option label="良好" value="良好" />
-            <el-option label="注意" value="注意" />
-            <el-option label="生病" value="生病" />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="绝育状态">
-          <el-switch v-model="editForm.sterilization" active-text="已绝育" inactive-text="未绝育" active-color="#FF69B4" />
-        </el-form-item>
-      </el-form>
-
-      <template #footer>
-        <el-button @click="showEditDialog = false" class="cancel-btn">取消</el-button>
-        <el-button type="primary" @click="confirmEdit" class="confirm-btn cute-btn">
-          保存修改
-        </el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -247,8 +205,9 @@ import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowUp, ArrowDown, Plus, Male, Female } from '@element-plus/icons-vue'
-import type { FormInstance } from 'element-plus'
-import HealthRecords from '@/views/myPets/components/HealthRecords.vue'
+// import type { FormInstance } from 'element-plus'
+// import request from '@/utils/request'
+import HealthRecords from '@/views/myPets/components/health-records/HealthRecords.vue'
 import GrowthAlbum from '@/views/myPets/components/GrowthAlbum.vue'
 import FragmentCarousel from '@/views/myPets/components/FragmentCarousel.vue'
 import NavBar from '@/components/NavBar.vue'
@@ -280,6 +239,8 @@ interface HealthRecords {
     diagnosis: string //诊断
     medicine: string
     date: string
+    nextReminder?: string
+
   }>
 }
 interface Photos {
@@ -305,11 +266,9 @@ interface Pet {
   birthday: DateString
   age: string
   weight: number
-  sterilization?: SterilizationStatus
-  healthStatus?: string
-  description?: string
-  specialNotes?: string
-  characterTags?: string[]
+  sterilization: SterilizationStatus
+  healthStatus: string
+  characterTags: string[]
   healthRecords?: HealthRecords
   growthRecords?: Growth
 }
@@ -319,8 +278,7 @@ const router = useRouter()
 //记录当前索引,-1表示轮播图区域
 const currentScreen = ref(0)
 const pets = ref<Pet[]>([])
-const showAddGrowthDialog = ref(false)
-const currentEditingPet = ref<Pet | null>(null)
+
 //总屏幕数
 const totalScreens = computed(() => 1 + pets.value.length)
 //滚动偏移量(当前屏幕索引*100vh)
@@ -360,72 +318,7 @@ const handleWheel = (e: WheelEvent) => {
     scrollToPrevScreen()
   }
 }
-//根据id寻找宠物对象
-const getPetById = (id: number) => {
-  return pets.value.find((pet) => pet.id === id)
-}
-// 删除一个性格标签
-const handleCloseTag = (id: number, tag: string) => {
-  const pet = getPetById(id)
-  const characterTags = ref(pet?.characterTags)
-  characterTags.value?.splice(characterTags.value.indexOf(tag), 1)
-}
-// 显示添加性格输入框
-// const tagInputValue = ref('')//输入框绑定的值（新增标签里面的内容）
-// const tagInputVisible = ref<Record<number, boolean>>({});
-// const InputRef = ref<Record<number, InputInstance | null>>({});//获取 el-input 组件实例的 ref
 
-// 设置输入框 ref 的辅助函数
-// const setInputRef = (id: number) => {
-//   return (el: any) => {
-//     if (el) {
-//       InputRef.value[id] = el as InputInstance
-//     }
-//   }
-// }
-
-// const showAddTagInput = (id: number) => {
-//   tagInputVisible.value[id] = true
-//   //确保输入框渲染后再聚焦
-//   nextTick(() => {
-//     const currentInput = InputRef.value[id]
-//     if (currentInput) {
-//       // 方法1: 尝试使用 Element Plus Input 组件的 focus 方法
-//       if (typeof (currentInput as any).focus === 'function') {
-//         (currentInput as any).focus()
-//       } else {
-//         // 方法2: 通过 $el 访问内部的 input 元素
-//         const inputElement = currentInput.$el?.querySelector('.el-input__inner') as HTMLInputElement | null
-//         if (inputElement) {
-//           inputElement.focus()
-//         } else {
-//           console.error('未找到 .el-input__inner 元素')
-//         }
-//       }
-//     }
-//   })
-// }
-// //确认输入标签
-// const handleInputConfirm = (id: number) => {
-//   //过滤空值
-//   if (!tagInputValue.value.trim()) {
-//     tagInputVisible.value[id] = false
-//     tagInputValue.value = ''
-//     return;
-//   }
-//   const pet = getPetById(id)
-//   if (pet) {
-//     //防止undefined
-//     if (!pet.characterTags) pet.characterTags = []
-//     //避免添加重复的标签
-//     if (!pet.characterTags?.includes(tagInputValue.value)) {
-//       pet.characterTags.push(tagInputValue.value)
-//     }
-
-//   }
-//   tagInputVisible.value[id] = false
-//   tagInputValue.value = ''
-// }
 // 获取宠物对应的emoji
 const getPetEmoji = (pet: Pet) => {
   if (pet.breed.includes('金毛')) return '🐕'
@@ -479,87 +372,10 @@ const deletePet = async (petId: number) => {
     // 用户取消删除
   }
 }
-//添加新的成长记录
-const newGrowthRecord = ref({
-  age: '',
-})
-//添加成长记录对应的图片
-// const addGrowthImg = ref({
-//   photos: [] as Array<Photos>
-// })
 
-// 打开添加成长记录对话框
-const openAddGrowthRecord = (pet: Pet) => {
-  currentEditingPet.value = pet
-  // 重置表单
-  Object.assign(newGrowthRecord, {
-    age: '',
-    photos: [],
-  })
-  showAddGrowthDialog.value = true
-}
 
-// 确认添加成长记录
-// const confirmAddGrowthRecord = () => {
-
-//   if (currentEditingPet.value) {
-//     const pet = pets.value.find(p => p.id === currentEditingPet.value!.id);
-//     if (pet) {
-//       pet.growthRecords?.push({
-//         age: newGrowthRecord.value.age,
-//         photos: [
-//           {
-//             date:'2025-11-20',
-//             description: newGrowthRecord.description,
-//             src: newGrowthRecord.photos
-//           }
-//         ]
-
-//       });
-//       ElMessage.success('成长记录添加成功！');
-//       showAddGrowthDialog.value = false;
-//     }
-//   }
-// };
-// 编辑相关状态
-const showEditDialog = ref(false)
-const editFormRef = ref<FormInstance | null>(null)
-const currentEditPet = ref<Pet | null>(null)
-const editForm = ref({
-  name: '',
-  birthday: '',
-  breed: '',
-  weight: 0,
-  healthStatus: '',
-  sterilization: 0,
-})
-
-// 表单验证规则
-const editRules = ref({
-  name: [{ required: true, message: '请输入宠物名称', trigger: 'blur' }],
-  breed: [{ required: true, message: '请输入品种', trigger: 'blur' }],
-  weight: [{ required: true, message: '请输入体重', trigger: 'blur' }],
-  healthStatus: [{ required: true, message: '请选择健康状态', trigger: 'change' }],
-})
-
-// 打开编辑弹窗
-const openEditDialog = (pet: Pet) => {
-  currentEditPet.value = pet
-  // 初始化表单数据
-  editForm.value = {
-    name: pet.name,
-    birthday: pet.birthday,
-    breed: pet.breed,
-    weight: pet.weight,
-    healthStatus: pet.healthStatus || '',
-    sterilization: pet.sterilization || 0,
-  }
-  showEditDialog.value = true
-}
-
-// 确认修改
-const confirmEdit = async () => {
-  showEditDialog.value = false
+const updatePetHealth = async (petId: number, type: 'vaccine' | 'deworming' | 'medical', newRecords: any[]) => {
+  console.log(petId, type, newRecords)
 }
 const activeTabs = reactive<Record<number, string>>({})
 
@@ -569,112 +385,131 @@ const initialize = () => {
     activeTabs[pet.id] = 'health'
   })
 }
+const openEditPage = (petId: number) => {
+  router.push({
+    path: `/pet-edit/${petId}`,
 
+  })
+}
 const loadPets = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 500))
+  const userId = localStorage.getItem('userId')
+  try {
+    // const response = await request(
+    //   `/server/api/pet/${userId}`,
+    //   'GET',
 
-  pets.value = [
-    {
-      id: 1,
-      userId: 3,
-      name: 'Lucky',
-      type: 'DOG',
-      age: '3',
-      breed: '金毛寻回犬',
-      birthday: '2020-05-15',
-      gender: 1,
-      weight: 32.5,
-      avatar: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&h=300&fit=crop',
-      characterTags: ['活泼', '友好', '粘人', '聪明', '贪吃'],
-      sterilization: 1,
-      healthStatus: '健康',
-      healthRecords: {
-        vaccine: [
-          { type: '狂犬病疫苗', date: '2023-03-10', nextReminder: '2024-03-10' },
-          { type: '六联疫苗', date: '2023-01-15', nextReminder: '2024-01-15' },
-        ],
-        deworming: [{ medicine: '体内驱虫片', date: '2023-05-20', nextReminder: '2023-08-20' }],
-        medical: [
+    // )
+    // pets.value = response.data
+    // console.log('获取宠物成功:', pets)
+
+    pets.value = [
+      {
+        id: 1,
+        userId: Number(userId),
+        name: 'Lucky',
+        type: '狗',
+        age: '3',
+        breed: '金毛寻回犬',
+        birthday: '2020-05-15',
+        gender: 1,
+        weight: 32.5,
+        avatar: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&h=300&fit=crop',
+        characterTags: ['活泼', '友好', '粘人', '聪明', '贪吃'],
+        sterilization: 1,
+        healthStatus: '健康',
+        healthRecords: {
+          vaccine: [
+            { type: '狂犬病疫苗', date: '2023-03-10', nextReminder: '2024-03-10' },
+            { type: '六联疫苗', date: '2023-01-15', nextReminder: '2024-01-15' },
+          ],
+          deworming: [{ medicine: '体内驱虫片', date: '2023-05-20', nextReminder: '2023-08-20' }],
+          medical: [
+            {
+              hospital: '爱心宠物医院',
+              diagnosis: '轻微皮炎',
+              medicine: '皮肤药膏',
+              date: '2022-11-05',
+              nextReminder: '2023-08-20'
+            },
+          ],
+        },
+        growthRecords: [
           {
-            hospital: '爱心宠物医院',
-            diagnosis: '轻微皮炎',
-            medicine: '皮肤药膏',
-            date: '2022-11-05',
+            age: '0-1岁',
+            photos: [
+              {
+                date: '2022-09-01',
+                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+                description: '第一次出门散步',
+              },
+            ],
+          },
+          {
+            age: '1-2岁',
+            photos: [
+              {
+                date: '2022-09-01',
+                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+                description: '第一次出门散步',
+              },
+              {
+                date: '2022-09-01',
+                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+                description: '第一次出门散步',
+              },
+              {
+                date: '2022-09-01',
+                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+                description: '第一次出门散步',
+              },
+              {
+                date: '2022-09-01',
+                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+                description: '第一次出门散步',
+              },
+            ],
           },
         ],
       },
-      growthRecords: [
-        {
-          age: '0-1岁',
-          photos: [
-            {
-              date: '2022-09-01',
-              src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-              description: '第一次出门散步',
-            },
-          ],
+      {
+        id: 2,
+        userId: 1,
+        name: 'Momo',
+        type: 'cat',
+        breed: '布偶猫',
+        age: '5个月',
+        birthday: '2021-08-22',
+        gender: 0,
+        weight: 4.2,
+        avatar: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300&h=300&fit=crop',
+        characterTags: ['安静', '优雅', '胆小', '爱干净'],
+        sterilization: 1,
+        healthStatus: '良好',
+        healthRecords: {
+          vaccine: [{ type: '猫三联', date: '2023-02-28', nextReminder: '2024-02-28' }],
+          deworming: [{ medicine: '体外驱虫滴剂', date: '2023-06-05', nextReminder: '2023-09-05' }],
+          medical: [],
         },
-        {
-          age: '1-2岁',
-          photos: [
-            {
-              date: '2022-09-01',
-              src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-              description: '第一次出门散步',
-            },
-            {
-              date: '2022-09-01',
-              src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-              description: '第一次出门散步',
-            },
-            {
-              date: '2022-09-01',
-              src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-              description: '第一次出门散步',
-            },
-            {
-              date: '2022-09-01',
-              src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-              description: '第一次出门散步',
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 2,
-      userId: 1,
-      name: 'Momo',
-      type: 'cat',
-      breed: '布偶猫',
-      age: '5个月',
-      birthday: '2021-08-22',
-      gender: 0,
-      weight: 4.2,
-      avatar: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300&h=300&fit=crop',
-      characterTags: ['安静', '优雅', '胆小', '爱干净'],
-      sterilization: 1,
-      healthStatus: '良好',
-      healthRecords: {
-        vaccine: [{ type: '猫三联', date: '2023-02-28', nextReminder: '2024-02-28' }],
-        deworming: [{ medicine: '体外驱虫滴剂', date: '2023-06-05', nextReminder: '2023-09-05' }],
-        medical: [],
+        growthRecords: [
+          {
+            age: '0-1岁',
+            photos: [
+              {
+                date: '2022-09-01',
+                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+                description: '第一次出门散步',
+              },
+            ],
+          },
+        ],
       },
-      growthRecords: [
-        {
-          age: '0-1岁',
-          photos: [
-            {
-              date: '2022-09-01',
-              src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-              description: '第一次出门散步',
-            },
-          ],
-        },
-      ],
-    },
-  ]
-  initialize()
+    ]
+    initialize()
+
+  } catch (error) {
+    console.error('Error loading pets:', error)
+  }
+
 }
 
 // 生命周期

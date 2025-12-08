@@ -12,7 +12,6 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddressSelect: typeof import('./src/components/business/AddressSelect.vue')['default']
-    BusinessEntry: typeof import('./src/components/BusinessEntry.vue')['default']
     CaptchaLoad: typeof import('./src/components/common/CaptchaLoad.vue')['default']
     ConfirmCode: typeof import('./src/components/common/ConfirmCode.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
@@ -57,15 +56,8 @@ declare module 'vue' {
     ElTimePicker: typeof import('element-plus/es')['ElTimePicker']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
-    FamilyEntry: typeof import('./src/components/FamilyEntry.vue')['default']
     FileUpload: typeof import('./src/components/common/FileUpload.vue')['default']
-    FlashSaleProduct: typeof import('./src/components/FlashSaleProduct.vue')['default']
-    FragmentCarousel: typeof import('./src/components/FragmentCarousel.vue')['default']
-    GrowthAlbum: typeof import('./src/components/GrowthAlbum.vue')['default']
-    HealthRecords: typeof import('./src/components/HealthRecords.vue')['default']
     NavBar: typeof import('./src/components/NavBar.vue')['default']
-    OrganizationEntry: typeof import('./src/components/OrganizationEntry.vue')['default']
-    RecordTable: typeof import('./src/components/RecordTable.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SellerManHeader: typeof import('./src/components/common/SellerManHeader.vue')['default']

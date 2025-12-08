@@ -3,27 +3,18 @@
     <el-tabs v-model="activeHealthTab" type="border-card">
       <el-tab-pane label="💉 疫苗记录" name="vaccine">
         <!-- 向子组件传递数据records和列配置columes -->
-        <RecordTable
-          :columns="vaccineColumns"
-          @add-record="addRecord('vaccine')"
-          @edit-record="editRecord()"
-        />
+        <VaccineRecords :records="pet.healthRecords?.vaccine" :columns="vaccineColumns"
+          @update-records="updateHealthRecords('vaccine', $event)" />
       </el-tab-pane>
 
       <el-tab-pane label="🧼 驱虫记录" name="deworming">
-        <RecordTable
-          :columns="dewormingColumns"
-          @add-record="addRecord('deworming')"
-          @edit-record="editRecord()"
-        />
+        <DewormRecords :records="pet.healthRecords?.deworming" :columns="dewormingColumns"
+          @update-records="updateHealthRecords('vaccine', $event)" />
       </el-tab-pane>
 
       <el-tab-pane label="🏥 病历记录" name="medical">
-        <RecordTable
-          :columns="medicalColumns"
-          @add-record="addRecord('medical')"
-          @edit-record="editRecord()"
-        />
+        <MedicineRecords :records="pet.healthRecords?.medical" :columns="medicalColumns"
+          @update-records="updateHealthRecords('vaccine', $event)" />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -31,8 +22,10 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import RecordTable from './RecordTable.vue'
+import DewormRecords from './DewormRecords.vue'
+import MedicineRecords from './MedicineRecords.vue'
+import VaccineRecords from './VaccineRecords.vue'
+
 enum PetGender {
   Male = 1,
   Female = 0,
@@ -60,7 +53,8 @@ interface HealthRecords {
     hospital: string
     diagnosis: string //诊断
     medicine: string
-    date: string
+    date: string,
+    nextReminder?: string
   }>
 }
 interface Photos {
@@ -86,11 +80,9 @@ interface Pet {
   birthday: DateString
   age: string
   weight: number
-  sterilization?: SterilizationStatus
-  healthStatus?: string
-  description?: string
-  specialNotes?: string
-  characterTags?: string[]
+  sterilization: SterilizationStatus
+  healthStatus: string
+  characterTags: string[]
   healthRecords?: HealthRecords
   growthRecords?: Growth
 }
@@ -120,12 +112,11 @@ const medicalColumns = [
   { prop: 'medicine', label: '用药' },
   { prop: 'date', label: '日期' },
 ]
+const emit = defineEmits<{
+  'update-pet-health': [petId: number, type: 'vaccine' | 'deworming' | 'medical', records: any[]]
+}>()
 
-// 添加记录
-const addRecord = (type: string) => {
-  ElMessage.info(`添加${type}记录功能开发中...`)
+const updateHealthRecords = (type: 'vaccine' | 'deworming' | 'medical', newRecords: any[]) => {
+  emit('update-pet-health', props.pet.id, type, newRecords)
 }
-
-// 编辑记录
-const editRecord = () => {}
 </script>

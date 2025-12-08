@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, computed } from 'vue'
+import { computed } from 'vue'
 type DateString = `${number}-${number}-${number}`
 interface HealthRecords {
     // 疫苗
@@ -45,7 +45,8 @@ interface HealthRecords {
         hospital: string
         diagnosis: string //诊断
         medicine: string
-        date: string
+        date: string,
+        nextReminder: string
     }>
 }
 interface TableColumn {
@@ -62,7 +63,8 @@ const props = defineProps<{
 //     'add-record': [];
 //     'edit-record': [index: number];
 // }>();
-console.log(props.records)
+console.log('records', props.records)
+console.log('columns', props.columns)
 const formattedRecords = computed(() => {
     return props.records?.map((record) => {
         console.log(record)

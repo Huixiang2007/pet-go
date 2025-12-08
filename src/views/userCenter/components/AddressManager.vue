@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import {  defineEmits, ref, onMounted, watch } from 'vue'
+import {  ref, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 import AddressSelect from '@/components/business/AddressSelect.vue'
@@ -336,7 +336,7 @@ const handleDelete = (id: string) => {
 // 设为默认地址
 const handleSetDefault = async (id: string) => {
   try {
-    const response = await request('/server/api/user/setDefaultUserAddress', 'POST', { id }, {
+    const response = await request('/server/api/user/setDefaultUserAddress', 'POST', { id:id }, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
     if (response.code === 0) {

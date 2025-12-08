@@ -8,6 +8,7 @@
 import HealthRecordsTable from './HealthRecordsTable.vue'
 
 interface Medical {
+    id?: number
     hospital: string
     diagnosis: string //诊断
     medicine: string

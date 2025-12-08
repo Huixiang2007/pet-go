@@ -27,12 +27,7 @@
                 <strong class="ml-2 text-lg">选择寄养宠物</strong>
               </div>
               <el-select v-model="selectedPetId" placeholder="选择宠物">
-                <el-option
-                  v-for="item in myPets"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
+                <el-option v-for="item in myPets" :key="item.id" :label="item.name" :value="item.id" />
               </el-select>
             </div>
 
@@ -44,15 +39,8 @@
                 </el-icon>
                 <span>备注</span>
               </div>
-              <el-input
-                v-model="textarea"
-                maxlength="100"
-                show-word-limit
-                style="width: 100%; min-width: 500px"
-                type="textarea"
-                resize="none"
-                placeholder="请填写宠物的特殊要求，比如宠物的疾病、过敏史、特殊需求等"
-              />
+              <el-input v-model="textarea" maxlength="100" show-word-limit style="width: 100%; min-width: 500px"
+                type="textarea" resize="none" placeholder="请填写宠物的特殊要求，比如宠物的疾病、过敏史、特殊需求等" />
             </div>
             <!-- 上传疫苗本 -->
             <div class="section">
@@ -65,17 +53,9 @@
               </div>
 
               <div class="upload-section">
-                <el-upload
-                  class="vaccine-upload"
-                  drag
-                  :http-request="handleLocalUpload"
-                  :before-upload="beforeUpload"
-                  :file-list="vaccineFiles"
-                  multiple
-                  accept=".jpg,.jpeg,.png,.pdf"
-                  :auto-upload="true"
-                  :show-file-list="false"
-                >
+                <el-upload class="vaccine-upload" drag :http-request="handleLocalUpload" :before-upload="beforeUpload"
+                  :file-list="vaccineFiles" multiple accept=".jpg,.jpeg,.png,.pdf" :auto-upload="true"
+                  :show-file-list="false">
                   <el-icon class="el-icon--upload">
                     <UploadFilled />
                   </el-icon>
@@ -138,18 +118,12 @@
               </div>
 
               <div class="preview-grid">
-                <div
-                  v-for="(day, index) in previewDays"
-                  :key="index"
-                  class="preview-day"
-                  :class="{
-                    available: day.spots > 0,
-                    unavailable: day.spots === 0,
-                    selected: isDaySelected(day.date),
-                    today: isToday(day.date),
-                  }"
-                  @click="onPreviewDayClick(day)"
-                >
+                <div v-for="(day, index) in previewDays" :key="index" class="preview-day" :class="{
+                  available: day.spots > 0,
+                  unavailable: day.spots === 0,
+                  selected: isDaySelected(day.date),
+                  today: isToday(day.date),
+                }" @click="onPreviewDayClick(day)">
                   <div class="day-number">{{ day.displayDate }}</div>
                   <div class="day-spots" v-if="day.spots > 0">空位：{{ day.spots }}</div>
                   <div class="day-full" v-else>满</div>
@@ -197,7 +171,7 @@
                 </h4>
                 <div class="info-item">
                   <span class="label">宠物名称：</span>
-                  <span class="value">{{ myPets.find((p) => p.id === selectedPetId)?.name }}</span>
+                  <span class="value">{{myPets.find((p) => p.id === selectedPetId)?.name}}</span>
                 </div>
                 <div class="info-item">
                   <span class="label">特殊备注：</span>
@@ -225,9 +199,7 @@
                 </h4>
                 <div class="info-item">
                   <span class="label">寄养时间：</span>
-                  <span class="value"
-                    >{{ formatDisplayDate(startDate) }} 至 {{ formatDisplayDate(endDate) }}</span
-                  >
+                  <span class="value">{{ formatDisplayDate(startDate) }} 至 {{ formatDisplayDate(endDate) }}</span>
                 </div>
                 <div class="info-item">
                   <span class="label">寄养天数：</span>
@@ -243,10 +215,8 @@
                 </h4>
                 <div class="info-item">
                   <span class="label">基础费用：</span>
-                  <span class="value"
-                    >{{ selectedPackage?.basePrice || 0 }} × {{ calculateStayDays() }} =
-                    {{ (selectedPackage?.basePrice || 0) * calculateStayDays() }} 元</span
-                  >
+                  <span class="value">{{ selectedPackage?.basePrice || 0 }} × {{ calculateStayDays() }} =
+                    {{ (selectedPackage?.basePrice || 0) * calculateStayDays() }} 元</span>
                 </div>
 
                 <div class="info-item total">
@@ -308,10 +278,7 @@
             </div>
             <!-- 服务协议 -->
             <div class="service-agreement">
-              <el-checkbox
-                v-model="agreedToTerms"
-                :class="{ 'checkbox-error': !agreedToTerms && isStepValidated[4] }"
-              >
+              <el-checkbox v-model="agreedToTerms" :class="{ 'checkbox-error': !agreedToTerms && isStepValidated[4] }">
                 我已阅读并同意
                 <el-link type="primary" @click="showAgreement = true">《宠物寄养服务协议》</el-link>
               </el-checkbox>
@@ -340,40 +307,24 @@
         </div>
       </div>
       <div class="step-actions">
-        <el-button
-          v-if="currentStep > 1 && currentStep < 5"
-          @click="previousStep"
-          :disabled="processing"
-          class="prev-btn"
-        >
+        <el-button v-if="currentStep > 1 && currentStep < 5" @click="previousStep" :disabled="processing"
+          class="prev-btn">
           <el-icon>
             <ArrowLeft />
           </el-icon>
           上一步
         </el-button>
 
-        <el-button
-          v-if="currentStep < 4"
-          type="primary"
-          @click="nextStep"
-          :loading="processing"
-          :disabled="!canProceed"
-          class="next-btn"
-        >
+        <el-button v-if="currentStep < 4" type="primary" @click="nextStep" :loading="processing" :disabled="!canProceed"
+          class="next-btn">
           下一步
           <el-icon>
             <ArrowRight />
           </el-icon>
         </el-button>
 
-        <el-button
-          v-if="currentStep === 4"
-          type="success"
-          @click="confirmPayment"
-          :loading="processing"
-          :disabled="!canConfirmPayment"
-          class="pay-btn"
-        >
+        <el-button v-if="currentStep === 4" type="success" @click="confirmPayment" :loading="processing"
+          :disabled="!canConfirmPayment" class="pay-btn">
           <el-icon>
             <Check />
           </el-icon>
@@ -413,6 +364,7 @@ import { ref, computed, onMounted, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useBookingStore } from '@/stores/booking'
 import { useRoute, onBeforeRouteLeave, useRouter } from 'vue-router'
+import NavBar from '@/components/common/NavBar.vue';
 
 const router = useRouter()
 const currentStep = ref(1)

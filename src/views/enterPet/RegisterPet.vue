@@ -1,7 +1,7 @@
 <template>
   <div class="demo-goLogin demo-login">
     <transition name="box-animation">
-      <form class="layui-form demo-login-container" v-if="isRegister">
+      <form class="layui-form demo-login-container" v-if="isRegister" @submit.prevent="handleSubmit">
         <div class="container">
           <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
 
@@ -28,9 +28,10 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-vercode"></i>
               </div>
-              <input type="text" name="vercode" v-model="form.vercode"
-                @input="(e) => handleInput('vercode', (e.target?.value || ''))" lay-verify="required"
-                placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" />
+             <input type="text" name="vercode" v-model="form.vercode"
+                lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" 
+                :class="{ 'error-border': errors.vercode }" />
+              <div v-if="errors.vercode" class="error-text">{{ errors.vercode }}</div>
             </div>
           </div>
           <div class="layui-form-item">
@@ -38,9 +39,15 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-              <input type="password" name="password" lay-verify="required|password" v-model="form.password"
-                @input="(e) => handleInput('password', (e.target?.value || ''))" placeholder="密码"
-                autocomplete="off" class="layui-input layui-input-password" id="reg-password" lay-affix="eye" />
+               <input :type="passwordVisible ? 'text' : 'password'" name="password" lay-verify="required|password" v-model="form.password"
+                placeholder="密码" autocomplete="off" class="layui-input layui-input-password" id="reg-password"
+                :class="{ 'error-border': errors.password }" @blur="validatePassword" />
+                 <div class="layui-input-suffix">
+                <i class="layui-icon" 
+                  :class="passwordVisible ? 'layui-icon-eye' : 'layui-icon-eye-invisible'" 
+                  @click="togglePasswordVisibility('password')"></i>
+              </div>
+              <div v-if="errors.password" class="error-text">{{ errors.password }}</div>
             </div>
           </div>
           <div class="layui-form-item">
@@ -48,9 +55,15 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-              <input type="password" name="confirmPassword" lay-verify="required|confirmPassword" v-model="form.confirm"
-                @input="(e) => handleInput('confirm', (e.target?.value || ''))" placeholder="确认密码"
-                autocomplete="off" class="layui-input layui-input-password" lay-affix="eye" id="confirm-password" />
+              <input :type="confirmPasswordVisible ? 'text' : 'password'" name="confirmPassword" lay-verify="required|confirmPassword" v-model="form.confirm"
+                placeholder="确认密码" autocomplete="off" class="layui-input layui-input-password" id="confirm-password"
+                :class="{ 'error-border': errors.confirm }" @blur="validateConfirmPassword" />
+              <div class="layui-input-suffix">
+                <i class="layui-icon" 
+                  :class="confirmPasswordVisible ? 'layui-icon-eye' : 'layui-icon-eye-invisible'" 
+                  @click="togglePasswordVisibility('confirm')"></i>
+              </div>
+              <div v-if="errors.confirm" class="error-text">{{ errors.confirm }}</div>
             </div>
           </div>
           <div class="layui-form-item">
@@ -59,14 +72,15 @@
                 <i class="layui-icon layui-icon-username"></i>
               </div>
               <input type="text" name="nickname" lay-verify="required|nickname" placeholder="账号" v-model="form.name"
-                @input="(e) => handleInput('name', (e.target?.value || ''))" autocomplete="off"
-                class="layui-input" lay-affix="clear" />
+                autocomplete="off" class="layui-input" lay-affix="clear"
+                :class="{ 'error-border': errors.name }" @blur="validateNickname" />
+              <div v-if="errors.name" class="error-text">{{ errors.name }}</div>
             </div>
           </div>
           <div class="layui-form-item">
             <div class="agreement-item">
-              <input v-model="isAgreed" @change="handleCheck" type="checkbox" id="agree" class="agreement-checkbox"
-                style="display: block"  lay-ignore/>
+              <input v-model="isAgreed" type="checkbox" id="agree" class="agreement-checkbox"
+                style="display: block" lay-ignore />
               <label class="agreement-label">
                 我已阅读并同意<span class="agreement-link" @click="toProtocal">用户服务协议</span>
               </label>
@@ -76,7 +90,7 @@
             </p>
           </div>
           <div class="layui-form-item">
-            <button class="layui-btn btn-donate" lay-submit lay-filter="demo-reg">
+            <button class="layui-btn btn-donate" type="submit">
               注册
             </button>
           </div>
@@ -91,17 +105,23 @@
 
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useRegisterStore } from '@/stores/register'
-import type { RegisterForm } from '@/stores/register'
 import ConfirmCode from '@/components/common/ConfirmCode.vue'
 import request from '@/utils/request'
 
 interface ConfirmCodeExposed {
   startCountdown: () => void;
-  // 其他需要的方法/属性也可以加在这里
 }
+
+interface FormErrors {
+  vercode?: string;
+  password?: string;
+  confirm?: string;
+  name?: string;
+}
+
 const ConfirmCodeRef = ref<InstanceType<typeof ConfirmCode> & ConfirmCodeExposed | null>(null);
 const registerStore = useRegisterStore()
 const router = useRouter()
@@ -110,114 +130,167 @@ const isRegister = ref(false)
 const form = registerStore.form
 const titleRegisterChars = '欢迎注册 PetGo'.split('')
 const isSending = ref(false)
-declare global {
-  interface Window {
-    layui: any
-     $: typeof jQuery; // 关联 jQuery 类型
+const isAgreed = ref(false)
+const showError = ref(false)
+const registerActive = ref(false)
+const errors = reactive<FormErrors>({})
+const passwordVisible = ref(false)
+const confirmPasswordVisible = ref(false)
+
+// 表单验证规则
+const validateEmail = () => {
+  const qqEmailReg = /^[1-9]\d+@qq\.com$/
+  if (!form.email) {
+    return '请输入QQ邮箱'
+  }
+  if (!qqEmailReg.test(form.email)) {
+    return '请输入正确的QQ邮箱格式'
+  }
+  return ''
+}
+// 切换密码可见性
+const togglePasswordVisibility = (field: 'password' | 'confirm') => {
+  if (field === 'password') {
+    passwordVisible.value = !passwordVisible.value
+  } else {
+    confirmPasswordVisible.value = !confirmPasswordVisible.value
   }
 }
-// 响应式状态管理
-const isAgreed = ref(false) // 协议勾选状态
-const showError = ref(false) // 错误提示显示状态
-const registerActive = ref(false) // 注册按钮激活状态
-const handleInput = (key: keyof RegisterForm, value: string) => {
-  // 调用Store的setField方法，更新对应字段（key必须是form中定义的：phone/vercode等）
-  registerStore.setField(key, value)
-}
-// 定时器管理（避免内存泄漏）
-let hideErrorTimer: NodeJS.Timeout | null = null
-
-/**
- * 处理协议勾选状态变化
- */
-const handleCheck = () => {
-  // 勾选时立即隐藏错误提示
-  if (isAgreed.value) {
-    showError.value = false
-    if (hideErrorTimer) clearTimeout(hideErrorTimer)
-    return
+const validateVercode = () => {
+  if (!form.vercode) {
+    return '请填写验证码'
   }
-
-  // 未勾选时显示错误提示并定时隐藏
-  showError.value = true
-  if (hideErrorTimer) clearTimeout(hideErrorTimer) // 清除旧定时器，防止多次触发
-  hideErrorTimer = setTimeout(() => {
-    showError.value = false
-    hideErrorTimer = null // 清空定时器引用
-  }, 3000)
+  return ''
 }
 
-/**
- * 处理注册逻辑
- */
-const handleRegister = async () => {
+const validatePassword = () => {
+  const passwordReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/
+  if (!form.password) {
+    errors.password = '请填写密码'
+    return false
+  }
+  if (!passwordReg.test(form.password)) {
+    errors.password = '密码需8-20位，包含大小写字母、数字和特殊字符'
+    return false
+  }
+  errors.password = ''
+  return true
+}
+
+const validateConfirmPassword = () => {
+  if (!form.confirm) {
+    errors.confirm = '请确认密码'
+    return false
+  }
+  if (form.confirm !== form.password) {
+    errors.confirm = '两次密码输入不一致'
+    return false
+  }
+  errors.confirm = ''
+  return true
+}
+
+const validateNickname = () => {
+  const nicknameReg = /^[a-zA-Z][a-zA-Z0-9]{5,19}$/
+  if (!form.name) {
+    errors.name = '请输入账号'
+    return false
+  }
+  if (!nicknameReg.test(form.name)) {
+    errors.name = '账号必须是6-20位字母、数字，首位不能为数字'
+    return false
+  }
+  errors.name = ''
+  return true
+}
+
+const validateForm = () => {
+  // 清除之前错误
+  Object.keys(errors).forEach(key => {
+    delete errors[key as keyof FormErrors]
+  })
+  
+  // 验证所有字段
+  const isPasswordValid = validatePassword()
+  const isConfirmValid = validateConfirmPassword()
+  const isNicknameValid = validateNickname()
+  
+  errors.vercode = validateVercode()
+  
+  return isPasswordValid && isConfirmValid && isNicknameValid && !errors.vercode
+}
+
+const handleSubmit = async () => {
   if (registerActive.value) return
   registerActive.value = true
-  if (!form.email || !form.vercode || !form.password || !form.confirm || !form.name) {
+  
+  // 校验表单
+  if (!validateForm()) {
+    registerActive.value = false
     return
   }
+  
   // 校验协议勾选状态
   if (!isAgreed.value) {
     showError.value = true
-    if (hideErrorTimer) clearTimeout(hideErrorTimer)
-    hideErrorTimer = setTimeout(() => {
+    setTimeout(() => {
       showError.value = false
-      hideErrorTimer = null
     }, 3000)
+    registerActive.value = false
     return
   }
+  
   try {
-
-
     // 调用注册接口
     const response = await request(
       '/server/api/user/register',
-      'POST',      
-        {
-          email: form.email,
-          code: form.vercode,
-          password: form.password,
-          account: form.name,
-        },
+      'POST',
       {
-         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-
-      
-      }    )
-    console.log(response)
+        email: form.email,
+        code: form.vercode,
+        password: form.password,
+        account: form.name,
+      },
+      {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      })
+    
     if (response.code === 0) {
       const { token, userId } = response.data
-
+      
       // 存储token到localStorage
       localStorage.setItem('authToken', token)
       localStorage.setItem('userId', userId)
       ElMessage.success('注册成功')
+      
       // 注册成功后清空表单并跳转到登录页
       registerStore.clearForm()
       router.push('/foster-care')
-    } 
+    } else {
+      ElMessage.error(response.msg || '注册失败')
+    }
   } catch (error) {
     ElMessage.error('注册失败: ' + (error as Error).message)
+  } finally {
+    registerActive.value = false
   }
 }
 
-//发送验证码
+// 发送验证码
 const SendVerificationCode = async (email: string) => {
   try {
-    const qqEmailReg = /^[1-9]\d+@qq\.com$/
-    if (!qqEmailReg.test(email)) {
-      ElMessage.error('请输入正确的QQ邮箱格式')
+    const errorMsg = validateEmail()
+    if (errorMsg) {
+      ElMessage.error(errorMsg)
       return
     }
-    if (ConfirmCodeRef.value) {
-      isSending.value = true
-    }
-
-     const response = await request('/server/api/user/sendCode', 'POST', { email:  email }, {
+    
+    isSending.value = true
+    
+    const response = await request('/server/api/user/sendCode', 'POST', { email: email }, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
-   
-    console.log(response)
+    
     if (response.code == 0) {
       ElMessage.success('验证码发送成功')
       setTimeout(() => {
@@ -230,139 +303,19 @@ const SendVerificationCode = async (email: string) => {
     }
   } catch (error) {
     ElMessage.error('发送验证码失败: ' + (error as Error).message)
-  } 
+  } finally {
+    isSending.value = false
+  }
 }
 
-/**
- * 初始化 Layui 组件（在组件挂载后执行）
- */
+
+
 onMounted(() => {
-  // 确保 Layui 已加载
-
-  if (window.layui) {
-    isRegister.value = true
-    window.layui.use(['form', 'layer', 'util'], function (form: any) {
-  setTimeout(() => {
-        form.render()
-      }, 100)
-
-      form.config.verifyOnBlur = true
-      // 自定义验证规则
-      form.verify({
-        QQemail: function (value: string) {
-          const qqEmailReg = /^[1-9]\d+@qq\.com$/
-          if (!qqEmailReg.test(value)) {
-            return '请输入正确的QQ邮箱格式'
-          }
-        },
-        nickname: function (value: string) {
-          if (!value) {
-            return '请输入账号'
-          }
-          const nicknameReg = /^[a-zA-Z][a-zA-Z0-9]{5,19}$/
-          if (!nicknameReg.test(value)) {
-            return '账号必须是6-20位字母、数字，首位不能为数字'
-          }
-        },
-        // 确认密码
-        password: [
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/, // 正则表达式
-          '密码需8-20位，包含大小写字母、数字和特殊字符',
-        ],
-        confirmPassword: function (value: string) {
-          const passwordValue = $('#reg-password').val()
-          if (value !== passwordValue) {
-            return '两次密码输入不一致'
-          }
-        },
-      })
-    let isClickEye = false;
-
-// 监听小眼睛点击事件（阻止 blur 验证）
-$(document).on('mousedown', '.layui-icon-eye-invisible,.layui-icon-eye', function(e) {
-  isClickEye = true;
-    e.stopPropagation();
-  e.preventDefault();
-  // 延迟重置标记（避免影响后续正常 blur）
-  setTimeout(() => {
-    isClickEye = false;
-  }, 100);
-});
-      $('#reg-password').on('blur', function (this: HTMLElement) {
-        if (isClickEye) {
-    isClickEye = false; // 重置标记
-    return;
-  }
-      
-      const $this = $(this)
-        const value = $this.val()?.toString().trim() || '';
-        
-        // 如果输入框为空，则不进行验证，允许失去焦点
-        if (!value) { 
-          return
-        }
-   
-        $this.attr('lay-verify', 'password')
-        const isValid = form.validate(this)
-        
-
-        if (!isValid) {
-          setTimeout(() => {
-            this.focus()
-          }, 10)
-        }
-        
-      })
-
-      // 为确认密码框添加防重复验证机制
-     
-      $('#confirm-password')
-        .off('blur')
-        .on('blur', function (this: HTMLElement) {
-              if (isClickEye) {
-      isClickEye = false;
-      return;
-    }
-
-          const $this = $(this)
-           const value = $this.val()?.toString().trim() || '';
-          // 如果输入框为空，则不进行验证，允许失去焦点
-          if (!value) {
-         
-            return
-          }
-             $this.attr('lay-verify', 'confirmPassword')
-          const isValid = form.validate(this)
-          
-          // 如果验证失败，聚焦回输入框
-          if (!isValid) {
-            setTimeout(() => {
-              this.focus()
-            }, 10)
-          }
-          
-        
   
-        })
-
-      // 提交事件
-      form.on('submit(demo-reg)', function () {
-        // 获取表单字段值
-
-        // 是否勾选同意
-        if (!isAgreed.value) {
-          return false
-        }
-        // 调用注册接口
-        handleRegister()
-
-        return false // 阻止默认 form 跳转
-      })
-    })
-    const agreementCheck = route.query.isAgreed === 'true'
-    if (agreementCheck) {
-      isAgreed.value = true
-    }
+  isRegister.value = true
+  const agreementCheck = route.query.isAgreed === 'true'
+  if (agreementCheck) {
+    isAgreed.value = true
   }
 })
 
@@ -370,21 +323,44 @@ $(document).on('mousedown', '.layui-icon-eye-invisible,.layui-icon-eye', functio
  * 组件卸载时清理资源（防止内存泄漏）
  */
 onUnmounted(() => {
-  if (hideErrorTimer) {
-    clearTimeout(hideErrorTimer)
-    hideErrorTimer = null
-  }
+  // 清理工作已经在onUnmounted中完成
 })
 
 const toLogin = () => {
   router.push('/login')
 }
+
 const toProtocal = () => {
   router.push('/protocal')
 }
 </script>
 
 <style scoped>
+
+
+.layui-input-suffix {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #999;
+    z-index: 10; /* 确保图标在输入框上方 */
+  pointer-events: auto; /* 确保可以接收点击事件 */
+  cursor: pointer;
+}
+
+.layui-input-suffix .layui-icon {
+  font-size: 18px;
+}
+
+.layui-input-wrap {
+  position: relative;
+}
+
+.layui-input {
+  padding-right: 30px;
+}
 .btn-donate {
   --clr-font-main: hsla(0 0% 20% / 100);
   --btn-bg-1: hsla(165, 80%, 60%, 1);
@@ -535,6 +511,20 @@ const toProtocal = () => {
 .layui-input:focus {
   border-color: rgb(253, 152, 96) !important;
   box-shadow: 0 0 3px 1px rgba(253, 152, 96, 0.3) !important;
+}
+
+.error-border {
+  border-color: #F56C6C !important;
+}
+
+.error-text {
+    top: -9px;
+    position: relative;
+    height: 10px;
+    color: #f44f4f;
+    font-size: 12px;
+    margin-top: 2px;
+    text-align: left;
 }
 
 .layui-checkbox:hover .layui-checkbox {

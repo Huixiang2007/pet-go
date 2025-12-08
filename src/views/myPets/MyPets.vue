@@ -40,12 +40,12 @@
                     <img :src="pet.avatar" :alt="pet.name" class="pet-avatar" />
                     <div class="avatar-frame"></div>
                     <div class="gender-tag cute-tag">
-                      <el-tag :type="pet.gender === 1 ? 'primary' : 'danger'" size="small">
+                      <el-tag :type="pet.gender === '公' ? 'primary' : 'danger'" size="small">
                         <el-icon class="mr-1">
-                          <Male v-if="pet.gender === 1" />
+                          <Male v-if="pet.gender === '公'" />
                           <Female v-else />
                         </el-icon>
-                        {{ pet.gender === 1 ? '小王子' : '小公主' }}
+                        {{ pet.gender === '公' ? '小王子' : '小公主' }}
                       </el-tag>
                     </div>
                     <div v-if="pet.sterilization" class="neutered-tag cute-tag">
@@ -206,72 +206,12 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowUp, ArrowDown, Plus, Male, Female } from '@element-plus/icons-vue'
 // import type { FormInstance } from 'element-plus'
-// import request from '@/utils/request'
+import request from '@/utils/request'
 import HealthRecords from '@/views/myPets/components/health-records/HealthRecords.vue'
 import GrowthAlbum from '@/views/myPets/components/GrowthAlbum.vue'
 import FragmentCarousel from '@/views/myPets/components/FragmentCarousel.vue'
-import NavBar from '@/components/NavBar.vue'
-enum PetGender {
-  Male = 1,
-  Female = 0,
-}
-enum SterilizationStatus {
-  Neutered = 1, // 已绝育
-  NotNeutered = 0, // 未绝育
-}
-type DateString = `${number}-${number}-${number}`
-interface HealthRecords {
-  // 疫苗
-  vaccine: Array<{
-    type: string
-    date: DateString
-    nextReminder?: DateString
-  }>
-  // 驱虫
-  deworming: Array<{
-    medicine: string
-    date: string
-    nextReminder?: string
-  }>
-  //病历
-  medical: Array<{
-    hospital: string
-    diagnosis: string //诊断
-    medicine: string
-    date: string
-    nextReminder?: string
-
-  }>
-}
-interface Photos {
-  src: string
-  description: string
-  date: DateString
-}
-interface GrowthRecords {
-  age: string
-  photos: Array<Photos>
-}
-//定义Growth为GrowthRecord类型的数组
-type Growth = GrowthRecords[]
-
-interface Pet {
-  id: number
-  userId: number
-  name: string
-  type: string
-  breed: string
-  avatar: string
-  gender: PetGender
-  birthday: DateString
-  age: string
-  weight: number
-  sterilization: SterilizationStatus
-  healthStatus: string
-  characterTags: string[]
-  healthRecords?: HealthRecords
-  growthRecords?: Growth
-}
+import NavBar from '@/components/common/NavBar.vue'
+import type { Pet } from '@/types/pet'
 const router = useRouter()
 
 // 状态管理
@@ -324,7 +264,7 @@ const getPetEmoji = (pet: Pet) => {
   if (pet.breed.includes('金毛')) return '🐕'
   if (pet.breed.includes('布偶')) return '🐱'
   if (pet.breed.includes('柯基')) return '🐶'
-  return pet.gender === 1 ? '🐾' : '🌸'
+  return pet.gender === '公' ? '🐾' : '🌸'
 }
 
 // 格式化日期
@@ -374,7 +314,7 @@ const deletePet = async (petId: number) => {
 }
 
 
-const updatePetHealth = async (petId: number, type: 'vaccine' | 'deworming' | 'medical', newRecords: any[]) => {
+const updatePetHealth = async (petId: number, type: '疫苗' | '驱虫' | '病历', newRecords: any) => {
   console.log(petId, type, newRecords)
 }
 const activeTabs = reactive<Record<number, string>>({})
@@ -394,116 +334,116 @@ const openEditPage = (petId: number) => {
 const loadPets = async () => {
   const userId = localStorage.getItem('userId')
   try {
-    // const response = await request(
-    //   `/server/api/pet/${userId}`,
-    //   'GET',
+    const response = await request(
+      `/server/api/pet/${userId}`,
+      'GET',
 
-    // )
-    // pets.value = response.data
-    // console.log('获取宠物成功:', pets)
+    )
+    pets.value = response.data
+    console.log('获取宠物成功:', pets)
 
-    pets.value = [
-      {
-        id: 1,
-        userId: Number(userId),
-        name: 'Lucky',
-        type: '狗',
-        age: '3',
-        breed: '金毛寻回犬',
-        birthday: '2020-05-15',
-        gender: 1,
-        weight: 32.5,
-        avatar: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&h=300&fit=crop',
-        characterTags: ['活泼', '友好', '粘人', '聪明', '贪吃'],
-        sterilization: 1,
-        healthStatus: '健康',
-        healthRecords: {
-          vaccine: [
-            { type: '狂犬病疫苗', date: '2023-03-10', nextReminder: '2024-03-10' },
-            { type: '六联疫苗', date: '2023-01-15', nextReminder: '2024-01-15' },
-          ],
-          deworming: [{ medicine: '体内驱虫片', date: '2023-05-20', nextReminder: '2023-08-20' }],
-          medical: [
-            {
-              hospital: '爱心宠物医院',
-              diagnosis: '轻微皮炎',
-              medicine: '皮肤药膏',
-              date: '2022-11-05',
-              nextReminder: '2023-08-20'
-            },
-          ],
-        },
-        growthRecords: [
-          {
-            age: '0-1岁',
-            photos: [
-              {
-                date: '2022-09-01',
-                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-                description: '第一次出门散步',
-              },
-            ],
-          },
-          {
-            age: '1-2岁',
-            photos: [
-              {
-                date: '2022-09-01',
-                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-                description: '第一次出门散步',
-              },
-              {
-                date: '2022-09-01',
-                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-                description: '第一次出门散步',
-              },
-              {
-                date: '2022-09-01',
-                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-                description: '第一次出门散步',
-              },
-              {
-                date: '2022-09-01',
-                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-                description: '第一次出门散步',
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: 2,
-        userId: 1,
-        name: 'Momo',
-        type: 'cat',
-        breed: '布偶猫',
-        age: '5个月',
-        birthday: '2021-08-22',
-        gender: 0,
-        weight: 4.2,
-        avatar: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300&h=300&fit=crop',
-        characterTags: ['安静', '优雅', '胆小', '爱干净'],
-        sterilization: 1,
-        healthStatus: '良好',
-        healthRecords: {
-          vaccine: [{ type: '猫三联', date: '2023-02-28', nextReminder: '2024-02-28' }],
-          deworming: [{ medicine: '体外驱虫滴剂', date: '2023-06-05', nextReminder: '2023-09-05' }],
-          medical: [],
-        },
-        growthRecords: [
-          {
-            age: '0-1岁',
-            photos: [
-              {
-                date: '2022-09-01',
-                src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-                description: '第一次出门散步',
-              },
-            ],
-          },
-        ],
-      },
-    ]
+    // pets.value = [
+    //   {
+    //     id: 1,
+    //     userId: Number(userId),
+    //     name: 'Lucky',
+    //     type: '狗',
+    //     age: 3,
+    //     breed: '金毛寻回犬',
+    //     birthday: '2020-05-15',
+    //     gender: "公",
+    //     weight: 32.5,
+    //     avatar: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&h=300&fit=crop',
+    //     characterTags: ['活泼', '友好', '粘人', '聪明', '贪吃'],
+    //     sterilization: '已绝育',
+    //     healthStatus: '健康',
+    //     healthRecords: {
+    //       vaccine: [
+    //         { type: '狂犬病疫苗', date: '2023-03-10', nextReminder: '2024-03-10' },
+    //         { type: '六联疫苗', date: '2023-01-15', nextReminder: '2024-01-15' },
+    //       ],
+    //       deworming: [{ medicine: '体内驱虫片', date: '2023-05-20', nextReminder: '2023-08-20' }],
+    //       medical: [
+    //         {
+    //           hospital: '爱心宠物医院',
+    //           diagnosis: '轻微皮炎',
+    //           medicine: '皮肤药膏',
+    //           date: '2022-11-05',
+    //           nextReminder: '2023-08-20'
+    //         },
+    //       ],
+    //     },
+    //     growthRecords: [
+    //       {
+    //         age: '0-1岁',
+    //         photos: [
+    //           {
+    //             date: '2022-09-01',
+    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+    //             description: '第一次出门散步',
+    //           },
+    //         ],
+    //       },
+    //       {
+    //         age: '1-2岁',
+    //         photos: [
+    //           {
+    //             date: '2022-09-01',
+    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+    //             description: '第一次出门散步',
+    //           },
+    //           {
+    //             date: '2022-09-01',
+    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+    //             description: '第一次出门散步',
+    //           },
+    //           {
+    //             date: '2022-09-01',
+    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+    //             description: '第一次出门散步',
+    //           },
+    //           {
+    //             date: '2022-09-01',
+    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+    //             description: '第一次出门散步',
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     id: 2,
+    //     userId: 1,
+    //     name: 'Momo',
+    //     type: 'cat',
+    //     breed: '布偶猫',
+    //     age: '5个月',
+    //     birthday: '2021-08-22',
+    //     gender: 0,
+    //     weight: 4.2,
+    //     avatar: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300&h=300&fit=crop',
+    //     characterTags: ['安静', '优雅', '胆小', '爱干净'],
+    //     sterilization: 1,
+    //     healthStatus: '良好',
+    //     healthRecords: {
+    //       vaccine: [{ type: '猫三联', date: '2023-02-28', nextReminder: '2024-02-28' }],
+    //       deworming: [{ medicine: '体外驱虫滴剂', date: '2023-06-05', nextReminder: '2023-09-05' }],
+    //       medical: [],
+    //     },
+    //     growthRecords: [
+    //       {
+    //         age: '0-1岁',
+    //         photos: [
+    //           {
+    //             date: '2022-09-01',
+    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
+    //             description: '第一次出门散步',
+    //           },
+    //         ],
+    //       },
+    //     ],
+    //   },
+    // ]
     initialize()
 
   } catch (error) {

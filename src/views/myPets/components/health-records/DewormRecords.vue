@@ -8,6 +8,7 @@ import HealthRecordsTable from './HealthRecordsTable.vue'
 
 // import { computed } from 'vue'
 interface Deworming {
+    id?: number
     medicine: string
     date: string
     nextReminder?: string

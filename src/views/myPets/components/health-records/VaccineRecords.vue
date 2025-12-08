@@ -4,14 +4,14 @@
     <el-dialog v-model="showAddDialog" title="💉 添加疫苗记录" width="450px" class="cute-dialog">
         <el-form :model="newVaccineRecord" label-width="80px" class="cute-input">
             <el-form-item label="疫苗类型" required>
-                <el-input v-model="newVaccineRecord.type" placeholder="如：狂犬病疫苗、六联疫苗" />
+                <el-input v-model="newVaccineRecord.vaccineType" placeholder="如：狂犬病疫苗、六联疫苗" />
             </el-form-item>
             <el-form-item label="接种时间" required>
                 <el-date-picker v-model="newVaccineRecord.date" type="date" format="YYYY-MM-DD"
                     value-format="YYYY-MM-DD" placeholder="选择接种日期" />
             </el-form-item>
             <el-form-item label="下次提醒">
-                <el-date-picker v-model="newVaccineRecord.nextReminder" type="date" format="YYYY-MM-DD"
+                <el-date-picker v-model="newVaccineRecord.nextReminderDate" type="date" format="YYYY-MM-DD"
                     value-format="YYYY-MM-DD" placeholder="选择下次提醒日期" />
             </el-form-item>
         </el-form>
@@ -23,14 +23,14 @@
     <el-dialog v-model="showEditDialog" title="✏️ 编辑疫苗记录" width="450px" class="cute-dialog">
         <el-form :model="editVaccineRecord" label-width="80px" class="cute-input">
             <el-form-item label="疫苗类型" required>
-                <el-input v-model="editVaccineRecord.type" placeholder="如：狂犬病疫苗、六联疫苗" />
+                <el-input v-model="editVaccineRecord.vaccineType" placeholder="如：狂犬病疫苗、六联疫苗" />
             </el-form-item>
             <el-form-item label="接种时间" required>
                 <el-date-picker v-model="editVaccineRecord.date" type="date" format="YYYY-MM-DD"
                     value-format="YYYY-MM-DD" placeholder="选择接种日期" />
             </el-form-item>
             <el-form-item label="下次提醒">
-                <el-date-picker v-model="editVaccineRecord.nextReminder" type="date" format="YYYY-MM-DD"
+                <el-date-picker v-model="editVaccineRecord.nextReminderDate" type="date" format="YYYY-MM-DD"
                     value-format="YYYY-MM-DD" placeholder="选择下次提醒日期" />
             </el-form-item>
         </el-form>
@@ -48,9 +48,10 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 type DateString = `${number}-${number}-${number}`
 interface Vaccine {
-    type: string
+    id?: number
+    vaccineType: string
     date: DateString
-    nextReminder?: DateString
+    nextReminderDate?: DateString
 }
 interface TableColumn {
     prop: string
@@ -63,31 +64,33 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-    'update-records': [records: Vaccine[]];
+    'add-records': [record: Vaccine];
+    'update-records': [records: Vaccine];
 }>();
 const showAddDialog = ref(false)
 const showEditDialog = ref(false)
 const currentEditIndex = ref(-1)
 //添加疫苗记录
 const newVaccineRecord = ref<Vaccine>({
-    type: '',
+    vaccineType: '',
     date: '' as DateString,
-    nextReminder: '' as DateString
+    nextReminderDate: '' as DateString
 
 })
 //编辑疫苗记录
 const editVaccineRecord = ref<Vaccine>({
-    type: '',
+    id: 0,
+    vaccineType: '',
     date: '' as DateString,
-    nextReminder: undefined
+    nextReminderDate: '' as DateString
 })
 //打开添加弹窗
 const openAddDialog = () => {
     //重置
     newVaccineRecord.value = {
-        type: '',
+        vaccineType: '',
         date: '' as DateString,
-        nextReminder: '' as DateString
+        nextReminderDate: '' as DateString
     }
     showAddDialog.value = true
 }
@@ -95,33 +98,31 @@ const openAddDialog = () => {
 const openEditDialog = (index: number) => {
     // 拷贝数据
     currentEditIndex.value = index
-    editVaccineRecord.value = { ...props.records[index] }
+    editVaccineRecord.value = props.records[index]
     showEditDialog.value = true
 }
 //确认添加
 const confirmAdd = () => {
-    if (!newVaccineRecord.value.type || !newVaccineRecord.value.date) {
+    if (!newVaccineRecord.value.vaccineType || !newVaccineRecord.value.date) {
         ElMessage.warning('请填写必填项！')
         return
     }
-    const newRecords = props.records ? [...props.records, newVaccineRecord.value] : [newVaccineRecord.value]
-    emit('update-records', newRecords)
+
+    emit('add-records', newVaccineRecord.value)
     ElMessage.success('疫苗记录添加成功！')
     showAddDialog.value = false
 
 }
 //确认编辑
 const confirmEdit = () => {
-    if (!editVaccineRecord.value.type || !editVaccineRecord.value.date) {
+    if (!editVaccineRecord.value.vaccineType || !editVaccineRecord.value.date) {
         ElMessage.warning('请填写必填项！')
         return
     }
-    if (!props.records || currentEditIndex.value === -1) return
-    // 替换原记录
-    const newRecords = [...props.records]
-    newRecords[currentEditIndex.value] = editVaccineRecord.value
+
+    const newRecords = editVaccineRecord.value
+    console.log('newRecords', newRecords)
     emit('update-records', newRecords) // 通知父组件更新
-    ElMessage.success('疫苗记录修改成功！')
     showEditDialog.value = false
 }
 console.log(props, emit)

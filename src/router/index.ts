@@ -265,13 +265,13 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '找回密码', requiresAuth: false },
   },
   //个人中心
-  {
-    path: '/person',
-    name: 'PersonalCenter',
-    component: () => import('@/views/user/PersonalCenter.vue'),
-    meta: { title: '个人中心', requiresAuth: true },
-  },
-    //个人中心组件版
+  // {
+  //   path: '/persons',
+  //   name: 'PersonalCenter',
+  //   component: () => import('@/views/user/PersonalCenter.vue'),
+  //   meta: { title: '个人中心', requiresAuth: true },
+  // },
+  //个人中心组件版
   {
     path: '/persons',
     name: 'PersonalCenter',
@@ -285,11 +285,11 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '后台管理', requiresAuth: true },
     children: [
       // 数据概览
-       {
-      path: '', // 空路径 = /admin 默认子路由
-      redirect: '/admin/data', // 等价于 /admin/data
-       name: 'homePage',
-    },
+      {
+        path: '', // 空路径 = /admin 默认子路由
+        redirect: '/admin/data', // 等价于 /admin/data
+        name: 'homePage',
+      },
       {
         path: 'data',
         name: 'dashboard',
@@ -336,66 +336,66 @@ const routes: RouteRecordRaw[] = [
           },
         ],
       },
-       // 补全电商管理路由
-    // {
-    //   path: 'mall',
-    //   name: 'mall',
-    //   redirect: '/admin/mall/goods',
-    //   meta: { title: '宠物电商管理', icon: 'el-icon-shop' },
-    //   children: [
-    //     {
-    //       path: 'goods',
-    //       name: 'mallGoods',
-    //       component: () => import('@/views/admin/components/AllGoods.vue'), // 替换为实际路径
-    //       meta: { title: '商品管理' },
-    //     },
-    //     {
-    //       path: 'order',
-    //       name: 'mallOrder',
-    //       component: () => import('@/views/admin/components/AllMallOrder.vue'), // 替换为实际路径
-    //       meta: { title: '订单管理' },
-    //     },
-    //     {
-    //       path: 'stock',
-    //       name: 'mallStock',
-    //       component: () => import('@/views/admin/components/AllStock.vue'), // 替换为实际路径
-    //       meta: { title: '库存管理' },
-    //     },
-    //     {
-    //       path: 'coupon',
-    //       name: 'mallCoupon',
-    //       component: () => import('@/views/admin/components/AllCoupon.vue'), // 替换为实际路径
-    //       meta: { title: '优惠券管理' },
-    //     },
-    //   ],
-    // },
-    // // 补全系统管理路由
-    // {
-    //   path: 'system',
-    //   name: 'system',
-    //   redirect: '/admin/system/notice',
-    //   meta: { title: '系统管理', icon: 'el-icon-setting' },
-    //   children: [
-    //     {
-    //       path: 'notice',
-    //       name: 'systemNotice',
-    //       component: () => import('@/views/admin/components/AllNotice.vue'), // 替换为实际路径
-    //       meta: { title: '通知发布' },
-    //     },
-    //     {
-    //       path: 'role',
-    //       name: 'systemRole',
-    //       component: () => import('@/views/admin/components/AllRole.vue'), // 替换为实际路径
-    //       meta: { title: '角色权限管理' },
-    //     },
-    //     {
-    //       path: 'log',
-    //       name: 'systemLog',
-    //       component: () => import('@/views/admin/components/AllLog.vue'), // 替换为实际路径
-    //       meta: { title: '操作日志查询' },
-    //     },
-    //   ],
-    // },
+      // 补全电商管理路由
+      // {
+      //   path: 'mall',
+      //   name: 'mall',
+      //   redirect: '/admin/mall/goods',
+      //   meta: { title: '宠物电商管理', icon: 'el-icon-shop' },
+      //   children: [
+      //     {
+      //       path: 'goods',
+      //       name: 'mallGoods',
+      //       component: () => import('@/views/admin/components/AllGoods.vue'), // 替换为实际路径
+      //       meta: { title: '商品管理' },
+      //     },
+      //     {
+      //       path: 'order',
+      //       name: 'mallOrder',
+      //       component: () => import('@/views/admin/components/AllMallOrder.vue'), // 替换为实际路径
+      //       meta: { title: '订单管理' },
+      //     },
+      //     {
+      //       path: 'stock',
+      //       name: 'mallStock',
+      //       component: () => import('@/views/admin/components/AllStock.vue'), // 替换为实际路径
+      //       meta: { title: '库存管理' },
+      //     },
+      //     {
+      //       path: 'coupon',
+      //       name: 'mallCoupon',
+      //       component: () => import('@/views/admin/components/AllCoupon.vue'), // 替换为实际路径
+      //       meta: { title: '优惠券管理' },
+      //     },
+      //   ],
+      // },
+      // // 补全系统管理路由
+      // {
+      //   path: 'system',
+      //   name: 'system',
+      //   redirect: '/admin/system/notice',
+      //   meta: { title: '系统管理', icon: 'el-icon-setting' },
+      //   children: [
+      //     {
+      //       path: 'notice',
+      //       name: 'systemNotice',
+      //       component: () => import('@/views/admin/components/AllNotice.vue'), // 替换为实际路径
+      //       meta: { title: '通知发布' },
+      //     },
+      //     {
+      //       path: 'role',
+      //       name: 'systemRole',
+      //       component: () => import('@/views/admin/components/AllRole.vue'), // 替换为实际路径
+      //       meta: { title: '角色权限管理' },
+      //     },
+      //     {
+      //       path: 'log',
+      //       name: 'systemLog',
+      //       component: () => import('@/views/admin/components/AllLog.vue'), // 替换为实际路径
+      //       meta: { title: '操作日志查询' },
+      //     },
+      //   ],
+      // },
     ],
   },
 ]

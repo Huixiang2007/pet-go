@@ -152,19 +152,19 @@
                 </div>
                 <div class="p-4 overflow-y-auto max-h-[calc(80vh-120px)]">
                   <div class="grid grid-cols-3 gap-3">
-                    <label
-                      v-for="(brand, index) in brandList"
-                      :key="index"
-                      class="flex items-center p-3 border border-gray-200 rounded-md cursor-pointer transition-all hover:border-[#f5a623] hover:bg-[#fff8f0]"
+                    <button
+                      v-for="brand in brandList"
+                      :key="brand"
+                      @click="selectBrand(brand)"
+                      :class="[
+                        'px-3 py-2 rounded-md text-sm transition-all',
+                        selectedBrands === brand
+                          ? 'bg-[#f5a623] text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                      ]"
                     >
-                      <input
-                        type="checkbox"
-                        :value="brand"
-                        v-model="selectedBrands"
-                        class="w-4 h-4 text-[#f5a623] focus:ring-[#f5a623] border-gray-300 rounded"
-                      />
-                      <span class="ml-2">{{ brand }}</span>
-                    </label>
+                      {{ brand }}
+                    </button>
                   </div>
                 </div>
                 <div class="flex items-center justify-end p-4 border-t border-gray-200 gap-3">
@@ -270,13 +270,13 @@ const productsTotal = ref(0)
 
 
 const filters = ref({
-  title: '', // 搜索关键词
-  brandName: '' ,// 选中的品牌
-  region: '' // 选中的地区
+  title: '', 
+  brandName: '', 
+  region: '', 
 })
 
 // 排序类型（1-价格升序/2-价格降序/3-销量升序/4-销量降序）
-const sortType = ref<number>(0) // 0表示未选择排序
+const sortType = ref<number>(0) 
 
 // 滚动相关状态
 const scrollY = ref(0)
@@ -288,6 +288,7 @@ const filterRegion = ref(false)
 const filterBrand = ref(false)
 const selectedRegion = ref('')
 const selectedCity = ref('')
+// 选中的品牌（字符串类型，单选）
 const selectedBrands = ref('')
 
 const regions = ref<string[]>([])
@@ -308,8 +309,8 @@ interface Products {
   currentPrice: number
   originalPrice: number
   warrantyTip: string
-  title: string,
-  total: number,
+  title: string
+  total: number
 }
 
 const productsDeatil = (id: string) => {
@@ -321,13 +322,10 @@ const productsDeatil = (id: string) => {
 // 切换排序类型
 const changeSortType = (type: 'price' | 'sales') => {
   if (type === 'price') {
-    // 价格排序：当前是升序则切换为降序，否则默认升序
     sortType.value = sortType.value === 1 ? 2 : 1
   } else if (type === 'sales') {
-    // 销量排序：当前是升序则切换为降序，否则默认升序
     sortType.value = sortType.value === 3 ? 4 : 3
   }
-  // 重置分页并重新搜索
   resetSearchState()
   SearchProducts()
 }
@@ -335,11 +333,11 @@ const changeSortType = (type: 'price' | 'sales') => {
 const SearchProducts = () => {
   if (idLoading.value || !hasmore.value) return
 
-  console.log("搜索商品请求参数:")
-  console.log("title:", filters.value.title)
-  console.log("brandName:", filters.value.brandName)
-  console.log("region:", filters.value.region)
-  console.log("sortType:", sortType.value)
+  console.log('搜索商品请求参数:')
+  console.log('title:', filters.value.title)
+  console.log('brandName:', filters.value.brandName)
+  console.log('region:', filters.value.region)
+  console.log('sortType:', sortType.value)
 
   idLoading.value = true
   axios
@@ -350,17 +348,17 @@ const SearchProducts = () => {
         pageNum: currentPage.value,
         pageSize: pageSize.value,
         title: filters.value.title,
-        brandNameList: filters.value.brandName,
+        brandName: filters.value.brandName, 
         region: filters.value.region,
-        sortType: sortType.value // 新增排序类型参数
+        sortType: sortType.value,
       },
     })
     .then((res: any) => {
-      console.log("商品搜索响应:", res)
+      console.log('商品搜索响应:', res)
       idLoading.value = false
       const newSearchProducts = res.data.data?.list || []
       products.value = [...products.value, ...newSearchProducts]
-      productsTotal.value = res.data.data.total || 0
+      productsTotal.value = res.data.data.total 
 
       if (newSearchProducts.length < pageSize.value) {
         hasmore.value = false
@@ -382,34 +380,30 @@ const resetSearchState = () => {
 }
 
 const clearAllFilters = () => {
-  // 重置筛选条件
   filters.value = {
     title: '',
     brandName: '',
-    region: ''
+    region: '',
   }
 
   sortType.value = 0
-
   selectedBrands.value = ''
   selectedRegion.value = ''
   filterBrand.value = false
   filterRegion.value = false
-  // 重置分页并重新搜索
   resetSearchState()
   SearchProducts()
 }
-
 
 watch(
   () => route.query.keyword,
   (newValue) => {
     filters.value.title = (newValue as string) || ''
-    console.log("当前关键词:", filters.value.title)
+    console.log('当前关键词:', filters.value.title)
     resetSearchState()
     SearchProducts()
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 // 获取品牌列表
@@ -420,7 +414,7 @@ const getBrands = () => {
       method: 'GET',
     })
     .then((res: any) => {
-      console.log("品牌列表响应:", res)
+      console.log('品牌列表响应:', res)
       brandList.value = res.data.data || []
     })
     .catch((error) => {
@@ -440,7 +434,7 @@ const getRegions = () => {
       },
     })
     .then((res: any) => {
-      console.log("地区列表响应:", res)
+      console.log('地区列表响应:', res)
       regions.value = res.data.data || []
       if (regions.value.length > 0 && regions.value[0] !== '全部') {
         regions.value.unshift('全部')
@@ -451,9 +445,19 @@ const getRegions = () => {
     })
 }
 
-// 品牌筛选确认
+const selectBrand = (brand: string) => {
+  if (selectedBrands.value === brand) {
+    selectedBrands.value = ''
+    filters.value.brandName = ''
+  } else {
+    selectedBrands.value = brand
+    filters.value.brandName = brand 
+  }
+  filterBrand.value = !!selectedBrands.value
+}
+
+
 const confirmBrands = () => {
-  filters.value.brandName = selectedBrands.value
   filterBrand.value = !!selectedBrands.value
   showBrandModal.value = false
   resetSearchState()
@@ -473,13 +477,14 @@ const resetRegion = () => {
   filterRegion.value = false
 }
 
+
 const resetBrands = () => {
   selectedBrands.value = ''
   filters.value.brandName = ''
   filterBrand.value = false
 }
 
-// 地区筛选确认
+
 const confirmRegion = () => {
   filters.value.region = selectedRegion.value
   filterRegion.value = !!selectedRegion.value
@@ -488,7 +493,7 @@ const confirmRegion = () => {
   SearchProducts()
 }
 
-// 滚动处理
+
 const handleScroll = () => {
   scrollY.value = window.scrollY
   showBackToTop.value = scrollY.value > 300
@@ -523,7 +528,9 @@ const scrollToTop = () => {
 
 <style scoped>
 .shadow-xl {
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
 .animate-fade-in {

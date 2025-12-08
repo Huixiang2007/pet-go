@@ -148,25 +148,25 @@ const tableData: TableRow[] = [
 </script>
 
 <style scoped>
-::v-deep .el-tag--primary {
+:deep(.el-tag--primary) {
   background-color: #e6f7ff;
   color: #1890ff;
   border-color: #91d5ff;
 }
 
-::v-deep .el-table__row:hover > td {
+:deep(.el-table__row:hover > td) {
   background-color: #f9fafb !important;
 }
 
-::v-deep .el-input__inner {
+:deep(.el-input__inner) {
   border-radius: 4px;
 }
 
-::v-deep .el-button {
+:deep(.el-button) {
   border-radius: 4px;
 }
 
-::v-deep .address-text {
+:deep(.address-text) {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

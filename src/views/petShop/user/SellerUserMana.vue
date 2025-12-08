@@ -157,30 +157,30 @@ const tableData: TableRow[] = [
 </script>
 
 <style scoped>
-::v-deep .el-tag--warning {
+:deep(.el-tag--warning) {
   background-color: #fff7e6;
   color: #fa8c16;
   border-color: #ffd591;
 }
-::v-deep .el-tag--info {
+:deep(.el-tag--info) {
   background-color: #e6f7ff;
   color: #1890ff;
   border-color: #91d5ff;
 }
-::v-deep .el-tag--danger {
+:deep(.el-tag--danger) {
   background-color: #fff2f0;
   color: #f5222d;
   border-color: #ffccc7;
 }
 
-::v-deep .el-table__row--striped td {
+:deep(.el-table__row--striped td) {
   background-color: #fafafa !important;
 }
 
-::v-deep .el-pagination {
+:deep(.el-pagination) {
   margin-top: 0;
 }
-::v-deep .el-pager li {
+:deep(.el-pager li) {
   margin: 0 2px;
 }
 </style>

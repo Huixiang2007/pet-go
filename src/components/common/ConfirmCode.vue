@@ -9,7 +9,12 @@
     </div>
 
     <div class="verification-button-container">
-      <button type="button" class="layui-btn layui-btn-fluid layui-btn-primary" :class="buttonClass" @click="sendCode"
+      <button type="button" class="layui-btn layui-btn-fluid layui-btn-primary " 
+          :class="[
+                 buttonClass,
+                 isDisabled ? 'layui-btn-disabled' : ''  
+            ]"
+         @click="sendCode"
         :disabled="isDisabled">
         {{ buttonText }}
       </button>

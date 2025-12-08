@@ -3,7 +3,7 @@
     <transition name="box-animation">
       <form class="layui-form demo-login-container" v-if="isLogin">
         <div class="container">
-          <img src="../../assets/img/logo.png" alt="这是图标" class="logo" />
+          <img src="@/assets/img/logo.png" alt="这是图标" class="logo" />
 
           <div class="title">
             <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
@@ -77,8 +77,10 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
 import CaptchaLoad from '@/components/common/CaptchaLoad.vue'
+import request from '@/utils/request'
 
-import axios from 'axios'
+
+
 type CaptchaExposed = {
   refreshCaptcha: () => void
   validateCaptcha: (input: string) => boolean
@@ -277,31 +279,39 @@ const handleLogin = async (formData: LoginForm) => {
     let response: any
     // 调用登录接口
     if (isAccount.value) {
-      response = await axios.post(
+      response = await request(
         '/server/api/user/login/account',
-        {},
+        'POST',
         {
-          params: {
-            account: formData.loginId,
-            password: formData.password,
-          },
+          account: formData.loginId,
+          password: formData.password,
         },
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        }
+
       )
     } else {
-      response = await axios.post(
+      response = await request(
         '/server/api/user/login/email',
-        {},
+        'POST',
         {
-          params: {
-            email: formData.loginId,
-            password: formData.password,
-          },
+          email: formData.loginId,
+          password: formData.password,
+
         },
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        }
       )
     }
 
-    if (response.data.code === 0) {
-      const { token, userId } = response.data.data
+    if (response.code === 0) {
+      const { token, userId } = response.data
 
       // 存储token到localStorage
       localStorage.setItem('authToken', token)
@@ -322,7 +332,7 @@ const handleLogin = async (formData: LoginForm) => {
       const redirect = router.currentRoute.value.query.redirect as string;
       router.push(redirect || '/person');
     } else {
-      const errorMsg = response.data.msg
+      const errorMsg = response.msg
       ElMessage.error(errorMsg)
 
       // 刷新验证码
@@ -339,9 +349,7 @@ const handleLogin = async (formData: LoginForm) => {
 
     // 登录失败处理
     console.error(error)
-    //   let errorMsg = '登录失败，请稍后重试'
-    //  ElMessage.error(errorMsg)
-    // errorMessage.value = errorMsg
+
     if (captchaRef.value) {
       captchaRef.value.refreshCaptcha()
     }
@@ -358,7 +366,7 @@ const handleLogin = async (formData: LoginForm) => {
 </script>
 
 <style scoped>
-::v-deep .layui-form-checked[lay-skin='primary']>i {
+:deep .layui-form-checked[lay-skin='primary']>i {
   border-color: #fd9860 !important;
   background-color: #fd9860;
   color: #fff;
@@ -447,7 +455,7 @@ body {
   font-size: 26px;
 }
 
-::v-deep .layui-input {
+:deep(.layui-input) {
   height: 38px !important;
   /* 可以根据需要调整高度值，默认通常是 38px 左右 */
   line-height: 38px;
@@ -457,7 +465,7 @@ body {
 }
 
 .forPicture {
-  background-image: url('../../assets/img/background6.png');
+  background-image: url('@/assets/img/background6.png');
   background-repeat: no-repeat;
   background-size: cover;
   overflow: hidden;
@@ -521,7 +529,7 @@ body {
   color: #fff;
 }
 
-::v-deep .layui-form-checkbox[lay-skin='primary']:hover i {
+:deep(.layui-form-checkbox[lay-skin='primary']:hover i) {
   border-color: rgb(253, 152, 96);
 }
 

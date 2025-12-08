@@ -22,34 +22,34 @@
       router
     >
       <!-- 数据概览 -->
-      <el-menu-item index="/dashboard">
+      <el-menu-item index="/admin/data">
         <el-icon><PieChart /></el-icon>
         <!-- 补充数据概览图标 -->
         <span v-if="sidebarOpened">数据概览</span>
       </el-menu-item>
       <!-- 用户管理 -->
-      <el-sub-menu index="/user">
-        <template #title>
+      <el-menu-item index="/admin/user">
+        <!-- <template #title> -->
           <el-icon><User /></el-icon>
           <span v-if="sidebarOpened">用户管理</span>
-        </template>
-        <el-menu-item index="/user/common">普通用户管理</el-menu-item>
+        <!-- </template> -->
+        <!-- <el-menu-item index="/user/common">普通用户管理</el-menu-item>
         <el-menu-item index="/user/merchant">寄养商家管理</el-menu-item>
-        <el-menu-item index="/user/seller">卖家管理</el-menu-item>
-      </el-sub-menu>
+        <el-menu-item index="/user/seller">卖家管理</el-menu-item> -->
+      </el-menu-item>
       <!-- 寄养服务管理 -->
-      <el-sub-menu index="/foster">
+      <el-sub-menu index="/admin/foster">
         <template #title>
           <el-icon><House /></el-icon>
           <span v-if="sidebarOpened">寄养服务管理</span>
         </template>
-        <el-menu-item index="/foster/audit">服务审核</el-menu-item>
-        <el-menu-item index="/foster/order">寄养订单管理</el-menu-item>
-        <el-menu-item index="/foster/home">寄养家庭管理</el-menu-item>
-        <el-menu-item index="/foster/comment">评价管理</el-menu-item>
+        <!-- <el-menu-item index="/admin/foster/audit">服务审核</el-menu-item> -->
+        <!-- <el-menu-item index="/admin/foster/orders">寄养订单管理</el-menu-item> -->
+        <!-- <el-menu-item index="/admin/foster/home">寄养家庭管理</el-menu-item> -->
+        <el-menu-item index="/admin/foster/audit">评价管理</el-menu-item>
       </el-sub-menu>
       <!-- 电商管理 -->
-      <el-sub-menu index="/mall">
+      <!-- <el-sub-menu index="admin/mall">
         <template #title>
           <el-icon><Shop /></el-icon>
           <span v-if="sidebarOpened">宠物电商管理</span>
@@ -58,19 +58,19 @@
         <el-menu-item index="/mall/order">订单管理</el-menu-item>
         <el-menu-item index="/mall/stock">库存管理</el-menu-item>
         <el-menu-item index="/mall/coupon">优惠券管理</el-menu-item>
-      </el-sub-menu>
+      </el-sub-menu> -->
 
       <!-- 系统管理 -->
-      <el-sub-menu index="/system">
+      <!-- <el-sub-menu index="/admin/system">
         <template #title>
           <el-icon><Setting /></el-icon>
           <span v-if="sidebarOpened">系统管理</span>
-        </template>
-        <el-menu-item index="/system/notice">通知发布</el-menu-item>
+        </template> -->
+        <!-- <el-menu-item index="/system/notice">通知发布</el-menu-item>
         <el-menu-item index="/system/role">角色权限管理</el-menu-item>
-        <el-menu-item index="/system/log">操作日志查询</el-menu-item>
-      </el-sub-menu>
-    </el-menu>
+        <el-menu-item index="/system/log">操作日志查询</el-menu-item> -->
+      <!-- </el-sub-menu>-->
+    </el-menu> 
   </div>
 </template>
 
@@ -83,7 +83,7 @@ const route = useRoute()
 // 侧边栏折叠状态
 const sidebarOpened = ref(true)
 // 当前激活菜单
-const activeMenu = computed(() => route.path || '/dashboard')
+const activeMenu = computed(() => route.path ||'/admin/data')
 </script>
 
 <script lang="ts">

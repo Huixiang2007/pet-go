@@ -9,6 +9,9 @@
         @avatar-change="handleAvatarChange"
       />
       <div class="header-actions">
+        <button class="layui-btn layui-btn-primary newColor" @click="gotoHome">
+          <i class="layui-icon layui-icon-return"></i> 返回首页
+        </button>
         <button class="layui-btn layui-btn-primary" @click="logout">
           <i class="layui-icon layui-icon-logout"></i> 退出登录
         </button>
@@ -65,12 +68,12 @@ import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 // 导入子组件
-import PersonalAvatar from './components/PersonalAvatar.vue'
-import PersonalNav from './components/PersonalNav.vue'
-import BaseInfo from './components/BaseInfo.vue'
-import RealNameAuth from './components/RealNameAuth.vue'
-import ChangePassword from './components/ChangePassword.vue'
-import AddressManager from './components/AddressManager.vue'
+import PersonalAvatar from '@/views/userCenter/components/PersonAvatar.vue'
+import PersonalNav from '@/views/userCenter/components/PersonalNav.vue'
+import BaseInfo from '@/views/userCenter/components/BaseInfo.vue'
+import RealNameAuth from '@/views/userCenter/components/RealNameAuth.vue'
+import ChangePassword from '@/views/userCenter/components/ChangePassword.vue'
+import AddressManager from '@/views/userCenter/components/AddressManager.vue'
 
 declare global {
   interface Window {
@@ -78,6 +81,8 @@ declare global {
   }
 }
 
+// 定义组件可以触发的事件
+const emit = defineEmits(['refresh']) 
 // 导航项（供导航组件使用）
 const navItems = [
   { name: '基本信息', icon: 'layui-icon-user' },
@@ -106,7 +111,19 @@ const realNameInfo = ref({
 })
 const isFetching = ref(false)
 const router = useRouter()
+// 1. 定义地址分页参数（核心缺失的变量）
+const addressPagination = ref({
+  currentPage: 1,  
+  pageSize: 5,    
+  total: 0,        
+  pages: 0       
+})
 
+// 2. 定义地址列表数据
+const addressList = ref([])
+
+// 3. 定义“显示添加地址表单”的开关
+const showAddressForm = ref(false)
 // 初始化
 onMounted(() => {
   getUserInfo()
@@ -185,6 +202,36 @@ const getUserInfo = async () => {
   }
 }
 
+// 获取地址列表
+const getAddressList = async () => {
+  
+  console.log('addressPagination:', addressPagination)
+  try {
+    const userId = localStorage.getItem('userId') || ''
+    if (!userId) {
+      ElMessage.warning('用户未登录或会话已过期，请重新登录')
+      addressList.value = []
+      return
+    }
+    const response = await request('/server/api/user/getUserAddresses', 'GET', {
+      pageNum: addressPagination.value.currentPage,
+      pageSize: addressPagination.value.pageSize,
+    })
+    console.log('获取地址列表成功:', response.data)
+    addressList.value = response.data.list || []
+    addressPagination.value.total = response.data.total || 0
+    addressPagination.value.pages = response.data.pages || 1
+    // 如果是第一页且没有地址，则显示添加地址表单
+    if (addressPagination.value.currentPage === 1 && addressList.value.length === 0) {
+      showAddressForm.value = true
+    }
+  } catch (error) {
+    console.log('获取地址列表:', error)
+
+    ElMessage.error('获取地址失败，请稍后重试')
+  }
+}
+
 // 全局方法：头像修改
 const handleAvatarChange = async (file: File) => {
   try {
@@ -213,12 +260,13 @@ const saveBaseInfo = async (formData: any) => {
       birthday: formData.birthday,
     }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
     if (response.code === 0) {
+      
       userInfo.value = { ...userInfo.value, ...formData }
       ElMessage.success('保存信息成功！')
     }
   } catch (error) {
     console.error('保存基本信息失败:', error)
-    ElMessage.error('保存失败！')
+   
   }
 }
 
@@ -277,23 +325,54 @@ const cancelWord = () => {
   ElMessage.success('已恢复原始值')
 }
 
-// 全局方法：退出登录
-const logout = () => {
-  window.layui.layer.confirm('确定要退出登录吗？', { title: '提示' }, (index: number) => {
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('userId')
-    window.layui.layer.close(index)
-    router.push('/login')
-  })
+
+const logout = async (): void => {
+  window.layui.layer.confirm('确定要退出登录吗？', {
+    title: '提示',
+    yes: async(index: number) => {
+        const response = await request('/server/api/user/logout', 'POST',{
+       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+    console.log(response)
+    if (response.code === 0) {
+       localStorage.removeItem('authToken');
+      localStorage.removeItem('userId');
+      window.layui.layer.close(index);
+      router.push('/login'); // 直接用 router 实例，无需 window.router
+      window.layui.layer.msg('退出登录成功', { icon: 1, time: 1500 });
+    }
+    
+    },
+    no: (index: number) => {
+      window.layui.layer.close(index);
+   
+    }
+  });
+};
+const gotoHome = () => {
+  router.push('/foster-care')
 }
 </script>
 
 <style scoped>
-/* 仅保留父组件全局样式，子组件样式抽离到各自文件 */
+.layui-btn-primary:hover {
+  border-color: #fd9860;
+  color: #fd9860;
+}
+
 .profile-container {
   width: 100%;
   height: 100vh;
   background-color: #f5f5f5;
+}
+
+.newColor{
+  border-color: #c1d4f6;
+  color: #419fe6;
+}
+.newColor:hover{
+  border-color: #417fe6;
+  color: #417fe6;
 }
 
 .profile-header {

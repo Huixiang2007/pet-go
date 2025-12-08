@@ -141,7 +141,6 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue'
 
 // 定义组件属性
 const props = defineProps<{

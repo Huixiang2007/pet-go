@@ -1,30 +1,40 @@
 <template>
-  <form class="layui-form profile-form" lay-submit lay-filter="change-password">
+  <form class="layui-form profile-form" @submit.prevent="handleChange">
     <div class="layui-form-item">
       <label class="layui-form-label">原密码</label>
       <div class="layui-input-block">
-        <input 
-          type="password" 
-          name="oldPassword" 
-          v-model="passwordForm.oldPassword"
-          lay-verify="required|password" 
-          placeholder="请输入原密码" 
-          class="layui-input" 
-        />
+         <div class="password-input-container">
+          <input 
+            :type="showOldPassword ? 'text' : 'password'" 
+            name="oldPassword" 
+            v-model="passwordForm.oldPassword"
+            lay-verify="required|password" 
+            placeholder="请输入原密码" 
+            class="layui-input password-input" 
+          />
+          <span class="password-toggle" @click="toggleOldPasswordVisibility">
+            <i class="layui-icon" :class="showOldPassword ? 'layui-icon-eye' : 'layui-icon-eye-invisible'"></i>
+          </span>
+        </div>
       </div>
     </div>
 
     <div class="layui-form-item">
       <label class="layui-form-label">新密码</label>
       <div class="layui-input-block">
-        <input 
-          type="password" 
-          name="newPassword" 
-          v-model="passwordForm.newPassword"
-          lay-verify="required|password" 
-          placeholder="请输入新密码" 
-          class="layui-input" 
-        />
+      <div class="password-input-container">
+          <input 
+            :type="showNewPassword ? 'text' : 'password'" 
+            name="newPassword" 
+            v-model="passwordForm.newPassword"
+            lay-verify="required|password" 
+            placeholder="请输入新密码" 
+            class="layui-input password-input" 
+          />
+          <span class="password-toggle" @click="toggleNewPasswordVisibility">
+            <i class="layui-icon" :class="showNewPassword ? 'layui-icon-eye' : 'layui-icon-eye-invisible'"></i>
+          </span>
+        </div>
         <p class="password-rule">密码需8-20位，包含大小写字母、数字和特殊字符</p>
         <p v-if="isSamePassword" class="password-same-warning" style="color: #e6a23c; margin-top: 5px">
           <i class="layui-icon layui-icon-tips"></i> 新密码不能与原密码相同
@@ -35,14 +45,19 @@
     <div class="layui-form-item">
       <label class="layui-form-label">确认密码</label>
       <div class="layui-input-block">
-        <input 
-          type="password" 
-          name="confirmPassword" 
-          v-model="passwordForm.confirmPassword"
-          lay-verify="required|confirmPassword" 
-          placeholder="请确认新密码" 
-          class="layui-input" 
-        />
+       <div class="password-input-container">
+          <input 
+            :type="showConfirmPassword ? 'text' : 'password'" 
+            name="confirmPassword" 
+            v-model="passwordForm.confirmPassword"
+            lay-verify="required|confirmPassword" 
+            placeholder="请确认新密码" 
+            class="layui-input password-input" 
+          />
+          <span class="password-toggle" @click="toggleConfirmPasswordVisibility">
+            <i class="layui-icon" :class="showConfirmPassword ? 'layui-icon-eye' : 'layui-icon-eye-invisible'"></i>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -112,7 +127,21 @@ const passwordForm = ref({
 const isSendingCode = ref(false)
 const countDown = ref(60)
 let timer: NodeJS.Timeout | null = null
+const showOldPassword = ref(false)
+const showNewPassword = ref(false)
+const showConfirmPassword = ref(false)
+// 切换密码可见性
+const toggleOldPasswordVisibility = () => {
+  showOldPassword.value = !showOldPassword.value
+}
 
+const toggleNewPasswordVisibility = () => {
+  showNewPassword.value = !showNewPassword.value
+}
+
+const toggleConfirmPasswordVisibility = () => {
+  showConfirmPassword.value = !showConfirmPassword.value
+}
 // 计算属性：新密码是否与原密码相同
 const isSamePassword = computed(() => {
   return passwordForm.value.oldPassword && passwordForm.value.newPassword &&
@@ -194,12 +223,49 @@ const stopCountDown = () => {
 
 // 确认修改密码
 const handleChange = () => {
+
+  // 添加本地验证逻辑
+  if (!passwordForm.value.oldPassword) {
+    ElMessage.warning('请输入原密码！')
+    return
+  }
+  
+  if (!passwordForm.value.newPassword) {
+    ElMessage.warning('请输入新密码！')
+    return
+  }
+  
+  if (!passwordForm.value.confirmPassword) {
+    ElMessage.warning('请确认新密码！')
+    return
+  }
+  
+  if (!passwordForm.value.code) {
+    ElMessage.warning('请输入验证码！')
+    return
+  }
+  
+  // 检查密码格式
+  const passwordReg = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,20}$/
+  if (!passwordReg.test(passwordForm.value.newPassword)) {
+    ElMessage.warning('密码需8-20位，包含大小写字母、数字和特殊字符')
+    return
+  }
+  
+  // 检查两次输入的密码是否一致
+  if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
+    ElMessage.warning('两次输入的密码不一致')
+    return
+  }
+  
+  // 检查新密码是否与原密码相同
   if (isSamePassword.value) {
     ElMessage.warning('新密码不能与原密码相同！')
     return
   }
   // 通知父组件修改
   emit('change', passwordForm.value)
+
 }
 
 // 取消修改
@@ -228,7 +294,26 @@ onUnmounted(() => {
 :deep(.layui-form-label) {
   width:87px;
 }
+.password-input-container {
+  position: relative;
+}
 
+.password-input {
+  padding-right: 30px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #999;
+}
+
+.password-toggle:hover {
+  color: #fd9860;
+}
 .password-rule {
   margin: 0.5rem 0 0 0;
   color: #666;

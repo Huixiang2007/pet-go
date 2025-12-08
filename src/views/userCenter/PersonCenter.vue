@@ -63,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onUnmounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
@@ -108,6 +108,10 @@ const realNameInfo = ref({
   idCard: '',
   idCardFront: '',
   idCardBack: '',
+   gender: '1',
+  birthday: '',
+  address: '',
+
 })
 const isFetching = ref(false)
 const router = useRouter()
@@ -146,14 +150,85 @@ onMounted(() => {
       emit('refresh')
     }
     if (currentTab.value === 1) {
-      getUserInfo()
+   getRealNameStatus()
     }
   })
 })
 
-onUnmounted(() => {
-  // 清理定时器/请求等
-})
+
+const getRealNameStatus = async () => {
+  // 避免重复请求
+  if (isFetching.value) return
+  isFetching.value = true
+
+  try {
+    const userId = localStorage.getItem('userId') || ''
+    if (!userId) {
+      ElMessage.error('用户未登录，请先登录')
+      isFetching.value = false
+      return
+    }
+
+    const response = await request('/server/api/user/getUserAuth', 'GET')
+    console.log('实名认证状态:', response)
+
+    if (response.code === 0) {
+      // 1. 处理“用户未认证”的情况
+      if (response.msg === '用户未认证') {
+        realNameStatus.value = 'unverified'
+        // 清空已有的认证信息
+        realNameInfo.value = {
+          realName: '',
+          idCard: '',
+          idCardFront: '',
+          idCardBack: '',
+          gender: '1',
+          birthday: '',
+          address: ''
+        }
+        return
+      }
+
+      // 2. 根据后端返回的status更新状态
+      const backendStatus = response.data.status
+      switch (backendStatus) {
+        case '待审核':
+          realNameStatus.value = 'pending'
+          break
+        case '审核通过':
+          realNameStatus.value = 'verified'
+          break
+        case '审核未通过':
+          realNameStatus.value = 'unverified'
+          break
+        default:
+          realNameStatus.value = 'unverified'
+      }
+
+      // 3. 填充后端返回的认证信息（和realNameInfo的字段对应）
+      realNameInfo.value = {
+        realName: response.data.realName || '',
+        idCard: response.data.idCard || '',
+        idCardFront: response.data.idCardFront || '',
+        idCardBack: response.data.idCardBack || '',
+        gender: response.data.gender || '1', // 后端返回的gender可能是数字，转成字符串
+        birthday: response.data.birthday || '',
+        address: response.data.address || ''
+      }
+    } else {
+      // 处理后端返回的业务错误
+      ElMessage.warning(response.msg || '获取实名认证状态失败')
+      realNameStatus.value = 'unverified'
+    }
+  } catch (error) {
+    console.error('获取实名认证状态异常:', error)
+  
+    realNameStatus.value = 'unverified'
+  } finally {
+    // 无论成功失败，都关闭加载状态
+    isFetching.value = false
+  }
+}
 
 // 全局方法：获取用户信息
 const getUserInfo = async () => {
@@ -167,33 +242,20 @@ const getUserInfo = async () => {
       return
     }
     const response = await request('/server/api/user/getUserInfo/userId', 'GET', { userId })
+    console.log('获取用户信息:', response)
     if (response.code === 0) {
       const userData = response.data.userVO
       userInfo.value = {
         ...userInfo.value,
         nickname: userData.username,
-        sex: userData.gender,
+        sex: userData.gender||1,
         phone: userData.phone,
         birthday: userData.birthday,
         avatar: userData.avatar,
         email: userData.email,
       }
       formData.value = { ...userInfo.value }
-      // 更新实名认证状态
-      if (userData.status) {
-        realNameInfo.value = {
-          realName: userData.realName,
-          idCard: userData.idCard,
-          idCardFront: userData.idCardFront,
-          idCardBack: userData.idCardBack,
-        }
-        switch (userData.status) {
-          case 0: realNameStatus.value = 'unverified'; break
-          case 1: realNameStatus.value = 'pending'; break
-          case 2: realNameStatus.value = 'verified'; break
-          default: realNameStatus.value = 'unverified'
-        }
-      }
+     
     }
   } catch (error) {
     console.error('获取用户信息失败:', error)
@@ -276,8 +338,11 @@ const submitRealName = async (realNameForm: any) => {
     const formData = new FormData()
     formData.append('realName', realNameForm.realName)
     formData.append('idCard', realNameForm.idCard)
-    formData.append('otherFiles', realNameForm.idCardFrontFile)
-    formData.append('otherFiles', realNameForm.idCardBackFile)
+    formData.append('gender', Number(realNameForm.gender))
+    formData.append('birthday', realNameForm.birthday)
+    formData.append('address', realNameForm.address)
+    formData.append('pictureUrl', realNameForm.idCardFrontFile)
+    formData.append('pictureUrl', realNameForm.idCardBackFile)
     const response = await request('/server/api/user/userAuth', 'POST', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
@@ -288,8 +353,13 @@ const submitRealName = async (realNameForm: any) => {
         idCard: realNameForm.idCard,
         idCardFront: realNameForm.idCardFront,
         idCardBack: realNameForm.idCardBack,
+        gender: realNameForm.gender,
+        birthday: realNameForm.birthday,
+        address: realNameForm.address,
       }
+       getRealNameStatus()
       ElMessage.success('实名认证提交成功，等待审核')
+     
     }
   } catch (error) {
     console.error('提交实名认证失败:', error)

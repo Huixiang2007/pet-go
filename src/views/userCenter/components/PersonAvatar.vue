@@ -17,7 +17,7 @@
 </template>
 
 <script setup lang="ts">
-import { emit } from 'vue'
+
 import { ElMessage } from 'element-plus'
 
 // 接收父组件传递的props

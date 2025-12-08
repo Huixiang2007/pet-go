@@ -326,7 +326,7 @@ const cancelWord = () => {
 }
 
 
-const logout = async (): void => {
+const logout = async (): Promise<void> => {
   window.layui.layer.confirm('确定要退出登录吗？', {
     title: '提示',
     yes: async(index: number) => {

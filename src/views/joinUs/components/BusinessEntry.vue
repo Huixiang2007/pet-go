@@ -1,3 +1,4 @@
+d:/vcode/pet-go-web/src/views/joinUs/components/BusinessEntry.vue
 <template>
   <div class="min-h-screen bg-gray-50 p-4 md:p-8">
     <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm p-6 md:p-10">
@@ -41,7 +42,7 @@
               <div v-if="imagePreviews.shopAvatar" class="mb-2">
                 <img :src="imagePreviews.shopAvatar" class="max-w-full max-h-40 object-contain rounded" alt="商铺头像预览" />
               </div>
-              <FileUpload :preview-image="imagePreviews.shopAvatar" accept="image/*">
+              <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'shopAvatar')">
                 <template #default>
                   <i class="fa fa-cloud-upload text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传商铺头像</span>
@@ -49,7 +50,6 @@
                 </template>
               </FileUpload>
             </div>
-
 
             <div class="space-y-2">
               <label class="block text-sm font-medium text-gray-700">
@@ -60,7 +60,7 @@
                 <img :src="imagePreviews.businessLicense" class="max-w-full max-h-40 object-contain rounded"
                   alt="营业执照预览" />
               </div>
-              <FileUpload :preview-image="imagePreviews.businessLicense" accept="image/*">
+              <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'businessLicense')">
                 <template #default>
                   <i class="fa fa-file-image-o text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传营业执照</span>
@@ -116,7 +116,7 @@
                 <img :src="imagePreviews.idCardFront" class="max-w-full max-h-40 object-contain rounded"
                   alt="身份证正面预览" />
               </div>
-              <FileUpload :preview-image="imagePreviews.idCardFront" accept="image/*">
+              <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'idCardFront')">
                 <template #default>
                   <i class="fa fa-id-card-o text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传身份证正面</span>
@@ -133,7 +133,7 @@
               <div v-if="imagePreviews.idCardBack" class="mb-2">
                 <img :src="imagePreviews.idCardBack" class="max-w-full max-h-40 object-contain rounded" alt="身份证反面预览" />
               </div>
-              <FileUpload :preview-image="imagePreviews.idCardBack" accept="image/*">
+              <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'idCardBack')">
                 <template #default>
                   <i class="fa fa-id-card text-4xl text-purple-500 mb-2"></i>
                   <span class="text-gray-600">点击上传身份证反面</span>
@@ -228,6 +228,15 @@ const imagePreviews = ref({
   idCardBack: '',
 })
 
+// 图片数据对象（存储上传后的URL）
+const imageData = ref({
+  shopAvatar: '',
+  businessLicense: '',
+  idCardFront: '',
+  idCardBack: '',
+  otherDocs: '',
+})
+
 // 地址选择对象
 const addressObject = ref({
   province: '',
@@ -248,6 +257,7 @@ const form = reactive({
   address: '',
   description: '',
 })
+
 // 监听地址对象变化，同步到表单
 watch(
   addressObject,
@@ -289,43 +299,25 @@ const addressDisplayText = computed(() => {
   return [provinceName, cityName, districtName].filter(Boolean).join(' - ')
 })
 
-// 辅助函数：获取字段中文名称
-// const getFieldName = (type: string): string => {
-//   const names: Record<string, string> = {
-//     shopAvatar: '商铺头像',
-//     businessLicense: '营业执照',
-//     idCardFront: '身份证正面',
-//     idCardBack: '身份证反面',
-//     otherDocs: '其他证件',
-//   }
-//   return names[type] || type
-// }
-const imageData = ref({
-  shopAvatar: '',
-  businessLicense: '',
-  idCardFront: '',
-  idCardBack: '',
-  otherDocs: '',
-})
-// 文件上传处理函数 - 修改为存储base64字符串
-// const handleFileChange = async (dataUrl: string, type: keyof typeof imageData.value) => {
-//   try {
-//     if (dataUrl && dataUrl.startsWith('data:image/')) {
-
-//       // 直接存储base64字符串
-//       imageData.value[type] = dataUrl
-//       ElMessage.success(`${getFieldName(type)}上传成功`)
-//     } else {
-//       // 清除无效上传
-//       imageData.value[type] = ''
-//       ElMessage.error(`${getFieldName(type)}格式错误，请重新上传`)
-//     }
-//   } catch (error) {
-//     console.error(`处理${getFieldName(type)}时出错:`, error)
-//     imageData.value[type] = ''
-//     ElMessage.error(`${getFieldName(type)}处理失败，请重试`)
-//   }
-// }
+// 文件上传处理函数
+const handleFileChange = (files: any[], type: keyof typeof imageData.value) => {
+  try {
+    if (files && files.length > 0) {
+      // 获取上传成功的文件URL
+      const fileUrl = files[0].url
+      if (fileUrl) {
+        // 存储文件URL
+        imageData.value[type] = fileUrl
+        // 更新预览
+        imagePreviews.value[type as keyof typeof imagePreviews.value] = fileUrl
+        ElMessage.success('文件上传成功')
+      }
+    }
+  } catch (error) {
+    console.error(`处理文件上传时出错:`, error)
+    ElMessage.error('文件处理失败，请重试')
+  }
+}
 
 // 表单验证函数
 const validateForm = (): boolean => {
@@ -390,6 +382,8 @@ const submitForm = async () => {
   if (!validateForm() || isSubmitting.value) return
 
   try {
+    isSubmitting.value = true
+
     let provinceName = ''
     let cityName = ''
     let districtName = ''
@@ -414,6 +408,13 @@ const submitForm = async () => {
 
     const userId = Number(localStorage.getItem('userId'))
 
+    // 检查用户ID是否存在
+    if (!userId) {
+      ElMessage.error('用户未登录，请先登录！')
+      isSubmitting.value = false
+      return
+    }
+
     const data = {
       userId: userId,
       shopName: form.shopName,
@@ -421,74 +422,81 @@ const submitForm = async () => {
       contactName: form.contactName,
       contactPhone: form.contactPhone,
       contactEmail: form.contactEmail,
-
       province: provinceName,
       city: cityName,
       district: districtName,
-
       address: form.address,
       description: form.description,
       shopAvatar: imageData.value.shopAvatar,
-
       businessLicense: imageData.value.businessLicense,
       idCardFront: imageData.value.idCardFront,
       idCardBack: imageData.value.idCardBack,
     }
-    console.log('FormData内容:')
-    console.log(data)
-    console.log(typeof userId)
-    console.log(typeof form.shopName)
-    console.log(typeof form.shopType)
 
-    console.log(typeof form.contactName)
-    console.log(typeof form.contactPhone)
-    console.log(typeof form.contactEmail)
-
-    console.log(typeof provinceName)
-    console.log(typeof cityName)
-    console.log(typeof districtName)
-
-    console.log(typeof form.address)
-    console.log(typeof form.description)
-    console.log(typeof imageData.value.shopAvatar)
-
-    console.log(typeof imageData.value.businessLicense)
-    console.log(typeof imageData.value.idCardFront)
-    console.log(typeof imageData.value.idCardBack)
+    console.log('提交的表单数据:', data)
 
     // 发送请求
-    axios
-      .request({
-        url: '/server/api/shop/shops/test',
-        method: 'POST',
-        data: data,
-      })
-      .then((response) => {
-        // 处理成功响应
-        ElMessage.success('提交成功，等待审核！')
-        console.log('提交成功', response.data)
-      })
-      .catch((error) => {
-        // 处理错误
-        console.log('提交失败:', error.response.data)
-        ElMessage.error('提交失败，请稍后重试。')
-      })
-  } catch (error) {
+    const response = await axios.request({
+      url: '/server/api/shop/shops/apply',
+      method: 'POST',
+      data: data,
+    })
+
+    // 处理成功响应
+    ElMessage.success('提交成功，等待审核！')
+    console.log('提交成功', response.data)
+
+    // 重置表单
+    resetForm()
+
+  } catch (error: any) {
     // 处理错误
-    console.log('提交失败:', error)
-    ElMessage.error('提交失败，请稍后重试。')
+    console.error('提交失败:', error)
+    if (error.response && error.response.data && error.response.data.message) {
+      ElMessage.error(`提交失败: ${error.response.data.message}`)
+    } else {
+      ElMessage.error('提交失败，请稍后重试。')
+    }
+  } finally {
+    isSubmitting.value = false
   }
 }
 
-// 重置图片预览
-Object.keys(imagePreviews.value).forEach((key) => {
-  imagePreviews.value[key as keyof typeof imagePreviews.value] = ''
-})
+// 重置表单函数
+const resetForm = () => {
+  // 重置表单数据
+  Object.assign(form, {
+    shopName: '',
+    shopType: '',
+    contactName: '',
+    contactPhone: '',
+    contactEmail: '',
+    province: '',
+    city: '',
+    district: '',
+    address: '',
+    description: '',
+  })
 
-// 重置地址对象
-addressObject.value = {
-  province: '',
-  city: '',
-  district: '',
+  // 重置图片数据
+  Object.keys(imageData.value).forEach((key) => {
+    imageData.value[key as keyof typeof imageData.value] = ''
+  })
+
+  // 重置图片预览
+  Object.keys(imagePreviews.value).forEach((key) => {
+    imagePreviews.value[key as keyof typeof imagePreviews.value] = ''
+  })
+
+  // 重置地址对象
+  addressObject.value = {
+    province: '',
+    city: '',
+    district: '',
+  }
 }
 </script>
+
+<style scoped>
+/* 原有样式保持不变 */
+</style>

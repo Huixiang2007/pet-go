@@ -212,15 +212,15 @@ import { ElMessage } from 'element-plus'
 import AddressSelect from '@/components/business/AddressSelect.vue'
 import FileUpload from '@/components/common/FileUpload.vue'
 
-// 导入地区数据
+
 import provincesData from 'china-division/dist/provinces.json'
 import citiesData from 'china-division/dist/cities.json'
 import districtsData from 'china-division/dist/areas.json'
 
-// 响应式状态定义
+
 const isSubmitting = ref(false)
 
-// 图片预览对象
+
 const imagePreviews = ref({
   shopAvatar: '',
   businessLicense: '',
@@ -228,7 +228,7 @@ const imagePreviews = ref({
   idCardBack: '',
 })
 
-// 图片数据对象（存储上传后的URL）
+
 const imageData = ref({
   shopAvatar: '',
   businessLicense: '',
@@ -258,7 +258,6 @@ const form = reactive({
   description: '',
 })
 
-// 监听地址对象变化，同步到表单
 watch(
   addressObject,
   (newValue) => {
@@ -269,7 +268,6 @@ watch(
   { deep: true },
 )
 
-// 计算属性：地址显示文本
 const addressDisplayText = computed(() => {
   if (!addressObject.value.province) return '请选择地区'
 
@@ -278,17 +276,17 @@ const addressDisplayText = computed(() => {
   let districtName = ''
 
   try {
-    // 获取省份名称
+
     const province = provincesData.find((p) => p.code === addressObject.value.province)
     provinceName = province ? province.name : `未知(${addressObject.value.province})`
 
-    // 获取城市名称
+
     if (addressObject.value.city) {
       const city = citiesData.find((c) => c.code === addressObject.value.city)
       cityName = city ? city.name : `未知(${addressObject.value.city})`
     }
 
-    // 获取区县名称
+
     if (addressObject.value.district) {
       const district = districtsData.find((d) => d.code === addressObject.value.district)
       districtName = district ? district.name : `未知(${addressObject.value.district})`
@@ -299,16 +297,13 @@ const addressDisplayText = computed(() => {
   return [provinceName, cityName, districtName].filter(Boolean).join(' - ')
 })
 
-// 文件上传处理函数
+
 const handleFileChange = (files: any[], type: keyof typeof imageData.value) => {
   try {
     if (files && files.length > 0) {
-      // 获取上传成功的文件URL
       const fileUrl = files[0].url
       if (fileUrl) {
-        // 存储文件URL
         imageData.value[type] = fileUrl
-        // 更新预览
         imagePreviews.value[type as keyof typeof imagePreviews.value] = fileUrl
         ElMessage.success('文件上传成功')
       }
@@ -319,9 +314,8 @@ const handleFileChange = (files: any[], type: keyof typeof imageData.value) => {
   }
 }
 
-// 表单验证函数
+// 表单验证
 const validateForm = (): boolean => {
-  // 基础字段验证
   const requiredFields = [
     { value: form.shopName, field: '商铺名称' },
     { value: form.shopType, field: '店铺类型' },
@@ -335,7 +329,6 @@ const validateForm = (): boolean => {
     { value: form.description, field: '商铺介绍' },
   ]
 
-  // 验证必填字段
   for (const field of requiredFields) {
     if (!field.value) {
       ElMessage.error(`请填写${field.field}！`)
@@ -343,7 +336,6 @@ const validateForm = (): boolean => {
     }
   }
 
-  // 文件验证
   const requiredImages = [
     { value: imageData.value.shopAvatar, field: '商铺头像' },
     { value: imageData.value.businessLicense, field: '营业执照' },
@@ -351,7 +343,7 @@ const validateForm = (): boolean => {
     { value: imageData.value.idCardBack, field: '身份证反面' },
   ]
 
-  // 验证必填文件
+
   for (const image of requiredImages) {
     if (!image.value) {
       ElMessage.error(`请上传${image.field}！`)
@@ -359,14 +351,13 @@ const validateForm = (): boolean => {
     }
   }
 
-  // 手机号格式验证
+
   const phoneRegex = /^1[3-9]\d{9}$/
   if (!phoneRegex.test(form.contactPhone)) {
     ElMessage.error('请输入正确的手机号码！')
     return false
   }
 
-  // 邮箱格式验证
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(form.contactEmail)) {
     ElMessage.error('请输入正确的邮箱地址！')
@@ -378,7 +369,6 @@ const validateForm = (): boolean => {
 
 // 表单提交函数
 const submitForm = async () => {
-  // 验证表单
   if (!validateForm() || isSubmitting.value) return
 
   try {
@@ -388,19 +378,19 @@ const submitForm = async () => {
     let cityName = ''
     let districtName = ''
 
-    // 获取省份名称
+
     if (addressObject.value.province) {
       const province = provincesData.find((p) => p.code === addressObject.value.province)
       provinceName = province ? province.name : ''
     }
 
-    // 获取城市名称
+
     if (addressObject.value.city) {
       const city = citiesData.find((c) => c.code === addressObject.value.city)
       cityName = city ? city.name : ''
     }
 
-    // 获取区县名称
+
     if (addressObject.value.district) {
       const district = districtsData.find((d) => d.code === addressObject.value.district)
       districtName = district ? district.name : ''
@@ -408,7 +398,6 @@ const submitForm = async () => {
 
     const userId = Number(localStorage.getItem('userId'))
 
-    // 检查用户ID是否存在
     if (!userId) {
       ElMessage.error('用户未登录，请先登录！')
       isSubmitting.value = false
@@ -416,7 +405,6 @@ const submitForm = async () => {
     }
 
     const data = {
-      userId: userId,
       shopName: form.shopName,
       shopType: form.shopType,
       contactName: form.contactName,
@@ -435,22 +423,22 @@ const submitForm = async () => {
 
     console.log('提交的表单数据:', data)
 
-    // 发送请求
+
     const response = await axios.request({
-      url: '/server/api/shop/shops/apply',
+      url: '/server/api/shop/shops/add',
       method: 'POST',
       data: data,
     })
 
-    // 处理成功响应
+
     ElMessage.success('提交成功，等待审核！')
     console.log('提交成功', response.data)
 
-    // 重置表单
+
     resetForm()
 
   } catch (error: any) {
-    // 处理错误
+
     console.error('提交失败:', error)
     if (error.response && error.response.data && error.response.data.message) {
       ElMessage.error(`提交失败: ${error.response.data.message}`)
@@ -462,9 +450,8 @@ const submitForm = async () => {
   }
 }
 
-// 重置表单函数
+
 const resetForm = () => {
-  // 重置表单数据
   Object.assign(form, {
     shopName: '',
     shopType: '',
@@ -478,17 +465,17 @@ const resetForm = () => {
     description: '',
   })
 
-  // 重置图片数据
+
   Object.keys(imageData.value).forEach((key) => {
     imageData.value[key as keyof typeof imageData.value] = ''
   })
 
-  // 重置图片预览
+
   Object.keys(imagePreviews.value).forEach((key) => {
     imagePreviews.value[key as keyof typeof imagePreviews.value] = ''
   })
 
-  // 重置地址对象
+
   addressObject.value = {
     province: '',
     city: '',
@@ -498,5 +485,4 @@ const resetForm = () => {
 </script>
 
 <style scoped>
-/* 原有样式保持不变 */
 </style>

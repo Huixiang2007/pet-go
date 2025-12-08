@@ -27,11 +27,6 @@
             v-model:videoUrl="productForm.videoUrl"
           />
 
-
-          <ProductSkuConfig
-            v-model:skuList="skuList"
-          />
-
           <div class="flex justify-end space-x-4 pt-6 border-t border-yellow-100">
             <el-button
               size="default"
@@ -79,9 +74,8 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import axios from 'axios'
-import {ProductBasicInfo } from './components/ProductBasicInfo.vue'
+import ProductBasicInfo  from './components/ProductBasicInfo.vue'
 import ProductImageUpload from './components/ProductImageUpload.vue'
-import ProductSkuConfig from './components/ProductSkuConfig.vue'
 
 // 商品表单接口
 interface ProductForm {
@@ -102,18 +96,6 @@ interface ProductForm {
   warrantyTip: string
 }
 
-// SKU项接口
-export interface SkuItem {
-  skuSn: string
-  specJson: string
-  price: number
-  marketPrice: number
-  costPrice: number
-  stock: number
-  imageUrl: string
-  weight: number
-  volume: number
-}
 
 // 商品表单数据
 const productForm = reactive<ProductForm>({
@@ -133,39 +115,20 @@ const productForm = reactive<ProductForm>({
   detail: '',
   warrantyTip: ''
 })
-
-// SKU列表
-const skuList = ref<SkuItem[]>([
-  {
-    skuSn: '',
-    specJson: '',
-    price: 0,
-    marketPrice: 0,
-    costPrice: 0,
-    stock: 0,
-    imageUrl: '',
-    weight: 0,
-    volume: 0
-  }
-])
-
-// 提交状态
 const isSubmitting = ref(false)
-// 消息显示状态
 const showMessage = ref(false)
-// 消息内容
 const message = ref('')
-// 消息类型
 const messageType = ref<'success' | 'error'>('success')
 
-// 显示消息提示
 const showToastMessage = (msg: string, type: 'success' | 'error' = 'success') => {
   message.value = msg
   messageType.value = type
   showMessage.value = true
   setTimeout(() => showMessage.value = false, 3000)
 }
-
+console.log(productForm.imagesList)
+console.log(productForm.imagesList.join(','))
+console.log(productForm.mainImage)
 // 表单验证
 const validateForm = (): boolean => {
   if (!productForm.productSn) { showToastMessage('请输入商品编码', 'error'); return false }
@@ -173,16 +136,11 @@ const validateForm = (): boolean => {
   if (productForm.typeParent === 0) { showToastMessage('请输入父分类ID', 'error'); return false }
   if (productForm.typeChild === 0) { showToastMessage('请输入子分类ID', 'error'); return false }
   if (productForm.currentPrice <= 0) { showToastMessage('请输入有效的销售价', 'error'); return false }
+  if (productForm.marketPrice <= 0) { showToastMessage('请输入有效的市场价', 'error'); return false }
+  if (productForm.costPrice < 0) { showToastMessage('请输入有效的成本价', 'error'); return false }
   if (productForm.stock < 0) { showToastMessage('请输入有效的库存数量', 'error'); return false }
   if (!productForm.mainImage) { showToastMessage('请上传商品主图', 'error'); return false }
   if (!productForm.detail) { showToastMessage('请输入商品详细描述', 'error'); return false }
-
-  for (const [index, sku] of skuList.value.entries()) {
-    if (!sku.skuSn) { showToastMessage(`第${index + 1}个SKU请输入编码`, 'error'); return false }
-    if (!sku.specJson) { showToastMessage(`第${index + 1}个SKU请输入规格JSON`, 'error'); return false }
-    if (sku.price <= 0) { showToastMessage(`第${index + 1}个SKU请输入有效的价格`, 'error'); return false }
-    if (sku.stock < 0) { showToastMessage(`第${index + 1}个SKU请输入有效的库存`, 'error'); return false }
-  }
   return true
 }
 
@@ -192,12 +150,11 @@ const handleSubmit = () => {
   isSubmitting.value = true
     const submitData = {
       ...productForm,
-      images: productForm.imagesList.join(','),
-      skus: skuList.value
+      images: productForm.imagesList.join(',')
     }
 
   axios.request({
-      url: '/server/api/product/add',
+      url: '/server/api/shop/product/add',
       method: 'POST',
       data: submitData
     })
@@ -213,20 +170,15 @@ const handleSubmit = () => {
   })
 }
 
-// 重置表单
+
 const handleReset = () => {
   if (confirm('确定要重置表单吗？所有已填写内容将被清空。')) {
-    // 重置商品主信息
     Object.assign(productForm, {
       productSn: '', title: '', subTitle: '', brandId: 0, typeParent: 0, typeChild: 0,
       currentPrice: 0, marketPrice: 0, costPrice: 0, stock: 0, mainImage: '',
       imagesList: [], videoUrl: '', detail: '', warrantyTip: ''
     })
-    // 重置SKU
-    skuList.value = [{
-      skuSn: '', specJson: '', price: 0, marketPrice: 0, costPrice: 0,
-      stock: 0, imageUrl: '', weight: 0, volume: 0
-    }]
+
   }
 }
 </script>

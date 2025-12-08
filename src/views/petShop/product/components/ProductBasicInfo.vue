@@ -48,9 +48,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="brandId" class="block text-sm font-medium text-yellow-800 mb-1">
-            品牌
-          </label>
+          <label for="brandId" class="block text-sm font-medium text-yellow-800 mb-1"> 品牌 </label>
           <select
             id="brandId"
             v-model.number="localForm.brandId"
@@ -58,7 +56,9 @@
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
           >
             <option value="">请选择品牌</option>
-            <option class="z-50"  v-for="brand in brands" :key="brand.id" :value="brand.id">{{ brand}}</option>
+            <option class="z-50" v-for="brand in brands" :key="brand.id" :value="brand.id">
+              {{ brand }}
+            </option>
           </select>
         </div>
         <div class="form-group">
@@ -68,12 +68,14 @@
           <select
             id="typeParent"
             v-model.number="localForm.typeParent"
-            @change="updateParentForm"
+            @change="handleParentChange"
             required
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
           >
             <option value="">请选择父分类</option>
-            <option  v-for="(type, index) in parentsTypes" :key="index" :value="type">{{ type }}</option>
+            <option v-for="(type, index) in parentsTypes" :key="index" :value="index">
+              {{ type }}
+            </option>
           </select>
         </div>
         <div class="form-group">
@@ -88,7 +90,9 @@
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
           >
             <option value="">请选择子分类</option>
-            <option class="z-50" v-for="(type, index) in sonTypes" :key="index" :value="type">{{ type }}</option>
+            <option v-for="category in sonTypes" :key="category.id" :value="category.id">
+              {{ category }}
+            </option>
           </select>
         </div>
       </div>
@@ -224,7 +228,6 @@ interface Brand {
   name: string
 }
 
-
 interface Category {
   id: number
   name: string
@@ -233,67 +236,8 @@ interface Category {
 const brands = ref<Brand[]>([])
 const parentsTypes = ref<Category[]>([])
 const sonTypes = ref<Category[]>([])
-
-// 获取品牌
-const getBrands = () => {
-  axios.request({
-    url: '/server/api/shop/product/add/brand',
-    method: 'GET',
-  }).then((res: any) => {
-    if(res.data.code === 0) {
-      brands.value = res.data.data
-    }else{
-      alert(res.data.msg)
-    }
-    console.log('品牌数据:', res)
-
-  }).catch(error => {
-    console.error('获取品牌失败:', error)
-    brands.value = []
-  })
-}
-
-// 获取父分类
-const getParentsTypes = () => {
-  axios.request({
-    url: '/server/api/shop/product/add/parentType',
-    method: 'GET',
-  }).then((res: any) => {
-    if(res.data.code === 0) {
-      parentsTypes.value = res.data.data
-    }else{
-      alert(res.data.msg)
-    }
-    console.log('父分类数据:', res)
-  }).catch(error => {
-    console.error('获取父分类失败:', error)
-    parentsTypes.value = []
-  })
-}
-
-// 获取子分类
-const getSonTypes = () => {
-  axios.request({
-    url: '/server/api/shop/product/add/childType',
-    method: 'GET',
-  }).then((res: any) => {
-    if(res.data.code === 0) {
-      sonTypes.value = res.data.data
-    }else{
-      alert(res.data.msg)
-    }
-    console.log('子分类数据:',res)
-  }).catch(error => {
-    console.error('获取子分类失败:', error)
-    sonTypes.value = []
-  })
-}
-
-onMounted(() => {
-  getParentsTypes()
-  getBrands()
-  getSonTypes()
-})
+const authToken = localStorage.getItem('authToken')
+console.log(authToken)
 
 const props = defineProps<{
   form: ProductForm
@@ -303,17 +247,109 @@ const emit = defineEmits<{
   (e: 'update:form', value: ProductForm): void
 }>()
 
-const localForm = ref<ProductForm>({ ...props.form })
-watch(() => props.form, (newForm) => {
-  localForm.value = { ...newForm }
-}, { deep: true })
+const initForm = { ...props.form }
+if (initForm.typeParent === 0) initForm.typeParent = undefined
+const localForm = ref<ProductForm>(initForm)
 
-// 更新父组件表单数据
+watch(
+  () => props.form,
+  (newForm) => {
+    const form = { ...newForm }
+    if (form.typeParent === 0) form.typeParent = undefined
+    localForm.value = form
+  },
+  { deep: true },
+)
+
+const getBrands = () => {
+  axios
+    .request({
+      url: '/server/api/shop/product/add/brand',
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+    .then((res: any) => {
+      if (res.data.code === 0) {
+        brands.value = res.data.data
+      } else {
+        alert(res.data.msg)
+      }
+    })
+    .catch((error) => {
+      console.error('获取品牌失败:', error)
+      brands.value = []
+    })
+}
+
+const getParentsTypes = () => {
+  axios
+    .request({
+      url: '/server/api/shop/product/add/parentType',
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+    .then((res: any) => {
+      if (res.data.code === 0) {
+        parentsTypes.value = res.data.data
+      } else {
+        alert(res.data.msg)
+      }
+    })
+    .catch((error) => {
+      console.error('获取父分类失败:', error)
+      parentsTypes.value = []
+    })
+}
+
+const getSonTypes = () => {
+  if (!localForm.value.typeParent) {
+    sonTypes.value = []
+    return
+  }
+
+  axios
+    .request({
+      url: '/server/api/shop/product/add/childType',
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+      params: {
+        parentId: localForm.value.typeParent,
+      },
+    })
+    .then((res: any) => {
+      if (res.data.code === 0) {
+        sonTypes.value = res.data.data
+      } else {
+        alert(res.data.msg)
+      }
+    })
+    .catch((error) => {
+      console.error('获取子分类失败:', error)
+      sonTypes.value = []
+    })
+}
+
+const handleParentChange = () => {
+  updateParentForm()
+  getSonTypes()
+  console.log('当前选中的父分类 ID：', localForm.value.typeParent)
+}
+
 const updateParentForm = () => {
   emit('update:form', { ...localForm.value })
 }
-</script>
 
+onMounted(() => {
+  getBrands()
+  getParentsTypes()
+})
+</script>
 <style scoped>
 .form-section {
   padding: 10px 0;

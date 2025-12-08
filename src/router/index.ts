@@ -42,6 +42,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/shop/PetShopView.vue'),
     meta: {
       requiresAuth: true,
+      title: '欢迎来到宠物商城',
     },
   },
   // 宠物购物车
@@ -51,6 +52,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/order/PetShopCar.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo购物车',
     },
   },
   //订单结算
@@ -60,6 +62,8 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/order/OrderCheckout.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo订单结算',
+
     },
   },
   //  商品列表（分类）
@@ -73,6 +77,9 @@ const routes: RouteRecordRaw[] = [
     path: '/product-detail/:id',
     name: 'productsDetail',
     component: () => import('@/views/petShop/product/ProductDetail.vue'),
+    meta: {
+      title: 'PetGo商品详情',
+    },
   },
   //  订单列表
   {
@@ -81,6 +88,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/order/OrderList.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo订单列表',
     },
   },
   //物流信息
@@ -90,6 +98,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/server/PackageInfo.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo物流信息',
     },
   },
   //  搜索
@@ -99,6 +108,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/product/SearchProduct.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo搜索',
     },
   },
   // 店铺
@@ -108,6 +118,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/shop/ShopStore.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo店铺',
     },
   },
   // 订单管理
@@ -117,6 +128,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/order/SellerOrderMana.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo订单管理',
     },
   },
   // 电商用户管理
@@ -127,6 +139,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/user/SellerUserMana.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo用户管理',
     },
   },
   // 优惠卷管理
@@ -136,6 +149,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/marketing/CouponManagement.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo优惠卷管理',
     },
   },
   // 商品管理
@@ -145,6 +159,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/product/SellerItemMana.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo商品管理',
     },
   },
   // 店铺设置
@@ -154,6 +169,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/shop/ShopSetting.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo店铺设置',
     },
   },
   // 销售分析
@@ -163,6 +179,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/data/SalesAnalytics.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo销售分析',
     },
   },
   // 秒杀
@@ -172,6 +189,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/marketing/FlashSale.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo秒杀',
     },
   },
   //消息
@@ -181,6 +199,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/petShop/server/CustomerService.vue'),
     meta: {
       requiresAuth: true,
+      title: 'PetGo消息',
     },
   },
   // 添加商品
@@ -188,7 +207,7 @@ const routes: RouteRecordRaw[] = [
     path: '/add-product',
     name: 'AddProduct',
     component: () => import('@/views/petShop/product/AddProduct.vue'),
-    meta: { title: '欢迎注册 PetGo', requiresAuth: true },
+    meta: { title: 'PetGo添加商品', requiresAuth: true },
   },
   //登录
   {
@@ -261,7 +280,7 @@ const routes: RouteRecordRaw[] = [
   },
   //后台管理
   {
-    path: '/admin',  
+    path: '/admin',
     component: () => import('@/views/admin/HomePage.vue'),
     meta: { title: '后台管理', requiresAuth: true },
     children: [

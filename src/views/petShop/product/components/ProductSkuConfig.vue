@@ -130,7 +130,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { SkuItem } from '../AddProduct.vue'
+import {type  SkuItem } from '../AddProduct.vue'
 
 // 接收父组件的SKU列表
 const props = defineProps<{

@@ -7,12 +7,8 @@
 
           <div class="title">
             <!-- 遍历字符数组，每个字符一个span，添加索引对应的延迟动画 -->
-            <span
-              v-for="(char, index) in titleLoginChars"
-              :key="index"
-              :style="{ animationDelay: `${index * 100}ms` }"
-              class="char"
-            >
+            <span v-for="(char, index) in titleLoginChars" :key="index" :style="{ animationDelay: `${index * 100}ms` }"
+              class="char">
               {{ char }}
             </span>
           </div>
@@ -22,22 +18,11 @@
           <div class="layui-form-item">
             <div class="layui-input-wrap">
               <div class="layui-input-prefix">
-                <i
-                  class="layui-icon"
-                  :class="isAccount ? 'layui-icon-username' : 'layui-icon-email'"
-                ></i>
+                <i class="layui-icon" :class="isAccount ? 'layui-icon-username' : 'layui-icon-email'"></i>
               </div>
-              <input
-                type="text"
-                name="loginId"
-                value=""
-                lay-verify="required|verifyType"
-                :placeholder="isAccount ? '账号' : 'QQ邮箱'"
-                :lay-reqtext="isAccount ? '请输入账号' : '请输入QQ邮箱'"
-                autocomplete="off"
-                class="layui-input"
-                lay-affix="clear"
-              />
+              <input type="text" name="loginId" value="" lay-verify="required|verifyType"
+                :placeholder="isAccount ? '账号' : 'QQ邮箱'" :lay-reqtext="isAccount ? '请输入账号' : '请输入QQ邮箱'"
+                autocomplete="off" class="layui-input" lay-affix="clear" />
             </div>
           </div>
           <div class="layui-form-item">
@@ -45,17 +30,8 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-              <input
-                type="password"
-                name="password"
-                value=""
-                lay-verify="required|password"
-                placeholder="密   码"
-                lay-reqtext="请填写密码"
-                autocomplete="off"
-                class="layui-input"
-                lay-affix="eye"
-              />
+              <input type="password" name="password" value="" lay-verify="required|password" placeholder="密   码"
+                lay-reqtext="请填写密码" autocomplete="off" class="layui-input" lay-affix="eye" />
             </div>
           </div>
           <div class="layui-form-item">
@@ -65,16 +41,8 @@
                   <div class="layui-input-prefix">
                     <i class="layui-icon layui-icon-vercode"></i>
                   </div>
-                  <input
-                    type="text"
-                    name="captcha"
-                    value=""
-                    placeholder="验证码"
-                    lay-reqtext="请填写验证码"
-                    autocomplete="off"
-                    class="layui-input"
-                    lay-affix="clear"
-                  />
+                  <input type="text" name="captcha" value="" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off"
+                    class="layui-input" lay-affix="clear" />
                 </div>
               </div>
               <div class="layui-col-xs5">
@@ -86,9 +54,7 @@
           </div>
           <div class="layui-form-item">
             <input type="checkbox" name="remember" lay-skin="primary" title="记住密码" />
-            <span @click="toForgotPassword" style="float: right; margin-top: 7px; color: #333"
-              >忘记密码？</span
-            >
+            <span @click="toForgotPassword" style="float: right; margin-top: 7px; color: #333">忘记密码？</span>
           </div>
           <div class="layui-form-item">
             <button class="layui-btn btn-donate" lay-submit lay-filter="demo-login">
@@ -97,8 +63,7 @@
           </div>
           <div class="layui-form-item demo-login-other" style="text-align: right">
             <span @click="changeLoginType" class="register">
-              {{ isAccount ? '使用QQ邮箱登录' : '使用账号登录' }}</span
-            >
+              {{ isAccount ? '使用QQ邮箱登录' : '使用账号登录' }}</span>
             或 <span @click="toRegister" class="register">注册帐号</span>
           </div>
         </div>
@@ -112,8 +77,10 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
 import CaptchaLoad from '@/components/common/CaptchaLoad.vue'
+import request from '@/utils/request'
 
-import axios from 'axios'
+
+
 type CaptchaExposed = {
   refreshCaptcha: () => void
   validateCaptcha: (input: string) => boolean
@@ -146,7 +113,7 @@ const changeLoginType = () => {
   isAccount.value = !isAccount.value
   const loginInput = document.querySelector('input[name="loginId"]')
   if (loginInput) {
-    ;(loginInput as HTMLInputElement).value = ''
+    ; (loginInput as HTMLInputElement).value = ''
   }
 }
 let hideErrorTimer: number | null = null
@@ -228,7 +195,7 @@ onMounted(() => {
       })
 
       form.on('submit(demo-login)', (data: any) => {
-    
+
 
         handleLogin(data.field)
         return false
@@ -249,7 +216,7 @@ onUnmounted(() => {
 })
 // 添加一个变量来跟踪当前是否有消息显示
 const isMessageShowing = ref(false)
-const currentMessageInstance = ref<any>(null) 
+const currentMessageInstance = ref<any>(null)
 
 // 创建一个包装函数来控制 ElMessage 的显示
 const showMessage = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
@@ -309,34 +276,42 @@ const handleLogin = async (formData: LoginForm) => {
       loading.value = false
       return
     }
-    let response: any 
+    let response: any
     // 调用登录接口
     if (isAccount.value) {
-      response = await axios.post(
+      response = await request(
         '/server/api/user/login/account',
-        {},
+        'POST',
         {
-          params: {
-            account: formData.loginId,
-            password: formData.password,
-          },
+          account: formData.loginId,
+          password: formData.password,
         },
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        }
+
       )
     } else {
-      response = await axios.post(
+      response = await request(
         '/server/api/user/login/email',
-        {},
+        'POST',
         {
-          params: {
-            email: formData.loginId,
-            password: formData.password,
-          },
+          email: formData.loginId,
+          password: formData.password,
+
         },
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        }
       )
     }
 
-    if (response.data.code === 0) {
-      const { token, userId } = response.data.data
+    if (response.code === 0) {
+      const { token, userId } = response.data
 
       // 存储token到localStorage
       localStorage.setItem('authToken', token)
@@ -354,9 +329,10 @@ const handleLogin = async (formData: LoginForm) => {
       }
 
       showMessage('success', '登录成功，欢迎进入PetGO!')
-      router.push('/persons')
+      const redirect = router.currentRoute.value.query.redirect as string;
+      router.push(redirect || '/person');
     } else {
-      const errorMsg = response.data.msg
+      const errorMsg = response.msg
       ElMessage.error(errorMsg)
 
       // 刷新验证码
@@ -373,9 +349,7 @@ const handleLogin = async (formData: LoginForm) => {
 
     // 登录失败处理
     console.error(error)
-    //   let errorMsg = '登录失败，请稍后重试'
-    //  ElMessage.error(errorMsg)
-    // errorMessage.value = errorMsg
+
     if (captchaRef.value) {
       captchaRef.value.refreshCaptcha()
     }
@@ -392,7 +366,7 @@ const handleLogin = async (formData: LoginForm) => {
 </script>
 
 <style scoped>
-::v-deep .layui-form-checked[lay-skin='primary'] > i {
+:deep .layui-form-checked[lay-skin='primary']>i {
   border-color: #fd9860 !important;
   background-color: #fd9860;
   color: #fff;
@@ -402,7 +376,7 @@ body {
   overflow: hidden;
 }
 
-.layui-form-checkbox[lay-skin='primary'] > div {
+.layui-form-checkbox[lay-skin='primary']>div {
   margin-top: 0.5px !important;
 }
 
@@ -420,12 +394,10 @@ body {
   font-weight: 500;
   transition: 0.8s;
   background-size: 280% auto;
-  background-image: linear-gradient(
-    325deg,
-    var(--btn-bg-2) 0%,
-    var(--btn-bg-1) 55%,
-    var(--btn-bg-2) 90%
-  );
+  background-image: linear-gradient(325deg,
+      var(--btn-bg-2) 0%,
+      var(--btn-bg-1) 55%,
+      var(--btn-bg-2) 90%);
   border: none;
   border-radius: var(--radii);
   color: var(--btn-bg-color);
@@ -483,7 +455,7 @@ body {
   font-size: 26px;
 }
 
-::v-deep .layui-input {
+:deep(.layui-input) {
   height: 38px !important;
   /* 可以根据需要调整高度值，默认通常是 38px 左右 */
   line-height: 38px;
@@ -557,7 +529,7 @@ body {
   color: #fff;
 }
 
-::v-deep .layui-form-checkbox[lay-skin='primary']:hover i {
+:deep(.layui-form-checkbox[lay-skin='primary']:hover i) {
   border-color: rgb(253, 152, 96);
 }
 
@@ -630,12 +602,12 @@ span {
 }
 
 /* 未勾选状态按钮样式 */
-.agreement-checkbox:not(:checked) + .agreement-label + .register-btn {
+.agreement-checkbox:not(:checked)+.agreement-label+.register-btn {
   background-color: #cccccc;
   cursor: not-allowed;
 }
 
-.agreement-checkbox:not(:checked) + .agreement-label + .register-btn:hover {
+.agreement-checkbox:not(:checked)+.agreement-label+.register-btn:hover {
   background-color: #cccccc;
 }
 
@@ -678,6 +650,7 @@ span {
 
 /* 定义脉冲动画 */
 @keyframes pulse {
+
   0%,
   100% {
     opacity: 1;

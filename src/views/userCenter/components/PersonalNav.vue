@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
+
 
 // 导航项数据（与父组件保持一致）
 const navItems = [

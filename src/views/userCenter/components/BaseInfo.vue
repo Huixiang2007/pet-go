@@ -30,6 +30,7 @@
           v-model="localFormData.birthday" 
           type="date" 
           name="birthday"
+          lay-verify="required" 
           placeholder="请选择生日日期" 
           :max-date="new Date()" 
           value-format="YYYY-MM-DD"
@@ -80,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits,ref,watch} from 'vue'
+import { ref,watch} from 'vue'
 import { ElMessage } from 'element-plus'
 
 // 接收父组件的表单数据
@@ -117,10 +118,21 @@ if (window.layui) {
         if (!phoneReg.test(value)) {
           return '请输入正确的手机号码'
         }
+        return undefined
       }
     })
     form.on('submit(save-base-info)', () => {
+        form.validate((valid: boolean) => {
+            if (valid) {
+              // 验证通过，执行实际的修改密码逻辑
       handleSave()
+              
+            } else {
+              // 验证失败，不执行修改密码逻辑
+              return false
+            }
+               return undefined
+          })
       return false
     })
   })
@@ -128,13 +140,14 @@ if (window.layui) {
 
 // 保存修改
 const handleSave = () => {
+  
   // 本地验证
   if (localFormData.value.nickname.length > 20) {
     ElMessage.error('昵称长度不能超过20个字符')
     return
   }
   if (localFormData.value.birthday) {
-    const birthdayDate = new Date(props.formData.birthday)
+    const birthdayDate = new Date(localFormData.value.birthday)
     const ageDiff = new Date().getFullYear() - birthdayDate.getFullYear()
     if (ageDiff > 150) {
       ElMessage.error('请输入合理的生日')

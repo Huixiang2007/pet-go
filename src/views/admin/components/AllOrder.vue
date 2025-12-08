@@ -33,7 +33,7 @@
         <el-table-column label="状态" prop="status" align="center"></el-table-column>
         <el-table-column label="操作" align="center">
           <template #default="scope">
-            <el-button size="mini" @click="handleView(scope.$index, scope.row)">查看</el-button>
+            <el-button size="small" @click="handleView(scope.$index, scope.row)">查看</el-button>
           </template>
         </el-table-column>
       </el-table>

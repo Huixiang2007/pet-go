@@ -3,21 +3,13 @@
     <div class="carousel-container">
       <div class="carousel" ref="carouselRef">
         <!-- 轮播图片 -->
-        <div
-          v-for="(image, index) in config.images"
-          :key="index"
-          :class="['slide', { active: currentSlide === index }]"
-        >
+        <div v-for="(image, index) in config.images" :key="index"
+          :class="['slide', { active: currentSlide === index }]">
           <img :src="image.src" :alt="image.alt" @load="onImageLoad" />
         </div>
 
         <!-- 碎片元素 -->
-        <div
-          v-for="fragment in fragments"
-          :key="fragment.id"
-          class="fragment"
-          :style="fragment.style"
-        ></div>
+        <div v-for="fragment in fragments" :key="fragment.id" class="fragment" :style="fragment.style"></div>
       </div>
 
       <!-- 导航按钮 -->
@@ -30,12 +22,8 @@
 
       <!-- 指示器 -->
       <div class="indicators">
-        <button
-          v-for="(image, index) in config.images"
-          :key="index"
-          :class="['dot', { active: currentSlide === index }]"
-          @click="goToSlide(index)"
-        ></button>
+        <button v-for="(image, index) in config.images" :key="index"
+          :class="['dot', { active: currentSlide === index }]" @click="goToSlide(index)"></button>
       </div>
     </div>
   </div>
@@ -83,7 +71,7 @@ interface Fragment {
 
 // 配置
 const getImageUrl = (name: string) => {
-  return new URL(`../assets/${name}`, import.meta.url).href
+  return new URL(`@/assets/img${name}`, import.meta.url).href
 }
 const config = reactive<CarouselConfig>({
   images: [

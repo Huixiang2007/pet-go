@@ -338,7 +338,7 @@ const submitRealName = async (realNameForm: any) => {
     const formData = new FormData()
     formData.append('realName', realNameForm.realName)
     formData.append('idCard', realNameForm.idCard)
-    formData.append('gender', Number(realNameForm.gender))
+    formData.append('gender', String(Number(realNameForm.gender)))
     formData.append('birthday', realNameForm.birthday)
     formData.append('address', realNameForm.address)
     formData.append('pictureUrl', realNameForm.idCardFrontFile)

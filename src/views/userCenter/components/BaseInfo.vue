@@ -1,5 +1,5 @@
 <template>
-  <form class="layui-form profile-form" lay-submit lay-filter="save-base-info">
+  <form class="layui-form profile-form" @submit.prevent="handleSave">
     <div class="layui-form-item">
       <label class="layui-form-label">昵称</label>
       <div class="layui-input-block">
@@ -70,7 +70,7 @@
 
     <div class="layui-form-item">
       <div class="layui-input-block">
-        <button class="layui-btn btn-save" type="submit">保存修改</button>
+        <button class="layui-btn btn-save"  type="submit">保存修改</button>
         <button class="layui-btn delete-btn" type="button" @click="handleCancel">取消修改</button>
       </div>
     </div>
@@ -109,50 +109,42 @@ const disabledDate = (time: Date) => {
   return time.getTime() > Date.now()
 }
 
-// 监听表单提交（layui触发）
-if (window.layui) {
-  window.layui.use('form', (form: any) => {
-    form.verify({
-      phone: function (value: string) {
-        const phoneReg = /^1[3-9]\d{9}$/
-        if (!phoneReg.test(value)) {
-          return '请输入正确的手机号码'
-        }
-        return undefined
-      }
-    })
-    form.on('submit(save-base-info)', () => {
-        form.validate((valid: boolean) => {
-            if (valid) {
-              // 验证通过，执行实际的修改密码逻辑
-      handleSave()
-              
-            } else {
-              // 验证失败，不执行修改密码逻辑
-              return false
-            }
-               return undefined
-          })
-      return false
-    })
-  })
-}
 
 // 保存修改
-const handleSave = () => {
-  
-  // 本地验证
-  if (localFormData.value.nickname.length > 20) {
+const handleSave = (event:Event) => {
+   event.preventDefault()
+    if (!localFormData.value.nickname) {
+    ElMessage.error('昵称不能为空')
+    return
+  }
+    if (localFormData.value.nickname.length > 20) {
     ElMessage.error('昵称长度不能超过20个字符')
     return
   }
-  if (localFormData.value.birthday) {
+   if (!localFormData.value.sex) {
+    ElMessage.error('请选择性别')
+    return
+  }
+  if (!localFormData.value.birthday) {
+    ElMessage.error('请选择生日')
+    return
+  }
+    if (localFormData.value.birthday) {
     const birthdayDate = new Date(localFormData.value.birthday)
     const ageDiff = new Date().getFullYear() - birthdayDate.getFullYear()
     if (ageDiff > 150) {
       ElMessage.error('请输入合理的生日')
       return
     }
+  }
+   if (!localFormData.value.phone) {
+    ElMessage.error('手机号不能为空')
+    return
+  }
+  const phoneReg = /^1[3-9]\d{9}$/
+  if (!phoneReg.test(localFormData.value.phone)) {
+    ElMessage.error('请输入正确的手机号码')
+    return
   }
   // 通知父组件保存
   emit('save', localFormData.value)
@@ -166,6 +158,12 @@ const handleCancel = () => {
 </script>
 
 <style scoped>
+:deep(.layui-form-radioed) {
+    color: #fd9860;
+}
+:deep(.layui-form-radioed > i) {
+    color: #fd9860;
+}
 .profile-form {
   max-width: 600px;
   position: relative;

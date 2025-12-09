@@ -108,7 +108,7 @@ export default defineComponent({
 
     // 验证用户输入的验证码
     const validateCaptcha = (input: string): boolean => {
-      return input === correctCode
+      return input.toLowerCase() === correctCode.toLowerCase()
     }
 
     const getCurrentCode = () => {

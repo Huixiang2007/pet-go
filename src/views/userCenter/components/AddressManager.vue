@@ -1,5 +1,9 @@
 <template>
-  <div class="address-manager" >
+ <div v-if="loading" class="loading-container">
+    <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+    <span class="loading-text">加载中...</span>
+  </div>
+  <div v-else class="address-manager" >
     <button class="layui-btn btn-save" @click="handleAdd" v-if="showAddressForm|| addressList.length > 0">
       <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
     </button>
@@ -70,6 +74,8 @@
 
     <!-- 地址列表 -->
     <div class="address-list" v-if="!showAddressForm && addressList.length > 0">
+      
+   
       <div class="address-item" v-for="address in addressList" :key="address.id">
         <div class="address-header">
           <span class="recipient">{{ address.consignee }} {{ address.phone }}</span>
@@ -98,8 +104,8 @@
           background 
         />
       </div>
-    </div>
-
+   
+</div>
     <!-- 空状态 -->
       <div class="empty-address" v-if="!showAddressForm && addressList.length === 0">
       <div class="empty-address-content">
@@ -150,7 +156,8 @@ interface District extends Area {
 
 // 定义事件（通知父组件刷新）
 const emit = defineEmits(['refresh'])
-
+// 在现有ref定义中添加
+const loading = ref(false)
 // 本地状态
 const addressForm = ref<Partial<Address>>({
   consignee: '',
@@ -184,6 +191,7 @@ watch(() => emit, () => {
 
 // 获取地址列表
 const getAddressList = async () => {
+    loading.value = true
   try {
     const userId = localStorage.getItem('userId') || ''
     if (!userId) {
@@ -216,6 +224,9 @@ const getAddressList = async () => {
   } catch (error) {
     console.log(error)
     ElMessage.error('获取地址失败！')
+  }finally {
+    // 无论成功失败，结束加载时隐藏加载状态
+    loading.value = false
   }
 }
 
@@ -327,7 +338,7 @@ const handleSave = async () => {
     }
   } catch (error) {
     console.log(error)
-    ElMessage.error('保存地址失败！')
+ 
   }
 }
 
@@ -392,6 +403,16 @@ const handleReset = () => {
 </script>
 
 <style scoped>
+.loading-container {
+  text-align: center;
+  padding: 2rem 0;
+  color: #fd9860;
+}
+
+.loading-text {
+  margin-left: 0.5rem;
+  color: #666;
+}
 .layui-btn-primary:hover {
     border-color: #fd9860 !important;
     color: #333;

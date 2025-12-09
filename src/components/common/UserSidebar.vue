@@ -32,10 +32,7 @@
         <!-- <template #title> -->
           <el-icon><User /></el-icon>
           <span v-if="sidebarOpened">用户管理</span>
-        <!-- </template> -->
-        <!-- <el-menu-item index="/user/common">普通用户管理</el-menu-item>
-        <el-menu-item index="/user/merchant">寄养商家管理</el-menu-item>
-        <el-menu-item index="/user/seller">卖家管理</el-menu-item> -->
+    
       </el-menu-item>
       <!-- 寄养服务管理 -->
       <el-sub-menu index="/admin/foster">
@@ -43,10 +40,10 @@
           <el-icon><House /></el-icon>
           <span v-if="sidebarOpened">寄养服务管理</span>
         </template>
-        <!-- <el-menu-item index="/admin/foster/audit">服务审核</el-menu-item> -->
-        <!-- <el-menu-item index="/admin/foster/orders">寄养订单管理</el-menu-item> -->
-        <!-- <el-menu-item index="/admin/foster/home">寄养家庭管理</el-menu-item> -->
-        <el-menu-item index="/admin/foster/audit">评价管理</el-menu-item>
+        <el-menu-item index="/admin/foster/audit">服务审核</el-menu-item> 
+      <el-menu-item index="/admin/foster/orders">寄养订单管理</el-menu-item> 
+         <el-menu-item index="/admin/foster/home">寄养家庭管理</el-menu-item>
+        <el-menu-item index="/admin/foster/comment">评价管理</el-menu-item>
       </el-sub-menu>
       <!-- 电商管理 -->
       <!-- <el-sub-menu index="admin/mall">

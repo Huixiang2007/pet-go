@@ -104,7 +104,7 @@
             <template #default="scope">
               <el-button
                 type="primary"
-                size="samll"
+                size="small"
                 icon="View"
                 class="view-btn"
                  @click="viewUser(scope.row)"
@@ -113,7 +113,7 @@
               </el-button>
               <el-button
                 type="warning"
-                size="samll"
+                size="small"
                 icon="Edit"
                 class="edit-btn"
                 @click="editUser(scope.row)"
@@ -122,7 +122,7 @@
               </el-button>
               <el-button
                 type="danger"
-                size="samll"
+                size="small"
                 icon="Delete"
                 class="del-btn"
                 
@@ -175,7 +175,7 @@ const userList = ref([
     realName: '罗小黑',
     phone: '17821044XXX',
     email: '352173371@qq.com',
-    avatar: 'http://8.13XXX/avatar1.png',
+    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
     userType: 'normal',
     authStatus: true
   },
@@ -185,7 +185,7 @@ const userList = ref([
     realName: '张小飞',
     phone: '187034078XX',
     email: '2711918392@qq.com',
-    avatar: 'http://8.13XXX/avatar2.png',
+    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
     userType: 'foster',
     authStatus: true
   },
@@ -195,7 +195,7 @@ const userList = ref([
     realName: '欧阳修',
     phone: '19836248XXX',
     email: '2711918393@qq.com',
-    avatar: 'http://8.13XXX/avatar3.png',
+    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
     userType: 'seller',
     authStatus: false
   },
@@ -205,7 +205,7 @@ const userList = ref([
     realName: '诸葛暗',
     phone: '17702505XXX',
     email: '2713318393@qq.com',
-    avatar: 'http://8.13XXX/avatar4.png',
+    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
     userType: 'normal',
     authStatus: true
   },
@@ -215,7 +215,7 @@ const userList = ref([
     realName: '开羽',
     phone: '156320145XX',
     email: '2713317393@qq.com',
-    avatar: 'http://8.13XXX/avatar5.png',
+    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
     userType: 'foster',
     authStatus: false
   }
@@ -248,119 +248,154 @@ const disableUser = (row: any) => {
   padding: 20px;
   background-color: #faf6f0;
   min-height: 100vh;
-}
 
-// 页面头部
-.page-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-  .header-icon {
-    font-size: 24px;
-    color: #e8a87c;
-    margin-right: 10px;
-  }
-  h2 {
-    margin: 0;
-    color: #6b5b45;
-    font-weight: 600;
-  }
-}
+  // 页面头部
+  .page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
 
-// 筛选搜索区
-.search-filter-wrapper {
-  margin-bottom: 20px;
-  .filter-card {
-    border-radius: 12px;
-    border: none;
-    background-color: #fff9f2;
-    .filter-select,
-    .search-input {
-      border-radius: 8px;
-      border-color: #e8d6c4;
+    .header-icon {
+      font-size: 24px;
+      color: #e8a87c;
+      margin-right: 10px;
     }
-    .search-btn-group {
-      display: flex;
-      gap: 10px;
-      .query-btn {
-        background-color: #e8a87c;
-        border-color: #e8a87c;
-        border-radius: 8px;
-      }
-      .reset-btn {
+
+    h2 {
+      margin: 0;
+      color: #6b5b45;
+      font-weight: 600;
+    }
+  }
+
+  // 筛选搜索区
+  .search-filter-wrapper {
+    margin-bottom: 20px;
+
+    .filter-card {
+      border-radius: 12px;
+      border: none;
+      background-color: #fff9f2;
+      padding: 15px; // 补充内边距，避免筛选内容贴边
+
+      .filter-select,
+      .search-input {
         border-radius: 8px;
         border-color: #e8d6c4;
-        color: #6b5b45;
+        width: 100%; // 补充宽度，适配布局
+      }
+
+      .search-btn-group {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end; // 补充右对齐，符合筛选按钮习惯
+
+        .query-btn {
+          background-color: #e8a87c;
+          border-color: #e8a87c;
+          border-radius: 8px;
+        }
+
+        .reset-btn {
+          border-radius: 8px;
+          border-color: #e8d6c4;
+          color: #6b5b45;
+        }
       }
     }
   }
-}
 
-// 用户列表区
-.user-list-wrapper {
-  .list-card {
-    border-radius: 12px;
-    border: none;
-    background-color: #fff;
-    // 表格样式
-    .user-table {
-      --el-table-border-color: #e8d6c4;
-      --el-table-hover-row-bg-color: #fff9f2;
-      border-radius: 8px;
-      overflow: hidden;
+  // 用户列表区
+  .user-list-wrapper {
+    .list-card {
+      border-radius: 12px;
+      border: none;
+      background-color: #fff;
+      padding: 15px; // 补充内边距
 
-      .user-name-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        .user-avatar {
-          width: 30px;
-          height: 30px;
-          border: 1px solid #f0e6dc;
+      // 表格样式 - 修正 Element 变量写法
+      .user-table {
+        border-radius: 8px;
+        overflow: hidden;
+        // 把 CSS 自定义属性移到单独的 &::v-deep 或直接用内联样式（避免 SCSS 编译冲突）
+        &::v-deep {
+          --el-table-border-color: #e8d6c4;
+          --el-table-hover-row-bg-color: #fff9f2;
+        }
+
+        .user-name-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .user-avatar {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #f0e6dc;
+            border-radius: 50%; // 补充圆形头像，贴合治愈风格
+          }
+        }
+
+        .type-tag,
+        .auth-tag {
+          border-radius: 6px;
+        }
+
+        // 按钮样式统一
+        .view-btn,
+        .edit-btn,
+        .del-btn {
+          border-radius: 6px;
+          margin: 0 2px; // 统一按钮间距，删除冗余的 margin-top
+        }
+
+        .view-btn {
+          background-color: #c3e6cb;
+          border-color: #c3e6cb;
+          color: #28a745;
+        }
+
+        .edit-btn {
+          background-color: #ffeaa7;
+          border-color: #ffeaa7;
+          color: #fd7e14;
+        }
+
+        .del-btn {
+          background-color: #f8d7da;
+          border-color: #f8d7da;
+          color: #dc3545;
         }
       }
 
-      .type-tag {
-        border-radius: 6px;
-      }
+      // 分页样式
+      .pagination-wrapper {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
 
-      .auth-tag {
-        border-radius: 6px;
-      }
-
-      .view-btn {
-        background-color: #c3e6cb;
-        border-color: #c3e6cb;
-        color: #28a745;
-        border-radius: 6px;
-      }
-
-      .edit-btn {
-        background-color: #ffeaa7;
-        border-color: #ffeaa7;
-        color: #fd7e14;
-        border-radius: 6px;
-      }
-
-      .del-btn {
-        background-color: #f8d7da;
-        border-color: #f8d7da;
-        color: #dc3545;
-        border-radius: 6px;
+        .user-pagination {
+          &::v-deep {
+            --el-pagination-button-bg-color: #fff;
+            --el-pagination-button-border-color: #e8d6c4;
+            --el-pagination-text-color: #6b5b45;
+            --el-pagination-active-color: #e8a87c;
+          }
+        }
       }
     }
+  }
 
-    // 分页样式
-    .pagination-wrapper {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      .user-pagination {
-        --el-pagination-button-bg-color: #fff;
-        --el-pagination-button-border-color: #e8d6c4;
-        --el-pagination-text-color: #6b5b45;
-        --el-pagination-active-color: #e8a87c;
-      }
+  // 响应式适配（补充，避免小屏布局错乱）
+  @media (max-width: 768px) {
+    padding: 10px;
+
+    .search-filter-wrapper .filter-card .search-btn-group {
+      flex-wrap: wrap;
+    }
+
+    .user-table {
+      font-size: 12px;
     }
   }
 }

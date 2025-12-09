@@ -1,5 +1,26 @@
 <template>
-  <div class="profile-container">
+  <div class="profile-container"  :style="{backgroundColor:bgColor}">
+        <div class="circle-color-picker">
+      <!-- 触发层：圆形图标 -->
+      <div 
+        class="color-trigger" 
+        :style="{ backgroundColor: bgColor }"
+        @click="showPicker = !showPicker"
+      >
+        <i class="layui-icon layui-icon-palette"></i> <!-- 色彩图标 -->
+      </div>
+      <!-- 选择器弹窗：点击图标后显示 -->
+      <div class="picker-popup" v-show="showPicker">
+        <el-color-picker
+          v-model="bgColor"
+          @change="handleBgColorChange"
+          @close="showPicker = false"
+          size="small"
+          :predefine="['#f5f5f5', '#f0f8fb', '#fdf2f8', '#f5fafe', '#faf6ed', '#f8f8f8']"
+          popper-class="custom-color-popper"
+        />
+      </div>
+    </div>
     <!-- 顶部用户核心信息 -->
     <header class="profile-header">
       <PersonalAvatar 
@@ -65,7 +86,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage,ElColorPicker } from 'element-plus'
 import request from '@/utils/request'
 // 导入子组件
 import PersonalAvatar from '@/views/userCenter/components/PersonAvatar.vue'
@@ -96,7 +117,7 @@ const currentTab = ref(0)
 const userInfo = ref({
   avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
   nickname: 'PetGo用户',
-  sex: '1',
+  sex: 1,
   phone: '',
   birthday: '',
   email: '',
@@ -108,13 +129,23 @@ const realNameInfo = ref({
   idCard: '',
   idCardFront: '',
   idCardBack: '',
-   gender: '1',
+   gender: 1,
   birthday: '',
   address: '',
 
 })
 const isFetching = ref(false)
 const router = useRouter()
+
+const bgColor = ref(localStorage.getItem('profileBgColor') || '#f5f5f5')
+const showPicker = ref(false) // 控制选择器弹窗显示/隐藏
+const handleBgColorChange = (newColor: string) => {
+   if (!newColor) return
+  bgColor.value = newColor
+  localStorage.setItem('profileBgColor', newColor)
+  showPicker.value = false // 选择后关闭弹窗
+  ElMessage.success('背景色已更新！')
+}
 // 1. 定义地址分页参数（核心缺失的变量）
 const addressPagination = ref({
   currentPage: 1,  
@@ -128,6 +159,8 @@ const addressList = ref([])
 
 // 3. 定义“显示添加地址表单”的开关
 const showAddressForm = ref(false)
+
+
 // 初始化
 onMounted(() => {
   getUserInfo()
@@ -139,7 +172,12 @@ onMounted(() => {
       })
     }
   }, 500)
-
+ document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement
+    if (!target.closest('.circle-color-picker')) {
+      showPicker.value = false
+    }
+  })
   // 切换标签时重新渲染表单/加载数据
   watch(currentTab, () => {
     if (window.layui) {
@@ -324,6 +362,7 @@ const saveBaseInfo = async (formData: any) => {
     if (response.code === 0) {
       
       userInfo.value = { ...userInfo.value, ...formData }
+      getUserInfo()
       ElMessage.success('保存信息成功！')
     }
   } catch (error) {
@@ -425,6 +464,51 @@ const gotoHome = () => {
 </script>
 
 <style scoped>
+
+.circle-color-picker {
+  position: absolute;
+     top: 148px;
+    right: 48px;
+  z-index: 9999;
+}
+
+/* 圆形触发图标 */
+.color-trigger {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* 圆形 */
+  background-color: #f5f5f5;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.color-trigger:hover {
+  transform: scale(1.05); /*  hover 放大 */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.color-trigger .layui-icon {
+  font-size: 18px;
+  color: #333; /* 图标颜色 */
+}
+
+/* 选择器弹窗 */
+.picker-popup {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background: #fff;
+  padding: 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  z-index: 9999;
+}
+
 .layui-btn-primary:hover {
   border-color: #fd9860;
   color: #fd9860;
@@ -433,7 +517,7 @@ const gotoHome = () => {
 .profile-container {
   width: 100%;
   height: 100vh;
-  background-color: #f5f5f5;
+ position: relative;
 }
 
 .newColor{
@@ -456,7 +540,7 @@ const gotoHome = () => {
 
 .profile-body {
   display: flex;
-  min-height: calc(100vh - 133px);
+  min-height: calc(100vh - 132px);
 }
 
 .content-area {

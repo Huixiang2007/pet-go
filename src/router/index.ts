@@ -264,14 +264,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/enterPet/ForgetPassword.vue'),
     meta: { title: '找回密码', requiresAuth: false },
   },
-  //个人中心
-  // {
-  //   path: '/persons',
-  //   name: 'PersonalCenter',
-  //   component: () => import('@/views/user/PersonalCenter.vue'),
-  //   meta: { title: '个人中心', requiresAuth: true },
-  // },
-  //个人中心组件版
+
   {
     path: '/persons',
     name: 'PersonalCenter',
@@ -321,7 +314,7 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'audit',
             name: 'fosterAudit',
-            component: () => import('@/views/admin/components/AllJudge.vue'),
+            component: () => import('@/views/admin/components/foster/FosterAudit.vue'),
             meta: {
               title: '服务审核',
             },
@@ -329,9 +322,25 @@ const routes: RouteRecordRaw[] = [
           {
             path: 'orders',
             name: 'fosterOrder',
-            component: () => import('@/views/admin/components/AllOrder.vue'),
+            component: () => import('@/views/admin/components/foster/FosterOrder.vue'),
             meta: {
               title: '寄养订单',
+            },
+          },
+           {
+            path: 'home',
+            name: 'fosterHome',
+            component: () => import('@/views/admin/components/foster/FosterHome.vue'),
+            meta: {
+              title: '寄养家庭管理',
+            },
+          },
+          {
+            path: 'comment',
+            name: 'fosterComment',
+            component: () => import('@/views/admin/components/foster/FosterComment.vue'),
+            meta: {
+              title: '评价管理',
             },
           },
         ],

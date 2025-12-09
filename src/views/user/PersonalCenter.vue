@@ -104,7 +104,7 @@
               </div>
             </div>
             <div class="show-photo">
-              <img src="@/assets/img/catPicture3.png" alt="这是展示图片" />
+              <img src="@/assets/img/do.png" alt="这是展示图片" />
             </div>
           </form>
 

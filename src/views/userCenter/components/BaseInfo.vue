@@ -1,4 +1,5 @@
 <template>
+
   <form class="layui-form profile-form" @submit.prevent="handleSave">
     <div class="layui-form-item">
       <label class="layui-form-label">昵称</label>
@@ -74,9 +75,9 @@
         <button class="layui-btn delete-btn" type="button" @click="handleCancel">取消修改</button>
       </div>
     </div>
-    <div class="show-photo">
-      <img src="@/assets/img/catPicture3.png" alt="这是展示图片" />
-    </div>
+    <!-- <div class="show-photo">
+      <img src="@/assets/img/do.png" alt="这是展示图片" />
+    </div> -->
   </form>
 </template>
 

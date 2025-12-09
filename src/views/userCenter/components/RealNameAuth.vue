@@ -1,5 +1,9 @@
 <template>
-  <form class="layui-form profile-form" @submit.prevent="  handleSubmit">
+ <div v-if="isLoading" class="loading-state">
+    <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+    <p>加载中...</p>
+  </div>
+  <form class="layui-form profile-form" @submit.prevent="  handleSubmit" v-else>
     <!-- 审核中状态 -->
     <div v-if="localStatus === 'pending'">
       <div class="verify-status">
@@ -246,7 +250,7 @@
 import { ref,onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
-
+const isLoading = ref(true)
 // 接收父组件的状态和信息
 defineProps({
   status: { 
@@ -274,7 +278,7 @@ const realNameForm = ref({
   idCardBackFile: null as File | null,
 })
 
-
+  
 // 本地状态和信息，用于替代从父组件接收的状态
 const localStatus = ref<'unverified' | 'pending' | 'verified'>('unverified')
 const localInfo = ref({
@@ -282,7 +286,7 @@ const localInfo = ref({
   idCard: '',
   idCardFront: '',
   idCardBack: '',
-   gender: 1,
+   gender: '',
   birthday: '',
   address: '',
 })
@@ -295,6 +299,7 @@ onMounted(() => {
 // 获取实名认证状态的函数
 const getRealNameStatus = async () => {
   try {
+      isLoading.value = true  // 开始加载
     const userId = localStorage.getItem('userId') || ''
     if (!userId) {
       ElMessage.error('用户未登录')
@@ -317,7 +322,7 @@ const getRealNameStatus = async () => {
           localInfo.value = {
             realName: response.data.realName || '',
             idCard: response.data.idCard || '',
-             gender: response.data.gender || 1,
+             gender: (response.data.gender ?? '').toString(),
             birthday: response.data.birthday || '',
             address: response.data.address || '',
             idCardFront: pictureUrlArr[0] || '',
@@ -329,7 +334,7 @@ const getRealNameStatus = async () => {
               localInfo.value = {
             realName: response.data.realName || '',
             idCard: response.data.idCard || '',
-             gender: response.data.gender || '1',
+             gender: (response.data.gender ?? '').toString(),
             birthday: response.data.birthday || '',
             address: response.data.address || '',
             idCardFront: response.data.idCardFront || '',
@@ -345,9 +350,9 @@ const getRealNameStatus = async () => {
       }
     } 
   } catch (error) {
-    console.error('获取实名认证状态异常:', error)
-    
-   
+    console.error('获取实名认证状态异常:', error) 
+  }finally {
+    isLoading.value = false  // 无论成功失败都结束加载
   }
 }
 // 身份证脱敏
@@ -466,6 +471,17 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
+.loading-state {
+  text-align: center;
+  padding: 50px 0;
+  color: #666;
+}
+
+.loading-state i {
+  font-size: 30px;
+  margin-bottom: 15px;
+  color: #fd9860;
+}
 :deep(.layui-form-radioed) {
     color: #fd9860;
 }

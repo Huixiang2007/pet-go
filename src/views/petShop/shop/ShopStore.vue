@@ -52,7 +52,8 @@
             </p></div>
             <div>
             <div class="shop-btn flex mt-20 justify-center md:justify-start gap-4">
-              <button class="bg-white text-orange-500 px-6 py-2 rounded-full text-sm border-2 border-orange-500 hover:bg-orange-50 transition-all active:scale-95">联系客服</button>
+              <router-link
+              to="/customer-service" class="bg-white text-orange-500 px-6 py-2 rounded-full text-sm border-2 border-orange-500 hover:bg-orange-50 transition-all active:scale-95">联系客服</router-link>
             </div></div>
 
           </div>
@@ -311,7 +312,7 @@ const getstore=()=>{
   axios.request({
     url: `/server/api/shop/shops/detail/${shopid}`,
     method: 'GET'
-    }).then(res => {
+    }).then((res: any) => {
       console.log('接口返回数据:', res)
       const store = res.data.data
       shopItem.value = store

@@ -14,10 +14,13 @@
       <div class="bg-white rounded-xl shadow-md p-6 md:p-8 transition-all duration-300 hover:shadow-lg">
         <form @submit.prevent="handleSubmit" class="space-y-8">
 
-          <ProductBasicInfo v-model:form="productForm" />
+<ProductBasicInfo
+  :form="productForm"
+  @update:form="handleFormUpdate"
+/>
 
-
-          <ProductImageUpload v-model:mainImage="productForm.mainImage" v-model:imagesList="productForm.imagesList"
+          <ProductImageUpload v-model:mainImage="productForm.mainImage"
+          v-model:imagesList="productForm.imagesList"
             v-model:videoUrl="productForm.videoUrl" />
           <div class="flex justify-end space-x-4 pt-6 border-t border-yellow-100">
             <el-button size="default" type="primary" @click="handleReset"
@@ -41,7 +44,7 @@
     </div>
 
     <teleport to="body">
-      <div v-if="showMessage"
+      <div v-if="message"
         :class="['fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300', messageType === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white']">
         <p class="flex items-center">
           <i :class="messageType === 'success' ? 'fa fa-check-circle mr-2' : 'fa fa-exclamation-circle mr-2'"></i>
@@ -53,10 +56,16 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref ,watch} from 'vue'
 import axios from 'axios'
 import ProductBasicInfo  from './components/ProductBasicInfo.vue'
 import ProductImageUpload from './components/ProductImageUpload.vue'
+
+interface ProductImage {
+  name: string
+  url: string
+  isImage: boolean
+}
 
 // 商品表单接口
 interface ProductForm {
@@ -71,13 +80,11 @@ interface ProductForm {
   costPrice: number
   stock: number
   mainImage: string
-  imagesList: string[]
+  imagesList: ProductImage[]
   videoUrl: string
   detail: string
   warrantyTip: string
 }
-
-
 // 商品表单数据
 const productForm = reactive<ProductForm>({
   productSn: '',
@@ -101,67 +108,85 @@ const showMessage = ref(false)
 const message = ref('')
 const messageType = ref<'success' | 'error'>('success')
 
+//提示框方法
 const showToastMessage = (msg: string, type: 'success' | 'error' = 'success') => {
   message.value = msg
   messageType.value = type
   showMessage.value = true
   setTimeout(() => showMessage.value = false, 3000)
 }
-console.log(productForm.imagesList)
-console.log(productForm.imagesList.join(','))
-console.log(productForm.mainImage)
-// 表单验证
-const validateForm = (): boolean => {
-  if (!productForm.productSn) { showToastMessage('请输入商品编码', 'error'); return false }
-  if (!productForm.title) { showToastMessage('请输入商品名称', 'error'); return false }
-  if (productForm.typeParent === 0) { showToastMessage('请输入父分类ID', 'error'); return false }
-  if (productForm.typeChild === 0) { showToastMessage('请输入子分类ID', 'error'); return false }
-  if (productForm.currentPrice <= 0) { showToastMessage('请输入有效的销售价', 'error'); return false }
-  if (productForm.marketPrice <= 0) { showToastMessage('请输入有效的市场价', 'error'); return false }
-  if (productForm.costPrice < 0) { showToastMessage('请输入有效的成本价', 'error'); return false }
-  if (productForm.stock < 0) { showToastMessage('请输入有效的库存数量', 'error'); return false }
-  if (!productForm.mainImage) { showToastMessage('请上传商品主图', 'error'); return false }
-  if (!productForm.detail) { showToastMessage('请输入商品详细描述', 'error'); return false }
-  return true
+watch(
+  () => productForm,
+  (newVal) => {
+    console.log('父组件productForm最新值：', newVal) // 调试用
+  },
+  { deep: true, immediate: true }
+)
+interface BasicProductForm {
+  productSn: string
+  title: string
+  subTitle: string
+  brandId: number
+  typeParent: number
+  typeChild: number
+  currentPrice: number
+  marketPrice: number
+  costPrice: number
+  stock: number
+  detail: string
+  warrantyTip: string
+}
+
+const handleFormUpdate = (newForm: BasicProductForm) => {
+  Object.assign(productForm, newForm) // 如果 productForm 是 reactive
+
 }
 
 // 提交表单
 const handleSubmit = () => {
-  if (!validateForm() || isSubmitting.value) return
+
+  if (isSubmitting.value) return
   isSubmitting.value = true
-    const submitData = {
-      ...productForm,
-      images: productForm.imagesList.join(',')
-    }
+
+  // 构造提交数据
+  const submitData = {
+    ...productForm,
+    images: productForm.imagesList.join(',')
+  }
+
+  console.log('最终提交的数据：', submitData) // 调试用
 
   axios.request({
-      url: '/server/api/shop/product/add',
-      method: 'POST',
-      data: submitData
-    })
-.then(response => {
-      showToastMessage('商品添加成功！')
-      console.log('商品添加成功:', response.data)
-      handleReset()
-    })
-    .catch(error => {
-      console.log('提交失败:', error.response?.data)
-      showToastMessage('提交失败，请稍后重试。', 'error')
+    url: '/server/api/shop/product/add',
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('authToken')}` // 添加token
+    },
+    data: submitData
+  })
+  .then(response => {
+      isSubmitting.value = false
+    showToastMessage('商品添加成功！')
+    console.log('商品添加成功:', response.data)
+    handleReset()
+  })
+  .catch(error => {
+      isSubmitting.value = false
+    console.error('提交失败:', error.response?.data || error.message)
+    showToastMessage(error.response?.data?.msg || '提交失败，请稍后重试。', 'error')
+  })
 
-    })
+
 }
 
-
+// 重置表单
 const handleReset = () => {
-  if (confirm('确定要重置表单吗？所有已填写内容将被清空。')) {
     Object.assign(productForm, {
       productSn: '', title: '', subTitle: '', brandId: 0, typeParent: 0, typeChild: 0,
       currentPrice: 0, marketPrice: 0, costPrice: 0, stock: 0, mainImage: '',
       imagesList: [], videoUrl: '', detail: '', warrantyTip: ''
     })
-
   }
-}
 </script>
 
 <style scoped>

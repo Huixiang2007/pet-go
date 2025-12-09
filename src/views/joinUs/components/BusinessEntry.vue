@@ -39,9 +39,6 @@ d:/vcode/pet-go-web/src/views/joinUs/components/BusinessEntry.vue
               <label class="block text-sm font-medium text-gray-700">
                 商铺头像 <span class="text-red-500">*</span>
               </label>
-              <div v-if="imagePreviews.shopAvatar" class="mb-2">
-                <img :src="imagePreviews.shopAvatar" class="max-w-full max-h-40 object-contain rounded" alt="商铺头像预览" />
-              </div>
               <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'shopAvatar')">
                 <template #default>
                   <i class="fa fa-cloud-upload text-4xl text-purple-500 mb-2"></i>
@@ -55,11 +52,6 @@ d:/vcode/pet-go-web/src/views/joinUs/components/BusinessEntry.vue
               <label class="block text-sm font-medium text-gray-700">
                 营业执照照片 <span class="text-red-500">*</span>
               </label>
-
-              <div v-if="imagePreviews.businessLicense" class="mb-2">
-                <img :src="imagePreviews.businessLicense" class="max-w-full max-h-40 object-contain rounded"
-                  alt="营业执照预览" />
-              </div>
               <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'businessLicense')">
                 <template #default>
                   <i class="fa fa-file-image-o text-4xl text-purple-500 mb-2"></i>
@@ -111,11 +103,6 @@ d:/vcode/pet-go-web/src/views/joinUs/components/BusinessEntry.vue
               <label class="block text-sm font-medium text-gray-700">
                 身份证正面 <span class="text-red-500">*</span>
               </label>
-
-              <div v-if="imagePreviews.idCardFront" class="mb-2">
-                <img :src="imagePreviews.idCardFront" class="max-w-full max-h-40 object-contain rounded"
-                  alt="身份证正面预览" />
-              </div>
               <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'idCardFront')">
                 <template #default>
                   <i class="fa fa-id-card-o text-4xl text-purple-500 mb-2"></i>
@@ -129,10 +116,6 @@ d:/vcode/pet-go-web/src/views/joinUs/components/BusinessEntry.vue
               <label class="block text-sm font-medium text-gray-700">
                 身份证反面 <span class="text-red-500">*</span>
               </label>
-
-              <div v-if="imagePreviews.idCardBack" class="mb-2">
-                <img :src="imagePreviews.idCardBack" class="max-w-full max-h-40 object-contain rounded" alt="身份证反面预览" />
-              </div>
               <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'idCardBack')">
                 <template #default>
                   <i class="fa fa-id-card text-4xl text-purple-500 mb-2"></i>

@@ -14,7 +14,7 @@
             type="text"
             id="productSn"
             v-model="localForm.productSn"
-            @input="updateParentForm"
+            @input="syncToParent"
             required
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
             placeholder="请输入商品编码"
@@ -28,7 +28,7 @@
             type="text"
             id="title"
             v-model="localForm.title"
-            @input="updateParentForm"
+            @input="syncToParent"
             required
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
             placeholder="请输入商品名称"
@@ -42,7 +42,7 @@
             type="text"
             id="subTitle"
             v-model="localForm.subTitle"
-            @input="updateParentForm"
+            @input="syncToParent"
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
             placeholder="请输入商品副标题"
           />
@@ -50,22 +50,22 @@
         <div class="form-group">
           <label for="brandId" class="block text-sm font-medium text-yellow-800 mb-1"> 品牌 </label>
           <select
-            id="brandId"
-            v-model.number="localForm.brandId"
-            @change="updateParentForm"
-            class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
-          >
-            <option value="">请选择品牌</option>
-            <option class="z-50" v-for="brand in brands" :key="brand.id" :value="brand.id">
-              {{ brand }}
-            </option>
-          </select>
+  id="brandId"
+  v-model.number="localForm.brandId"
+  @change="syncToParent"
+  class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
+>
+  <option value="0">请选择品牌</option>
+  <option v-for="brand in brands" :key="brand.id" :value="brand.id">
+    {{ brand}}
+  </option>
+</select>
         </div>
         <div class="form-group">
           <label for="typeParent" class="block text-sm font-medium text-yellow-800 mb-1">
             父分类<span class="text-red-500">*</span>
           </label>
-          <select
+      <select
             id="typeParent"
             v-model.number="localForm.typeParent"
             @change="handleParentChange"
@@ -85,7 +85,7 @@
           <select
             id="typeChild"
             v-model.number="localForm.typeChild"
-            @change="updateParentForm"
+            @change="syncToParent"
             required
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
           >
@@ -112,7 +112,7 @@
             type="number"
             id="currentPrice"
             v-model.number="localForm.currentPrice"
-            @input="updateParentForm"
+            @input="syncToParent"
             min="0"
             step="0.01"
             required
@@ -128,7 +128,7 @@
             type="number"
             id="marketPrice"
             v-model.number="localForm.marketPrice"
-            @input="updateParentForm"
+            @input="syncToParent"
             min="0"
             step="0.01"
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
@@ -143,7 +143,7 @@
             type="number"
             id="costPrice"
             v-model.number="localForm.costPrice"
-            @input="updateParentForm"
+            @input="syncToParent"
             min="0"
             step="0.01"
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
@@ -158,7 +158,7 @@
             type="number"
             id="stock"
             v-model.number="localForm.stock"
-            @input="updateParentForm"
+            @input="syncToParent"
             min="0"
             required
             class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
@@ -180,7 +180,7 @@
         <textarea
           id="detail"
           v-model="localForm.detail"
-          @input="updateParentForm"
+          @input="syncToParent"
           rows="6"
           required
           class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none resize-none"
@@ -195,7 +195,7 @@
           type="text"
           id="warrantyTip"
           v-model="localForm.warrantyTip"
-          @input="updateParentForm"
+          @input="syncToParent"
           class="w-full px-4 py-2.5 border border-yellow-200 rounded-lg focus:ring-[1px] focus:ring-yellow-500 focus:border-yellow-500 transition-all outline-none"
           placeholder="请输入售后保障提示"
         />
@@ -237,7 +237,6 @@ const brands = ref<Brand[]>([])
 const parentsTypes = ref<Category[]>([])
 const sonTypes = ref<Category[]>([])
 const authToken = localStorage.getItem('authToken')
-console.log(authToken)
 
 const props = defineProps<{
   form: ProductForm
@@ -247,19 +246,53 @@ const emit = defineEmits<{
   (e: 'update:form', value: ProductForm): void
 }>()
 
-const initForm = { ...props.form }
-if (initForm.typeParent === 0) initForm.typeParent = undefined
-const localForm = ref<ProductForm>(initForm)
+const localForm = ref<ProductForm>({
+  productSn: '',
+  title: '',
+  subTitle: '',
+  brandId: 0,
+  typeParent: 0,
+  typeChild: 0,
+  currentPrice: 0,
+  marketPrice: 0,
+  costPrice: 0,
+  stock: 0,
+  detail: '',
+  warrantyTip: ''
+})
 
 watch(
   () => props.form,
   (newForm) => {
-    const form = { ...newForm }
-    if (form.typeParent === 0) form.typeParent = undefined
-    localForm.value = form
+    if (JSON.stringify(newForm) !== JSON.stringify(localForm.value)) {
+      Object.assign(localForm.value, newForm)
+    }
   },
-  { deep: true },
+  { immediate: true, deep: true }
 )
+
+
+// 更新父组件表单
+const syncToParent = () => {
+  const syncData = {
+    ...localForm.value,
+    brandId: localForm.value.brandId || 0,
+    typeParent: localForm.value.typeParent || 0,
+    typeChild: localForm.value.typeChild || 0,
+    currentPrice: localForm.value.currentPrice || 0,
+    marketPrice: localForm.value.marketPrice || 0,
+    costPrice: localForm.value.costPrice || 0,
+    stock: localForm.value.stock || 0
+  }
+  emit('update:form', syncData)
+  console.log('子组件同步到父组件的数据：', syncData)
+}
+
+// 分类选择变化处理
+const handleParentChange = () => {
+  syncToParent()
+  getSonTypes()
+}
 
 const getBrands = () => {
   axios
@@ -310,7 +343,6 @@ const getSonTypes = () => {
     sonTypes.value = []
     return
   }
-
   axios
     .request({
       url: '/server/api/shop/product/add/childType',
@@ -335,21 +367,16 @@ const getSonTypes = () => {
     })
 }
 
-const handleParentChange = () => {
-  updateParentForm()
-  getSonTypes()
-  console.log('当前选中的父分类 ID：', localForm.value.typeParent)
-}
-
-const updateParentForm = () => {
-  emit('update:form', { ...localForm.value })
-}
-
 onMounted(() => {
   getBrands()
   getParentsTypes()
+  if (props.form.typeParent && props.form.typeParent !== 0) {
+    localForm.value.typeParent = props.form.typeParent
+    getSonTypes()
+  }
 })
 </script>
+
 <style scoped>
 .form-section {
   padding: 10px 0;

@@ -34,7 +34,7 @@
  <div class="layui-form-item">
           <label class="layui-form-label">用户性别</label>
           <div class="layui-input-block info-display">
-            {{ localInfo.gender === '1' ? '男' : localInfo.gender === '0' ? '女' : '未填写' }}
+            {{ localInfo.gender === 1 ? '男' : localInfo.gender === 0 ? '女' : '未填写' }}
           </div>
         </div>
         <div class="layui-form-item">
@@ -100,7 +100,7 @@
          <div class="layui-form-item">
           <label class="layui-form-label">用户性别</label>
           <div class="layui-input-block info-display">
-            {{ localInfo.gender === '1' ? '男' : localInfo.gender === '0' ? '女' : '未填写' }}
+            {{ localInfo.gender === 1 ? '男' : localInfo.gender === 0 ? '女' : '未填写' }}
           </div>
         </div>
         <div class="layui-form-item">

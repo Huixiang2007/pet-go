@@ -12,7 +12,7 @@
       </li>
     </ul>
     <div class="show-photos">
-      <img src="@/assets/img/catPicture.png" alt="这是展示图片" />
+      <img src="@/assets/img/catPicture5.png" alt="这是展示图片" />
     </div>
   </aside>
 </template>

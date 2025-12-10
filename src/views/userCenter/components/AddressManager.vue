@@ -1,6 +1,10 @@
 <template>
-  <div class="address-manager">
-    <button class="layui-btn btn-save" @click="handleAdd">
+ <div v-if="loading" class="loading-container">
+    <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
+    <span class="loading-text">加载中...</span>
+  </div>
+  <div v-else class="address-manager" >
+    <button class="layui-btn btn-save" @click="handleAdd" v-if="showAddressForm|| addressList.length > 0">
       <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
     </button>
 
@@ -70,6 +74,8 @@
 
     <!-- 地址列表 -->
     <div class="address-list" v-if="!showAddressForm && addressList.length > 0">
+      
+   
       <div class="address-item" v-for="address in addressList" :key="address.id">
         <div class="address-header">
           <span class="recipient">{{ address.consignee }} {{ address.phone }}</span>
@@ -98,11 +104,18 @@
           background 
         />
       </div>
-    </div>
-
+   
+</div>
     <!-- 空状态 -->
-    <div class="empty-address" v-if="!showAddressForm && addressList.length === 0">
-      <p>您还没有添加收货地址，点击"添加新地址"按钮添加</p>
+      <div class="empty-address" v-if="!showAddressForm && addressList.length === 0">
+      <div class="empty-address-content">
+        <i class="layui-icon layui-icon-location" style="font-size: 48px; color: #ccc;"></i>
+        <h3>暂无收货地址</h3>
+        <p>您还没有添加任何收货地址</p>
+        <button class="layui-btn btn-save" @click="handleAdd">
+          <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -143,7 +156,8 @@ interface District extends Area {
 
 // 定义事件（通知父组件刷新）
 const emit = defineEmits(['refresh'])
-
+// 在现有ref定义中添加
+const loading = ref(false)
 // 本地状态
 const addressForm = ref<Partial<Address>>({
   consignee: '',
@@ -177,6 +191,7 @@ watch(() => emit, () => {
 
 // 获取地址列表
 const getAddressList = async () => {
+    loading.value = true
   try {
     const userId = localStorage.getItem('userId') || ''
     if (!userId) {
@@ -188,15 +203,30 @@ const getAddressList = async () => {
       pageNum: pagination.value.currentPage,
       pageSize: pagination.value.pageSize,
     })
+    console.log(response)
+    if(response.code === 0){
+      if(response.msg === '操作成功'){
     addressList.value = response.data.list || []
     pagination.value.total = response.data.total || 0
     pagination.value.pages = response.data.pages || 1
     if (pagination.value.currentPage === 1 && addressList.value.length === 0) {
       showAddressForm.value = true
     }
+      }
+      if(response.msg === '用户暂无地址！'){
+        ElMessage.warning('您还没有添加收货地址！')
+      }
+    
+ 
+    }
+       
+   
   } catch (error) {
     console.log(error)
     ElMessage.error('获取地址失败！')
+  }finally {
+    // 无论成功失败，结束加载时隐藏加载状态
+    loading.value = false
   }
 }
 
@@ -308,7 +338,7 @@ const handleSave = async () => {
     }
   } catch (error) {
     console.log(error)
-    ElMessage.error('保存地址失败！')
+ 
   }
 }
 
@@ -373,6 +403,58 @@ const handleReset = () => {
 </script>
 
 <style scoped>
+.loading-container {
+  text-align: center;
+  padding: 2rem 0;
+  color: #fd9860;
+}
+
+.loading-text {
+  margin-left: 0.5rem;
+  color: #666;
+}
+.layui-btn-primary:hover {
+    border-color: #fd9860 !important;
+    color: #333;
+}
+.layui-input:focus,
+.layui-textarea:focus {
+  border-color: #fd9860 !important;
+  box-shadow: 0 0 0 3px #fd98600f;
+}
+
+.empty-address {
+  margin-top: 2rem;
+  text-align: center;
+  color: #999;
+  padding: 2rem 0;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.empty-address-content {
+  padding: 2rem 1rem;
+}
+
+.empty-address-content h3 {
+  margin: 1rem 0 0.5rem 0;
+  color: #666;
+  font-size: 1.2rem;
+}
+
+.empty-address-content p {
+  margin: 0 0 1.5rem 0;
+}
+
+.empty-address-content .layui-btn {
+  background-color: #fd9860;
+  border-color: #fd9860;
+}
+
+.empty-address-content .layui-btn:hover {
+  background-color: #fc8747;
+  border-color: #fc8747;
+}
 .address-form-container {
   margin-top: 1.5rem;
   padding: 1.5rem;

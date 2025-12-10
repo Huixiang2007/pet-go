@@ -265,7 +265,8 @@ const getProducts = () => {
           pageSize: 12,
         },
       })
-      .then((response) => {
+      .then((response: any) => {
+          isLoading.value = false
         console.log(response)
         console.log(response.data)
         const newProducts = response.data.data.list
@@ -278,11 +279,8 @@ const getProducts = () => {
         }
       })
       .catch((error) => {
+          isLoading.value = false
         console.error('获取商品数据失败:', error)
-      })
-      .finally(() => {
-        isLoading.value = false
-        console.log('加载完成，重置加载状态')
       })
   }
 }

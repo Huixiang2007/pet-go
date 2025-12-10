@@ -132,7 +132,6 @@
                   <i class="fa fa-ticket text-[#FF7043] mr-2"></i>
                   我的优惠券
                 </h2>
-                <a href="#" class="text-[#FF7043] text-sm hover:underline">查看全部</a>
               </div>
               <div class="rounded-xl shadow-sm p-5">
                 <Coupons />
@@ -145,7 +144,6 @@
                   <i class="fa fa-comment text-[#FF7043] mr-2"></i>
                   评论管理
                 </h2>
-                <a href="#" class="text-[#FF7043] text-sm hover:underline">查看全部</a>
               </div>
 
               <div class="bg-white rounded-xl shadow-sm p-5">

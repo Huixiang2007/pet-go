@@ -161,7 +161,7 @@ import {
 
 // 筛选条件
 const selectedActive = ref('')
-const dateRange = ref([] as [Date, Date])
+const dateRange = ref([] as [Date?, Date?])
 
 // 核心指标数据
 const totalView = ref(12580) // 总浏览次数

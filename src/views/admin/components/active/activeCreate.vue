@@ -124,7 +124,7 @@ import type { UploadFile, UploadProps } from 'element-plus'
 const activeForm = reactive({
   title: '',
   type: '',
-  timeRange: [] as [Date, Date],
+  timeRange: [] as [Date?, Date?],
   coverImg: '',
   rule: '',
   desc: ''

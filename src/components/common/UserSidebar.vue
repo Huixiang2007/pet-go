@@ -21,52 +21,53 @@
       active-text-color="#FF8A65"
       router
     >
-      <!-- 数据概览 -->
+      <!-- 数据概览 1-->
       <el-menu-item index="/admin/data">
         <el-icon><PieChart /></el-icon>
         <!-- 补充数据概览图标 -->
         <span v-if="sidebarOpened">数据概览</span>
       </el-menu-item>
-      <!-- 用户管理 -->
+      <!-- 用户管理 1 -->
       <el-menu-item index="/admin/user">
-        <!-- <template #title> -->
           <el-icon><User /></el-icon>
           <span v-if="sidebarOpened">用户管理</span>
     
       </el-menu-item>
-      <!-- 寄养服务管理 -->
-      <el-sub-menu index="/admin/foster">
-        <template #title>
+      <!-- 寄养服务管理 1-->
+    <el-menu-item index="/admin/foster">
+        <!-- <template #title> -->
           <el-icon><House /></el-icon>
           <span v-if="sidebarOpened">寄养服务管理</span>
-        </template>
-        <el-menu-item index="/admin/foster/audit">服务审核</el-menu-item> 
-      <el-menu-item index="/admin/foster/orders">寄养订单管理</el-menu-item> 
-         <el-menu-item index="/admin/foster/home">寄养家庭管理</el-menu-item>
-        <el-menu-item index="/admin/foster/comment">评价管理</el-menu-item>
-      </el-sub-menu>
-      <!-- 电商管理 -->
-      <!-- <el-sub-menu index="admin/mall">
+      </el-menu-item>
+      <!-- 活动管理 -->
+      <el-sub-menu index="/admin/active">
         <template #title>
           <el-icon><Shop /></el-icon>
-          <span v-if="sidebarOpened">宠物电商管理</span>
+          <span v-if="sidebarOpened">运营活动管理</span>
         </template>
-        <el-menu-item index="/mall/goods">商品管理</el-menu-item>
-        <el-menu-item index="/mall/order">订单管理</el-menu-item>
-        <el-menu-item index="/mall/stock">库存管理</el-menu-item>
-        <el-menu-item index="/mall/coupon">优惠券管理</el-menu-item>
-      </el-sub-menu> -->
+        <el-menu-item index="/admin/active/create">活动创建</el-menu-item>
+        <el-menu-item index="/admin/active/manage">活动管理</el-menu-item>
+        <el-menu-item index="/admin/active/dashboard">数据看板</el-menu-item>
+       
+      </el-sub-menu>
 
-      <!-- 系统管理 -->
-      <!-- <el-sub-menu index="/admin/system">
+      <!-- 内容管理 -->
+      <el-sub-menu index="/admin/content">
         <template #title>
           <el-icon><Setting /></el-icon>
-          <span v-if="sidebarOpened">系统管理</span>
-        </template> -->
-        <!-- <el-menu-item index="/system/notice">通知发布</el-menu-item>
-        <el-menu-item index="/system/role">角色权限管理</el-menu-item>
-        <el-menu-item index="/system/log">操作日志查询</el-menu-item> -->
-      <!-- </el-sub-menu>-->
+          <span v-if="sidebarOpened">内容管理</span>
+        </template> 
+      <el-menu-item index="/admin/content/check">内容审核</el-menu-item>
+        <el-menu-item index="/admin/content/comment">评论管理</el-menu-item>
+      </el-sub-menu>
+  <!-- 通知发布 -->
+      <el-menu-item index="/admin/send">
+   
+          <el-icon><User /></el-icon>
+          <span v-if="sidebarOpened">通知发布</span>
+    
+      </el-menu-item>
+   
     </el-menu> 
   </div>
 </template>

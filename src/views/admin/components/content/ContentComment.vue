@@ -3,11 +3,10 @@
     <!-- 页面头部 -->
     <div class="page-header">
       <el-icon class="header-icon"><StarFilled /></el-icon>
-      <h2>寄养服务管理 - 评价管理</h2>
+      <h2>内容管理 - 评价管理</h2>
     </div>
 
-    <!-- 通用指标卡片（复用组件） -->
-    <FosterStatsCard />
+
 
     <!-- 评价管理内容区 -->
     <el-card class="main-content-card" shadow="hover">
@@ -134,8 +133,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { StarFilled, Search, Refresh, Download } from '@element-plus/icons-vue'
-// 导入通用指标卡片组件
-import FosterStatsCard from './FosterCard.vue'
+
 
 // 筛选条件
 const commentScore = ref('')

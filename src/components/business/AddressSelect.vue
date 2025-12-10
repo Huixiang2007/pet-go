@@ -244,6 +244,7 @@ export default defineComponent({
 
 /* 核心选择框样式 */
 .address-select {
+    z-index: 1000;
   width: 100%;
   height: 40px;
   line-height: 40px;
@@ -268,6 +269,7 @@ export default defineComponent({
 .address-select:hover {
   border-color: #fd9860;
   box-shadow: 0 0 0 2px rgba(225, 170, 88, 0.1);
+
 }
 
 /* 聚焦状态 */
@@ -304,22 +306,46 @@ export default defineComponent({
 .address-option {
   color: #606266;
   background-color: #fff;
-  padding: 8px 12px;
+  padding: 10px 15px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  /* 确保样式生效 */
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 /* 选项悬停效果 */
-.address-option:hover {
-  background-color: #f5f7fa;
+:deep(.address-option:hover) {
+     background-color: #fd9860 !important;
+  color: #fff;
+  transform: translateX(5px);
+  border-left: 3px solid #fd9860;
 }
-/* 适配小屏幕 */
-@media (max-width: 480px) {
-  .address-select {
-    height: 36px;
-    line-height: 36px;
-    font-size: 13px;
-    padding: 0 12px;
-  }
+.address-option:checked {
+  background-color: #fff8f0;
+  color: #fd9860;
+  font-weight: 500;
 }
+
+/* 下拉菜单整体样式 */
+.address-select::-webkit-scrollbar {
+  width: 6px;
+}
+
+.address-select::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.address-select::-webkit-scrollbar-thumb {
+  background: #fd9860;
+  border-radius: 10px;
+}
+
+.address-select::-webkit-scrollbar-thumb:hover {
+  background: #e78a50;
+}
+
 .layui-input-block select {
   width: 32%;
   display: inline-block;

@@ -305,106 +305,74 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'foster',
         name: 'foster',
-        redirect: '/admin/foster/audit',
+        component: () => import('@/views/admin/components/foster/FosterAudit.vue'),
         meta: {
           title: '寄养服务管理',
           icon: 'el-icon-house',
-        },
+        }
+       
+      },
+      //活动管理路由
+      {
+        path: 'active',
+        name: 'active',
+        redirect: '/admin/active/create',
+        meta: { title: '活动管理', icon: 'el-icon-s-promotion' },
         children: [
           {
-            path: 'audit',
-            name: 'fosterAudit',
-            component: () => import('@/views/admin/components/foster/FosterAudit.vue'),
-            meta: {
-              title: '服务审核',
-            },
+            path: 'create',
+            name: 'activeCreate',
+            component: () => import('@/views/admin/components/active/activeCreate.vue'), // 替换为实际路径
+            meta: { title: '活动创建' },
           },
           {
-            path: 'orders',
-            name: 'fosterOrder',
-            component: () => import('@/views/admin/components/foster/FosterOrder.vue'),
-            meta: {
-              title: '寄养订单',
-            },
+            path: 'manage',
+            name: 'activeManage',
+            component: () => import('@/views/admin/components/active/activeManage.vue'), // 替换为实际路径
+            meta: { title: '活动管理' },
           },
-           {
-            path: 'home',
-            name: 'fosterHome',
-            component: () => import('@/views/admin/components/foster/FosterHome.vue'),
-            meta: {
-              title: '寄养家庭管理',
-            },
+       {
+            path: 'dashboard',
+            name: 'activeDashboard',
+            component: () => import('@/views/admin/components/active/activeDashboard.vue'), // 替换为实际路径
+            meta: { title: '数据看板' },
+          },
+        
+        ],
+      },
+      // 内容管理路由
+      {
+        path: 'content',
+        name: 'content',
+        redirect: '/admin/content/check',
+        meta: { title: '内容管理', icon: 'el-icon-edit-pen' },
+        children: [
+          {
+            path: 'check',
+            name: 'contentCheck',
+            component: () => import('@/views/admin/components/content/ContentCheck.vue'), // 替换为实际路径
+            meta: { title: '内容审核' },
           },
           {
             path: 'comment',
-            name: 'fosterComment',
-            component: () => import('@/views/admin/components/foster/FosterComment.vue'),
-            meta: {
-              title: '评价管理',
-            },
+            name: 'contentComment',
+            component: () => import('@/views/admin/components/content/ContentComment.vue'), // 替换为实际路径
+            meta: { title: '评论管理' },
           },
+    
         ],
       },
-      // 补全电商管理路由
-      // {
-      //   path: 'mall',
-      //   name: 'mall',
-      //   redirect: '/admin/mall/goods',
-      //   meta: { title: '宠物电商管理', icon: 'el-icon-shop' },
-      //   children: [
-      //     {
-      //       path: 'goods',
-      //       name: 'mallGoods',
-      //       component: () => import('@/views/admin/components/AllGoods.vue'), // 替换为实际路径
-      //       meta: { title: '商品管理' },
-      //     },
-      //     {
-      //       path: 'order',
-      //       name: 'mallOrder',
-      //       component: () => import('@/views/admin/components/AllMallOrder.vue'), // 替换为实际路径
-      //       meta: { title: '订单管理' },
-      //     },
-      //     {
-      //       path: 'stock',
-      //       name: 'mallStock',
-      //       component: () => import('@/views/admin/components/AllStock.vue'), // 替换为实际路径
-      //       meta: { title: '库存管理' },
-      //     },
-      //     {
-      //       path: 'coupon',
-      //       name: 'mallCoupon',
-      //       component: () => import('@/views/admin/components/AllCoupon.vue'), // 替换为实际路径
-      //       meta: { title: '优惠券管理' },
-      //     },
-      //   ],
-      // },
-      // // 补全系统管理路由
-      // {
-      //   path: 'system',
-      //   name: 'system',
-      //   redirect: '/admin/system/notice',
-      //   meta: { title: '系统管理', icon: 'el-icon-setting' },
-      //   children: [
-      //     {
-      //       path: 'notice',
-      //       name: 'systemNotice',
-      //       component: () => import('@/views/admin/components/AllNotice.vue'), // 替换为实际路径
-      //       meta: { title: '通知发布' },
-      //     },
-      //     {
-      //       path: 'role',
-      //       name: 'systemRole',
-      //       component: () => import('@/views/admin/components/AllRole.vue'), // 替换为实际路径
-      //       meta: { title: '角色权限管理' },
-      //     },
-      //     {
-      //       path: 'log',
-      //       name: 'systemLog',
-      //       component: () => import('@/views/admin/components/AllLog.vue'), // 替换为实际路径
-      //       meta: { title: '操作日志查询' },
-      //     },
-      //   ],
-      // },
+      //通知发布
+       {
+        path: 'send',
+        name: 'send',
+        component: () => import('@/views/admin/components/AllSend.vue'),
+        meta: {
+          title: '通知发布',
+          icon: 'el-icon-message',
+        }
+       
+      },
     ],
   },
 ]
@@ -419,7 +387,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.meta.requiresAuth ?? false
   const isLogin = !!localStorage.getItem('authToken')
-  console.log(isLogin)
+
   if (requiresAuth && !isLogin) {
     ElMessage.warning('请先登录后再访问')
     // 跳转到登录页，并记录当前页面路径（登录后可返回）

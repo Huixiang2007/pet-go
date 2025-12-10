@@ -4,14 +4,8 @@
     <div class="layui-form-item">
       <label class="layui-form-label">昵称</label>
       <div class="layui-input-block">
-        <input 
-          type="text" 
-          name="nickname" 
-          v-model="localFormData.nickname" 
-          lay-verify="required" 
-          placeholder="请输入昵称"
-          class="layui-input" 
-        />
+        <input type="text" name="nickname" v-model="localFormData.nickname" lay-verify="required" placeholder="请输入昵称"
+          class="layui-input" />
       </div>
     </div>
 
@@ -26,52 +20,31 @@
     <div class="layui-form-item">
       <label class="layui-form-label">生日</label>
       <div class="layui-input-block">
-        <el-date-picker 
-          class="custom-style" 
-          v-model="localFormData.birthday" 
-          type="date" 
-          name="birthday"
-          lay-verify="required" 
-          placeholder="请选择生日日期" 
-          :max-date="new Date()" 
-          value-format="YYYY-MM-DD"
-          style="width: 100%; height: 37px" 
-          :disabled-date="disabledDate" 
-        />
+        <el-date-picker class="custom-style" v-model="localFormData.birthday" type="date" name="birthday"
+          lay-verify="required" placeholder="请选择生日日期" :max-date="new Date()" value-format="YYYY-MM-DD"
+          style="width: 100%; height: 37px" :disabled-date="disabledDate" />
       </div>
     </div>
 
     <div class="layui-form-item">
       <label class="layui-form-label">手机</label>
       <div class="layui-input-block">
-        <input 
-          type="text" 
-          name="Phone" 
-          v-model="localFormData.phone" 
-          lay-verify="required|phone"
-          placeholder="请输入手机号" 
-          class="layui-input" 
-        />
+        <input type="text" name="Phone" v-model="localFormData.phone" lay-verify="required|phone" placeholder="请输入手机号"
+          class="layui-input" />
       </div>
     </div>
 
     <div class="layui-form-item">
       <label class="layui-form-label">邮箱</label>
       <div class="layui-input-block">
-        <input 
-          type="text" 
-          name="email" 
-          v-model="localFormData.email" 
-          placeholder="请输入邮箱" 
-          class="layui-input" 
-          readonly 
-        />
+        <input type="text" name="email" v-model="localFormData.email" placeholder="请输入邮箱" class="layui-input"
+          readonly />
       </div>
     </div>
 
     <div class="layui-form-item">
       <div class="layui-input-block">
-        <button class="layui-btn btn-save"  type="submit">保存修改</button>
+        <button class="layui-btn btn-save" type="submit">保存修改</button>
         <button class="layui-btn delete-btn" type="button" @click="handleCancel">取消修改</button>
       </div>
     </div>
@@ -82,18 +55,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref,watch} from 'vue'
+import { ref, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 
 // 接收父组件的表单数据
 const props = defineProps({
-  formData: { type: Object as () => {
+  formData: {
+    type: Object as () => {
       nickname: string
-      sex: string
+      sex: number
       phone: string
       birthday: string
       email: string
-    }, required: true },
+    }, required: true
+  },
   userInfo: { type: Object, required: true }
 })
 
@@ -112,17 +87,17 @@ const disabledDate = (time: Date) => {
 
 
 // 保存修改
-const handleSave = (event:Event) => {
-   event.preventDefault()
-    if (!localFormData.value.nickname) {
+const handleSave = (event: Event) => {
+  event.preventDefault()
+  if (!localFormData.value.nickname) {
     ElMessage.error('昵称不能为空')
     return
   }
-    if (localFormData.value.nickname.length > 20) {
+  if (localFormData.value.nickname.length > 20) {
     ElMessage.error('昵称长度不能超过20个字符')
     return
   }
-   if (!localFormData.value.sex) {
+  if (!localFormData.value.sex) {
     ElMessage.error('请选择性别')
     return
   }
@@ -130,7 +105,7 @@ const handleSave = (event:Event) => {
     ElMessage.error('请选择生日')
     return
   }
-    if (localFormData.value.birthday) {
+  if (localFormData.value.birthday) {
     const birthdayDate = new Date(localFormData.value.birthday)
     const ageDiff = new Date().getFullYear() - birthdayDate.getFullYear()
     if (ageDiff > 150) {
@@ -138,7 +113,7 @@ const handleSave = (event:Event) => {
       return
     }
   }
-   if (!localFormData.value.phone) {
+  if (!localFormData.value.phone) {
     ElMessage.error('手机号不能为空')
     return
   }
@@ -153,18 +128,20 @@ const handleSave = (event:Event) => {
 
 // 取消修改
 const handleCancel = () => {
-   localFormData.value = { ...props.formData }
+  localFormData.value = { ...props.formData }
   emit('cancel')
 }
 </script>
 
 <style scoped>
 :deep(.layui-form-radioed) {
-    color: #fd9860;
+  color: #fd9860;
 }
+
 :deep(.layui-form-radioed > i) {
-    color: #fd9860;
+  color: #fd9860;
 }
+
 .profile-form {
   max-width: 600px;
   position: relative;
@@ -175,7 +152,7 @@ const handleCancel = () => {
 }
 
 :deep(.layui-form-label) {
-  width:87px;
+  width: 87px;
 }
 
 :deep(.layui-form-radio:hover>*, .layui-form-radioed, .layui-form-radioed>i) {

@@ -2,7 +2,9 @@
   <div class="user-management-container">
     <!-- 页面头部 -->
     <div class="page-header">
-      <el-icon class="header-icon"><User /></el-icon>
+      <el-icon class="header-icon">
+        <User />
+      </el-icon>
       <h2>用户管理中心</h2>
     </div>
 
@@ -11,12 +13,7 @@
       <el-card class="filter-card" shadow="hover">
         <el-row :gutter="15">
           <el-col :span="6">
-            <el-select
-              v-model="userType"
-              placeholder="请选择用户类型"
-              class="filter-select"
-              size="small"
-            >
+            <el-select v-model="userType" placeholder="请选择用户类型" class="filter-select" size="small">
               <el-option label="全部用户" value="" />
               <el-option label="普通用户" value="normal" />
               <el-option label="寄养商家" value="foster" />
@@ -24,20 +21,19 @@
             </el-select>
           </el-col>
           <el-col :span="10">
-            <el-input
-              v-model="searchKeyword"
-              placeholder="请输入用户名/手机号/邮箱搜索"
-              size="small"
-              prefix-icon="Search"
-              class="search-input"
-            />
+            <el-input v-model="searchKeyword" placeholder="请输入用户名/手机号/邮箱搜索" size="small" prefix-icon="Search"
+              class="search-input" />
           </el-col>
           <el-col :span="8" class="search-btn-group">
             <el-button type="primary" size="small" class="query-btn">
-              <el-icon><Search /></el-icon> 搜索
+              <el-icon>
+                <Search />
+              </el-icon> 搜索
             </el-button>
             <el-button size="small" class="reset-btn">
-              <el-icon><Refresh /></el-icon> 重置
+              <el-icon>
+                <Refresh />
+              </el-icon> 重置
             </el-button>
           </el-col>
         </el-row>
@@ -47,13 +43,8 @@
     <!-- 用户列表区 -->
     <div class="user-list-wrapper">
       <el-card class="list-card" shadow="hover">
-        <el-table
-          :data="userList"
-          border
-          stripe
-          class="user-table"
-          :header-cell-style="{ background: '#f9f7f3', color: '#6b5b45' }"
-        >
+        <el-table :data="userList" border stripe class="user-table"
+          :header-cell-style="{ background: '#f9f7f3', color: '#6b5b45' }">
           <el-table-column prop="id" label="用户ID" width="80" />
           <el-table-column prop="username" label="用户名" min-width="100">
             <template #default="scope">
@@ -68,67 +59,38 @@
           <el-table-column prop="email" label="邮箱" min-width="150" />
           <el-table-column prop="userType" label="用户类型" width="100">
             <template #default="scope">
-              <el-tag
-                :type="
-                  scope.row.userType === 'normal'
-                    ? 'info'
-                    : scope.row.userType === 'foster'
-                    ? 'success'
-                    : 'warning'
-                "
-                size="small"
-                class="type-tag"
-              >
+              <el-tag :type="scope.row.userType === 'normal'
+                ? 'info'
+                : scope.row.userType === 'foster'
+                  ? 'success'
+                  : 'warning'
+                " size="small" class="type-tag">
                 {{
                   scope.row.userType === 'normal'
                     ? '普通用户'
                     : scope.row.userType === 'foster'
-                    ? '寄养商家'
-                    : '电商卖家'
+                      ? '寄养商家'
+                      : '电商卖家'
                 }}
               </el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="authStatus" label="认证状态" width="100">
             <template #default="scope">
-              <el-tag
-                :type="scope.row.authStatus ? 'success' : 'danger'"
-                size="small"
-                class="auth-tag"
-              >
+              <el-tag :type="scope.row.authStatus ? 'success' : 'danger'" size="small" class="auth-tag">
                 {{ scope.row.authStatus ? '已认证' : '未认证' }}
               </el-tag>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="160" fixed="right">
             <template #default="scope">
-              <el-button
-                type="primary"
-                size="small"
-                icon="View"
-                class="view-btn"
-                 @click="viewUser(scope.row)"
-              >
+              <el-button type="primary" size="small" icon="View" class="view-btn" @click="viewUser(scope.row)">
                 查看
               </el-button>
-              <el-button
-                type="warning"
-                size="small"
-                icon="Edit"
-                class="edit-btn"
-                @click="editUser(scope.row)"
-              >
+              <el-button type="warning" size="small" icon="Edit" class="edit-btn" @click="editUser(scope.row)">
                 编辑
               </el-button>
-              <el-button
-                type="danger"
-                size="small"
-                icon="Delete"
-                class="del-btn"
-                
-                @click="disableUser(scope.row)"
-            
-              >
+              <el-button type="danger" size="small" icon="Delete" class="del-btn" @click="disableUser(scope.row)">
                 禁用
               </el-button>
             </template>
@@ -137,16 +99,9 @@
 
         <!-- 分页组件 -->
         <div class="pagination-wrapper">
-          <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="currentPage"
-            :page-sizes="[5, 10, 20, 50]"
-            :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total"
-            class="user-pagination"
-          >
+          <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
+            :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper" :total="total" class="user-pagination">
           </el-pagination>
         </div>
       </el-card>
@@ -156,7 +111,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { User, Search, Refresh} from '@element-plus/icons-vue'
+import { User, Search, Refresh } from '@element-plus/icons-vue'
 
 // 筛选条件
 const userType = ref('')
@@ -317,8 +272,9 @@ const disableUser = (row: any) => {
       .user-table {
         border-radius: 8px;
         overflow: hidden;
+
         // 把 CSS 自定义属性移到单独的 &::v-deep 或直接用内联样式（避免 SCSS 编译冲突）
-        &::v-deep {
+        :deep(.el-table) {
           --el-table-border-color: #e8d6c4;
           --el-table-hover-row-bg-color: #fff9f2;
         }
@@ -374,13 +330,12 @@ const disableUser = (row: any) => {
         display: flex;
         justify-content: center;
 
-        .user-pagination {
-          &::v-deep {
-            --el-pagination-button-bg-color: #fff;
-            --el-pagination-button-border-color: #e8d6c4;
-            --el-pagination-text-color: #6b5b45;
-            --el-pagination-active-color: #e8a87c;
-          }
+
+        :deep(.user-pagination) {
+          --el-pagination-button-bg-color: #fff;
+          --el-pagination-button-border-color: #e8d6c4;
+          --el-pagination-text-color: #6b5b45;
+          --el-pagination-active-color: #e8a87c;
         }
       }
     }

@@ -1,9 +1,9 @@
 <template>
- <div v-if="isLoading" class="loading-state">
+  <div v-if="isLoading" class="loading-state">
     <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
     <p>加载中...</p>
   </div>
-  <form class="layui-form profile-form" @submit.prevent="  handleSubmit" v-else>
+  <form class="layui-form profile-form" @submit.prevent="handleSubmit" v-else>
     <!-- 审核中状态 -->
     <div v-if="localStatus === 'pending'">
       <div class="verify-status">
@@ -35,7 +35,7 @@
             {{ maskIdCard(localInfo.idCard) || '未填写' }}
           </div>
         </div>
- <div class="layui-form-item">
+        <div class="layui-form-item">
           <label class="layui-form-label">用户性别</label>
           <div class="layui-input-block info-display">
             {{ localInfo.gender === 1 ? '男' : localInfo.gender === 0 ? '女' : '未填写' }}
@@ -101,7 +101,7 @@
             {{ maskIdCard(localInfo.idCard) || '未填写' }}
           </div>
         </div>
-         <div class="layui-form-item">
+        <div class="layui-form-item">
           <label class="layui-form-label">用户性别</label>
           <div class="layui-input-block info-display">
             {{ localInfo.gender === 1 ? '男' : localInfo.gender === 0 ? '女' : '未填写' }}
@@ -139,72 +139,37 @@
       <div class="layui-form-item">
         <label class="layui-form-label">真实姓名</label>
         <div class="layui-input-block">
-          <input 
-            type="text" 
-            name="realName" 
-            v-model="realNameForm.realName" 
-            lay-verify="required"
-            placeholder="请输入真实姓名" 
-            class="layui-input" 
-          />
+          <input type="text" name="realName" v-model="realNameForm.realName" lay-verify="required" placeholder="请输入真实姓名"
+            class="layui-input" />
         </div>
       </div>
 
       <div class="layui-form-item">
         <label class="layui-form-label">身份证号</label>
         <div class="layui-input-block">
-          <input 
-            type="text" 
-            name="idCard" 
-            v-model="realNameForm.idCard" 
-            lay-verify="required|idCard"
-            placeholder="请输入身份证号" 
-            class="layui-input" 
-          />
+          <input type="text" name="idCard" v-model="realNameForm.idCard" lay-verify="required|idCard"
+            placeholder="请输入身份证号" class="layui-input" />
         </div>
       </div>
- <div class="layui-form-item">
+      <div class="layui-form-item">
         <label class="layui-form-label">用户性别</label>
         <div class="layui-input-block">
-          <input 
-            type="radio" 
-            name="gender" 
-            value="1" 
-            title="男" 
-            v-model="realNameForm.gender"
-          />
-          <input 
-            type="radio" 
-            name="gender" 
-            value="0" 
-            title="女" 
-            v-model="realNameForm.gender"
-          />
+          <input type="radio" name="gender" value="1" title="男" v-model="realNameForm.gender" />
+          <input type="radio" name="gender" value="0" title="女" v-model="realNameForm.gender" />
         </div>
       </div>
 
       <div class="layui-form-item">
         <label class="layui-form-label">出生日期</label>
         <div class="layui-input-block">
-          <input 
-            type="date" 
-            name="birthday" 
-            v-model="realNameForm.birthday" 
-            class="layui-input" 
-          />
+          <input type="date" name="birthday" v-model="realNameForm.birthday" class="layui-input" />
         </div>
       </div>
 
       <div class="layui-form-item">
         <label class="layui-form-label">用户地址</label>
         <div class="layui-input-block">
-          <input 
-            type="text" 
-            name="address" 
-            v-model="realNameForm.address" 
-            placeholder="请输入用户地址" 
-            class="layui-input" 
-          />
+          <input type="text" name="address" v-model="realNameForm.address" placeholder="请输入用户地址" class="layui-input" />
         </div>
       </div>
 
@@ -243,18 +208,18 @@
     </div>
   </form>
 </template>
-        
+
 
 
 <script setup lang="ts">
-import { ref,onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 const isLoading = ref(true)
 // 接收父组件的状态和信息
 defineProps({
-  status: { 
-    type: String, 
+  status: {
+    type: String,
     required: true,
     validator: (v: string) => ['unverified', 'pending', 'verified'].includes(v)
   },
@@ -269,7 +234,7 @@ const showSubmittedMaterials = ref(false)
 const realNameForm = ref({
   realName: '',
   idCard: '',
-   gender: '1', // 默认为男性
+  gender: '1', // 默认为男性
   birthday: '',
   address: '',
   idCardFront: '',
@@ -278,7 +243,7 @@ const realNameForm = ref({
   idCardBackFile: null as File | null,
 })
 
-  
+
 // 本地状态和信息，用于替代从父组件接收的状态
 const localStatus = ref<'unverified' | 'pending' | 'verified'>('unverified')
 const localInfo = ref({
@@ -286,7 +251,7 @@ const localInfo = ref({
   idCard: '',
   idCardFront: '',
   idCardBack: '',
-   gender: '',
+  gender: 0,
   birthday: '',
   address: '',
 })
@@ -299,30 +264,30 @@ onMounted(() => {
 // 获取实名认证状态的函数
 const getRealNameStatus = async () => {
   try {
-      isLoading.value = true  // 开始加载
+    isLoading.value = true  // 开始加载
     const userId = localStorage.getItem('userId') || ''
     if (!userId) {
       ElMessage.error('用户未登录')
       return
     }
-    
+
     const response = await request('/server/api/user/getUserAuth', 'GET')
     console.log('实名认证状态:', response)
     if (response.code === 0) {
       // 根据后端返回的状态设置 localStatus
-      if(response.data== 'null'){
-         localStatus.value = 'unverified'
-         return
+      if (response.data == 'null') {
+        localStatus.value = 'unverified'
+        return
       }
       switch (response.data.status) {
         case '待审核':
-            localStatus.value = 'pending'
-            const pictureUrlArr = JSON.parse(response.data.pictureUrl || '[]');
+          localStatus.value = 'pending'
+          const pictureUrlArr = JSON.parse(response.data.pictureUrl || '[]');
           // 填充已提交的信息
           localInfo.value = {
             realName: response.data.realName || '',
             idCard: response.data.idCard || '',
-             gender: (response.data.gender ?? '').toString(),
+            gender: (response.data.gender ?? '').toString(),
             birthday: response.data.birthday || '',
             address: response.data.address || '',
             idCardFront: pictureUrlArr[0] || '',
@@ -330,11 +295,11 @@ const getRealNameStatus = async () => {
           }
           break
         case '审核通过':
-            localStatus.value = 'verified'
-              localInfo.value = {
+          localStatus.value = 'verified'
+          localInfo.value = {
             realName: response.data.realName || '',
             idCard: response.data.idCard || '',
-             gender: (response.data.gender ?? '').toString(),
+            gender: (response.data.gender ?? '').toString(),
             birthday: response.data.birthday || '',
             address: response.data.address || '',
             idCardFront: response.data.idCardFront || '',
@@ -348,10 +313,10 @@ const getRealNameStatus = async () => {
         default:
           localStatus.value = 'unverified'
       }
-    } 
+    }
   } catch (error) {
-    console.error('获取实名认证状态异常:', error) 
-  }finally {
+    console.error('获取实名认证状态异常:', error)
+  } finally {
     isLoading.value = false  // 无论成功失败都结束加载
   }
 }
@@ -418,53 +383,53 @@ const selectIdCardPhoto = (type: 'front' | 'back') => {
 
 // 提交实名认证
 const handleSubmit = () => {
- if (!realNameForm.value.realName) {
+  if (!realNameForm.value.realName) {
     ElMessage.warning('请输入真实姓名！')
     return
   }
-  
+
   // 验证身份证号
   if (!realNameForm.value.idCard) {
     ElMessage.warning('请输入身份证号！')
     return
   }
-  
+
   // 验证身份证号格式
   const idCardReg = /(^\d{18}$)|(^\d{17}(\d|X|x)$)/
   if (!idCardReg.test(realNameForm.value.idCard)) {
     ElMessage.warning('请输入正确的身份证号码！')
     return
   }
-  
+
   // 验证性别
   if (!realNameForm.value.gender) {
     ElMessage.warning('请选择性别！')
     return
   }
-  
+
   // 验证出生日期
   if (!realNameForm.value.birthday) {
     ElMessage.warning('请选择出生日期！')
     return
   }
-  
+
   // 验证用户地址
   if (!realNameForm.value.address) {
     ElMessage.warning('请输入用户地址！')
     return
   }
-  
+
   // 验证身份证照片
   if (!realNameForm.value.idCardFront || !realNameForm.value.idCardBack) {
     ElMessage.warning('请上传身份证正反面照片！')
     return
   }
-  
+
   if (!realNameForm.value.idCardFrontFile || !realNameForm.value.idCardBackFile) {
     ElMessage.warning('身份证照片文件缺失，请重新上传！')
     return
   }
-  
+
   // 通知父组件提交
   emit('submit', realNameForm.value)
 }
@@ -482,19 +447,24 @@ const handleSubmit = () => {
   margin-bottom: 15px;
   color: #fd9860;
 }
+
 :deep(.layui-form-radioed) {
-    color: #fd9860;
+  color: #fd9860;
 }
+
 :deep(.layui-form-radioed > i) {
-    color: #fd9860;
+  color: #fd9860;
 }
+
 .layui-input:focus {
   border-color: #fd9860 !important;
   box-shadow: 0 0 0 3px #fd98600f;
 }
-:deep(.layui-form-label){
+
+:deep(.layui-form-label) {
   width: 110px;
 }
+
 .profile-form {
   max-width: 600px;
 }

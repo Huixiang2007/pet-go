@@ -1,34 +1,21 @@
 <template>
-  <div class="profile-container"  :style="{backgroundColor:bgColor}">
-        <div class="circle-color-picker">
+  <div class="profile-container" :style="{ backgroundColor: bgColor }">
+    <div class="circle-color-picker">
       <!-- 触发层：圆形图标 -->
-      <div 
-        class="color-trigger" 
-        :style="{ backgroundColor: bgColor }"
-        @click="showPicker = !showPicker"
-      >
+      <div class="color-trigger" :style="{ backgroundColor: bgColor }" @click="showPicker = !showPicker">
         <i class="layui-icon layui-icon-palette"></i> <!-- 色彩图标 -->
       </div>
       <!-- 选择器弹窗：点击图标后显示 -->
       <div class="picker-popup" v-show="showPicker">
-        <el-color-picker
-          v-model="bgColor"
-          @change="handleBgColorChange"
-          @close="showPicker = false"
-          size="small"
+        <el-color-picker v-model="bgColor" @change="handleBgColorChange" @close="showPicker = false" size="small"
           :predefine="['#f5f5f5', '#f0f8fb', '#fdf2f8', '#f5fafe', '#faf6ed', '#f8f8f8']"
-          popper-class="custom-color-popper"
-        />
+          popper-class="custom-color-popper" />
       </div>
     </div>
     <!-- 顶部用户核心信息 -->
     <header class="profile-header">
-      <PersonalAvatar 
-        :avatar="userInfo.avatar" 
-        :nickname="userInfo.nickname" 
-        :email="userInfo.email" 
-        @avatar-change="handleAvatarChange"
-      />
+      <PersonalAvatar :avatar="userInfo.avatar" :nickname="userInfo.nickname" :email="userInfo.email"
+        @avatar-change="handleAvatarChange" />
       <div class="header-actions">
         <button class="layui-btn layui-btn-primary newColor" @click="gotoHome">
           <i class="layui-icon layui-icon-return"></i> 返回首页
@@ -41,10 +28,7 @@
 
     <div class="profile-body">
       <!-- 侧边导航栏 -->
-      <PersonalNav 
-        :active-tab="currentTab" 
-        @tab-change="currentTab = $event"
-      />
+      <PersonalNav :active-tab="currentTab" @tab-change="currentTab = $event" />
 
       <!-- 内容展示区 -->
       <main class="content-area">
@@ -53,30 +37,13 @@
         </div>
         <div class="content-wrapper">
           <!-- 子组件按需渲染 -->
-          <BaseInfo 
-            v-if="currentTab === 0" 
-            :form-data="formData" 
-            :user-info="userInfo"
-            @save="saveBaseInfo" 
-            @cancel="cancelEdit"
-          />
-          <RealNameAuth 
-            v-if="currentTab === 1" 
-            :status="realNameStatus" 
-            :info="realNameInfo"
-            @submit="submitRealName" 
-            @refresh="getUserInfo"
-          />
-          <ChangePassword 
-            v-if="currentTab === 2" 
-            :email="userInfo.email"
-            @change="changePassword" 
-            @cancel="cancelWord"
-          />
-          <AddressManager 
-            v-if="currentTab === 3" 
-            @refresh="getAddressList"
-          />
+          <BaseInfo v-if="currentTab === 0" :form-data="formData" :user-info="userInfo" @save="saveBaseInfo"
+            @cancel="cancelEdit" />
+          <RealNameAuth v-if="currentTab === 1" :status="realNameStatus" :info="realNameInfo" @submit="submitRealName"
+            @refresh="getUserInfo" />
+          <ChangePassword v-if="currentTab === 2" :email="userInfo.email" @change="changePassword"
+            @cancel="cancelWord" />
+          <AddressManager v-if="currentTab === 3" @refresh="getAddressList" />
         </div>
       </main>
     </div>
@@ -86,7 +53,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage,ElColorPicker } from 'element-plus'
+import { ElMessage, ElColorPicker } from 'element-plus'
 import request from '@/utils/request'
 // 导入子组件
 import PersonalAvatar from '@/views/userCenter/components/PersonAvatar.vue'
@@ -103,7 +70,7 @@ declare global {
 }
 
 // 定义组件可以触发的事件
-const emit = defineEmits(['refresh']) 
+const emit = defineEmits(['refresh'])
 // 导航项（供导航组件使用）
 const navItems = [
   { name: '基本信息', icon: 'layui-icon-user' },
@@ -129,7 +96,7 @@ const realNameInfo = ref({
   idCard: '',
   idCardFront: '',
   idCardBack: '',
-   gender: 1,
+  gender: 1,
   birthday: '',
   address: '',
 
@@ -140,7 +107,7 @@ const router = useRouter()
 const bgColor = ref(localStorage.getItem('profileBgColor') || '#f5f5f5')
 const showPicker = ref(false) // 控制选择器弹窗显示/隐藏
 const handleBgColorChange = (newColor: string) => {
-   if (!newColor) return
+  if (!newColor) return
   bgColor.value = newColor
   localStorage.setItem('profileBgColor', newColor)
   showPicker.value = false // 选择后关闭弹窗
@@ -148,10 +115,10 @@ const handleBgColorChange = (newColor: string) => {
 }
 // 1. 定义地址分页参数（核心缺失的变量）
 const addressPagination = ref({
-  currentPage: 1,  
-  pageSize: 5,    
-  total: 0,        
-  pages: 0       
+  currentPage: 1,
+  pageSize: 5,
+  total: 0,
+  pages: 0
 })
 
 // 2. 定义地址列表数据
@@ -172,7 +139,7 @@ onMounted(() => {
       })
     }
   }, 500)
- document.addEventListener('click', (e) => {
+  document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement
     if (!target.closest('.circle-color-picker')) {
       showPicker.value = false
@@ -188,7 +155,7 @@ onMounted(() => {
       emit('refresh')
     }
     if (currentTab.value === 1) {
-   getRealNameStatus()
+      getRealNameStatus()
     }
   })
 })
@@ -220,7 +187,7 @@ const getRealNameStatus = async () => {
           idCard: '',
           idCardFront: '',
           idCardBack: '',
-          gender: '1',
+          gender: 1,
           birthday: '',
           address: ''
         }
@@ -260,7 +227,7 @@ const getRealNameStatus = async () => {
     }
   } catch (error) {
     console.error('获取实名认证状态异常:', error)
-  
+
     realNameStatus.value = 'unverified'
   } finally {
     // 无论成功失败，都关闭加载状态
@@ -286,14 +253,14 @@ const getUserInfo = async () => {
       userInfo.value = {
         ...userInfo.value,
         nickname: userData.username,
-        sex: userData.gender||1,
+        sex: userData.gender || 1,
         phone: userData.phone,
         birthday: userData.birthday,
         avatar: userData.avatar,
         email: userData.email,
       }
       formData.value = { ...userInfo.value }
-     
+
     }
   } catch (error) {
     console.error('获取用户信息失败:', error)
@@ -304,7 +271,7 @@ const getUserInfo = async () => {
 
 // 获取地址列表
 const getAddressList = async () => {
-  
+
   console.log('addressPagination:', addressPagination)
   try {
     const userId = localStorage.getItem('userId') || ''
@@ -360,14 +327,14 @@ const saveBaseInfo = async (formData: any) => {
       birthday: formData.birthday,
     }, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
     if (response.code === 0) {
-      
+
       userInfo.value = { ...userInfo.value, ...formData }
       getUserInfo()
       ElMessage.success('保存信息成功！')
     }
   } catch (error) {
     console.error('保存基本信息失败:', error)
-   
+
   }
 }
 
@@ -396,9 +363,9 @@ const submitRealName = async (realNameForm: any) => {
         birthday: realNameForm.birthday,
         address: realNameForm.address,
       }
-       getRealNameStatus()
+      getRealNameStatus()
       ElMessage.success('实名认证提交成功，等待审核')
-     
+
     }
   } catch (error) {
     console.error('提交实名认证失败:', error)
@@ -438,23 +405,23 @@ const cancelWord = () => {
 const logout = async (): Promise<void> => {
   window.layui.layer.confirm('确定要退出登录吗？', {
     title: '提示',
-    yes: async(index: number) => {
-        const response = await request('/server/api/user/logout', 'POST',{
-       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
-    console.log(response)
-    if (response.code === 0) {
-       localStorage.removeItem('authToken');
-      localStorage.removeItem('userId');
-      window.layui.layer.close(index);
-      router.push('/login'); // 直接用 router 实例，无需 window.router
-      window.layui.layer.msg('退出登录成功', { icon: 1, time: 1500 });
-    }
-    
+    yes: async (index: number) => {
+      const response = await request('/server/api/user/logout', 'POST', {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      })
+      console.log(response)
+      if (response.code === 0) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
+        window.layui.layer.close(index);
+        router.push('/login'); // 直接用 router 实例，无需 window.router
+        window.layui.layer.msg('退出登录成功', { icon: 1, time: 1500 });
+      }
+
     },
     no: (index: number) => {
       window.layui.layer.close(index);
-   
+
     }
   });
 };
@@ -464,11 +431,10 @@ const gotoHome = () => {
 </script>
 
 <style scoped>
-
 .circle-color-picker {
   position: absolute;
-     top: 148px;
-    right: 48px;
+  top: 148px;
+  right: 48px;
   z-index: 9999;
 }
 
@@ -476,10 +442,11 @@ const gotoHome = () => {
 .color-trigger {
   width: 40px;
   height: 40px;
-  border-radius: 50%; /* 圆形 */
+  border-radius: 50%;
+  /* 圆形 */
   background-color: #f5f5f5;
   border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -488,13 +455,15 @@ const gotoHome = () => {
 }
 
 .color-trigger:hover {
-  transform: scale(1.05); /*  hover 放大 */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transform: scale(1.05);
+  /*  hover 放大 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .color-trigger .layui-icon {
   font-size: 18px;
-  color: #333; /* 图标颜色 */
+  color: #333;
+  /* 图标颜色 */
 }
 
 /* 选择器弹窗 */
@@ -505,7 +474,7 @@ const gotoHome = () => {
   background: #fff;
   padding: 8px;
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   z-index: 9999;
 }
 
@@ -517,14 +486,15 @@ const gotoHome = () => {
 .profile-container {
   width: 100%;
   height: 100vh;
- position: relative;
+  position: relative;
 }
 
-.newColor{
+.newColor {
   border-color: #c1d4f6;
   color: #419fe6;
 }
-.newColor:hover{
+
+.newColor:hover {
   border-color: #417fe6;
   color: #417fe6;
 }

@@ -214,6 +214,14 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: true,
     },
   },
+  {
+    path: '/edit-pet/:petId',
+    name: 'editPet',
+    component: () => import('@/views/myPets/AddPet.vue'),
+    meta: {
+      requiresAuth: true,
+    },
+  },
   //加入我们
   {
     path: '/join-us',

@@ -31,7 +31,14 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, watch, nextTick } from 'vue'
-
+import image1 from '@/assets/img/image1.jpg'
+import image2 from '@/assets/img/image2.jpg'
+import image3 from '@/assets/img/image3.jpg'
+import image4 from '@/assets/img/image4.jpg'
+import image5 from '@/assets/img/image5.jpg'
+import image6 from '@/assets/img/image6.jpg'
+import image7 from '@/assets/img/image7.jpg'
+import image8 from '@/assets/img/image8.jpg'
 // 类型定义
 interface ImageConfig {
   src: string
@@ -69,20 +76,17 @@ interface Fragment {
   }
 }
 
-// 配置
-const getImageUrl = (name: string) => {
-  return new URL(`@/assets/img${name}`, import.meta.url).href
-}
+
 const config = reactive<CarouselConfig>({
   images: [
-    { src: getImageUrl('image1.jpg'), alt: '图片一' },
-    { src: getImageUrl('image2.jpg'), alt: '图片二' },
-    { src: getImageUrl('image3.jpg'), alt: '图片三' },
-    { src: getImageUrl('image4.jpg'), alt: '图片四' },
-    { src: getImageUrl('image5.jpg'), alt: '图片五' },
-    { src: getImageUrl('image6.jpg'), alt: '图片五' },
-    { src: getImageUrl('image7.jpg'), alt: '图片五' },
-    { src: getImageUrl('image8.jpg'), alt: '图片五' },
+    { src: image1, alt: '图片一' },
+    { src: image2, alt: '图片二' },
+    { src: image3, alt: '图片三' },
+    { src: image4, alt: '图片四' },
+    { src: image5, alt: '图片五' },
+    { src: image6, alt: '图片五' },
+    { src: image7, alt: '图片五' },
+    { src: image8, alt: '图片五' },
   ],
   fragmentConfig: {
     rows: 10,

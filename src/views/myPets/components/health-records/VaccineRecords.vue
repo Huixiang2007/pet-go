@@ -1,8 +1,8 @@
 <template>
-    <HealthRecordsTable :records="records" :columns="columns" @add-record="openAddDialog"
-        @edit-record="openEditDialog" />
+    <HealthRecordsTable :records="records" :columns="columns" @add-record="openAddDialog" @edit-record="openEditDialog"
+        @delete-record="deleteRecord" />
     <el-dialog v-model="showAddDialog" title="💉 添加疫苗记录" width="450px" class="cute-dialog">
-        <el-form :model="newVaccineRecord" label-width="80px" class="cute-input">
+        <el-form :model="newVaccineRecord" class="cute-input">
             <el-form-item label="疫苗类型" required>
                 <el-input v-model="newVaccineRecord.vaccineType" placeholder="如：狂犬病疫苗、六联疫苗" />
             </el-form-item>
@@ -21,7 +21,7 @@
         </template>
     </el-dialog>
     <el-dialog v-model="showEditDialog" title="✏️ 编辑疫苗记录" width="450px" class="cute-dialog">
-        <el-form :model="editVaccineRecord" label-width="80px" class="cute-input">
+        <el-form :model="editVaccineRecord" class="cute-input">
             <el-form-item label="疫苗类型" required>
                 <el-input v-model="editVaccineRecord.vaccineType" placeholder="如：狂犬病疫苗、六联疫苗" />
             </el-form-item>
@@ -45,10 +45,11 @@
 // import { computed } from 'vue'
 import HealthRecordsTable from './HealthRecordsTable.vue'
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 type DateString = `${number}-${number}-${number}`
 interface Vaccine {
     id?: number
+    recordType?: string,
     vaccineType: string
     date: DateString
     nextReminderDate?: DateString
@@ -66,12 +67,14 @@ const props = defineProps<{
 const emit = defineEmits<{
     'add-records': [record: Vaccine];
     'update-records': [records: Vaccine];
+    'delete-records': [id: number];
 }>();
 const showAddDialog = ref(false)
 const showEditDialog = ref(false)
 const currentEditIndex = ref(-1)
 //添加疫苗记录
 const newVaccineRecord = ref<Vaccine>({
+    recordType: '疫苗',
     vaccineType: '',
     date: '' as DateString,
     nextReminderDate: '' as DateString
@@ -80,6 +83,7 @@ const newVaccineRecord = ref<Vaccine>({
 //编辑疫苗记录
 const editVaccineRecord = ref<Vaccine>({
     id: 0,
+    recordType: '疫苗',
     vaccineType: '',
     date: '' as DateString,
     nextReminderDate: '' as DateString
@@ -88,6 +92,7 @@ const editVaccineRecord = ref<Vaccine>({
 const openAddDialog = () => {
     //重置
     newVaccineRecord.value = {
+        recordType: '疫苗',
         vaccineType: '',
         date: '' as DateString,
         nextReminderDate: '' as DateString
@@ -98,7 +103,7 @@ const openAddDialog = () => {
 const openEditDialog = (index: number) => {
     // 拷贝数据
     currentEditIndex.value = index
-    editVaccineRecord.value = props.records[index]
+    editVaccineRecord.value = { recordType: '疫苗', ...props.records[index] }
     showEditDialog.value = true
 }
 //确认添加
@@ -107,7 +112,7 @@ const confirmAdd = () => {
         ElMessage.warning('请填写必填项！')
         return
     }
-
+    console.log(newVaccineRecord.value)
     emit('add-records', newVaccineRecord.value)
     ElMessage.success('疫苗记录添加成功！')
     showAddDialog.value = false
@@ -126,6 +131,25 @@ const confirmEdit = () => {
     showEditDialog.value = false
 }
 console.log(props, emit)
+//删除记录
+const deleteRecord = (id: number) => {
+    console.log('deleteRecord', id)
+    ElMessageBox.confirm(
+        '确定要删除这条驱虫记录吗？',
+        '删除确认',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+        }
+    ).then(() => {
+        emit('delete-records', id)
+
+    }).catch(() => {
+        ElMessage.info('已取消删除')
+    })
+
+}
 </script>
 <style lang="scss" scoped>
 .cute-dialog {

@@ -111,7 +111,7 @@
               <span>修改密码</span>
             </el-dropdown-item>
             <el-dropdown-item>
-              <el-icon></el-icon>
+              <el-icon><SwitchButton /></el-icon>
               <span>退出登录</span>
             </el-dropdown-item>
           </el-dropdown-menu>

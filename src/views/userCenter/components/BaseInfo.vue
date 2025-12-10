@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref,watch, onMounted} from 'vue'
 import { ElMessage } from 'element-plus'
 
 // 接收父组件的表单数据
@@ -79,7 +79,22 @@ const localFormData = ref({ ...props.formData })
 // 当props.formData变化时，更新本地副本
 watch(() => props.formData, (newVal) => {
   localFormData.value = { ...newVal }
+   if (window.layui) {
+      window.layui.use('form', (form: any) => {
+        form.render('radio') // 只重新渲染单选框，性能更高
+      })
+    }
 }, { deep: true })
+
+onMounted(() => {
+  setTimeout(() => {
+    if (window.layui) {
+      window.layui.use('form', (form: any) => {
+        form.render('radio')
+      })
+    }
+  }, 0)
+})
 // 禁用未来日期
 const disabledDate = (time: Date) => {
   return time.getTime() > Date.now()
@@ -96,8 +111,8 @@ const handleSave = (event: Event) => {
   if (localFormData.value.nickname.length > 20) {
     ElMessage.error('昵称长度不能超过20个字符')
     return
-  }
-  if (!localFormData.value.sex) {
+  } 
+   if (!localFormData.value.sex) {
     ElMessage.error('请选择性别')
     return
   }

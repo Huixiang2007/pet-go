@@ -12,6 +12,8 @@
           popper-class="custom-color-popper" />
       </div>
     </div>
+   
+
     <!-- 顶部用户核心信息 -->
     <header class="profile-header">
       <PersonalAvatar :avatar="userInfo.avatar" :nickname="userInfo.nickname" :email="userInfo.email"
@@ -126,7 +128,7 @@ const addressList = ref([])
 
 // 3. 定义“显示添加地址表单”的开关
 const showAddressForm = ref(false)
-
+const isLoading = ref(true)
 
 // 初始化
 onMounted(() => {
@@ -160,7 +162,42 @@ onMounted(() => {
   })
 })
 
-
+// 全局方法：获取用户信息
+const getUserInfo = async () => {
+  if (isFetching.value) return
+  isFetching.value = true
+    isLoading.value = true 
+  try {
+    const userId = localStorage.getItem('userId') || ''
+    if (!userId) {
+      window.layui?.layer.msg('用户未登录')
+       isLoading.value = false 
+      router.push('/login')
+      return
+    }
+    const response = await request('/server/api/user/getUserInfo/userId', 'GET', { userId })
+    console.log('获取用户信息:', response)
+    if (response.code === 0) {
+      const userData = response.data.userVO
+      userInfo.value = {
+        ...userInfo.value,
+        nickname: userData.username,
+        sex: userData.gender||1,
+        phone: userData.phone,
+        birthday: userData.birthday,
+        avatar: userData.avatar,
+        email: userData.email,
+      }
+      formData.value = { ...userInfo.value }
+     
+    }
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+  } finally {
+    isFetching.value = false
+     isLoading.value = false 
+  }
+}
 const getRealNameStatus = async () => {
   // 避免重复请求
   if (isFetching.value) return

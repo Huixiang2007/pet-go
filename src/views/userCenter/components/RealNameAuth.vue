@@ -38,7 +38,7 @@
         <div class="layui-form-item">
           <label class="layui-form-label">用户性别</label>
           <div class="layui-input-block info-display">
-            {{ localInfo.gender === 1 ? '男' : localInfo.gender === 0 ? '女' : '未填写' }}
+            {{ localInfo.gender === 1 ? '男' : localInfo.gender === 2 ? '女' : '未填写' }}
           </div>
         </div>
         <div class="layui-form-item">
@@ -104,7 +104,7 @@
         <div class="layui-form-item">
           <label class="layui-form-label">用户性别</label>
           <div class="layui-input-block info-display">
-            {{ localInfo.gender === 1 ? '男' : localInfo.gender === 0 ? '女' : '未填写' }}
+            {{ localInfo.gender == 1 ? '男' : localInfo.gender == 2 ? '女' : '未填写' }}
           </div>
         </div>
         <div class="layui-form-item">
@@ -154,8 +154,8 @@
       <div class="layui-form-item">
         <label class="layui-form-label">用户性别</label>
         <div class="layui-input-block">
-          <input type="radio" name="gender" value="1" title="男" v-model="realNameForm.gender" />
-          <input type="radio" name="gender" value="0" title="女" v-model="realNameForm.gender" />
+          <input type="radio" name="gender" value=1 title="男" v-model="realNameForm.gender" />
+          <input type="radio" name="gender" value=2 title="女" v-model="realNameForm.gender" />
         </div>
       </div>
 
@@ -234,7 +234,7 @@ const showSubmittedMaterials = ref(false)
 const realNameForm = ref({
   realName: '',
   idCard: '',
-  gender: '1', // 默认为男性
+  gender: 1, 
   birthday: '',
   address: '',
   idCardFront: '',
@@ -251,7 +251,7 @@ const localInfo = ref({
   idCard: '',
   idCardFront: '',
   idCardBack: '',
-  gender: 0,
+  gender: 1,
   birthday: '',
   address: '',
 })
@@ -287,7 +287,7 @@ const getRealNameStatus = async () => {
           localInfo.value = {
             realName: response.data.realName || '',
             idCard: response.data.idCard || '',
-            gender: (response.data.gender ?? '').toString(),
+            gender: response.data.gender ?? '',
             birthday: response.data.birthday || '',
             address: response.data.address || '',
             idCardFront: pictureUrlArr[0] || '',
@@ -299,7 +299,7 @@ const getRealNameStatus = async () => {
           localInfo.value = {
             realName: response.data.realName || '',
             idCard: response.data.idCard || '',
-            gender: (response.data.gender ?? '').toString(),
+            gender: response.data.gender ?? '',
             birthday: response.data.birthday || '',
             address: response.data.address || '',
             idCardFront: response.data.idCardFront || '',

@@ -14,6 +14,7 @@
             <el-table-column label="操作" align="center">
                 <template #default="scope">
                     <el-button size="small" icon="Edit" type="primary" @click="handleEdit(scope.$index)" />
+                    <el-button size="small" icon="Delete" type="danger" @click="handleDelete(scope.row.id)" />
                 </template>
             </el-table-column>
         </el-table>
@@ -39,6 +40,7 @@ console.log(props.records)
 const emit = defineEmits<{
     'add-record': [];
     'edit-record': [index: number];
+    'delete-record': [id: number];
 }>();
 
 // 通用添加/编辑逻辑（仅转发事件）
@@ -48,5 +50,7 @@ const handleAdd = () => {
 const handleEdit = (index: number) => {
     emit('edit-record', index)
 }
-
+const handleDelete = (id: number) => {
+    emit('delete-record', id)
+}
 </script>

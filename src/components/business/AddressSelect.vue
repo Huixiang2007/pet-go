@@ -1,26 +1,26 @@
 <template>
-  <div class="layui-form-item">
+  <div class="layui-form-item ">
     <label class="layui-form-label">所在地区</label>
-    <div class="layui-input-block">
+    <div class="layui-input-block ">
       <!-- 使用三级联动下拉框 -->
-      <select v-model="selectedProvince" @change="handleProvinceChange">
-        <option value="">请选择省份</option>
-        <option :value="province.code" v-for="province in provinces" :key="province.code">
+      <select v-model="selectedProvince" @change="handleProvinceChange"    class="address-select province-select">
+        <option value=""  class="address-placeholder">请选择省份</option>
+        <option :value="province.code" v-for="province in provinces" :key="province.code"  class="address-option">
           {{ province.name }}
         </option>
       </select>
 
-      <select v-model="selectedCity" @change="handleCityChange" :disabled="!selectedProvince">
-        <option value="">请选择城市</option>
-        <option :value="city.code" v-for="city in cities" :key="city.code">
+      <select v-model="selectedCity" @change="handleCityChange" :disabled="!selectedProvince" class="address-select province-select">
+        <option value="" class="address-placeholder">请选择城市</option>
+        <option :value="city.code" v-for="city in cities" :key="city.code"  class="address-option">
           {{ city.name }}
         </option>
       </select>
 
-      <select v-model="selectedDistrict" @change="handleDistrictChange" :disabled="!selectedCity">
-        <option value="">请选择区县
+      <select v-model="selectedDistrict" @change="handleDistrictChange" :disabled="!selectedCity" class="address-select province-select">
+        <option value="" class="address-placeholder">请选择区县
         </option>
-        <option :value="district.code" v-for="district in districts" :key="district.code">
+        <option :value="district.code" v-for="district in districts" :key="district.code"  class="address-option">
           {{ district.name }}
         </option>
       </select>
@@ -235,10 +235,115 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+
+.address-select-container {
+  width: 100%;
+  max-width: 360px; /* 可选：限制最大宽度 */
+}
+
+/* 核心选择框样式 */
+.address-select {
+    z-index: 1000;
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  border: 1px solid #dcdfe6;
+  border-radius: 6px;
+  padding: 0 15px 0 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: #606266;
+  background-color: #fff;
+  transition: all 0.2s ease-in-out;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  /* 自定义下拉箭头 */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23606266' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  background-size: 12px;
+}
+
+/* 悬停状态 */
+.address-select:hover {
+  border-color: #fd9860;
+  box-shadow: 0 0 0 2px rgba(225, 170, 88, 0.1);
+
+}
+
+/* 聚焦状态 */
+.address-select:focus {
+  outline: none;
+  border-color: #fd9860; /* 主题色 */
+  box-shadow: 0 0 0 2px rgba(235, 168, 101, 0.2);
+}
+
+/* 禁用状态（如果需要） */
+.address-select:disabled {
+  background-color: #f5f7fa;
+  cursor: not-allowed;
+  color: #c0c4cc;
+  border-color: #e4e7ed;
+  /* 禁用状态的箭头 */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c0c4cc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* 占位选项样式（请选择省份） */
+.address-placeholder {
+  color: #909399;
+}
+.address-placeholder:hover {
+  border-color: #fd9860;
+  box-shadow: 0 0 0 2px rgba(225, 170, 88, 0.1);
+}
 /* 添加选择框样式 */
 .layui-form-label {
   width: 100px;
   font-weight: 500;
+}
+/* 普通选项样式 */
+.address-option {
+  color: #606266;
+  background-color: #fff;
+  padding: 10px 15px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  /* 确保样式生效 */
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 选项悬停效果 */
+:deep(.address-option:hover) {
+     background-color: #fd9860 !important;
+  color: #fff;
+  transform: translateX(5px);
+  border-left: 3px solid #fd9860;
+}
+.address-option:checked {
+  background-color: #fff8f0;
+  color: #fd9860;
+  font-weight: 500;
+}
+
+/* 下拉菜单整体样式 */
+.address-select::-webkit-scrollbar {
+  width: 6px;
+}
+
+.address-select::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.address-select::-webkit-scrollbar-thumb {
+  background: #fd9860;
+  border-radius: 10px;
+}
+
+.address-select::-webkit-scrollbar-thumb:hover {
+  background: #e78a50;
 }
 
 .layui-input-block select {

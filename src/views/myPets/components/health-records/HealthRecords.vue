@@ -4,17 +4,20 @@
       <el-tab-pane label="💉 疫苗记录" name="vaccine">
         <!-- 向子组件传递数据records和列配置columes -->
         <VaccineRecords :records="pet.healthRecords?.vaccineList" :columns="vaccineColumns"
-          @add-records="addHealthRecords('疫苗', $event)" @update-records="updateHealthRecords('疫苗', $event)" />
+          @add-records="addHealthRecords($event)" @update-records="updateHealthRecords($event)"
+          @delete-records="deleteHealthRecords($event)" />
       </el-tab-pane>
 
       <el-tab-pane label="🧼 驱虫记录" name="deworming">
         <DewormRecords :records="pet.healthRecords?.dewormingList" :columns="dewormingColumns"
-          @add-records="addHealthRecords('驱虫', $event)" @update-records="updateHealthRecords('驱虫', $event)" />
+          @add-records="addHealthRecords($event)" @update-records="updateHealthRecords($event)"
+          @delete-records="deleteHealthRecords($event)" />
       </el-tab-pane>
 
       <el-tab-pane label="🏥 病历记录" name="medical">
         <MedicineRecords :records="pet.healthRecords?.medicalList" :columns="medicalColumns"
-          @add-records="addHealthRecords('病历', $event)" @update-records="updateHealthRecords('病历', $event)" />
+          @add-records="addHealthRecords($event)" @update-records="updateHealthRecords($event)"
+          @delete-records="deleteHealthRecords($event)" />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -35,15 +38,15 @@ const activeHealthTab = ref('vaccine')
 
 // 表格列定义
 const vaccineColumns = [
-  { prop: 'type', label: '疫苗类型' },
+  { prop: 'vaccineType', label: '疫苗类型' },
   { prop: 'date', label: '接种时间' },
-  { prop: 'nextReminder', label: '下次提醒' },
+  { prop: 'nextReminderDate', label: '下次提醒' },
 ]
 
 const dewormingColumns = [
   { prop: 'medicine', label: '药品' },
   { prop: 'date', label: '时间' },
-  { prop: 'nextReminder', label: '下次提醒' },
+  { prop: 'nextReminderDate', label: '下次提醒' },
 ]
 
 const medicalColumns = [
@@ -53,13 +56,19 @@ const medicalColumns = [
   { prop: 'date', label: '日期' },
 ]
 const emit = defineEmits<{
-  'add-pet-health': [type: '疫苗' | '驱虫' | '病历', records: any],
-  'update-pet-health': [petId: number, type: '疫苗' | '驱虫' | '病历', records: any]
+  'add-pet-health': [petId: number, records: any],
+  'update-pet-health': [petId: number, records: any]
+  'delete-pet-health': [petId: number, id: number, type: string]
 }>()
-const addHealthRecords = (type: '疫苗' | '驱虫' | '病历', newRecord: any) => {
-  emit('add-pet-health', type, newRecord)
+
+const addHealthRecords = (newRecord: any) => {
+  console.log(newRecord)
+  emit('add-pet-health', props.pet.id, newRecord)
 }
-const updateHealthRecords = (type: '疫苗' | '驱虫' | '病历', newRecords: any) => {
-  emit('update-pet-health', props.pet.id, type, newRecords)
+const updateHealthRecords = (newRecords: any) => {
+  emit('update-pet-health', props.pet.id, newRecords)
+}
+const deleteHealthRecords = (id: number) => {
+  emit('delete-pet-health', props.pet.id, id, 'health')
 }
 </script>

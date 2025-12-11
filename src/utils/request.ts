@@ -8,23 +8,23 @@ const service = axios.create({
 const noTokenApiList = [
   '/server/api/user/login/email',
   '/server/api/user/login/account',
-  '/server/api/user/register',    // 注册接口
-  '/server/api/user/sendCode'     // 发送验证码接口
-  // 其他无需 Token 的接口都加在这里
-];
+  '/server/api/user/register', // 注册接口
+  '/server/api/user/sendCode', // 发送验证码接口
+]
 //请求拦截器
 service.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken')
-      const isNoTokenApi = noTokenApiList.some(api => config.url?.includes(api));
-    if (token && config.headers && !isNoTokenApi) { // 仅非白名单接口加 Token
+    const isNoTokenApi = noTokenApiList.some((api) => config.url?.includes(api))
+    if (token && config.headers && !isNoTokenApi) {
+      // 仅非白名单接口加 Token
       config.headers.Authorization = `Bearer ${token}`
     } else if (isNoTokenApi) {
       // 白名单接口：主动删除 Authorization 头（防止残留）
       if (config.headers) {
-        delete config.headers.Authorization;
+        delete config.headers.Authorization
       }
-      console.log('白名单接口，跳过 Token 添加');
+      console.log('白名单接口，跳过 Token 添加')
     } else {
       console.log('token不存在')
     }
@@ -113,14 +113,14 @@ service.interceptors.response.use(
           ElMessage.error('请求参数错误（HTTP 400）')
           break
         case 401:
-           ElMessageBox.confirm('登录已失效，请重新登录', '提示', {
-    confirmButtonText: '重新登录',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(() => {
-    localStorage.removeItem('authToken')
-    window.location.href = '/login'
-  })
+          ElMessageBox.confirm('登录已失效，请重新登录', '提示', {
+            confirmButtonText: '重新登录',
+            cancelButtonText: '取消',
+            type: 'warning',
+          }).then(() => {
+            localStorage.removeItem('authToken')
+            window.location.href = '/login'
+          })
           break
         case 404:
           ElMessage.error(`请求地址不存在：${config.url}（HTTP 404）`)

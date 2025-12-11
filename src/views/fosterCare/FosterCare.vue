@@ -169,7 +169,7 @@
                                                         <div class="flex justify-between items-start">
                                                             <h3 class="font-bold text-lg text-gray-800">{{
                                                                 foster.name
-                                                                }}
+                                                            }}
                                                             </h3>
                                                             <span
                                                                 class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs">
@@ -182,15 +182,15 @@
                                                                 class="mr-2"></el-rate>
                                                             <span class="text-sm text-gray-600">({{
                                                                 foster.reviewCount
-                                                                }})</span>
+                                                            }})</span>
                                                         </div>
                                                         <p class="text-gray-600 text-sm mt-1 truncate">{{
                                                             foster.address
-                                                            }}
+                                                        }}
                                                         </p>
                                                         <div class="flex justify-between items-center mt-2">
                                                             <span class="text-blue-500 font-bold">{{ foster.price
-                                                                }}元/天</span>
+                                                            }}元/天</span>
                                                             <div class="flex items-center">
                                                                 <span class="text-xs text-gray-500 mr-2"
                                                                     v-if="currentLocation.lat">
@@ -264,7 +264,7 @@ declare global {
 const router = useRouter();
 
 const goToPerson = () => {
-    router.push({ path: '/person' })
+    router.push({ path: '/persons' })
 }
 // 地图相关
 const mapContainer = ref<HTMLElement>()

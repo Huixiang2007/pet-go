@@ -25,6 +25,8 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import request from '@/utils/request'
+import { ElMessage } from 'element-plus'
 interface NavItem {
   text: string
   color: string
@@ -103,7 +105,24 @@ const activeIndex = ref(0)
 const activeBgColor = ref(navItems.value[0]?.bgColor)
 const isAnimating = ref(false)
 const router = useRouter()
+const checkFosterStatus = async () => {
+  try {
+    const res = await request('/server/api/foster/provider/judge', 'GET')
+    console.log(res)
+    const hasFoster = res.data
+    if (hasFoster) {
+      navItems.value[navItems.value.length - 1] = {
+        ...navItems.value[navItems.value.length - 1],
+        text: '寄养管理',
+        path: '/foster-manage',
+      }
+    }
 
+  } catch (err) {
+    ElMessage.error(err)
+
+  }
+}
 const goToPerson = () => {
   router.push({ path: '/persons' })
 }
@@ -129,13 +148,15 @@ watch(activeIndex, (newVal) => {
 
 onMounted(() => {
   // 获取当前路由路径
-  const currentPath = router.currentRoute.value.path
-  // 查找当前路由对应的导航项索引
-  const currentIndex = navItems.value.findIndex((item) => item.path === currentPath)
-  if (currentIndex !== -1) {
-    activeIndex.value = currentIndex
-    activeBgColor.value = navItems.value[currentIndex]!.bgColor
-  }
+  checkFosterStatus().then(() => {
+    const currentPath = router.currentRoute.value.path
+    // 查找当前路由对应的导航项索引
+    const currentIndex = navItems.value.findIndex((item) => item.path === currentPath)
+    if (currentIndex !== -1) {
+      activeIndex.value = currentIndex
+      activeBgColor.value = navItems.value[currentIndex]!.bgColor
+    }
+  })
 })
 
 </script>

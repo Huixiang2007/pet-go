@@ -11,8 +11,8 @@ interface HealthRecords {
   dewormingList: Array<{
     id?: number
     medicine: string
-    date: string
-    nextReminder?: string
+    date: DateString
+    nextReminderDate?: DateString
   }>
   //病历
   medicalList: Array<{
@@ -20,8 +20,8 @@ interface HealthRecords {
     hospital: string
     diagnosis: string //诊断
     medicine: string
-    date: string
-    nextReminder?: string
+    date: DateString
+    nextReminderDate?: DateString
   }>
 }
 interface Photos {
@@ -30,11 +30,10 @@ interface Photos {
   date: DateString
 }
 interface GrowthRecords {
+  id?: number
   age: string
   photos: Array<Photos>
 }
-//定义Growth为GrowthRecord类型的数组
-type Growth = GrowthRecords[]
 
 export interface Pet {
   id: number
@@ -51,5 +50,5 @@ export interface Pet {
   healthStatus: string
   characterTags: string[]
   healthRecords?: HealthRecords
-  growthRecords?: Growth
+  growthRecords?: GrowthRecords[]
 }

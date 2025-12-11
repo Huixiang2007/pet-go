@@ -138,12 +138,14 @@
                 <el-tabs v-model="activeTabs[pet.id]" class="detail-tabs">
                   <!-- 健康档案 -->
                   <el-tab-pane label="🏥 健康档案" name="health">
-                    <HealthRecords :pet="pet" @update-pet-health="updatePetHealth" />
+                    <HealthRecords :pet="pet" @add-pet-health="addPetHealth" @update-pet-health="updatePetHealth"
+                      @delete-pet-health="deletePetHealth" />
                   </el-tab-pane>
 
                   <!-- 成长记录 -->
                   <el-tab-pane label="📸 成长记录" name="growth">
-                    <GrowthAlbum :pet="pet" />
+                    <GrowthAlbum :pet="pet" @add-growth-records="addGrowthRecord"
+                      @update-growth-record="updatePetHealth" @delete-growth-records="deletePetHealth" />
                   </el-tab-pane>
                 </el-tabs>
               </div>
@@ -184,24 +186,11 @@
       </el-icon>
     </el-button>
 
-    <!-- 添加成长记录对话框 -->
-    <!-- <el-dialog v-model="showAddGrowthDialog" title="📸 添加成长记录" width="500px" class="cute-dialog">
-      <el-form :model="newGrowthRecord" label-width="80px">
-        <el-form-item label="年龄阶段">
-          <el-input v-model="newGrowthRecord.age" placeholder="如：0-1岁、1-2岁" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="showAddGrowthDialog = false">取消</el-button>
-        <el-button type="primary" class="cute-btn">确认添加</el-button>
-      </template>
-</el-dialog> -->
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowUp, ArrowDown, Plus, Male, Female } from '@element-plus/icons-vue'
@@ -297,27 +286,139 @@ const deletePet = async (petId: number) => {
       type: 'warning',
       center: true,
     })
+    const res = await request(`/server/api/pet/delete/${petId}`, 'DELETE',)
+    if (res.code === 0) {
+      const index = pets.value.findIndex((pet) => pet.id === petId)
+      if (index !== -1) {
+        pets.value.splice(index, 1)
+        ElMessage.success('宠物删除成功')
 
-    const index = pets.value.findIndex((pet) => pet.id === petId)
-    if (index !== -1) {
-      pets.value.splice(index, 1)
-      ElMessage.success('宠物删除成功')
-
-      // 如果删除的是当前显示的宠物，调整当前索引
-      if (currentScreen.value >= pets.value.length) {
-        currentScreen.value = Math.max(0, pets.value.length - 1)
+        // 如果删除的是当前显示的宠物，调整当前索引
+        if (currentScreen.value >= pets.value.length) {
+          currentScreen.value = Math.max(0, pets.value.length - 1)
+        }
       }
+    } else {
+      ElMessage.error(res.msg)
     }
+
   } catch {
     // 用户取消删除
   }
 }
+const typeMap = {
+  '疫苗': 'vaccineList',
+  '驱虫': 'dewormingList',
+  '病历': 'medicalList'
+}
+//添加宠物健康信息
+const addPetHealth = async (petId: number, newRecords: any) => {
+  console.log(petId, newRecords)
+  try {
+    const response = await request(
+      '/server/api/pet/health/record/add',
+      'POST',
+      { petId, ...newRecords },)
+    console.log(response)
+    if (response.code === 0) {
+      const newRecord = response.data
+      const targetPet = pets.value.find(pet => pet.id === petId)
 
+      const targetListName = typeMap[newRecords.recordType]
+      console.log(targetListName)
+      targetPet.healthRecords[targetListName].push(newRecord)
+      ElMessage.success('添加成功')
 
-const updatePetHealth = async (petId: number, type: '疫苗' | '驱虫' | '病历', newRecords: any) => {
-  console.log(petId, type, newRecords)
+    } else {
+      ElMessage.error('添加失败')
+
+    }
+  } catch (err) {
+    console.log(err)
+  }
+
+}
+//修改宠物健康信息
+const updatePetHealth = async (petId: number, newRecords: any) => {
+  console.log(petId, newRecords)
+  try {
+    const response = await request(
+      '/server/api/pet/health/record/update',
+      'PUT',
+      { ...newRecords },)
+    console.log(response)
+    if (response.code === 0) {
+
+      const targetPet = pets.value.find(pet => pet.id === petId)
+
+      const targetListName = typeMap[newRecords.recordType]
+      const targetList = targetPet.healthRecords[targetListName];
+      const targetIndex = targetList.findIndex((item: any) => item.id === response.data.id);
+      targetList.splice(targetIndex, 1, response.data);
+    } else {
+      ElMessage.error('更新失败')
+
+    }
+  } catch (err) {
+    console.log(err)
+  }
+
+}
+const healthRecordTypes = ['vaccineList', 'dewormingList', 'medicalList'];
+// 删除宠物健康信息
+const deletePetHealth = async (petId: number, id: number, type: string) => {
+  console.log(id)
+  try {
+    const response = await request(`/server/api/pet/health/record/delete/${id}`, 'DELETE')
+    console.log(response)
+    if (response.code === 0) {
+      const targetPet = pets.value.find(pet => pet.id === petId);
+      if (type == 'health') {
+        if (!targetPet || !targetPet.healthRecords) return;
+
+        healthRecordTypes.forEach(listName => {
+
+          if (!targetPet.healthRecords[listName]) return;
+          // 过滤掉匹配 ID 的记录（返回新数组，触发 Vue 响应式）
+          targetPet.healthRecords[listName] = targetPet.healthRecords[listName].filter(
+            item => item.id !== id
+          );
+        });
+      } else if (type === 'growth') {
+        targetPet.growthRecords = targetPet.growthRecords.filter(
+          item => item.id !== id
+        );
+      }
+
+      ElMessage.success('删除成功')
+
+    } else {
+      ElMessage.error('删除失败')
+
+    }
+  } catch (err) {
+    console.log(err)
+  }
 }
 const activeTabs = reactive<Record<number, string>>({})
+//添加成长记录
+const addGrowthRecord = async (newRecords: any) => {
+  try {
+    const res = await request('/server/api/pet/health/record/add', 'POST', newRecords)
+    console.log(res)
+    if (res.code === 0) {
+      ElMessage.success('添加成功')
+      const targetPet = pets.value.find(pet => pet.id === newRecords.petId)
+      if (targetPet) {
+        targetPet.growthRecords.push(res.data)
+      }
+    } else { }
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('添加失败')
+  }
+}
+
 
 // 初始化
 const initialize = () => {
@@ -327,10 +428,11 @@ const initialize = () => {
 }
 const openEditPage = (petId: number) => {
   router.push({
-    path: `/pet-edit/${petId}`,
+    path: `/edit-pet/${petId}`,
 
   })
 }
+// 获取用户宠物列表
 const loadPets = async () => {
   const userId = localStorage.getItem('userId')
   try {
@@ -342,108 +444,6 @@ const loadPets = async () => {
     pets.value = response.data
     console.log('获取宠物成功:', pets)
 
-    // pets.value = [
-    //   {
-    //     id: 1,
-    //     userId: Number(userId),
-    //     name: 'Lucky',
-    //     type: '狗',
-    //     age: 3,
-    //     breed: '金毛寻回犬',
-    //     birthday: '2020-05-15',
-    //     gender: "公",
-    //     weight: 32.5,
-    //     avatar: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=300&h=300&fit=crop',
-    //     characterTags: ['活泼', '友好', '粘人', '聪明', '贪吃'],
-    //     sterilization: '已绝育',
-    //     healthStatus: '健康',
-    //     healthRecords: {
-    //       vaccine: [
-    //         { type: '狂犬病疫苗', date: '2023-03-10', nextReminder: '2024-03-10' },
-    //         { type: '六联疫苗', date: '2023-01-15', nextReminder: '2024-01-15' },
-    //       ],
-    //       deworming: [{ medicine: '体内驱虫片', date: '2023-05-20', nextReminder: '2023-08-20' }],
-    //       medical: [
-    //         {
-    //           hospital: '爱心宠物医院',
-    //           diagnosis: '轻微皮炎',
-    //           medicine: '皮肤药膏',
-    //           date: '2022-11-05',
-    //           nextReminder: '2023-08-20'
-    //         },
-    //       ],
-    //     },
-    //     growthRecords: [
-    //       {
-    //         age: '0-1岁',
-    //         photos: [
-    //           {
-    //             date: '2022-09-01',
-    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-    //             description: '第一次出门散步',
-    //           },
-    //         ],
-    //       },
-    //       {
-    //         age: '1-2岁',
-    //         photos: [
-    //           {
-    //             date: '2022-09-01',
-    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-    //             description: '第一次出门散步',
-    //           },
-    //           {
-    //             date: '2022-09-01',
-    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-    //             description: '第一次出门散步',
-    //           },
-    //           {
-    //             date: '2022-09-01',
-    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-    //             description: '第一次出门散步',
-    //           },
-    //           {
-    //             date: '2022-09-01',
-    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-    //             description: '第一次出门散步',
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //   },
-    //   {
-    //     id: 2,
-    //     userId: 1,
-    //     name: 'Momo',
-    //     type: 'cat',
-    //     breed: '布偶猫',
-    //     age: '5个月',
-    //     birthday: '2021-08-22',
-    //     gender: 0,
-    //     weight: 4.2,
-    //     avatar: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300&h=300&fit=crop',
-    //     characterTags: ['安静', '优雅', '胆小', '爱干净'],
-    //     sterilization: 1,
-    //     healthStatus: '良好',
-    //     healthRecords: {
-    //       vaccine: [{ type: '猫三联', date: '2023-02-28', nextReminder: '2024-02-28' }],
-    //       deworming: [{ medicine: '体外驱虫滴剂', date: '2023-06-05', nextReminder: '2023-09-05' }],
-    //       medical: [],
-    //     },
-    //     growthRecords: [
-    //       {
-    //         age: '0-1岁',
-    //         photos: [
-    //           {
-    //             date: '2022-09-01',
-    //             src: 'https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300&h=200&fit=crop',
-    //             description: '第一次出门散步',
-    //           },
-    //         ],
-    //       },
-    //     ],
-    //   },
-    // ]
     initialize()
 
   } catch (error) {
@@ -455,14 +455,10 @@ const loadPets = async () => {
 // 生命周期
 onMounted(() => {
   loadPets()
-  //   window.addEventListener('keydown', handleKeydown);
-  //   window.addEventListener('wheel', handleWheel, { passive: false });
+
 })
 
-onUnmounted(() => {
-  //   window.removeEventListener('keydown', handleKeydown);
-  //   window.removeEventListener('wheel', handleWheel);
-})
+
 </script>
 
 <style scoped lang="scss">

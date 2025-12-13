@@ -176,7 +176,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, watch } from 'vue'
-import { ElMessage, ElMessageBox,type FormInstance} from 'element-plus'
+import { ElMessage,type FormInstance} from 'element-plus'
 import type { RuleItem } from 'element-plus'
 
 interface Sku {

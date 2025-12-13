@@ -14,10 +14,9 @@
         <el-row :gutter="15">
           <el-col :span="6">
             <el-select v-model="userType" placeholder="请选择用户类型" class="filter-select" size="small">
-              <el-option label="全部用户" value="" />
-              <el-option label="普通用户" value="normal" />
-              <el-option label="寄养商家" value="foster" />
-              <el-option label="电商卖家" value="seller" />
+              <el-option label="已认证用户" value="verified" />
+              <el-option label="待审核用户" value="unverified" />
+
             </el-select>
           </el-col>
           <el-col :span="10">
@@ -114,9 +113,9 @@ import { ref } from 'vue'
 import { User, Search, Refresh } from '@element-plus/icons-vue'
 
 // 筛选条件
-const userType = ref('')
-const searchKeyword = ref('')
 
+const searchKeyword = ref('')
+const userType = ref('')
 // 分页参数
 const currentPage = ref(1)
 const pageSize = ref(10)

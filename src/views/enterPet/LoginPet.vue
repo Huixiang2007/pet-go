@@ -327,10 +327,15 @@ const handleLogin = async (formData: LoginForm) => {
         localStorage.removeItem('rememberedPassword')
         localStorage.removeItem('rememberedLoginType')
       }
-
-      showMessage('success', '登录成功，欢迎进入PetGO!')
+    if(response.data.userRole==='管理员'){
+      showMessage('success', '登录成功，欢迎进入PetGO管理系统!')
+      router.push('/admin');
+    }else{
+       showMessage('success', '登录成功，欢迎进入PetGO!')
       const redirect = router.currentRoute.value.query.redirect as string;
       router.push(redirect || '/foster-care');
+    }
+    
     } else {
       const errorMsg = response.msg
       ElMessage.error(errorMsg)

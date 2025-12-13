@@ -179,7 +179,6 @@ import { ref, reactive, watch } from 'vue'
 import { ElMessage, type FormInstance} from 'element-plus'
 
 
-
 interface Sku {
   skuSn: string;          // SKU编号
   specJson: Record<string, string>;

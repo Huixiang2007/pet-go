@@ -1,21 +1,21 @@
 <template>
-  <div class="sidebar">
+  <div class="sidebar" :class="{ 'sidebar-collapsed': !isOpened  }">
     <!-- 品牌Logo -->
-    <div class="sidebar-logo">
+    <div class="sidebar-logo" :class="{ 'logo-collapsed': !isOpened  }">
       <div class="logo-wrapper">
-        <el-icon class="logo-icon">
-          <img src="@/assets/img/logo.png" alt="这是图标" class="logo" />
+        <el-icon class="logo-icon" v-if="isOpened ">
+          <img  src="@/assets/img/logo.png" alt="这是图标" class="logo" />
         </el-icon>
-        <span v-if="sidebarOpened" class="logo-text">PetGo 管理后台</span>
+        <span v-if="isOpened " class="logo-text">PetGo 管理后台</span>
       </div>
       <!-- 折叠按钮 -->
-      <el-button icon="Menu" class="fold-btn" @click="sidebarOpened = !sidebarOpened" circle />
+      <el-button icon="Menu" class="fold-btn" @click="emit('toggle')" circle />
     </div>
     <!-- 菜单列表 -->
     <el-menu
       :default-active="activeMenu"
       class="sidebar-menu"
-      :collapse="!sidebarOpened"
+      :collapse="!isOpened "
       background-color="#995f4687"
       text-color="#F5E8D9"
       active-text-color="#FF8A65"
@@ -25,19 +25,19 @@
       <el-menu-item index="/admin/data">
         <el-icon><PieChart /></el-icon>
         <!-- 补充数据概览图标 -->
-        <span v-if="sidebarOpened">数据概览</span>
+        <span v-if="isOpened ">数据概览</span>
       </el-menu-item>
       <!-- 用户管理 1 -->
       <el-menu-item index="/admin/user">
           <el-icon><User /></el-icon>
-          <span v-if="sidebarOpened">用户管理</span>
+          <span v-if="isOpened ">用户管理</span>
     
       </el-menu-item>
       <!-- 寄养服务管理 1-->
     <el-menu-item index="/admin/foster">
         <!-- <template #title> -->
           <el-icon><House /></el-icon>
-          <span v-if="sidebarOpened">寄养服务管理</span>
+          <span v-if="isOpened ">寄养服务管理</span>
       </el-menu-item>
       <!-- 活动管理 -->
       <el-sub-menu index="/admin/active">
@@ -55,7 +55,7 @@
       <el-sub-menu index="/admin/content">
         <template #title>
           <el-icon><Setting /></el-icon>
-          <span v-if="sidebarOpened">内容管理</span>
+          <span v-if="isOpened">内容管理</span>
         </template> 
       <el-menu-item index="/admin/content/check">内容审核</el-menu-item>
         <el-menu-item index="/admin/content/comment">评论管理</el-menu-item>
@@ -64,7 +64,7 @@
       <el-menu-item index="/admin/send">
    
           <el-icon><User /></el-icon>
-          <span v-if="sidebarOpened">通知发布</span>
+          <span v-if="isOpened">通知发布</span>
     
       </el-menu-item>
    
@@ -82,7 +82,12 @@ const route = useRoute()
 const sidebarOpened = ref(true)
 // 当前激活菜单
 const activeMenu = computed(() => route.path ||'/admin/data')
+defineProps<{
+  isOpened: boolean
+}>()
+const emit = defineEmits(['toggle'])
 </script>
+
 
 <script lang="ts">
 export default {
@@ -100,20 +105,38 @@ $text-normal: #f5e8d9; // 普通文字色（浅米色）
 $text-active: #ff8a65; // 激活文字色（主橙色）
 $border-color: #4a3629; // 边框色
 
+
 .sidebar {
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: $sidebar-bg;
+  // 1. 添加基础宽度（与展开时菜单宽度匹配）
+  width: 220px; 
+  // 2. 过渡动画（可选，提升体验）
+  transition: width 0.3s ease; 
+   flex-shrink: 0; // 关键：防止flex布局下宽度被挤压，保证收缩生效
+  overflow: hidden; // 关键：隐藏折叠时溢出的内容
+
+}
+
+// 3. 折叠状态的宽度（与内部菜单折叠宽度一致：64px）
+.sidebar.sidebar-collapsed {
+  width: 64px !important; 
 }
 
 .sidebar-logo {
   display: flex;
+   transition: padding 0.3s ease;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
   height: 60px;
   border-bottom: 1px solid $border-color;
+}
+.sidebar-logo.logo-collapsed {
+  padding: 0 8px; // 折叠后减少padding，防止按钮外溢
+  justify-content: center; // 按钮居中
 }
 .sidebar-logo img {
   margin-bottom: 20%;
@@ -143,6 +166,7 @@ $border-color: #4a3629; // 边框色
   color: $text-normal;
   background-color: transparent;
   border: none;
+   flex-shrink: 0; // 关键：按钮不被挤压
   &:hover {
     background-color: $sidebar-hover;
     color: $primary-orange; // hover时按钮颜色变为主橙色
@@ -156,6 +180,7 @@ $border-color: #4a3629; // 边框色
   --el-menu-text-color: $text-normal;
   --el-menu-active-text-color: $text-active;
   --el-menu-hover-bg-color: $sidebar-hover;
+   width: 100%; 
 }
 
 // 修复子菜单标题样式
@@ -178,6 +203,7 @@ $border-color: #4a3629; // 边框色
 
 // 菜单项样式
 .el-menu-item {
+ 
   height: 50px !important;
   line-height: 50px !important;
   color: $text-normal !important;
@@ -214,9 +240,13 @@ $border-color: #4a3629; // 边框色
 
 // 折叠状态下的菜单宽度调整
 .el-menu--collapse {
-  width: 64px !important;
+  width: 100% !important;
   .el-sub-menu__title {
     justify-content: center !important;
   }
+}
+:deep(.el-menu--popup){
+  padding: none !important;
+  background-color: rgb(255 138 101 / 20%) !important;
 }
 </style>

@@ -506,7 +506,10 @@ const handleCancelRecommend = (row: any) => { console.log('取消推荐:', row) 
     font-weight: 600;
   }
 }
-
+:deep(.el-menu--popup){
+  padding: none !important;
+  background-color: rgb(255 138 101 / 20%) !important;
+}
 // 主卡片
 .main-card {
   border-radius: 12px;

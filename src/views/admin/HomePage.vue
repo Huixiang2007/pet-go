@@ -6,7 +6,7 @@
       class="sidebar-container"
       :class="{ 'sidebar-folded': !sidebarOpened }"
     >
-      <Sidebar />
+      <Sidebar :is-opened="sidebarOpened"  @toggle="handleToggleSidebar"/>
     </el-aside>
     <!-- 主内容区 -->
     <div class="main-container">
@@ -27,7 +27,13 @@ import { ref } from 'vue'
 // 导入子组件
 import Sidebar from '@/components/common/UserSidebar.vue'
 import Header from '@/components/common/UserHeader.vue'
+// 侧边栏折叠状态
 
+
+// 处理侧边栏切换
+const handleToggleSidebar = () => {
+  sidebarOpened.value = !sidebarOpened.value
+}
 
 // 侧边栏折叠状态（仅为样式服务）
 const sidebarOpened = ref(true)
@@ -86,6 +92,18 @@ $header-height: 60px;
   flex: 1;
   padding: 20px;
   overflow-y: auto;
-  background-color: #f5f7fa;
+  background-color: #fff9f2;
 }
+:deep(.el-menu--collapse .el-sub-menu__popper.el-menu--popup){
+  padding: 0 !important;
+  --el-menu-bg-color: rgba(255, 138, 101, 0.2) !important; 
+}
+// :deep(.el-popper .is-pure .is-light .el-tooltip) {
+//   background-color: rgb(255 138 101 / 20%) !important; // 子菜单背景色（与侧边栏一致）
+//   border: none !important; // 去掉默认边框
+//   box-shadow: 0 2px 12px rgba(0,0,0,0.2) !important; // 可选：加阴影增强层次
+//   min-width: 180px !important; // 可选：自定义子菜单宽度
+// }
+
+
 </style>

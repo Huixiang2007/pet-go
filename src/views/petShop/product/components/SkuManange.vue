@@ -176,8 +176,9 @@
 
 <script lang="ts" setup>
 import { ref, reactive, watch } from 'vue'
-import { ElMessage, ElMessageBox,type FormInstance} from 'element-plus'
-import type { RuleItem } from 'element-plus'
+import { ElMessage, type FormInstance} from 'element-plus'
+
+
 
 interface Sku {
   skuSn: string;          // SKU编号
@@ -190,6 +191,22 @@ interface Sku {
   weight?: number;         // 重量(kg)
   volume?: number;         // 体积
   productId: string;       // 关联商品ID
+}
+interface RuleItem {
+  required?: boolean;
+  message: string;
+  trigger?: string | string[];
+  type?: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'enum' | 'date' | 'url' | 'email' | 'hex' | 'integer'; // 验证的数据类型
+  max?: number;
+  min?: number;
+  len?: number;
+  enum?: any[];
+  whitespace?: boolean;
+  pattern?: RegExp;
+  transform?: (value: any) => any;
+  validator?: (rule: any, value: any, callback: (error?: Error) => void) => Promise<void> | void; // 自定义验证函数
+  fields?: Record<string, RuleItem[]>;
+  defaultField?: RuleItem;
 }
 
 interface SpecItem {
@@ -257,13 +274,9 @@ const skuRules = reactive<Record<string, RuleItem[]>>({
   ],
   specJson: [
     {
+      type: 'object',
       required: true,
-      validator: (_, value, callback) => {
-        const validSpec = specItems.value.some(item => item.key && item.value)
-        if (validSpec) {callback()
-        } else {callback(new Error('请至少添加1组有效规格'))}
-      },
-      trigger: 'change'
+      message: '请选择规格组合',
     }
   ],
   price: [

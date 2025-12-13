@@ -596,9 +596,33 @@ watch(detailDialogVisible, (newVal) => {
     detailRequestCancel = null
   }
 })
-// 编辑弹窗
+// 编辑弹窗显示
 const editDialogVisible = ref(false)
-const currentEditProduct = reactive<ProductDetail>({
+// 添加Type接口
+export interface Type {
+  id: number;
+  name: string;
+}
+
+// 编辑弹窗显示
+interface ProductEdit extends TableRow {
+  id: string;
+  productName: string;
+  productSn: string;
+  brandId: number;
+  typeParent: Type;
+  typeChild: Type;
+  currentPrice: number;
+  marketPrice: number;
+  costPrice: number;
+  stock: number;
+  status: string;
+  detail: string;
+  warrantyTip: string;
+  mainImage: string;
+}
+
+const currentEditProduct = reactive<ProductEdit>({
   id: '',
   productName: '',
   productType: '',
@@ -607,25 +631,19 @@ const currentEditProduct = reactive<ProductDetail>({
   stock: 0,
   status: '',
   stockStatus: '',
-  shelfTime: '',
-  mainImage: '',
-  images: [],
-  imageList: [],
-  params: [],
-  currentPrice: 0,
-  brandName: '',
-  marketPrice: 0,
-  productWeight: 0,
-  sales: 0,
-  reviewCount: 0,
-  productScore: 0,
-  warrantyTip: '',
-  detail: '',
-  subTitle: ''
-})
 
+  brandId: 0,
+  typeParent: { id: 0, name: '' },
+  typeChild: { id: 0, name: '' },
+  currentPrice: 0,
+  marketPrice: 0,
+  costPrice: 0,
+  detail: '',
+  warrantyTip: '',
+  mainImage: ''
+})
 // 打开编辑弹窗
-const openEditDialog = (row: TableRow | ProductDetail) => {
+const openEditDialog = (row: TableRow | ProductEdit) => {
   const detail = productDetailMap[row.id] ? JSON.parse(JSON.stringify(productDetailMap[row.id])) : JSON.parse(JSON.stringify(row))
 
 
@@ -652,74 +670,84 @@ const openEditDialog = (row: TableRow | ProductDetail) => {
 }
 
 const handleEditUpdate = (updatedForm: any) => {
+  console.log('handleEditUpdate被调用，参数：', updatedForm)
+
   if (!updatedForm.id) {
     ElMessage.warning('商品ID不能为空！')
     return
   }
+  const priceValue = updatedForm.currentPrice || updatedForm.price
+  if (typeof priceValue === 'number') {
+    const priceStr = priceValue.toFixed(2)
 
-  const priceStr = updatedForm.price.toFixed(2)
+    const targetRow = tableData.value.find((item) => item.id === updatedForm.id)
+    console.log('找到的目标行：', targetRow)
 
+    if (targetRow) {
+      targetRow.productName = updatedForm.productName
+      targetRow.productType = updatedForm.productType
+      targetRow.productSn = updatedForm.productSn
+      targetRow.price = priceStr
+      targetRow.stock = updatedForm.stock
+      targetRow.status = updatedForm.status
+    }
+    if (productDetailMap[updatedForm.id]) {
+      productDetailMap[updatedForm.id] = {
+        ...productDetailMap[updatedForm.id],
+        productName: updatedForm.productName,
+        productType: updatedForm.productType,
+        productSn: updatedForm.productSn,
+        price: priceStr,
+        stock: updatedForm.stock,
+        status: updatedForm.status,
+        mainImage: updatedForm.mainImage,
+        detail: updatedForm.detail,
+        currentPrice: priceValue
+      }
+    }
 
-  const targetRow = tableData.value.find((item) => item.id === updatedForm.id)
-  if (targetRow) {
-    targetRow.productName = updatedForm.productName
-    targetRow.productType = updatedForm.productType
-    targetRow.productSn = updatedForm.productSn
-    targetRow.price = priceStr
-    targetRow.stock = updatedForm.stock
-    targetRow.status = updatedForm.status
+    axios.request({
+      url: '/server/api/shop/product/update/' + updatedForm.id,
+      method: 'post',
+      headers: { Authorization: 'Bearer ' + authToken },
+      data: {
+        id: updatedForm.id,
+        productName: updatedForm.productName,
+        productType: updatedForm.productType,
+        productSn: updatedForm.productSn,
+        price: priceStr,
+        stock: updatedForm.stock,
+        status: updatedForm.status,
+        mainImage: updatedForm.mainImage,
+        detail: updatedForm.detail
+      }
+    })
+    .then((res) => {
+      console.log('商品编辑成功', res)
+
+      if (currentProduct.id === updatedForm.id) {
+        currentProduct.productName = updatedForm.productName
+        currentProduct.productType = updatedForm.productType
+        currentProduct.productSn = updatedForm.productSn
+        currentProduct.price = priceStr
+        currentProduct.stock = updatedForm.stock
+        currentProduct.status = updatedForm.status
+        currentProduct.mainImage = updatedForm.mainImage
+        currentProduct.detail = updatedForm.detail
+        currentProduct.currentPrice = priceValue
+        ElMessage.success('商品编辑成功！')
+      }
+          getItem()
+    })
+    .catch((err) => {
+      ElMessage.error('商品编辑失败！')
+      console.log('商品编辑失败：', err)
+    })
+  } else {
+    ElMessage.error('商品价格格式不正确！')
+    return
   }
 
-  if (productDetailMap[updatedForm.id]) {
-    productDetailMap[updatedForm.id] = {
-      ...productDetailMap[updatedForm.id],
-      productName: updatedForm.productName,
-      productType: updatedForm.productType,
-      productSn: updatedForm.productSn,
-      price: priceStr,
-      stock: updatedForm.stock,
-      status: updatedForm.status,
-      mainImage: updatedForm.mainImage,
-      detail: updatedForm.detail,
-      currentPrice: updatedForm.price
-    }
-  }
-
-  axios.request({
-    url: '/server/api/shop/product/update/' + updatedForm.id,
-    method: 'post',
-    headers: { Authorization: 'Bearer ' + authToken },
-    data: {
-      id: updatedForm.id,
-      productName: updatedForm.productName,
-      productType: updatedForm.productType,
-      productSn: updatedForm.productSn,
-      price: priceStr,
-      stock: updatedForm.stock,
-      status: updatedForm.status,
-      mainImage: updatedForm.mainImage,
-      detail: updatedForm.detail
-    }
-  })
-  .then((res) => {
-    ElMessage.success('商品编辑成功！')
-    console.log('商品编辑成功', res)
-    if (currentProduct.id === updatedForm.id) {
-      currentProduct.productName = updatedForm.productName
-      currentProduct.productType = updatedForm.productType
-      currentProduct.productSn = updatedForm.productSn
-      currentProduct.price = priceStr
-      currentProduct.stock = updatedForm.stock
-      currentProduct.status = updatedForm.status
-      currentProduct.mainImage = updatedForm.mainImage
-      currentProduct.detail = updatedForm.detail
-      currentProduct.currentPrice = updatedForm.price
-    }
-  })
-  .catch((err) => {
-    ElMessage.error('商品编辑失败！')
-    console.log('商品编辑失败：', err)
-  })
   editDialogVisible.value = false
 }
 

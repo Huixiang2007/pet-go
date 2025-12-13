@@ -40,6 +40,9 @@
           <h3 class="text-xl font-bold text-gray-800">
             {{ props.product.productName || '暂无商品名称' }}
           </h3>
+            <div class="text-gray-500 text-xs my-2">
+            {{ props.product.subTitle || '' }}
+          </div>
           <div class="text-sm text-gray-500 mt-1">
             品牌：{{ props.product.brandName || '暂无品牌' }}
           </div>
@@ -126,9 +129,6 @@
           <p class="text-gray-600 text-sm leading-relaxed">
             {{ props.product.detail || '暂无商品描述' }}
           </p>
-          <div class="text-gray-500 text-sm mt-2">
-            {{ props.product.subTitle || '' }}
-          </div>
         </div>
       </div>
     </div>
@@ -185,7 +185,7 @@ const activeImgIndex = ref(0)
 
 // 简化的关闭处理
 const handleClose = () => {
-  emit('update:visible', false)  // 通知父组件关闭
+  emit('update:visible', false)
   emit('close')
 }
 

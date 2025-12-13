@@ -29,17 +29,8 @@
 
     <!-- 右侧：功能入口区 -->
     <div class="header-right">
-      <!-- 主题切换-->
-      <el-dropdown trigger="click">
-        <el-button icon="Moon" circle class="header-btn"></el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="light">亮色模式</el-dropdown-item>
-            <el-dropdown-item command="dark">暗色模式</el-dropdown-item>
-            <el-dropdown-item command="auto">跟随系统</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+    
+     
 
       <!-- 消息通知（简化 dropdown 插槽写法） -->
       <el-dropdown trigger="click" class="notification-dropdown">
@@ -89,34 +80,16 @@
         </template>
       </el-dropdown>
 
-      <!-- 个人中心（简化结构，无冗余） -->
-      <el-dropdown trigger="click" class="user-dropdown">
-        <div class="user-info" @click.stop>
-          <el-avatar :src="userAvatar" class="user-avatar"></el-avatar>
-          <span class="user-name" v-show="!isMobile || (isMobile && sidebarOpened)">
-            {{ userName }}
-          </span>
-          <el-icon class="user-arrow" v-show="!isMobile">
-            <ArrowDown></ArrowDown>
-          </el-icon>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item>
-              <el-icon><User></User></el-icon>
-              <span>个人资料</span>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <el-icon><Lock></Lock></el-icon>
-              <span>修改密码</span>
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <el-icon><SwitchButton /></el-icon>
-              <span>退出登录</span>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+    <!--退出登录 -->
+   
+        <el-button
+          icon="SwitchButton"
+          class="header-btn"
+          @click="LoginOut"
+        >退出登录
+        </el-button>
+    
+     
     </div>
   </div>
 </template>
@@ -124,6 +97,11 @@
 <!-- 注意：如果使用的是 Element Plus（Vue 3），需要确保图标已导入，可在 script 中添加： -->
 <script setup lang="ts">
 import { ref } from 'vue'
+import  request  from '@/utils/request'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+
+
 // 导入所需图标（根据你的 Element 版本调整，Element Plus 需手动导入）
 
 interface NotificationItem {
@@ -139,8 +117,7 @@ const sidebarOpened = ref(false)
 const searchValue = ref('')
 const unreadCount = ref(0)
 const notificationList = ref<NotificationItem[]>([])
-const userAvatar = ref('')
-const userName = ref('')
+
 
 const handleSearch = () => {
   // 搜索逻辑
@@ -153,6 +130,30 @@ const getIconClass = (type: string) => {
 const getIconComponent = (type: string) => {
   // 图标组件逻辑
 }
+
+const LoginOut = async (): Promise<void> => {
+  window.layui.layer.confirm('确定要退出登录吗？', {
+    title: '提示',
+    yes: async (index: number) => {
+      const response = await request('/server/api/user/logout', 'POST', {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+      })
+      console.log(response)
+      if (response.code === 0) {
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userId');
+        window.layui.layer.close(index);
+        router.push('/login'); // 直接用 router 实例，无需 window.router
+        window.layui.layer.msg('退出登录成功', { icon: 1, time: 1500 });
+      }
+
+    },
+    no: (index: number) => {
+      window.layui.layer.close(index);
+
+    }
+  });
+};
 </script>
 <script lang="ts">
 export default {

@@ -311,11 +311,12 @@ const handleLogin = async (formData: LoginForm) => {
     }
 
     if (response.code === 0) {
-      const { token, userId } = response.data
+      const { token, userId,userRole } = response.data
 
       // 存储token到localStorage
       localStorage.setItem('authToken', token)
       localStorage.setItem('userId', userId)
+        localStorage.setItem('userRole', userRole)
 
       if (shouldRemember) {
         localStorage.setItem('rememberedLoginId', encrypt(formData.loginId))
@@ -327,7 +328,7 @@ const handleLogin = async (formData: LoginForm) => {
         localStorage.removeItem('rememberedPassword')
         localStorage.removeItem('rememberedLoginType')
       }
-    if(response.data.userRole==='管理员'){
+    if(userRole==='管理员'){
       showMessage('success', '登录成功，欢迎进入PetGO管理系统!')
       router.push('/admin');
     }else{

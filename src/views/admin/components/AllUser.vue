@@ -13,23 +13,23 @@
       <el-card class="filter-card" shadow="hover">
         <el-row :gutter="15">
           <el-col :span="6">
-            <el-select v-model="userType" placeholder="请选择用户类型" class="filter-select" size="small">
+            <el-select v-model="userType" placeholder="请选择用户类型" class="filter-select" size="large" @change="handleUserTypeChange">
               <el-option label="已认证用户" value="verified" />
               <el-option label="待审核用户" value="unverified" />
 
             </el-select>
           </el-col>
           <el-col :span="10">
-            <el-input v-model="searchKeyword" placeholder="请输入用户名/手机号/邮箱搜索" size="small" prefix-icon="Search"
+            <el-input v-model="searchKeyword" placeholder="请输入用户名/手机号/邮箱搜索" size="large" prefix-icon="Search"
               class="search-input" />
           </el-col>
           <el-col :span="8" class="search-btn-group">
-            <el-button type="primary" size="small" class="query-btn">
+            <el-button type="primary" size="large" class="query-btn" @click="fetchUsers">
               <el-icon>
                 <Search />
               </el-icon> 搜索
             </el-button>
-            <el-button size="small" class="reset-btn">
+            <el-button size="large" class="reset-btn" @click="resetFilters">
               <el-icon>
                 <Refresh />
               </el-icon> 重置
@@ -44,44 +44,32 @@
       <el-card class="list-card" shadow="hover">
         <el-table :data="userList" border stripe class="user-table"
           :header-cell-style="{ background: '#f9f7f3', color: '#6b5b45' }">
-          <el-table-column prop="id" label="用户ID" width="80" />
-          <el-table-column prop="username" label="用户名" min-width="100">
+          <el-table-column prop="account" label="账号" min-width="80" />
+          <el-table-column prop="userName" label="用户名" min-width="80">
             <template #default="scope">
               <div class="user-name-item">
                 <el-avatar :src="scope.row.avatar" class="user-avatar" />
-                <span>{{ scope.row.username }}</span>
+                <span>{{ scope.row.userName }}</span>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="realName" label="真实姓名" width="100" />
-          <el-table-column prop="phone" label="手机号" width="120" />
-          <el-table-column prop="email" label="邮箱" min-width="150" />
-          <el-table-column prop="userType" label="用户类型" width="100">
+          <el-table-column prop="realName" label="真实姓名" width="130" />
+          <el-table-column prop="gender" label="性别" width="100" >
+             <template #default="scope">
+              {{ formatGender(scope.row.gender) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="birthday" label="生日" width="130" />
+          <el-table-column prop="email" label="邮箱" min-width="100" />
+          <el-table-column prop="address" label="所在省份" min-width="50" />
+          <el-table-column prop="status" label="认证状态" width="100">
             <template #default="scope">
-              <el-tag :type="scope.row.userType === 'normal'
-                ? 'info'
-                : scope.row.userType === 'foster'
-                  ? 'success'
-                  : 'warning'
-                " size="small" class="type-tag">
-                {{
-                  scope.row.userType === 'normal'
-                    ? '普通用户'
-                    : scope.row.userType === 'foster'
-                      ? '寄养商家'
-                      : '电商卖家'
-                }}
+              <el-tag :type="scope.row.status!='待审核' ? 'success' : 'danger'" size="small" class="auth-tag">
+                {{ scope.row.status!= '待审核' ? '已认证' : '未认证' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="authStatus" label="认证状态" width="100">
-            <template #default="scope">
-              <el-tag :type="scope.row.authStatus ? 'success' : 'danger'" size="small" class="auth-tag">
-                {{ scope.row.authStatus ? '已认证' : '未认证' }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="160" fixed="right">
+          <el-table-column label="操作" width="260" fixed="right">
             <template #default="scope">
               <el-button type="primary" size="small" icon="View" class="view-btn" @click="viewUser(scope.row)">
                 查看
@@ -109,79 +97,94 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref,onMounted } from 'vue'
 import { User, Search, Refresh } from '@element-plus/icons-vue'
+import request from '@/utils/request'
 
+const loading = ref(false)
+
+// 用户列表数据
+const userList = ref([])
 // 筛选条件
 
 const searchKeyword = ref('')
-const userType = ref('')
+const userType = ref('unverified')
 // 分页参数
 const currentPage = ref(1)
 const pageSize = ref(10)
-const total = ref(50)
+const total = ref(0)
+// 格式化性别显示
+const formatGender = (gender: number | undefined) => {
+  if (gender === undefined || gender === null) return '未知';
+  if (gender === 1) return '男';
+  if (gender === 2) return '女';
+  return '未知';
+};
 
-// 模拟用户列表数据
-const userList = ref([
-  {
-    id: 'a20250001',
-    username: '罗小黑',
-    realName: '罗小黑',
-    phone: '17821044XXX',
-    email: '352173371@qq.com',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
-    userType: 'normal',
-    authStatus: true
-  },
-  {
-    id: 'a20250002',
-    username: '张小飞',
-    realName: '张小飞',
-    phone: '187034078XX',
-    email: '2711918392@qq.com',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
-    userType: 'foster',
-    authStatus: true
-  },
-  {
-    id: 'a20250003',
-    username: '欧阳修',
-    realName: '欧阳修',
-    phone: '19836248XXX',
-    email: '2711918393@qq.com',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
-    userType: 'seller',
-    authStatus: false
-  },
-  {
-    id: 'a20250004',
-    username: '诸葛暗',
-    realName: '诸葛暗',
-    phone: '17702505XXX',
-    email: '2713318393@qq.com',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
-    userType: 'normal',
-    authStatus: true
-  },
-  {
-    id: 'a20250005',
-    username: '开羽',
-    realName: '开羽',
-    phone: '156320145XX',
-    email: '2713317393@qq.com',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280',
-    userType: 'foster',
-    authStatus: false
-  }
-])
+
+// 页面加载完成时，请求用户列表数据
+onMounted(() => {
+  fetchUsers()
+})
 
 // 分页事件
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+    fetchUsers()
 }
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+    fetchUsers()
 }
+// 用户类型变化时的处理函数
+const handleUserTypeChange = () => {
+  currentPage.value = 1 // 重置到第一页
+  fetchUsers()
+}
+// 重置筛选条件
+const resetFilters = () => {
+  searchKeyword.value = ''
+  userType.value = 'unverified'
+  currentPage.value = 1
+  fetchUsers()
+}
+const fetchUsers = async () => {
+  loading.value = true
+  try {
+    // 构建查询参数
+    const params: any = {
+      page: currentPage.value,
+      size: pageSize.value
+    }
+
+    // 如果有搜索关键词，添加到参数中
+    if (searchKeyword.value) {
+      params.keyword = searchKeyword.value
+    }
+
+    let response
+    // 根据用户类型选择不同的接口
+    if (userType.value === 'unverified') {
+      // 获取未认证用户列表
+      response = await request('/server/api/user/getUnAuthUserList', 'GET', params)
+    } else {
+      response = await request('/server/api/user/getAuthUserList', 'GET', params)
+    }
+    console.log('用户列表:', response)
+    if (response.code === 0) {
+      userList.value = response.data.list
+      total.value = response.data.total ||  0
+    }
+  } catch (error) {
+    console.error('获取用户列表失败:', error)
+    // 出错时清空列表
+    userList.value = []
+    total.value = 0
+  } finally {
+    loading.value = false
+  }
+}
+
 // 操作按钮事件
 const viewUser = (row: any) => {
   console.log('查看用户:', row)
@@ -194,9 +197,20 @@ const editUser = (row: any) => {
 const disableUser = (row: any) => {
   console.log('禁用用户:', row)
 }
+
 </script>
 
 <style scoped lang="scss">
+.el-table .cell {
+    font-size: 17px;
+    box-sizing: border-box;
+    line-height: 63px;
+    overflow: hidden;
+    overflow-wrap: break-word;
+    padding: 0 12px;
+    text-overflow: ellipsis;
+    white-space: normal;
+}
 // 全局容器
 .user-management-container {
   padding: 20px;

@@ -38,9 +38,11 @@
         <div class="layui-form-item">
           <label class="layui-form-label">用户性别</label>
           <div class="layui-input-block info-display">
-            {{ localInfo.gender === 1 ? '男' : localInfo.gender === 2 ? '女' : '未填写' }}
+            {{ localInfo.gender == 1 ? '男' : localInfo.gender == 2 ? '女' : '未填写' }}
+           
           </div>
         </div>
+       
         <div class="layui-form-item">
           <label class="layui-form-label">出生日期</label>
           <div class="layui-input-block info-display">
@@ -151,20 +153,30 @@
             placeholder="请输入身份证号" class="layui-input" />
         </div>
       </div>
-      <div class="layui-form-item">
+      <!-- <div class="layui-form-item">
         <label class="layui-form-label">用户性别</label>
         <div class="layui-input-block">
           <input type="radio" name="gender" value=1 title="男" v-model="realNameForm.gender" />
           <input type="radio" name="gender" value=2 title="女" v-model="realNameForm.gender" />
         </div>
+      </div> -->
+        <div class="layui-form-item">
+      <label class="layui-form-label">性别</label>
+      <div class="layui-input-block">
+        <input type="radio" name="gender" value=1 v-model.number="realNameForm.gender" title="男" />
+        <input type="radio" name="gender" value=2 v-model.number="realNameForm.gender" title="女" />
       </div>
+    </div>
 
-      <div class="layui-form-item">
-        <label class="layui-form-label">出生日期</label>
-        <div class="layui-input-block">
-          <input type="date" name="birthday" v-model="realNameForm.birthday" class="layui-input" />
-        </div>
+    
+          <div class="layui-form-item">
+      <label class="layui-form-label">出生日期</label>
+      <div class="layui-input-block">
+        <el-date-picker class="custom-style" v-model="realNameForm.birthday" type="date" name="birthday"
+          lay-verify="required" placeholder="请填入出生日期" :max-date="new Date()" value-format="YYYY-MM-DD"
+          style="width: 100%; height: 37px" :disabled-date="disabledDate" />
       </div>
+    </div>
 
       <div class="layui-form-item">
         <label class="layui-form-label">用户地址</label>
@@ -172,6 +184,7 @@
           <input type="text" name="address" v-model="realNameForm.address" placeholder="请输入用户地址" class="layui-input" />
         </div>
       </div>
+      
 
       <div class="layui-form-item">
         <label class="layui-form-label">身份证照片</label>
@@ -256,9 +269,19 @@ const localInfo = ref({
   address: '',
 })
 
+const disabledDate = (time: Date) => {
+  return time.getTime() > Date.now()
+}
 // 组件挂载时获取实名认证状态
 onMounted(() => {
   getRealNameStatus()
+   setTimeout(() => {
+    if (window.layui) {
+      window.layui.use('form', (form: any) => {
+        form.render('radio')
+      })
+    }
+  }, 100)
 })
 
 // 获取实名认证状态的函数
@@ -272,14 +295,16 @@ const getRealNameStatus = async () => {
     }
 
     const response = await request('/server/api/user/getUserAuth', 'GET')
-    console.log('实名认证状态:', response)
+  
     if (response.code === 0) {
       // 根据后端返回的状态设置 localStatus
-      if (response.data == 'null') {
+      if (response.data == null) {
         localStatus.value = 'unverified'
         return
       }
-      switch (response.data.status) {
+      Status = response.data?response.data.statu:'unverified';
+     
+      switch (Status) {     
         case '待审核':
           localStatus.value = 'pending'
           const pictureUrlArr = JSON.parse(response.data.pictureUrl || '[]');

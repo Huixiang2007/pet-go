@@ -213,7 +213,6 @@ const getRealNameStatus = async () => {
 
     const response = await request('/server/api/user/getUserAuth', 'GET')
     console.log('实名认证状态:', response)
-
     if (response.code === 0) {
       // 1. 处理“用户未认证”的情况
       if (response.msg === '用户未认证') {
@@ -232,7 +231,7 @@ const getRealNameStatus = async () => {
       }
 
       // 2. 根据后端返回的status更新状态
-      const backendStatus = response.data.status
+      const backendStatus = response.data?response.data.status:'unverified';
       switch (backendStatus) {
         case '待审核':
           realNameStatus.value = 'pending'
@@ -249,13 +248,13 @@ const getRealNameStatus = async () => {
 
       // 3. 填充后端返回的认证信息（和realNameInfo的字段对应）
       realNameInfo.value = {
-        realName: response.data.realName || '',
-        idCard: response.data.idCard || '',
-        idCardFront: response.data.idCardFront || '',
-        idCardBack: response.data.idCardBack || '',
-        gender: response.data.gender || 1, 
-        birthday: response.data.birthday || '',
-        address: response.data.address || ''
+        realName: response.data?response.data.realName : '',
+        idCard: response.data?response.data.idCard : '',
+        idCardFront:response.data? response.data.idCardFront : '',
+        idCardBack:  response.data?response.data.idCardBack :'',
+        gender: response.data?response.data.gender :1, 
+        birthday: response.data?response.data.birthday : '',
+        address:response.data? response.data.address : ''
       }
     } else {
       // 处理后端返回的业务错误

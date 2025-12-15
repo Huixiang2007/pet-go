@@ -1,7 +1,8 @@
 <template>
-  <el-dialog
+   <el-dialog
     v-model="isVisible"
-    title="管理SKU - {{ props.productName }}"
+   :title="props.productName"
+
     width="800px"
     destroy-on-close
   >
@@ -78,7 +79,7 @@
       </el-form-item>
 
       <!--成本价 -->
-      <el-form-item label="成本价(元)" prop="costPrice">
+      <el-form-item label="成本价(元)(可选)" prop="costPrice">
         <el-input
           v-model.number="skuForm.costPrice"
           placeholder="如：50.00"
@@ -97,39 +98,11 @@
         />
       </el-form-item>
 
-      <!-- SKU图片 -->
-      <el-form-item label="SKU图片">
-        <el-input
-          v-model="skuForm.imageUrl"
-          placeholder="输入图片URL（如不同颜色图）"
-        />
-      </el-form-item>
-
-      <!--商品重量(kg) -->
-      <el-form-item label="商品重量(kg)">
-        <el-input
-          v-model.number="skuForm.weight"
-          placeholder="如：0.2"
-          step="0.01"
-          type="number"
-        />
-      </el-form-item>
-
-      <!--商品体积-->
-      <el-form-item label="商品体积(m³)">
-        <el-input
-          v-model.number="skuForm.volume"
-          placeholder="如：0.01"
-          step="0.001"
-          type="number"
-        />
-      </el-form-item>
 
       <!-- 提交按钮 -->
       <el-form-item>
-        <el-button type="primary" @click="submitSku">
-          {{ isEdit ? '更新SKU' : '添加SKU' }}
-        </el-button>
+        <el-button type="primary" v-if="!isEdit" @click="addSku">添加SKU</el-button>
+        <el-button type="primary"  v-if="isEdit"  @click="editSku">更新SKU</el-button>
         <el-button @click="resetSkuForm">重置</el-button>
       </el-form-item>
     </el-form>
@@ -187,8 +160,6 @@ interface Sku {
   costPrice?: number;      // 成本价
   stock: number;           // 库存
   imageUrl?: string;       // SKU图片
-  weight?: number;         // 重量(kg)
-  volume?: number;         // 体积
   productId: string;       // 关联商品ID
 }
 interface RuleItem {
@@ -224,7 +195,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   close: []
   update: [skuList: Sku[]]
-  add: [sku: Sku]
+  addSku: [sku: Sku]
   delete: [skuSn: string]
 }>()
 //监听弹窗显示
@@ -260,7 +231,7 @@ const skuForm = reactive<Sku>({
   productId: props.productId
 })
 
-// 监听productId变化，更新表单中的productId
+
 watch(() => props.productId, (newVal) => {
   skuForm.productId = newVal
 })
@@ -292,25 +263,9 @@ const skuList = ref<Sku[]>([])
 
 // 加载SKU数据
 const loadSkuData = () => {
-  skuList.value = [
-    {
-      skuSn: `${props.productId}-WH-M`,
-      specJson: { "颜色": "白色", "尺码": "M" },
-      price: 99.00,
-      stock: 50,
-      productId: props.productId
-    },
-    {
-      skuSn: `${props.productId}-BK-L`,
-      specJson: { "颜色": "黑色", "尺码": "L" },
-      price: 109.00,
-      stock: 30,
-      productId: props.productId
-    }
-  ]
+  skuList.value = []
 }
-
-// 添加
+// 添加规格
 const addSpecItem = () => {
   if (specItems.value.length >= 5) {
     ElMessage.warning('最多添加5组规格')
@@ -318,14 +273,44 @@ const addSpecItem = () => {
   }
   specItems.value.push({ key: '', value: '' })
 }
+// 添加sku
+const addSku = () => {
+  const specJson = specItems.value.reduce((acc, item) => {
+    const key = item.key.trim()
+    const value = item.value.trim()
+    if (key && value) {
+      acc[key] = value
+    }
+    return acc
+  }, {} as Record<string, string>)
 
-// 移除
+  if (Object.keys(specJson).length === 0) {
+    ElMessage.warning('请填写有效的规格组合')
+    return
+  }
+  const newSku = {
+    skuSn: skuForm.skuSn.trim(),
+    specJson: { key: specJson },
+    price: skuForm.price,
+    marketPrice: skuForm.marketPrice || 0,
+    costPrice: skuForm.costPrice || 0,
+    stock: skuForm.stock,
+    imageUrl: skuForm.imageUrl || "",
+    productId: props.productId
+  }
+
+  skuList.value.push(newSku as any)
+  emit('addSku', newSku as any)
+  resetSkuForm()
+
+
+}// 移除
 const removeSpecItem = (index: number) => {
   if (specItems.value.length <= 1) {
     ElMessage.warning('至少保留1组规格')
     return
   }
-  specItems.value.splice(index, 1)
+  emit('delete', skuList.value[index].skuSn)
 }
 
 // 重置
@@ -344,47 +329,54 @@ const resetSkuForm = () => {
   editIndex.value = -1
 }
 
-// 编辑SKU
 const editSku = (row: Sku) => {
   isEdit.value = true
   editIndex.value = skuList.value.findIndex(
     sku => sku.skuSn === row.skuSn && sku.productId === row.productId
   )
+
   // 回显
-  Object.assign(skuForm, { ...row })
+  Object.assign(skuForm, row)
 
-  specItems.value = Object.entries(row.specJson).map(([key, value]) => ({ key, value }))
-  if (specItems.value.length === 0) {
-    specItems.value = [{ key: '', value: '' }]
-  }
-}
+  const specData = row.specJson || {}
 
-// 提交SKU
-const submitSku = () => {
-  skuFormRef.value?.validate(async (valid) => {
-    if (!valid) return
-
-    try {
-      // 组装specJson
-      skuForm.specJson = specItems.value.reduce((obj, item) => {
-        if (item.key && item.value) obj[item.key] = item.value
-        return obj
-      }, {} as Record<string, string>)
-
-      if (isEdit.value) {
-        skuList.value[editIndex.value] = { ...skuForm }
-        ElMessage.success('SKU更新成功！')
-      } else {
-        skuList.value.push({ ...skuForm })
-               emit('add', skuForm)
-      }
-      emit('update', skuList.value)
-      resetSkuForm()
-    } catch (error) {
-      ElMessage.error(isEdit.value ? 'SKU更新失败！' : 'SKU添加失败！')
-      console.error('SKU操作失败：', error)
+  specItems.value = Object.entries(specData).map(([key, value]) => ({
+    key: key,
+    value: value as string
+  }))
+  const specJson = specItems.value.reduce((acc, item) => {
+    const key = item.key.trim()
+    const value = item.value.trim()
+    if (key && value) {
+      acc[key] = value
     }
-  })
+    return acc
+  }, {} as Record<string, string>)
+
+  if (Object.keys(specJson).length === 0) {
+    ElMessage.warning('请填写有效的规格组合')
+    return
+  }
+
+  const newSku = {
+    skuSn: skuForm.skuSn.trim(),
+    specJson: specJson,
+    price: skuForm.price,
+    marketPrice: skuForm.marketPrice || 0,
+    costPrice: skuForm.costPrice || 0,
+    stock: skuForm.stock,
+    imageUrl: skuForm.imageUrl || "",
+    productId: props.productId
+  }
+
+  if (editIndex.value !== -1) {
+    skuList.value[editIndex.value] = newSku
+  } else {
+    skuList.value.push(newSku)
+  }
+
+  emit('update', [...skuList.value])
+  resetSkuForm()
 }
 
 
@@ -392,7 +384,7 @@ const submitSku = () => {
 const deleteSku = (row: Sku) => {
       skuList.value = skuList.value.filter(
         sku => !(sku.skuSn === row.skuSn && sku.productId === row.productId)
-      ) // 过滤掉要删除的SKU
+      )
       emit('delete', row.skuSn)
       emit('update', skuList.value)
       ElMessage.success('SKU删除成功！')

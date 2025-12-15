@@ -150,7 +150,7 @@ interface ProductDetail {
   productName: string
   productType: string
   productSn: string
-  price: string
+  price: number
   stock: number
   status: string
   shelfTime: string

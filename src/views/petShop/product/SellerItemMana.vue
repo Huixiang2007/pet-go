@@ -236,7 +236,7 @@
     @close="skuDialogVisible = false"
     @update="handleSkuUpdate"
     @delete="handleSkuDelete"
-    @add="handleSkuAdd"
+    @addSku="handleSkuAdd"
   />
 </template>
 
@@ -259,7 +259,7 @@ interface TableRow {
   productName: string
   productType: string
   productSn: string
-  price: string
+  price: number;
   stock: number;
   status: string
   stockStatus: string
@@ -501,7 +501,7 @@ const currentProduct = reactive<ProductDetail>({
   productName: '',
   productType: '',
   productSn: '',
-  price: '',
+  price: 0,
   stock: 0,
   status: '',
   stockStatus: '',
@@ -627,7 +627,7 @@ const currentEditProduct = reactive<ProductEdit>({
   productName: '',
   productType: '',
   productSn: '',
-  price: '',
+  price: 0,
   stock: 0,
   status: '',
   stockStatus: '',
@@ -687,7 +687,7 @@ const handleEditUpdate = (updatedForm: any) => {
       targetRow.productName = updatedForm.productName
       targetRow.productType = updatedForm.productType
       targetRow.productSn = updatedForm.productSn
-      targetRow.price = priceStr
+      targetRow.price =Number(priceStr)
       targetRow.stock = updatedForm.stock
       targetRow.status = updatedForm.status
     }
@@ -697,7 +697,7 @@ const handleEditUpdate = (updatedForm: any) => {
         productName: updatedForm.productName,
         productType: updatedForm.productType,
         productSn: updatedForm.productSn,
-        price: priceStr,
+        price: Number(priceStr),
         stock: updatedForm.stock,
         status: updatedForm.status,
         mainImage: updatedForm.mainImage,
@@ -724,20 +724,8 @@ const handleEditUpdate = (updatedForm: any) => {
     })
     .then((res) => {
       console.log('商品编辑成功', res)
-
-      if (currentProduct.id === updatedForm.id) {
-        currentProduct.productName = updatedForm.productName
-        currentProduct.productType = updatedForm.productType
-        currentProduct.productSn = updatedForm.productSn
-        currentProduct.price = priceStr
-        currentProduct.stock = updatedForm.stock
-        currentProduct.status = updatedForm.status
-        currentProduct.mainImage = updatedForm.mainImage
-        currentProduct.detail = updatedForm.detail
-        currentProduct.currentPrice = priceValue
-        ElMessage.success('商品编辑成功！')
-      }
-          getItem()
+        ElMessage.success(res.data.msg)
+        getItem()
     })
     .catch((err) => {
       ElMessage.error('商品编辑失败！')
@@ -759,7 +747,9 @@ const currentSkuProductName = ref('')
 // 打开SKU管理弹窗
 const openSkuManageDialog = (row: TableRow) => {
   currentSkuProductId.value = row.id
-  currentSkuProductName.value = row.productName
+  console.log(row.id)
+  currentSkuProductName.value =  row.productName
+  console.log(row.productName)
   skuDialogVisible.value = true
 }
 
@@ -781,15 +771,16 @@ const handleSkuUpdate = (skuList: any[]) => {
 
   axios
     .request({
-      url: '/petshop/sku/update',
-      method: 'put',
-      data: { productId: currentSkuProductId.value, skuList },
+      url: `/server/api/shop/sku/update/sku/${currentSkuProductId.value}`,
+      method: 'post',
+      data: skuList,
     })
-    .then(() => {
-      ElMessage.success('SKU列表更新成功！')
+    .then((res) => {
+      console.log('SKU列表更新成功！')
+      console.log(res)
     })
     .catch(() => {
-      ElMessage.error('SKU列表更新失败！')
+      console.log('SKU列表更新失败！')
     })
 }
 // 处理SKU删除
@@ -797,7 +788,7 @@ const handleSkuDelete = (skuId: string) => {
   ElMessageBox.confirm('确定删除该SKU吗？', '删除确认', { type: 'warning' })
   axios
     .request({
-      url: '/petshop/sku/delete',
+      url: '/server/api/shop/sku/delete/{skuId}',
       method: 'delete',
       data: { skuId },
     })
@@ -809,22 +800,32 @@ const handleSkuDelete = (skuId: string) => {
     })
 }
 // 处理SKU新增
-const handleSkuAdd = () => {
-  console.log('SKU新增')
-  axios
-    .request({
-      url: '/petshop/sku/add',
-      method: 'post',
-      data: { productId: currentSkuProductId.value, skuList: [] },
-    })
-    .then(() => {
-      ElMessage.success('SKU新增成功！')
-    })
-    .catch(() => {
-      ElMessage.error('SKU新增失败！')
-    })
-}
-
+const handleSkuAdd = (sku: any) => { // 参数改为单个SKU对象
+  console.log('待新增的SKU:', sku);
+  if (!sku) {
+    ElMessage.warning('SKU数据为空，无法新增')
+    return
+  }
+  const skuArray = [sku];
+  axios.request({
+    url: '/server/api/shop/sku/add',
+    method: 'post',
+    params: { productId: currentSkuProductId.value },
+    data: skuArray,
+    headers: {
+      Authorization: 'Bearer ' + authToken,
+    }
+  })
+  .then((res) => {
+    console.log('新增成功:', res);
+    ElMessage.success('SKU新增成功！');
+  })
+  .catch((err) => {
+    console.error('新增失败详情:', err);
+    console.error('实际传递的请求体:', skuArray);
+    ElMessage.error('SKU新增失败！');
+  });
+};
 
 
 // 上/下架商品

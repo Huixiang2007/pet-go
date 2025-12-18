@@ -109,7 +109,7 @@ import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useRegisterStore } from '@/stores/register'
 import ConfirmCode from '@/components/common/ConfirmCode.vue'
-import request from '@/utils/request'
+import { register, sendVerificationCode } from '@/api/auth'
 
 interface ConfirmCodeExposed {
   startCountdown: () => void;
@@ -242,18 +242,12 @@ const handleSubmit = async () => {
   
   try {
     // 调用注册接口
-    const response = await request(
-      '/server/api/user/register',
-      'POST',
-      {
-        email: form.email,
-        code: form.vercode,
-        password: form.password,
-        account: form.name,
-      },
-      {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      })
+    const response = await register({
+      email: form.email,
+      code: form.vercode,
+      password: form.password,
+      account: form.name,
+    })
     
     if (response.code === 0) {
       const { token, userId } = response.data
@@ -287,9 +281,7 @@ const SendVerificationCode = async (email: string) => {
     
     isSending.value = true
     
-    const response = await request('/server/api/user/sendCode', 'POST', { email: email }, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
+    const response =await sendVerificationCode({ email: email })
     
     if (response.code == 0) {
       ElMessage.success('验证码发送成功')

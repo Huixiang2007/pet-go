@@ -25,8 +25,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 // 导入子组件
-import Sidebar from '@/components/common/UserSidebar.vue'
-import Header from '@/components/common/UserHeader.vue'
+import Sidebar from './components/UserSidebar.vue'
+import Header from './components/UserHeader.vue'
 // 侧边栏折叠状态
 
 

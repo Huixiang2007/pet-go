@@ -13,71 +13,117 @@
       <el-card class="filter-card" shadow="hover">
         <el-row :gutter="15">
           <el-col :span="6">
-            <el-select v-model="userType" placeholder="请选择用户类型" class="filter-select" size="large" @change="handleUserTypeChange">
+            <el-select
+              v-model="userType"
+              placeholder="请选择用户类型"
+              class="filter-select"
+              size="large"
+              @change="handleUserTypeChange"
+            >
               <el-option label="已认证用户" value="verified" />
               <el-option label="待审核用户" value="unverified" />
-
             </el-select>
           </el-col>
           <el-col :span="10">
-            <el-input v-model="searchKeyword" placeholder="请输入用户名/手机号/邮箱搜索" size="large" prefix-icon="Search"
-              class="search-input" />
+            <el-input
+              v-model="searchKeyword"
+              placeholder="请输入用户名/手机号/邮箱搜索"
+              size="large"
+              prefix-icon="Search"
+              class="search-input"
+            />
           </el-col>
           <el-col :span="8" class="search-btn-group">
             <el-button type="primary" size="large" class="query-btn" @click="fetchUsers">
               <el-icon>
                 <Search />
-              </el-icon> 搜索
+              </el-icon>
+              搜索
             </el-button>
             <el-button size="large" class="reset-btn" @click="resetFilters">
               <el-icon>
                 <Refresh />
-              </el-icon> 重置
+              </el-icon>
+              重置
             </el-button>
           </el-col>
         </el-row>
       </el-card>
     </div>
-
+    <LoadingComponent v-if="loading" />
     <!-- 用户列表区 -->
-    <div class="user-list-wrapper">
+    <div v-else class="user-list-wrapper">
       <el-card class="list-card" shadow="hover">
-        <el-table :data="userList" border stripe class="user-table"
-          :header-cell-style="{ background: '#f9f7f3', color: '#6b5b45' }">
+        <el-table
+          :data="userList"
+          border
+          stripe
+          class="user-table"
+          :header-cell-style="{ background: '#f9f7f3', color: '#6b5b45' }"
+        >
           <el-table-column prop="account" label="账号" min-width="80" />
           <el-table-column prop="userName" label="用户名" min-width="80">
             <template #default="scope">
               <div class="user-name-item">
-                <el-avatar :src="scope.row.avatar" class="user-avatar" />
-                <span>{{ scope.row.userName }}</span>
+                <el-avatar :src="scope.row.avatar" class="user-avatar" loading="lazy" />
+                <el-tooltip
+                  :content="scope.row.userName"
+                  placement="bottom-start"
+                  effect="light"
+                  :disabled="scope.row.userName.length <= 10"
+                >
+                  <span class="name-text">{{ scope.row.userName }}</span>
+                </el-tooltip>
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="realName" label="真实姓名" width="130" />
-          <el-table-column prop="gender" label="性别" width="100" >
-             <template #default="scope">
+          <el-table-column prop="realName" label="真实姓名" width="90" />
+          <el-table-column prop="gender" label="性别" width="100">
+            <template #default="scope">
               {{ formatGender(scope.row.gender) }}
             </template>
           </el-table-column>
           <el-table-column prop="birthday" label="生日" width="130" />
           <el-table-column prop="email" label="邮箱" min-width="100" />
-          <el-table-column prop="address" label="所在省份" min-width="50" />
-          <el-table-column prop="status" label="认证状态" width="100">
+          <!-- <el-table-column prop="address" label="地址" min-width="50" /> -->
+          <el-table-column prop="status" label="认证状态" width="85">
             <template #default="scope">
-              <el-tag :type="scope.row.status!='待审核' ? 'success' : 'danger'" size="small" class="auth-tag">
-                {{ scope.row.status!= '待审核' ? '已认证' : '未认证' }}
+              <el-tag
+                :type="scope.row.status != '待审核' ? 'success' : 'danger'"
+                size="small"
+                class="auth-tag"
+              >
+                {{ scope.row.status != '待审核' ? '已认证' : '未认证' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="260" fixed="right">
+          <el-table-column label="操作" width="160" fixed="right">
             <template #default="scope">
-              <el-button type="primary" size="small" icon="View" class="view-btn" @click="viewUser(scope.row)">
+              <el-button
+                type="primary"
+                size="small"
+                icon="View"
+                class="view-btn"
+                @click="viewUser(scope.row)"
+              >
                 查看
               </el-button>
-              <el-button type="warning" size="small" icon="Edit" class="edit-btn" @click="editUser(scope.row)">
+              <!-- <el-button
+                type="warning"
+                size="small"
+                icon="Edit"
+                class="edit-btn"
+                @click="editUser(scope.row)"
+              >
                 编辑
-              </el-button>
-              <el-button type="danger" size="small" icon="Delete" class="del-btn" @click="disableUser(scope.row)">
+              </el-button> -->
+              <el-button
+                type="danger"
+                size="small"
+                icon="Delete"
+                class="del-btn"
+                @click="disableUser(scope.row)"
+              >
                 禁用
               </el-button>
             </template>
@@ -86,25 +132,43 @@
 
         <!-- 分页组件 -->
         <div class="pagination-wrapper">
-          <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-            :current-page="currentPage" :page-sizes="[5, 10, 20, 50]" :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper" :total="total" class="user-pagination">
+          <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="currentPage"
+            :page-sizes="[5, 10, 20, 50]"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            class="user-pagination"
+          >
           </el-pagination>
         </div>
       </el-card>
     </div>
+      <UserDetailDialog
+      v-model:visible="dialogVisible"
+      :user-detail="currentUserDetail"
+      :loading="detailLoading"
+      @close="handleClose"
+       @approve="() => handleApprove(currentUserDetail.id)"
+       @reject="() => handleReject(currentUserDetail.id)"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref,onMounted } from 'vue'
-import { User, Search, Refresh } from '@element-plus/icons-vue'
-import request from '@/utils/request'
+import { ElMessage } from 'element-plus'
+import { ref, onMounted } from 'vue'
+import { approveOrReject,type UserAuthDetail,getUnAuthUserList, getAuthUserList, type UserInfo,searchDetail,getUserAuthDetail } from '@/api/admin/user'
+import LoadingComponent from '@/components/common/LoadingStatus.vue'
+import UserDetailDialog from '@/views/admin/components/user/DetailBox.vue'
+
 
 const loading = ref(false)
-
+const detailLoading = ref(false)
 // 用户列表数据
-const userList = ref([])
+const userList = ref<UserInfo[]>([])
 // 筛选条件
 
 const searchKeyword = ref('')
@@ -113,14 +177,17 @@ const userType = ref('unverified')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+// 弹窗相关
+const dialogVisible = ref(false)
+const currentUserDetail = ref<UserAuthDetail | null>(null)
+const selectedUser = ref<UserInfo | null>(null)
 // 格式化性别显示
 const formatGender = (gender: number | undefined) => {
-  if (gender === undefined || gender === null) return '未知';
-  if (gender === 1) return '男';
-  if (gender === 2) return '女';
-  return '未知';
-};
-
+  if (gender === undefined || gender === null) return '未知'
+  if (gender === 1) return '男'
+  if (gender === 2) return '女'
+  return '未知'
+}
 
 // 页面加载完成时，请求用户列表数据
 onMounted(() => {
@@ -130,11 +197,11 @@ onMounted(() => {
 // 分页事件
 const handleSizeChange = (val: number) => {
   pageSize.value = val
-    fetchUsers()
+  fetchUsers()
 }
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
-    fetchUsers()
+  fetchUsers()
 }
 // 用户类型变化时的处理函数
 const handleUserTypeChange = () => {
@@ -153,27 +220,30 @@ const fetchUsers = async () => {
   try {
     // 构建查询参数
     const params: any = {
-      page: currentPage.value,
-      size: pageSize.value
+      pageNum: currentPage.value,
+      pageSize: pageSize.value,
     }
-
+    let response: any
     // 如果有搜索关键词，添加到参数中
     if (searchKeyword.value) {
       params.keyword = searchKeyword.value
+      response = await searchDetail(params)
+    }else{
+ if (userType.value === 'unverified') {
+      // 获取未认证用户列表
+      response = await getUnAuthUserList(params)
+    } else {
+      response = await  getAuthUserList(params)
+    }
     }
 
-    let response
+    
     // 根据用户类型选择不同的接口
-    if (userType.value === 'unverified') {
-      // 获取未认证用户列表
-      response = await request('/server/api/user/getUnAuthUserList', 'GET', params)
-    } else {
-      response = await request('/server/api/user/getAuthUserList', 'GET', params)
-    }
+   
     console.log('用户列表:', response)
     if (response.code === 0) {
       userList.value = response.data.list
-      total.value = response.data.total ||  0
+      total.value = response.data.total || 0
     }
   } catch (error) {
     console.error('获取用户列表失败:', error)
@@ -186,30 +256,144 @@ const fetchUsers = async () => {
 }
 
 // 操作按钮事件
-const viewUser = (row: any) => {
-  console.log('查看用户:', row)
+const viewUser = async(row: UserInfo) => {
+  selectedUser.value = row
+    dialogVisible.value = true
+  detailLoading.value = true
+    try {
+    const response = await getUserAuthDetail(row.id)
+    if (response.code === 0) {
+      currentUserDetail.value = response.data ||{
+        id: 0,
+        realName: '',
+        idCard: '',
+        address: '',
+        birthday: '',
+        gender: 1,
+        pictureUrl: '',
+        status: ''
+      }
+    } 
+  } catch (error) {
+    console.error('获取用户详情失败:', error)
+ 
+  } finally {
+    detailLoading.value = false
+  }
 }
 
-const editUser = (row: any) => {
-  console.log('编辑用户:', row)
+// 关闭弹窗
+const handleClose = () => {
+  dialogVisible.value = false
+  currentUserDetail.value = null
+  selectedUser.value = null
 }
+// 处理认证通过
+const handleApprove = async(id: number) => {
+  try {
+    const response = await approveOrReject(id, '通过')
+    if (response.code === 0) {
+      ElMessage.success('认证通过成功')
+      handleClose()
+      fetchUsers() // 刷新列表
+    } else {
+      ElMessage.error(response.msg || '认证通过失败')
+    }
+  } catch (error) {
+    console.error('认证通过失败:', error)
+}
+}
+
+// 处理认证拒绝
+const handleReject = async(id:number) => {
+  try {
+    const response = await approveOrReject(id, '拒绝')
+    if (response.code === 0) {  
+  ElMessage.success('已标记为认证失败')
+  handleClose()
+  fetchUsers() 
+} else {
+  ElMessage.error(response.msg || '标记失败') 
+}}catch (error) {
+  console.error('标记失败:', error)
+}
+}
+
 
 const disableUser = (row: any) => {
   console.log('禁用用户:', row)
 }
-
 </script>
 
 <style scoped lang="scss">
+.user-name-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+}
+
+.name-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+/* 用户名容器：控制布局 + 省略 */
+.user-name-item {
+  display: flex; /* 让头像和用户名横向排列 */
+  align-items: center; /* 垂直居中 */
+  gap: 8px; /* 头像和用户名间距 */
+  width: 100%; /* 占满单元格宽度 */
+}
+
+/* 用户名文本：超出省略 */
+.user-name-item > span:last-child {
+  flex: 1; /* 占满剩余空间 */
+  white-space: nowrap; /* 不换行 */
+  overflow: hidden; /* 超出隐藏 */
+  text-overflow: ellipsis; /* 超出显示省略号 */
+  position: relative; /* 用于 hover 提示定位 */
+  cursor: pointer; /* 鼠标悬浮提示可点击 */
+}
+
+/* hover 显示完整用户名（纯 CSS 实现） */
+.user-name-item > span:last-child:hover::after {
+  content: attr(title); /* 取 title 属性的内容（需在 HTML 中加 title） */
+  position: absolute;
+  top: 100%; /* 提示框在文本下方 */
+  left: 0;
+  min-width: max-content; /* 自适应宽度 */
+  padding: 4px 8px;
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999; /* 防止被遮挡 */
+  white-space: nowrap; /* 保证完整显示 */
+}
+:deep(.el-table--border .el-table__inner-wrapper) {
+  cursor: pointer;
+}
+:deep(.el-table .el-table__cell) {
+  text-align: center;
+}
+
 .el-table .cell {
-    font-size: 17px;
-    box-sizing: border-box;
-    line-height: 63px;
-    overflow: hidden;
-    overflow-wrap: break-word;
-    padding: 0 12px;
-    text-overflow: ellipsis;
-    white-space: normal;
+  font-size: 17px;
+  box-sizing: border-box;
+  line-height: 63px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  padding: 0 12px;
+  text-overflow: ellipsis;
+  white-space: normal;
 }
 // 全局容器
 .user-management-container {
@@ -312,28 +496,24 @@ const disableUser = (row: any) => {
 
         // 按钮样式统一
         .view-btn,
-        .edit-btn,
+        
         .del-btn {
           border-radius: 6px;
-          margin: 0 2px; // 统一按钮间距，删除冗余的 margin-top
+          margin: 2px 2px; // 统一按钮间距，删除冗余的 margin-top
         }
 
-        .view-btn {
-          background-color: #c3e6cb;
-          border-color: #c3e6cb;
-          color: #28a745;
-        }
+.view-btn {
+  background-color: #cce5ff;
+  border-color: #cce5ff;
+  color: #007bff;
+}
 
-        .edit-btn {
-          background-color: #ffeaa7;
-          border-color: #ffeaa7;
-          color: #fd7e14;
-        }
+       
 
         .del-btn {
-          background-color: #f8d7da;
-          border-color: #f8d7da;
-          color: #dc3545;
+         background-color: #fff3cd;
+  border-color: #fff3cd;
+  color: #856404;
         }
       }
 
@@ -342,7 +522,6 @@ const disableUser = (row: any) => {
         margin-top: 20px;
         display: flex;
         justify-content: center;
-
 
         :deep(.user-pagination) {
           --el-pagination-button-bg-color: #fff;

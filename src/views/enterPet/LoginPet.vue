@@ -77,7 +77,7 @@ import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
 import CaptchaLoad from '@/components/common/CaptchaLoad.vue'
-import request from '@/utils/request'
+import { loginByAccount, loginByEmail } from '@/api/auth'
 
 
 
@@ -279,35 +279,16 @@ const handleLogin = async (formData: LoginForm) => {
     let response: any
     // 调用登录接口
     if (isAccount.value) {
-      response = await request(
-        '/server/api/user/login/account',
-        'POST',
-        {
-          account: formData.loginId,
-          password: formData.password,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          }
-        }
-
-      )
+      response = await loginByAccount({
+        account: formData.loginId,
+        password: formData.password,
+      })
     } else {
-      response = await request(
-        '/server/api/user/login/email',
-        'POST',
-        {
-          email: formData.loginId,
-          password: formData.password,
-
-        },
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          }
-        }
-      )
+      // 使用新的API模块
+      response = await loginByEmail({
+        email: formData.loginId,
+        password: formData.password,
+      })
     }
 
     if (response.code === 0) {

@@ -1,4 +1,10 @@
 export * from './user';
+export * from './foster';
+export interface ApiResponse<T> {
+  code: number;        
+  data: T;             
+  msg: string;         
+}
 export interface PageParams {
   pageNum: number;
   pageSize: number;

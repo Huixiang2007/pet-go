@@ -17,30 +17,31 @@
               v-model="userType"
               placeholder="请选择用户类型"
               class="filter-select"
-              size="large"
+              size="default"
               @change="handleUserTypeChange"
             >
               <el-option label="已认证用户" value="verified" />
               <el-option label="待审核用户" value="unverified" />
+              <el-option label="所有用户" value="all" />
             </el-select>
           </el-col>
           <el-col :span="10">
             <el-input
               v-model="searchKeyword"
-              placeholder="请输入用户名/手机号/邮箱搜索"
-              size="large"
+              placeholder="请输入用户名/邮箱搜索"
+              size="default"
               prefix-icon="Search"
               class="search-input"
             />
           </el-col>
           <el-col :span="8" class="search-btn-group">
-            <el-button type="primary" size="large" class="query-btn" @click="fetchUsers">
+            <el-button type="primary" size="default" class="query-btn" @click="fetchUsers">
               <el-icon>
                 <Search />
               </el-icon>
               搜索
             </el-button>
-            <el-button size="large" class="reset-btn" @click="resetFilters">
+            <el-button size="default" class="reset-btn" @click="resetFilters">
               <el-icon>
                 <Refresh />
               </el-icon>
@@ -77,23 +78,27 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="realName" label="真实姓名" width="90" />
+          <el-table-column prop="realName" label="真实姓名" width="90">
+            <template #default="scope">
+              {{ scope.row.realName || '暂无' }}
+            </template>
+          </el-table-column>
           <el-table-column prop="gender" label="性别" width="100">
             <template #default="scope">
               {{ formatGender(scope.row.gender) }}
             </template>
           </el-table-column>
-          <el-table-column prop="birthday" label="生日" width="130" />
+          <el-table-column prop="birthday" label="生日" width="130">
+            <template #default="scope">
+              {{ scope.row.birthday || '暂无' }}
+            </template>
+          </el-table-column>
           <el-table-column prop="email" label="邮箱" min-width="100" />
           <!-- <el-table-column prop="address" label="地址" min-width="50" /> -->
           <el-table-column prop="status" label="认证状态" width="85">
             <template #default="scope">
-              <el-tag
-                :type="scope.row.status != '待审核' ? 'success' : 'danger'"
-                size="small"
-                class="auth-tag"
-              >
-                {{ scope.row.status != '待审核' ? '已认证' : '未认证' }}
+              <el-tag :type="getAuthStatusType(scope.row)" size="small" class="auth-tag">
+                {{ getAuthStatusText(scope.row) }}
               </el-tag>
             </template>
           </el-table-column>
@@ -108,15 +113,7 @@
               >
                 查看
               </el-button>
-              <!-- <el-button
-                type="warning"
-                size="small"
-                icon="Edit"
-                class="edit-btn"
-                @click="editUser(scope.row)"
-              >
-                编辑
-              </el-button> -->
+
               <el-button
                 type="danger"
                 size="small"
@@ -136,7 +133,7 @@
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange"
             :current-page="currentPage"
-            :page-sizes="[5, 10, 20, 50]"
+            :page-sizes="[5, 10, 15, 20]"
             :page-size="pageSize"
             layout="total, sizes, prev, pager, next, jumper"
             :total="total"
@@ -146,13 +143,13 @@
         </div>
       </el-card>
     </div>
-      <UserDetailDialog
+    <UserDetailDialog
       v-model:visible="dialogVisible"
       :user-detail="currentUserDetail"
       :loading="detailLoading"
       @close="handleClose"
-       @approve="() => handleApprove(currentUserDetail.id)"
-       @reject="() => handleReject(currentUserDetail.id)"
+      @approve="() => handleApprove(currentUserDetail.id)"
+      @reject="() => handleReject(currentUserDetail.id)"
     />
   </div>
 </template>
@@ -160,33 +157,68 @@
 <script setup lang="ts">
 import { ElMessage } from 'element-plus'
 import { ref, onMounted } from 'vue'
-import { approveOrReject,type UserAuthDetail,getUnAuthUserList, getAuthUserList, type UserInfo,searchDetail,getUserAuthDetail } from '@/api/admin/user'
+import {
+  approveOrReject,
+  getUnAuthUserList,
+  getAuthUserList,
+  getAllList,
+  type UserInfo,
+  searchDetail,
+  getUserAuthDetail,
+  type UserSearchDetail,
+} from '@/api/admin/user'
 import LoadingComponent from '@/components/common/LoadingStatus.vue'
 import UserDetailDialog from '@/views/admin/components/user/DetailBox.vue'
 
-
-const loading = ref(false)
-const detailLoading = ref(false)
-// 用户列表数据
-const userList = ref<UserInfo[]>([])
-// 筛选条件
-
-const searchKeyword = ref('')
-const userType = ref('unverified')
-// 分页参数
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-// 弹窗相关
+const searchKeyword = ref('')
+const loading = ref(false)
+const detailLoading = ref(false)
+// 用户列表数据
+const userList = ref<(UserInfo | UserSearchDetail)[]>([])
+
+const userType = ref('unverified') // 初始化默认值，与resetFilters保持一致
 const dialogVisible = ref(false)
-const currentUserDetail = ref<UserAuthDetail | null>(null)
-const selectedUser = ref<UserInfo | null>(null)
+const currentUserDetail = ref<any>(null)
+const selectedUser = ref<any>(null)
+
 // 格式化性别显示
 const formatGender = (gender: number | undefined) => {
-  if (gender === undefined || gender === null) return '未知'
+  if (gender === undefined || gender === null) return '暂无'
   if (gender === 1) return '男'
   if (gender === 2) return '女'
-  return '未知'
+  return '暂无'
+}
+// 获取认证状态显示文本
+const getAuthStatusText = (row: UserInfo | UserSearchDetail) => {
+  if ('statusDesc' in row) {
+    if (row.statusDesc === '审核通过') return '已认证'
+    return row.statusDesc
+  } else {
+    if (row.status !== '待审核') {
+      return '已认证'
+    } else if (row.status === '待审核') {
+      return '待审核'
+    } else {
+      return '未认证'
+    }
+  }
+}
+
+// 获取认证状态标签类型
+const getAuthStatusType = (row: UserInfo | UserSearchDetail) => {
+  // 搜索结果使用 statusDesc 字段
+  if ('statusDesc' in row) {
+    if (row.statusDesc === '审核通过') return 'success'
+    else if (row.statusDesc === '待审核') return 'warning'
+    else if (row.statusDesc === '未认证') return 'danger'
+  }
+  // 普通列表使用 status 字段
+  else {
+    return row.status !== '待审核' ? 'success' : 'warning'
+  }
 }
 
 // 页面加载完成时，请求用户列表数据
@@ -228,22 +260,27 @@ const fetchUsers = async () => {
     if (searchKeyword.value) {
       params.keyword = searchKeyword.value
       response = await searchDetail(params)
-    }else{
- if (userType.value === 'unverified') {
-      // 获取未认证用户列表
-      response = await getUnAuthUserList(params)
+      console.log('用户列表:', response)
+      if (response.code === 0) {
+        userList.value = response.data.list
+        total.value = response.data.total || 0
+      }
     } else {
-      response = await  getAuthUserList(params)
-    }
-    }
+      if (userType.value === 'unverified') {
+        // 获取未认证用户列表
+        response = await getUnAuthUserList(params)
+      } else if (userType.value === 'verified') {
+        response = await getAuthUserList(params)
+      } else {
+        // 获取所有用户列表
+        response = await getAllList(params)
+      }
 
-    
-    // 根据用户类型选择不同的接口
-   
-    console.log('用户列表:', response)
-    if (response.code === 0) {
-      userList.value = response.data.list
-      total.value = response.data.total || 0
+      console.log('用户列表:', response)
+      if (response.code === 0) {
+        userList.value = response.data.list
+        total.value = response.data.total || 0
+      }
     }
   } catch (error) {
     console.error('获取用户列表失败:', error)
@@ -256,14 +293,15 @@ const fetchUsers = async () => {
 }
 
 // 操作按钮事件
-const viewUser = async(row: UserInfo) => {
+const viewUser = async (row: UserInfo|UserSearchDetail) => {
   selectedUser.value = row
-    dialogVisible.value = true
+  dialogVisible.value = true
   detailLoading.value = true
-    try {
-    const response = await getUserAuthDetail(row.id)
+  try {
+    const id='authRecordId' in row ? row.authRecordId : row.id;
+    const response = await getUserAuthDetail(id)
     if (response.code === 0) {
-      currentUserDetail.value = response.data ||{
+      currentUserDetail.value = response.data || {
         id: 0,
         realName: '',
         idCard: '',
@@ -271,12 +309,11 @@ const viewUser = async(row: UserInfo) => {
         birthday: '',
         gender: 1,
         pictureUrl: '',
-        status: ''
+        status: '',
       }
-    } 
+    }
   } catch (error) {
     console.error('获取用户详情失败:', error)
- 
   } finally {
     detailLoading.value = false
   }
@@ -289,7 +326,7 @@ const handleClose = () => {
   selectedUser.value = null
 }
 // 处理认证通过
-const handleApprove = async(id: number) => {
+const handleApprove = async (id: number) => {
   try {
     const response = await approveOrReject(id, '通过')
     if (response.code === 0) {
@@ -301,24 +338,24 @@ const handleApprove = async(id: number) => {
     }
   } catch (error) {
     console.error('认证通过失败:', error)
-}
+  }
 }
 
 // 处理认证拒绝
-const handleReject = async(id:number) => {
+const handleReject = async (id: number) => {
   try {
     const response = await approveOrReject(id, '拒绝')
-    if (response.code === 0) {  
-  ElMessage.success('已标记为认证失败')
-  handleClose()
-  fetchUsers() 
-} else {
-  ElMessage.error(response.msg || '标记失败') 
-}}catch (error) {
-  console.error('标记失败:', error)
+    if (response.code === 0) {
+      ElMessage.success('已标记为认证失败')
+      handleClose()
+      fetchUsers()
+    } else {
+      ElMessage.error(response.msg || '标记失败')
+    }
+  } catch (error) {
+    console.error('标记失败:', error)
+  }
 }
-}
-
 
 const disableUser = (row: any) => {
   console.log('禁用用户:', row)
@@ -496,24 +533,21 @@ const disableUser = (row: any) => {
 
         // 按钮样式统一
         .view-btn,
-        
         .del-btn {
           border-radius: 6px;
           margin: 2px 2px; // 统一按钮间距，删除冗余的 margin-top
         }
 
-.view-btn {
-  background-color: #cce5ff;
-  border-color: #cce5ff;
-  color: #007bff;
-}
-
-       
+        .view-btn {
+          background-color: #cce5ff;
+          border-color: #cce5ff;
+          color: #007bff;
+        }
 
         .del-btn {
-         background-color: #fff3cd;
-  border-color: #fff3cd;
-  color: #856404;
+          background-color: #fff3cd;
+          border-color: #fff3cd;
+          color: #856404;
         }
       }
 

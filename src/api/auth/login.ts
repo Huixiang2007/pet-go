@@ -14,9 +14,22 @@ interface EmailLoginData {
 
 // 登录响应数据类型
 interface LoginResponse {
-  token: string
-  userId: string
-  userRole: string
+  code: number;
+  level: null;
+  msg: string;
+  ok: boolean;
+  data: {
+    userInfo: {
+      userId: string;
+      userRole: string;
+    };
+    shopInfo: {
+      shopId: string;
+      shopName: string;
+      shopStatus: string;
+    };
+    token: string;
+  };
 }
 
 /**

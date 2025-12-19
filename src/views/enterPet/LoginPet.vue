@@ -292,12 +292,16 @@ const handleLogin = async (formData: LoginForm) => {
     }
 
     if (response.code === 0) {
-      const { token, userId,userRole } = response.data
+      const { token } = response.data
+      const {userId,userRole}=response.data.userInfo
+      const shopId=response.data.shopInfo.shopId
+      
 
       // 存储token到localStorage
       localStorage.setItem('authToken', token)
       localStorage.setItem('userId', userId)
         localStorage.setItem('userRole', userRole)
+        localStorage.setItem('shopId', shopId)
 
       if (shouldRemember) {
         localStorage.setItem('rememberedLoginId', encrypt(formData.loginId))

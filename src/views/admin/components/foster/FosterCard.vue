@@ -2,23 +2,31 @@
   <div class="stats-card-group">
     <el-card class="stat-card card-orange" shadow="hover">
       <div class="stat-content">
-        <div class="stat-label">待审核服务</div>
-        <div class="stat-value">{{ pendingAuditCount }}</div>
-        <div class="stat-trend">
-          <el-icon><ArrowUp /></el-icon> 3 个待处理
-        </div>
+        <div class="stat-label">待审核机构</div>
+        <div class="stat-value">{{ cardData.auditCount}}</div>
+       
       </div>
       <div class="stat-icon">
         <el-icon><Clock /></el-icon>
       </div>
     </el-card>
+    <el-card class="stat-card card-green" shadow="hover">
+      <div class="stat-content">
+        <div class="stat-label">已入驻机构</div>
+        <div class="stat-value">{{ cardData.stayCount }}</div>
+     
+      </div>
+        <div class="stat-icon">
+       <el-icon><Flag /></el-icon>
+        </div>
+    </el-card>
 
     <el-card class="stat-card card-pink" shadow="hover">
       <div class="stat-content">
         <div class="stat-label">今日寄养订单</div>
-        <div class="stat-value">{{ todayOrderCount }}</div>
+        <div class="stat-value">{{ cardData.todayOrderCount }}</div>
         <div class="stat-trend">
-          <el-icon><ArrowUp /></el-icon> 12% 环比增长
+          <el-icon><ArrowUp /></el-icon> {{ cardData.chainGrowth }} 环比增长
         </div>
       </div>
       <div class="stat-icon">
@@ -28,49 +36,36 @@
 
     <el-card class="stat-card card-yellow" shadow="hover">
       <div class="stat-content">
-        <div class="stat-label">活跃寄养家庭</div>
-        <div class="stat-value">{{ activeHomeCount }}</div>
+        <div class="stat-label">人气寄养机构</div>
+        <div class="stat-value">{{ cardData.popularFosterProvider }}</div>
+        <div class="stat-icon">
+   <el-icon><TrophyBase /></el-icon>
+      </div>
         <div class="stat-trend">
-          <el-icon><ArrowDown /></el-icon> 2 个昨日减少
+         
+        <el-icon><GoldMedal /></el-icon>
         </div>
       </div>
-      <div class="stat-icon">
+      <!-- <div class="stat-icon">
         <el-icon><UserFilled /></el-icon>
-      </div>
+      </div> -->
     </el-card>
 
-    <el-card class="stat-card card-green" shadow="hover">
-      <div class="stat-content">
-        <div class="stat-label">本月服务收入</div>
-        <div class="stat-value">¥{{ monthIncome.toFixed(2) }}</div>
-        <div class="stat-trend">
-          <el-icon><ArrowUp /></el-icon> 8.5% 同比增长
-        </div>
-      </div>
-      <div class="stat-icon">
-        <el-icon><Money /></el-icon>
-      </div>
-    </el-card>
+    
   </div>
 </template>
 
 <script setup lang="ts">
-import {defineProps, withDefaults } from 'vue'
-import { Clock, Ticket, UserFilled, Money, ArrowUp, ArrowDown } from '@element-plus/icons-vue'
+import type { fourCard } from '@/api/admin/foster'
+
+
 
 // 定义Props，允许父组件传递动态数据（静态阶段用默认值）
- withDefaults(defineProps<{
-  pendingAuditCount?: number
-  todayOrderCount?: number
-  activeHomeCount?: number
-  monthIncome?: number
-}>(), {
-  pendingAuditCount: 8,
-  todayOrderCount: 26,
-  activeHomeCount: 42,
-  monthIncome: 58620.35
-})
+defineProps<{
+  cardData: fourCard
+}>()
 </script>
+
 
 <style scoped lang="scss">
 .stats-card-group {
@@ -116,7 +111,7 @@ import { Clock, Ticket, UserFilled, Money, ArrowUp, ArrowDown } from '@element-p
     }
 
     .stat-value {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
       color: #3e2723;
       margin-bottom: 5px;

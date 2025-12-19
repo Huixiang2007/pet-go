@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-import type { PageParams, PageResult } from './index'
+import type { PageParams, PageResult,ApiResponse } from './index'
 
 // 用户信息类型定义
 export interface UserInfo {
@@ -31,6 +31,20 @@ export interface UserAuthDetail {
   status: string
   pictureUrl: string|string[]
 }
+export interface UserSearchDetail {
+  authRecordId: number
+  account: string
+  userName: string
+  avatar: string
+  realName: string
+  email: string
+  birthday: string
+  gender: number
+  status: number
+  statusDesc: string
+
+}
+
 
 
 //未认证列表
@@ -50,13 +64,19 @@ export const getAuthUserList = (params: UserQueryParams) => {
  * @returns 用户认证详情
  */
 export const getUserAuthDetail = (id: number) => {
-  return request<UserAuthDetail>(`/server/api/user/getUserAuthDetail`, 'GET', { id })
+  return request<ApiResponse<UserAuthDetail>>(`/server/api/user/getUserAuthDetail`, 'GET', { id })
 }
 
 //分页查询用户
 export const searchDetail = (params: UserQueryParams) => {
-  return request<UserAuthDetail>('/server/api/user/admin/getUser', 'GET', params)
+  return request<PageResult<UserSearchDetail>>('/server/api/user/admin/getUser', 'GET', params)
 }
+
+//分页获取所有用户
+export const getAllList = (params: UserQueryParams) => {
+  return request<PageResult<UserSearchDetail>>('/server/api/user/getUserList', 'GET', params)
+}
+
 //通过或拒绝认证
 export const approveOrReject = (id: number, status: string) => {
   return request<UserInfo>(`/server/api/user/admin/review/auth`, 'POST', { authRecordId:id, status }, {

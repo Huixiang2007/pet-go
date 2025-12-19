@@ -272,7 +272,7 @@ const editRules = reactive({
   ],
   detail: [
     { required: true, message: '请输入商品描述', trigger: 'blur' },
-    { min: 10, message: '商品描述不能少于10个字符', trigger: 'blur' }
+    { min: 1, message: '商品描述不能少于1个字符', trigger: 'blur' }
   ]
 })
 

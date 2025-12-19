@@ -46,6 +46,18 @@
 
               <div class="border-t border-gray-100">
                 <nav class="p-2">
+                    <button
+                    @click="activeTab = 'keep-pet'"
+                    class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1"
+                    :class="
+                      activeTab === 'comments'
+                        ? 'bg-orange-50 text-orange-600 font-medium'
+                        : 'text-gray-600 hover:bg-gray-50'
+                    "
+                  >
+                    <i class="fa fa-comment w-5 text-center mr-3"></i>
+                    寄养订单
+                  </button>
                   <a
                     href="/pet-cart"
                     class="flex items-center px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-all mb-1"
@@ -77,6 +89,7 @@
                     <i class="fa fa-comment w-5 text-center mr-3"></i>
                     评论管理
                   </button>
+
                 </nav>
               </div>
             </div>

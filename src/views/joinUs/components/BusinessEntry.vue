@@ -421,7 +421,9 @@ catch(error:any){
     isSubmitting.value = false
   }
 }
-}
+catch(error) {
+  console.error('提交失败',error)
+}}
 const resetForm = () => {
   Object.assign(form, {
     shopName: '',

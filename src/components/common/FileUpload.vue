@@ -3,17 +3,11 @@
     <!-- 上传区域（大图二样式） -->
     <div
       class="upload-area border-2 border-dashed border-blue-200 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer"
-      :class="{ 'opacity-50': disabled || isMaxReached }"
-      @click="handleUploadClick"
-      @dragover.prevent="isDragOver = true"
-      @dragleave.prevent="isDragOver = false"
-      @drop.prevent="handleDrop"
-    >
+      :class="{ 'opacity-50': disabled || isMaxReached }" @click="handleUploadClick"
+      @dragover.prevent="isDragOver = true" @dragleave.prevent="isDragOver = false" @drop.prevent="handleDrop">
       <!-- 拖拽状态提示 -->
-      <div
-        v-if="isDragOver"
-        class="drag-overlay absolute inset-0 bg-blue-100 rounded-lg flex items-center justify-center"
-      >
+      <div v-if="isDragOver"
+        class="drag-overlay absolute inset-0 bg-blue-100 rounded-lg flex items-center justify-center">
         <div class="text-blue-600">
           <i class="fa fa-cloud-upload text-4xl mb-2"></i>
           <p>松开上传文件</p>
@@ -35,18 +29,10 @@
     <div v-if="fileList.length > 0" class="preview-section mt-4">
       <p class="text-sm text-gray-600 mb-3">已上传文件：</p>
       <div class="preview-list flex flex-wrap gap-3">
-        <div
-          v-for="(file, index) in fileList"
-          :key="index"
-          class="preview-item relative bg-white rounded-md shadow-sm overflow-hidden border border-gray-100"
-        >
+        <div v-for="(file, index) in fileList" :key="index"
+          class="preview-item relative bg-white rounded-md shadow-sm overflow-hidden border border-gray-100">
           <!-- 图片预览 -->
-          <img
-            v-if="file.isImage"
-            :src="file.url"
-            :alt="file.name"
-            class="w-24 h-24 object-cover"
-          />
+          <img v-if="file.isImage" :src="file.url" :alt="file.name" class="w-24 h-24 object-cover" />
 
           <!-- 非图片文件图标 -->
           <div v-else class="w-24 h-24 bg-gray-50 flex items-center justify-center">
@@ -59,11 +45,9 @@
           </div>
 
           <!-- 删除按钮（悬停显示） -->
-          <button
-            type="button"
+          <button type="button"
             class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 hover:opacity-100 transition-opacity"
-            @click.stop="removeFile(index)"
-          >
+            @click.stop="removeFile(index)">
             ×
           </button>
         </div>
@@ -73,10 +57,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue'
-import request from '@/utils/request'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
-
+import { useUpload } from '@/composables/use-upload'
+import { validateFile } from '@/utils/upload'
+import type { FileItem } from '@/types/upload'
 interface Props {
   accept?: string
   maxSizeMB?: number
@@ -84,49 +69,52 @@ interface Props {
   acceptDescription?: string
   disabled?: boolean
   uploadUrl?: string
+  chunkSizeMB?: number
+  chunkThreshold?: number
 }
 
-interface FileItem {
-  name: string
-  url: string
-  isImage: boolean
-}
 
 const props = withDefaults(defineProps<Props>(), {
   accept: 'image/*',
   maxSizeMB: 5,
   maxCount: 99,
-  acceptDescription: 'JPG、PNG、PDF格式',
   disabled: false,
   uploadUrl: '/server/api/file/upload',
+  chunkThreshold: 5
 })
 
 const emit = defineEmits<{
   'file-change': [files: FileItem[]]
   'upload-success': [urls: string[]]
+  'upload-progress': [progress: number]
 }>()
 
+const {
+  isUploading,
+  uploadProgress,
+  fileList,
+  uploadFiles,
+  removeFile,
+} = useUpload({
+  accept: props.accept,
+  maxSizeMB: props.maxSizeMB,
+  chunkThreshold: props.chunkThreshold * 1024 * 1024 // 转成字节
+})
+
+watch(uploadProgress, (progress) => {
+  emit('upload-progress', progress)
+})
 // 响应式数据
-const fileList = ref<FileItem[]>([])
+// const fileList = ref<FileItem[]>([])
 const isDragOver = ref(false)
 const fileInput = ref<HTMLInputElement>()
 
 // 计算属性
 const isMaxReached = computed(() => fileList.value.length >= props.maxCount)
 
-// 清空内部文件列表
-const clearFiles = () => {
-  fileList.value = []
-}
-defineExpose({
-  clearFiles,
-  removeFile(index: number) {
-    fileList.value.splice(index, 1)
-  },
-})
-
 // 创建隐藏的file input
 const createFileInput = () => {
+  if (fileInput.value) return fileInput.value
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = props.accept
@@ -151,122 +139,66 @@ const handleFileSelect = async (e: Event) => {
   if (!input.files || input.files.length === 0) return
 
   const files = Array.from(input.files)
-  await processFiles(files)
-  input.value = '' // 重置输入，允许重复选择相同文件
-}
+  const validFiles = files.filter(file => {
+    const { isValid, message } = validateFile(file, props.accept, props.maxSizeMB)
+    if (!isValid) ElMessage.error(message)
+    return isValid
+  }).slice(0, props.maxCount - fileList.value.length)
 
+  if (validFiles.length === 0) return
+
+  try {
+    const urls = await uploadFiles(validFiles)
+    emit('file-change', fileList.value)
+    emit('upload-success', urls)
+  } catch (error) {
+    console.error('上传失败：', error)
+  }
+
+  input.value = ''
+}
+// const handleRemoveFile = (index: number) => {
+//   if (props.disabled || isUploading.value) return
+//   removeFileFromUseUpload(index) // 调用 useUpload 的删除方法
+//   emit('file-change', fileList.value) // 删除后同步触发文件变化事件
+// }
 // 处理拖拽文件
 const handleDrop = async (e: DragEvent) => {
   isDragOver.value = false
   if (props.disabled || isMaxReached.value) return
 
   const files = Array.from(e.dataTransfer?.files || [])
-  await processFiles(files)
-}
-
-// 上传单个文件
-const uploadFile = async (file: File): Promise<string> => {
-  const formData = new FormData()
-  formData.append('file', file)
-
-  const response = await request(props.uploadUrl, 'POST', formData)
-
-  return response.data
-}
-
-// 删除文件
-const removeFile = (index: number) => {
-  fileList.value.splice(index, 1)
-  emit('file-change', fileList.value)
-}
-
-// 处理文件列表（仅保留这一个processFiles函数）
-const processFiles = async (files: File[]) => {
-  // 过滤并限制数量
-  const validFiles = files
-    .filter(file => validateFile(file))
-    .slice(0, props.maxCount - fileList.value.length)
+  const validFiles = files.filter(file => {
+    const { isValid, message } = validateFile(file, props.accept, props.maxSizeMB)
+    if (!isValid) ElMessage.error(message)
+    return isValid
+  }).slice(0, props.maxCount - fileList.value.length)
 
   if (validFiles.length === 0) return
 
-  // 上传文件
-  const uploadedUrls: string[] = []
-  for (const file of validFiles) {
-    try {
-      const url = await uploadFile(file)
-      uploadedUrls.push(url)
-
-      // 添加到预览列表
-      fileList.value.push({
-        name: file.name,
-        url,
-        isImage: file.type.startsWith('image/')
-      })
-    } catch (error) {
-      console.error(`文件${file.name}上传失败:`, error)
-      ElMessage(
-        {
-          message: `文件${file.name}上传失败，请重试`,
-          type: 'error',
-          duration: 3000
-        }
-      )
-    }
+  try {
+    const urls = await uploadFiles(validFiles)
+    emit('file-change', fileList.value)
+    emit('upload-success', urls)
+  } catch (error) {
+    console.error('上传失败：', error)
   }
 
-  // 触发事件
-  emit('file-change', fileList.value)
-  if (uploadedUrls.length > 0) {
-    emit('upload-success', uploadedUrls)
-  }
+
 }
-
-// 验证文件
-const validateFile = (file: File): boolean => {
-  // 大小验证
-  if (file.size > props.maxSizeMB * 1024 * 1024) {
-    ElMessage({
-      message: `文件大小不能超过${props.maxSizeMB}MB`,
-      type: 'error',
-      duration: 3000,
-    })
-
-    return false
+onUnmounted(() => {
+  if (fileInput.value) {
+    document.body.removeChild(fileInput.value)
+    fileInput.value = null
   }
+})
+defineExpose({
+  removeFile,
+  fileList,
+  isUploading,
+  uploadProgress
+})
 
-  // 类型验证
-  const acceptTypes = props.accept.split(',').map((t) => t.trim())
-  const fileExt = '.' + file.name.split('.').pop()?.toLowerCase()
-  const fileType = file.type.toLowerCase()
-
-  const isValid = acceptTypes.some((type) => {
-    if (type === '*/*') return true
-    if (type.endsWith('/*')) return fileType.startsWith(type.split('/')[0] + '/')
-    return fileType === type || fileExt === type
-  })
-
-  if (!isValid) {
-    ElMessage({
-      message: `文件"${file.name}"格式不支持，请上传${props.acceptDescription}文件`,
-      type: 'error',
-      duration: 3000,
-    })
-    return false
-  }
-
-  return true
-}
-
-// 移动到根作用域（组件初始化时执行）
-watch(
-  () => props.disabled,
-  (newVal) => {
-    if (newVal && fileInput.value) {
-      fileInput.value.remove()
-      fileInput.value = undefined
-    }
-  }
-)
 </script>
 <style scoped>
 .file-upload-wrapper {

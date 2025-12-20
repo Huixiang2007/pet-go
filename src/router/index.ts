@@ -22,7 +22,7 @@ const routes: RouteRecordRaw[] = [
   },
   // 寄养预订
   {
-    path: '/foster-book/:fosterId/:packageId',
+    path: '/foster-book/:fosterId/:serviceId',
     name: 'fosterBook',
     component: () => import('@/views/fosterCare/FosterBook.vue'),
   },
@@ -63,7 +63,6 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       title: 'PetGo订单结算',
-
     },
   },
   //  商品列表（分类）
@@ -317,8 +316,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: '寄养服务管理',
           icon: 'el-icon-house',
-        }
-       
+        },
       },
       //活动管理路由
       {
@@ -339,13 +337,12 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/admin/components/active/activeManage.vue'), // 替换为实际路径
             meta: { title: '活动管理' },
           },
-       {
+          {
             path: 'dashboard',
             name: 'activeDashboard',
             component: () => import('@/views/admin/components/active/activeDashboard.vue'), // 替换为实际路径
             meta: { title: '数据看板' },
           },
-        
         ],
       },
       // 内容管理路由
@@ -367,19 +364,17 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/admin/components/content/ContentComment.vue'), // 替换为实际路径
             meta: { title: '评论管理' },
           },
-    
         ],
       },
       //通知发布
-       {
+      {
         path: 'send',
         name: 'send',
         component: () => import('@/views/admin/components/AllSend.vue'),
         meta: {
           title: '通知发布',
           icon: 'el-icon-message',
-        }
-       
+        },
       },
     ],
   },
@@ -395,7 +390,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const requiresAuth = to.meta.requiresAuth ?? false
   const isLogin = !!localStorage.getItem('authToken')
-
+  const isAdminRoute = to.path.startsWith('/admin')
   if (requiresAuth && !isLogin) {
     ElMessage.warning('请先登录后再访问')
     // 跳转到登录页，并记录当前页面路径（登录后可返回）
@@ -403,6 +398,20 @@ router.beforeEach((to, from, next) => {
       path: '/login',
       query: { redirect: to.fullPath }, // 携带要返回的页面路径
     })
+  } else if (isAdminRoute && isLogin) {
+    // 如果访问的是管理员页面且已登录，需要进一步验证权限
+    // 获取存储在localStorage中的用户角色信息
+    const userRole = localStorage.getItem('userRole')
+    
+    if (userRole === '管理员') {
+      // 是管理员，允许访问
+      next()
+    } else {
+      // 不是管理员，拒绝访问
+      ElMessage.error('请您登录后访问此页面')
+      // 重定向到首页或其他合适页面
+      next('/')
+    }
   } else {
     // 已登录/无需登录 → 正常访问
     next()

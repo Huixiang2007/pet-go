@@ -420,7 +420,6 @@ const handleTagsUpdate = (newTags) => {
 </script>
 
 <style lang="scss" scoped>
-/* 基础动画 */
 @keyframes modal-in {
   0% {
     opacity: 0;
@@ -437,7 +436,6 @@ const handleTagsUpdate = (newTags) => {
   animation: modal-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 按钮样式 */
 .action-btn {
   min-width: 140px;
 }

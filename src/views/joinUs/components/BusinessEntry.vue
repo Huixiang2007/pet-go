@@ -187,15 +187,13 @@ d:/vcode/pet-go-web/src/views/joinUs/components/BusinessEntry.vue
 </template>
 
 <script lang="ts" setup>
-// 导入依赖
 import { reactive, ref, computed, watch } from 'vue'
-import axios from 'axios'
 import { ElMessage } from 'element-plus'
 // 导入组件
 import AddressSelect from '@/components/business/AddressSelect.vue'
 import FileUpload from '@/components/common/FileUpload.vue'
 
-
+import {registerShop} from '../../../api/pet-shop/shop'
 import provincesData from 'china-division/dist/provinces.json'
 import citiesData from 'china-division/dist/cities.json'
 import districtsData from 'china-division/dist/areas.json'
@@ -405,24 +403,15 @@ const submitForm = async () => {
     }
 
     console.log('提交的表单数据:', data)
-
-
-    const response = await axios.request({
-      url: '/server/api/shop/shops/add',
-      method: 'POST',
-      data: data,
-    })
-
-
-    ElMessage.success('提交成功，等待审核！')
+try{
+  const response = await registerShop(data)
+    ElMessage.success(response.data)
     console.log('提交成功', response.data)
+      resetForm()
 
-
-    resetForm()
-
-  } catch (error: any) {
-
-    console.error('提交失败:', error)
+}
+catch(error:any){
+  console.error('提交失败:', error)
     if (error.response && error.response.data && error.response.data.message) {
       ElMessage.error(`提交失败: ${error.response.data.message}`)
     } else {
@@ -432,8 +421,9 @@ const submitForm = async () => {
     isSubmitting.value = false
   }
 }
-
-
+catch(error) {
+  console.error('提交失败',error)
+}}
 const resetForm = () => {
   Object.assign(form, {
     shopName: '',

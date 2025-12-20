@@ -7,7 +7,7 @@
     </div>
 
     <!-- 通用指标卡片（复用组件） -->
-    <FosterStatsCard />
+    <!-- <FosterStatsCard /> -->
 
     <!-- 家庭管理内容区 -->
     <el-card class="main-content-card" shadow="hover">
@@ -154,7 +154,7 @@
 import { ref } from 'vue'
 import { HomeFilled, Search, Plus } from '@element-plus/icons-vue'
 // 导入通用指标卡片组件
-import FosterStatsCard from './FosterCard.vue'
+// import FosterStatsCard from './FosterCard.vue'
 
 // 筛选条件
 const homeType = ref('')

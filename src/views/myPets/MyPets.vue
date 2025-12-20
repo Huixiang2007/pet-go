@@ -457,10 +457,7 @@ onMounted(() => {
   loadPets()
 
 })
-
-
 </script>
-
 <style scoped lang="scss">
 .pet-showcase-app {
   overflow: hidden;
@@ -548,33 +545,6 @@ onMounted(() => {
   min-height: 0;
 }
 
-.cute-card {
-  background: white;
-  border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  border: 2px solid rgba(255, 182, 193, 0.3);
-  height: 100%;
-  overflow-y: auto;
-}
-
-.cute-card::-webkit-scrollbar {
-  width: 5px;
-}
-
-.cute-card::-webkit-scrollbar-track {
-  background: rgba(255, 182, 193, 0.1);
-  border-radius: 3px;
-}
-
-.cute-card::-webkit-scrollbar-thumb {
-  background: #ffb6c1;
-  border-radius: 3px;
-}
-
-.cute-card::-webkit-scrollbar-thumb:hover {
-  background: #ff69b4;
-}
 
 /* 头像区域 */
 .avatar-section {
@@ -757,7 +727,7 @@ onMounted(() => {
   }
 }
 
-/* 可爱输入框样式 */
+/* 输入框样式 */
 .cute-input {
 
   :deep(.el-input__inner),
@@ -1008,12 +978,4 @@ onMounted(() => {
     bottom: 10px;
   }
 }
-
-// ::-webkit-scrollbar {
-//   width: 0;
-//   /* 垂直滚动条宽度设为0 */
-//   height: 0;
-//   /* 水平滚动条高度设为0 */
-//   display: none;
-//   /* 直接隐藏 */
-// }</style>
+</style>

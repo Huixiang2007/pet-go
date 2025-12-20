@@ -106,7 +106,7 @@
 <script setup lang="ts">
 import {  ref, computed, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import request from '@/utils/request'
+import { sendForgetPasswordCode } from '@/api/auth'
 
 // 接收父组件的邮箱
 const props = defineProps({
@@ -186,8 +186,8 @@ const sendVerificationCode = async () => {
 
   try {
     isSendingCode.value = true
-    const response = await request('/server/api/user/sendCode', 'POST', { email: props.email }, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    const response = await sendForgetPasswordCode({
+      email: passwordForm.value.email,
     })
     if (response.code === 0) {
       ElMessage.success('验证码已发送至您的邮箱！')

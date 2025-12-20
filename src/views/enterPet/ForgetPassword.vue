@@ -95,7 +95,7 @@
         </div>
 
         <div class="layui-form-item">
-          <button class="layui-btn btn-donate" @click="resetPassword">重置密码</button>
+          <button class="layui-btn btn-donate" @click="resetPasswords">重置密码</button>
         </div>
 
         <div class="layui-form-item demo-login-other" style="display: flex; justify-content: space-between"
@@ -119,8 +119,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import request from '@/utils/request'
-
+import { sendForgetPasswordCode, resetPassword,validateEmailCode } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 
 declare global {
@@ -195,19 +194,9 @@ const sendCaptcha = async () => {
 
   try {
     isSendingCode.value = true
-    const response = await request(
-      '/server/api/user/sendCode',
-      'POST',
-      {
-        email: formData.value.email,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      },
-    )
-    console.log('发送验证码:', response)
+    const response = await sendForgetPasswordCode({
+      email: formData.value.email,
+    })
     if (response.code === 0) {
       ElMessage.success('验证码已发送至您的邮箱')
       // 开始倒计时
@@ -247,21 +236,11 @@ const verifyEmail = async () => {
 
   isVerifying.value = true
   try {
-    const response = await request(
-      '/server/api/user/codeValidate',
-      'POST',
-      {
-        email: formData.value.email,
-        code: formData.value.captcha,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: 'Bearer ', // 替换为实际需要的Header名称// 明确指定格式
-        },
-      },
-    )
-    console.log('验证邮箱和验证码:', response)
+    const response =  await validateEmailCode({
+      email: formData.value.email,
+      code: formData.value.captcha,
+    })
+  
     if (response.code === 0) {
       layer.msg('验证成功，请重置密码', { icon: 1 })
       step.value = 2
@@ -280,7 +259,7 @@ const verifyEmail = async () => {
 }
 
 // 重置密码
-const resetPassword = async () => {
+const resetPasswords = async () => {
   // 检查新密码是否为空
   if (!formData.value.newPassword) {
     ElMessage.error('请输入新密码')
@@ -305,20 +284,11 @@ const resetPassword = async () => {
   }
 
   try {
-    const response = await request(
-      '/server/api/user/forgetPassword',
-      'POST',
-      {
-        againPassword: formData.value.confirmPassword,
-        password: formData.value.newPassword,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: 'Bearer ', // 替换为实际需要的Header名称// 明确指定格式
-        },
-      },
-    )
+    const response =await resetPassword({
+      email: formData.value.email,
+      password: formData.value.newPassword,
+      code: formData.value.captcha,
+    })
     if (response.code == 0) {
       layer.msg('密码重置成功，请登录', { icon: 1 })
       router.push('/login')

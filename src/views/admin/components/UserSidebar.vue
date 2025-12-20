@@ -43,7 +43,7 @@
       <el-sub-menu index="/admin/active">
         <template #title>
           <el-icon><Shop /></el-icon>
-          <span v-if="sidebarOpened">运营活动管理</span>
+          <span v-if="isOpened ">运营活动管理</span>
         </template>
         <el-menu-item index="/admin/active/create">活动创建</el-menu-item>
         <el-menu-item index="/admin/active/manage">活动管理</el-menu-item>
@@ -73,13 +73,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import {  computed } from 'vue'
 import { useRoute } from 'vue-router'
 
 // 路由实例
 const route = useRoute()
 // 侧边栏折叠状态
-const sidebarOpened = ref(true)
+
 // 当前激活菜单
 const activeMenu = computed(() => route.path ||'/admin/data')
 defineProps<{
@@ -246,7 +246,7 @@ $border-color: #4a3629; // 边框色
   }
 }
 :deep(.el-menu--popup){
-  padding: none !important;
+  padding: 0 !important;
   background-color: rgb(255 138 101 / 20%) !important;
 }
 </style>

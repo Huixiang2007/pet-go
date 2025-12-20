@@ -60,6 +60,7 @@ declare module 'vue' {
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ElUpload: typeof import('element-plus/es')['ElUpload']
     FileUpload: typeof import('./src/components/common/FileUpload.vue')['default']
+    LoadingStatus: typeof import('./src/components/common/LoadingStatus.vue')['default']
     NavBar: typeof import('./src/components/common/NavBar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
@@ -67,10 +68,9 @@ declare module 'vue' {
     SellerManNav: typeof import('./src/components/common/SellerManNav.vue')['default']
     ShopCategoryNav: typeof import('./src/components/common/ShopCategoryNav.vue')['default']
     ShopFoot: typeof import('./src/components/common/ShopFoot.vue')['default']
-    UserHeader: typeof import('./src/components/common/UserHeader.vue')['default']
-    UserSidebar: typeof import('./src/components/common/UserSidebar.vue')['default']
   }
   export interface GlobalDirectives {
     vInfiniteScroll: typeof import('element-plus/es')['ElInfiniteScroll']
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

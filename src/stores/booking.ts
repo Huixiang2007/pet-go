@@ -1,22 +1,14 @@
 import { defineStore } from 'pinia'
-interface PackageItem {
-  id: number
-  title: string
-  basePrice: number
-  description: string
-  petTypes: string[]
-  maxPets: number
-  serviceType: number
-}
-
-export const useBookingStore = defineStore('booking', {
+import type { FosterServiceItem, AdditionalServiceItem } from '@/types/foster'
+import { reactive } from 'vue'
+export const useBookingPackageStore = defineStore('booking', {
   state: () => ({
-    selectedPackage: null as PackageItem | null,
+    selectedPackage: null as FosterServiceItem | null,
     // fosterHome: null as any | null,
     // bookingForm: {} as any,
   }),
   actions: {
-    setSelectedPackage(packageInfo: PackageItem) {
+    setSelectedPackage(packageInfo: FosterServiceItem) {
       this.selectedPackage = packageInfo
     },
     clearBookingData() {
@@ -24,4 +16,40 @@ export const useBookingStore = defineStore('booking', {
       // this.bookingForm = {}
     },
   },
+})
+export const useBookingFormStore = defineStore('bookingForm', () => {
+  // 全局共享的 bookingForm
+  const bookingForm = reactive({
+    petName: '',
+    serviceId: 0,
+    startDate: '',
+    endDate: '',
+    petType: '',
+    additionalServices: [] as AdditionalServiceItem[],
+    additionalServiceId: [] as number[],
+    specialRequirements: '',
+    emergencyPhone: '',
+    userNotes: '',
+    pictureUrlList: [] as File[],
+  })
+  // 重置表单
+  const resetBookingForm = (serviceId: number) => {
+    bookingForm.serviceId = serviceId
+    bookingForm.petName = ''
+    bookingForm.petType = ''
+    bookingForm.additionalServiceId = []
+    bookingForm.specialRequirements = ''
+    bookingForm.emergencyPhone = ''
+  }
+
+  // 更新附加服务
+  const updateAdditionalServiceIds = (ids: number[]) => {
+    bookingForm.additionalServiceId = ids
+  }
+
+  return {
+    bookingForm,
+    resetBookingForm,
+    updateAdditionalServiceIds,
+  }
 })

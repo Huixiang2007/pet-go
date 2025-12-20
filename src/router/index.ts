@@ -22,7 +22,7 @@ const routes: RouteRecordRaw[] = [
   },
   // 寄养预订
   {
-    path: '/foster-book/:fosterId/:packageId',
+    path: '/foster-book/:fosterId/:serviceId',
     name: 'fosterBook',
     component: () => import('@/views/fosterCare/FosterBook.vue'),
   },
@@ -63,7 +63,6 @@ const routes: RouteRecordRaw[] = [
     meta: {
       requiresAuth: true,
       title: 'PetGo订单结算',
-
     },
   },
   //  商品列表（分类）
@@ -317,8 +316,7 @@ const routes: RouteRecordRaw[] = [
         meta: {
           title: '寄养服务管理',
           icon: 'el-icon-house',
-        }
-       
+        },
       },
       //活动管理路由
       {
@@ -339,13 +337,12 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/admin/components/active/activeManage.vue'), // 替换为实际路径
             meta: { title: '活动管理' },
           },
-       {
+          {
             path: 'dashboard',
             name: 'activeDashboard',
             component: () => import('@/views/admin/components/active/activeDashboard.vue'), // 替换为实际路径
             meta: { title: '数据看板' },
           },
-        
         ],
       },
       // 内容管理路由
@@ -367,19 +364,17 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/admin/components/content/ContentComment.vue'), // 替换为实际路径
             meta: { title: '评论管理' },
           },
-    
         ],
       },
       //通知发布
-       {
+      {
         path: 'send',
         name: 'send',
         component: () => import('@/views/admin/components/AllSend.vue'),
         meta: {
           title: '通知发布',
           icon: 'el-icon-message',
-        }
-       
+        },
       },
     ],
   },

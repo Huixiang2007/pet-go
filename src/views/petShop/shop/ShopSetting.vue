@@ -30,12 +30,12 @@
             </div>
             <div class="space-y-2">
               <label for="shop-type" class="block text-sm font-medium text-gray-700">
-                店铺类型 <span class="text-red-500">*</span>
+                店铺类型 <span class="text-red-500">*</span>   <span class="text-xs">({{ form.shopType }}) </span>
               </label>
               <select id="shop-type" v-model="form.shopType"
                 class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all outline-none bg-white"
                 required>
-                <option value="" class="text-gray-400">请选择店铺类型</option>
+                <option value="" class="text-gray-400" id="shopType">请选择店铺类型</option>
                 <option value="个人店">个人店</option>
                 <option value="企业店">企业店</option>
                 <option value="旗舰店">旗舰店</option>
@@ -262,9 +262,9 @@ watch(
 )
 
 //根据api来获取商铺信息
-onMounted(async()=>{
   const shopId = Number(localStorage.getItem('shopId'))
   console.log('商铺ID:', shopId)
+onMounted(async()=>{
   if(!shopId){
     ElMessage.error('请先登录')
     return
@@ -273,8 +273,8 @@ try{
     const res = await getShopDetail(shopId)
     const shop = res
     console.log('商铺信息:', shop)
-   form.shopName = shop.shopName
-        form.shopType = shop.shopType
+       form.shopName = shop.shopName
+    form.shopType = shop.shopType
         form.contactName = shop.contactName
         form.contactPhone = shop.contactPhone
         form.contactEmail = shop.contactEmail
@@ -298,9 +298,9 @@ try{
 
         // 地区选择器同步更新
         addressObject.value = {
-          province: shop.province || '',
-          city: shop.city || '',
-          district: shop.district || ''
+          province: shop.province,
+          city: shop.city ,
+          district: shop.district
         }
 
         // 存储店铺ID用于后续更新
@@ -313,7 +313,6 @@ try{
 })
 
 const addressDisplayText = computed(() => {
-  if (!addressObject.value.province) return '请选择地区'
   let provinceName = ''
   let cityName = ''
   let districtName = ''
@@ -351,31 +350,15 @@ const handleFileChange = (files: any[], type: keyof typeof imageData.value) => {
 const validateForm = (): boolean => {
   const requiredFields = [
     { value: form.shopName, field: '商铺名称' },
-    { value: form.shopType, field: '店铺类型' },
     { value: form.contactName, field: '联系人姓名' },
     { value: form.contactPhone, field: '联系人电话' },
     { value: form.contactEmail, field: '联系人邮箱' },
-    { value: form.province, field: '所在省份' },
-    { value: form.city, field: '所在城市' },
-    { value: form.district, field: '所在区县' },
     { value: form.address, field: '详细地址' },
     { value: form.description, field: '商铺介绍' },
   ]
   for (const field of requiredFields) {
     if (!field.value) {
       ElMessage.error(`请填写${field.field}！`)
-      return false
-    }
-  }
-  const requiredImages = [
-    { value: imageData.value.shopAvatar, field: '商铺头像' },
-    { value: imageData.value.businessLicense, field: '营业执照' },
-    { value: imageData.value.idCardFront, field: '身份证正面' },
-    { value: imageData.value.idCardBack, field: '身份证反面' },
-  ]
-  for (const image of requiredImages) {
-    if (!image.value) {
-      ElMessage.error(`请上传${image.field}！`)
       return false
     }
   }
@@ -392,7 +375,7 @@ const validateForm = (): boolean => {
   return true
 }
 const submitForm = async () => {
-  if (!validateForm() || isSubmitting.value) return
+  if (!validateForm()||isSubmitting.value) return
   try {
     isSubmitting.value = true
     let provinceName = ''
@@ -417,6 +400,7 @@ const submitForm = async () => {
       return
     }
     const data = {
+      shopId: shopId,
       shopName: form.shopName,
       shopType: form.shopType,
       contactName: form.contactName,
@@ -432,49 +416,23 @@ const submitForm = async () => {
       idCardFront: imageData.value.idCardFront,
       idCardBack: imageData.value.idCardBack,
     }
+    console.log('提交数据:', data)
     try{
     const response = await updateShopInfo(data)
     ElMessage.success('提交成功，等待审核！')
-    console.log('提交成功', response.data)
-    resetForm()
+    console.log('提交成功', response)
     }
       catch(error: any){
       console.error('提交失败:', error)
     if (error.response && error.response.data && error.response.data.message) {
       ElMessage.error(`提交失败: ${error.response.data.message}`)
-    } else {
-      ElMessage.error('提交失败，请稍后重试。')
     }
     }
   } finally {
     isSubmitting.value = false
   }
 }
-const resetForm = () => {
-  Object.assign(form, {
-    shopName: '',
-    shopType: '',
-    contactName: '',
-    contactPhone: '',
-    contactEmail: '',
-    province: '',
-    city: '',
-    district: '',
-    address: '',
-    description: '',
-  })
-  Object.keys(imageData.value).forEach((key) => {
-    imageData.value[key as keyof typeof imageData.value] = ''
-  })
-  Object.keys(imagePreviews.value).forEach((key) => {
-    imagePreviews.value[key as keyof typeof imagePreviews.value] = ''
-  })
-  addressObject.value = {
-    province: '',
-    city: '',
-    district: '',
-  }
-}
+
 </script>
 
 <style scoped>

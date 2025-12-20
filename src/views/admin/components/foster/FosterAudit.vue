@@ -7,7 +7,7 @@
     </div>
 
     <!-- 通用指标卡片（复用组件） -->
-    <FosterStatsCard />
+    <FosterStatsCard :cardData="cardData" />
 
     <!-- 服务审核内容区 -->
     <el-card class="main-content-card" shadow="hover">
@@ -18,32 +18,32 @@
             <el-select
               v-model="auditStatus"
               placeholder="请选择审核状态"
-              size="small"
+              size="default"
               class="filter-select"
             >
               <el-option label="全部状态" value="" />
               <el-option label="待审核" value="pending" />
               <el-option label="已通过" value="passed" />
-              <el-option label="已拒绝" value="rejected" />
+       
             </el-select>
           </el-col>
           <el-col :span="10">
             <el-input
               v-model="auditKeyword"
               placeholder="搜索寄养家庭名称/联系人"
-              size="small"
-              prefix-icon="Search"
+              size="default"
+              prefix-icon="el-icon-search"
               class="search-input"
             />
           </el-col>
           <el-col :span="8" class="filter-btn-group">
-            <el-button type="primary" size="small" class="query-btn">
+            <el-button type="primary" size="default" class="query-btn" @click="fetchAuditList">
               <el-icon><Search /></el-icon> 搜索
             </el-button>
-            <el-button size="small" class="reset-btn">
+            <el-button size="default" class="reset-btn" @click="resetFilter">
               <el-icon><Refresh /></el-icon> 重置
             </el-button>
-            <el-button size="small" class="export-btn">
+            <el-button size="default" class="export-btn">
               <el-icon><Download /></el-icon> 导出
             </el-button>
           </el-col>
@@ -57,22 +57,27 @@
         stripe
         class="audit-table"
         :header-cell-style="{ background: '#f9f7f3', color: '#6b5b45' }"
+        v-loading="loading"
       >
-        <el-table-column prop="id" label="审核编号" width="100" />
-        <el-table-column prop="homeName" label="寄养家庭名称" min-width="120">
+        <el-table-column prop="homeName" label="机构名称名称" min-width="120" />
+        <el-table-column prop="contactName" label="联系人" width="140" />
+        <el-table-column prop="contactPhone" label="联系电话" width="120">
           <template #default="scope">
-            <div class="home-name-item">
-              <el-avatar :src="scope.row.avatar" class="home-avatar" />
-              <span>{{ scope.row.homeName }}</span>
-            </div>
+            {{ scope.row.contactPhone || '暂无' }}
           </template>
         </el-table-column>
-        <el-table-column prop="contactName" label="联系人" width="100" />
-        <el-table-column prop="contactPhone" label="联系电话" width="120" />
-        <el-table-column prop="serviceType" label="服务类型" width="120">
+
+        <el-table-column prop="serviceType" label="类型" width="120" />
+        <el-table-column prop="petTypes" label="服务类型" width="120">
           <template #default="scope">
-            <el-tag size="small" class="type-tag">
-              {{ scope.row.serviceType === 'cat' ? '猫咪寄养' : '狗狗寄养' }}
+            <el-tag 
+              v-for="type in scope.row.petTypes" 
+              :key="type" 
+              size="small" 
+              :class="getPetTypeClass(type)"
+              style="margin-right: 5px; margin-top: 5px;"
+            >
+              {{ type === '猫' ? '猫咪寄养' : type === '狗' ? '狗狗寄养' : type }}
             </el-tag>
           </template>
         </el-table-column>
@@ -84,8 +89,8 @@
                 scope.row.status === 'pending'
                   ? 'warning'
                   : scope.row.status === 'passed'
-                  ? 'success'
-                  : 'danger'
+                    ? 'success'
+                    : 'danger'
               "
               size="small"
               class="status-tag"
@@ -94,16 +99,15 @@
                 scope.row.status === 'pending'
                   ? '待审核'
                   : scope.row.status === 'passed'
-                  ? '已通过'
-                  : '已拒绝'
+                    ? '已通过'
+                    : '已拒绝'
               }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="140" fixed="right">
           <template #default="scope">
-           
-            <el-button
+            <!-- <el-button
               v-if="scope.row.status === 'pending'"
               type="success"
               size="small"
@@ -112,6 +116,15 @@
             >
               通过
             </el-button>
+             <el-button
+              v-if="scope.row.status === 'pending'"
+              type="danger"
+              size="small"
+              class="reject-btn"
+              @click="handleReject(scope.row)"
+            >
+              拒绝
+            </el-button> -->
             <el-button
               type="primary"
               size="small"
@@ -121,16 +134,7 @@
             >
               详情
             </el-button>
-            <el-button
-              v-if="scope.row.status === 'pending'"
-              type="danger"
-              size="small"
-              class="reject-btn"
-              @click="handleReject(scope.row)"
-            >
-              拒绝
-            </el-button>
-             
+           
           </template>
         </el-table-column>
       </el-table>
@@ -153,97 +157,157 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { House, Search, Refresh, Download} from '@element-plus/icons-vue'
+import { ref, onMounted, watch } from 'vue'
 // 导入通用指标卡片组件
 import FosterStatsCard from './FosterCard.vue'
+import { getFosterListByCondition, getCardData } from '@/api/admin/foster'
+import type { FosterInfo, fourCard } from '@/api/admin/foster'
 
 // 筛选条件
-const auditStatus = ref('')
+const auditStatus = ref('全部状态')
 const auditKeyword = ref('')
-
+const loading = ref(false)
 // 分页参数
 const currentPage = ref(1)
 const pageSize = ref(10)
-const auditTotal = ref(32)
+const auditTotal = ref(0)
+const auditList = ref<FosterInfo[]>([])
 
-// 模拟审核列表数据
-const auditList = ref([
-  {
-    id: 'FS2025001',
-    homeName: '暖心宠物之家',
-    contactName: '张小飞',
-    contactPhone: '187034078XX',
-    serviceType: 'cat',
-    applyTime: '2025-05-12 10:23:45',
-    status: 'pending',
-    avatar: ''
-  },
-  {
-    id: 'FS2025002',
-    homeName: '汪汪快乐屋',
-    contactName: '罗小黑',
-    contactPhone: '17821044XXX',
-    serviceType: 'dog',
-    applyTime: '2025-05-11 16:45:12',
-    status: 'passed',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280'
-  },
-  {
-    id: 'FS2025003',
-    homeName: '毛孩子驿站',
-    contactName: '欧阳修',
-    contactPhone: '19836248XXX',
-    serviceType: 'cat',
-    applyTime: '2025-05-10 09:12:33',
-    status: 'rejected',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280'
-  },
-  {
-    id: 'FS2025004',
-    homeName: '萌宠寄养院',
-    contactName: '诸葛暗',
-    contactPhone: '17702505XXX',
-    serviceType: 'dog',
-    applyTime: '2025-05-09 14:36:21',
-    status: 'pending',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280'
-  },
-  {
-    id: 'FS2025005',
-    homeName: '宠爱之家',
-    contactName: '开羽',
-    contactPhone: '156320145XX',
-    serviceType: 'cat',
-    applyTime: '2025-05-08 11:22:55',
-    status: 'passed',
-    avatar: 'https://b0.bdstatic.com/ugc/jZ_JPWxjeOnpN8_yzjld7gf29909a77394189861852249c96da6c5.jpg@h_1280'
+// 卡片数据
+const cardData = ref<fourCard>({
+  auditCount: 0,
+  stayCount: 0,
+  todayOrderCount: 0,
+  chainGrowth: '',
+  popularFosterProvider: '',
+})
+// 根据宠物类型获取对应的CSS类名
+const getPetTypeClass = (type: string) => {
+  if (type === '猫') {
+    return 'cat-type-tag'
+  } else if (type === '狗') {
+    return 'dog-type-tag'
+  } else {
+    return 'type-tag'
   }
-])
+}
+const fetchAuditList = async () => {
+  loading.value = true
+  try {
+    // 构造请求参数
+    const params: any = {
+      pageNum: currentPage.value,
+      pageSize: pageSize.value,
+    }
 
-// 分页事件（仅静态）
+    if (auditStatus.value === 'pending') {
+      params.status = 0
+    } else if (auditStatus.value === 'passed') {
+      params.status = 1
+    }
+
+    // 如果有关键词搜索
+    if (auditKeyword.value) {
+      params.keyword = auditKeyword.value
+    }
+
+    const res = await getFosterListByCondition(params)
+    console.log('获取审核列表成功:', res)
+    if (res.code === 0 && res.data) {
+      // 正确处理分页数据
+      const records =  res.data.list || []
+      auditList.value = records.map((item) => ({
+        ...item,
+        status: item.status === '待审核' ? 'pending' : item.status === '已审核' ? 'passed' : 'rejected',
+        homeName: item.name,
+        applyTime: item.createTime,
+        serviceType: item.providerType,
+        petTypes: Array.isArray(item.petTypes) 
+          ? item.petTypes 
+          : typeof item.petTypes === 'string' 
+            ? (item.petTypes as string).split(',') 
+            : []
+      }))
+      auditTotal.value = res.data.total || 0
+    }
+  } catch (error) {
+    console.error('获取审核列表失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+// 获取卡片数据
+const fetchCardData = async () => {
+  try {
+    const res = await getCardData()
+    console.log('获取卡片数据成功:', res)
+    if (res.code === 0 && res.data) {
+      cardData.value = {
+        auditCount: res.data.auditCount || 0,
+        stayCount: res.data.stayCount || 0,
+        todayOrderCount: res.data.todayOrderCount || 0,
+        chainGrowth: res.data.chainGrowth || '',
+        popularFosterProvider: res.data.popularFosterProvider || ''
+      }
+    }
+  } catch (error) {
+    console.error('获取卡片数据失败:', error)
+  }
+}
+// 重置搜索条件
+const resetFilter = () => {
+  auditStatus.value = ''
+  auditKeyword.value = ''
+  currentPage.value = 1
+  fetchAuditList()
+}
+
+// 分页事件
 const handleSizeChange = (val: number) => {
   pageSize.value = val
+  currentPage.value = 1
+  fetchAuditList()
 }
+
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
+  fetchAuditList()
 }
 
 // 操作事件（仅静态）
-const handleView = (row: any) => { console.log('查看审核详情:', row) }
-const handlePass = (row: any) => { console.log('通过审核:', row) }
-const handleReject = (row: any) => { console.log('拒绝审核:', row) }
+const handleView = (row: any) => {
+  console.log('查看审核详情:', row)
+}
+// const handlePass = (row: any) => {
+//   console.log('通过审核:', row)
+// }
+// const handleReject = (row: any) => {
+//   console.log('拒绝审核:', row)
+// }
+// // 监听筛选条件变化
+watch([auditStatus, auditKeyword], () => {
+  currentPage.value = 1
+  fetchAuditList()
+})
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchCardData()
+  fetchAuditList()
+})
 </script>
 
 <style scoped lang="scss">
-// 全局容器
+:deep(.el-table .el-table__cell) {
+  text-align: center;
+}
 .foster-audit-container {
   padding: 20px;
   background-color: #faf6f0;
   min-height: 100vh;
 }
 
-// 页面头部（与原风格统一）
 .page-header {
   display: flex;
   align-items: center;
@@ -262,7 +326,6 @@ const handleReject = (row: any) => { console.log('拒绝审核:', row) }
   }
 }
 
-// 筛选区（与原风格统一）
 .filter-bar {
   margin-bottom: 15px;
   padding: 15px;
@@ -295,7 +358,6 @@ const handleReject = (row: any) => { console.log('拒绝审核:', row) }
   }
 }
 
-// 审核列表（与原风格统一）
 .main-content-card {
   border-radius: 12px;
   border: none;
@@ -325,7 +387,18 @@ const handleReject = (row: any) => { console.log('拒绝审核:', row) }
     color: #28a745;
     border-radius: 6px;
   }
+  .cat-type-tag {
+    background-color: #fff0f5; /* 粉红色背景 */
+    color: #ff69b4; /* 粉色文字 */
+    border-radius: 6px;
+    border-color: #fbd1e6;
+  }
 
+  .dog-type-tag {
+    background-color: #f0f8ff; /* 淡蓝色背景 */
+    color: #1e90ff; /* 蓝色文字 */
+    border-radius: 6px;
+  }
   .status-tag {
     border-radius: 6px;
   }
@@ -345,8 +418,8 @@ const handleReject = (row: any) => { console.log('拒绝审核:', row) }
   }
 
   .reject-btn {
-    margin-top:10px;
-    margin-left:0px;
+    margin-top: 10px;
+    margin-left: 0px;
     background-color: #f8d7da;
     border-color: #f8d7da;
     color: #721c24;

@@ -1,8 +1,5 @@
 <template>
- <div v-if="loading" class="loading-container">
-    <i class="layui-icon layui-icon-loading layui-icon layui-anim layui-anim-rotate layui-anim-loop"></i>
-    <span class="loading-text">加载中...</span>
-  </div>
+  <LoadingComponent v-if="loading" />
   <div v-else class="address-manager" >
     <button class="layui-btn btn-save" @click="handleAdd" v-if="showAddressForm|| addressList.length > 0">
       <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
@@ -123,11 +120,19 @@
 <script setup lang="ts">
 import {  ref, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import request from '@/utils/request'
+import { 
+  getUserAddresses, 
+  getUserAddressDetail, 
+  addUserAddress, 
+  updateUserAddress, 
+  deleteUserAddress, 
+  setDefaultUserAddress 
+} from '@/api/person/address'
 import AddressSelect from '@/components/business/AddressSelect.vue'
 import provincesData from 'china-division/dist/provinces.json';
 import citiesData from 'china-division/dist/cities.json';
 import districtsData from 'china-division/dist/areas.json';
+import LoadingComponent from '@/components/common/LoadingStatus.vue'
 
 // 类型定义
 interface Address {
@@ -199,14 +204,16 @@ const getAddressList = async () => {
       addressList.value = []
       return
     }
-    const response = await request('/server/api/user/getUserAddresses', 'GET', {
+    const response = await getUserAddresses({
       pageNum: pagination.value.currentPage,
       pageSize: pagination.value.pageSize,
     })
-    console.log(response)
     if(response.code === 0){
       if(response.msg === '操作成功'){
-    addressList.value = response.data.list || []
+    addressList.value = (response.data.list || []).map(item => ({
+      ...item,
+      isDefault: item.isDefault === 1
+    }))
     pagination.value.total = response.data.total || 0
     pagination.value.pages = response.data.pages || 1
     if (pagination.value.currentPage === 1 && addressList.value.length === 0) {
@@ -267,7 +274,7 @@ const handleAdd = () => {
 // 编辑地址
 const handleEdit = async (address: Address) => {
   try {
-    const response = await request('/server/api/user/UserAddressDetail', 'GET', { id: address.id })
+    const response = await getUserAddressDetail(address.id)
     if (response.code === 0 && response.data) {
       const detail = response.data
       addressForm.value = {
@@ -324,10 +331,11 @@ const handleSave = async () => {
     let response: any
     if (editingAddressId.value) {
       // 编辑地址
-      response = await request(`/server/api/user/updateUserAddress?id=${editingAddressId.value}`, 'POST', addressData)
+      response =  await updateUserAddress(editingAddressId.value,
+      addressData)
     } else {
       // 新增地址
-      response = await request('/server/api/user/addUserAddress', 'POST', addressData)
+      response = await addUserAddress( addressData)
     }
 
     if (response.code === 0) {
@@ -346,9 +354,7 @@ const handleSave = async () => {
 const handleDelete = (id: string) => {
   window.layui.layer.confirm('确定要删除这个地址吗？', { title: '提示' }, async (index: number) => {
     try {
-      const response = await request('/server/api/user/deleteUserAddress', 'POST', { id }, {
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-      })
+      const response = await deleteUserAddress(id)
       if (response.code === 0) {
         ElMessage.success('地址删除成功！')
         getAddressList()
@@ -366,9 +372,7 @@ const handleDelete = (id: string) => {
 // 设为默认地址
 const handleSetDefault = async (id: string) => {
   try {
-    const response = await request('/server/api/user/setDefaultUserAddress', 'POST', { id:id }, {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    })
+    const response =  await setDefaultUserAddress(id)
     if (response.code === 0) {
       ElMessage.success('默认地址更改成功！')
       getAddressList()
@@ -403,16 +407,7 @@ const handleReset = () => {
 </script>
 
 <style scoped>
-.loading-container {
-  text-align: center;
-  padding: 2rem 0;
-  color: #fd9860;
-}
 
-.loading-text {
-  margin-left: 0.5rem;
-  color: #666;
-}
 .layui-btn-primary:hover {
     border-color: #fd9860 !important;
     color: #333;

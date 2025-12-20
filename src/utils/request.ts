@@ -107,7 +107,8 @@ service.interceptors.response.use(
     // 处理HTTP网络错误（非2xx状态码）
     if (error.response) {
       // 有响应但状态码异常
-      const { status, config } = error.response
+      console.log('HTTP错误：', error.response)
+      const { status, config} = error.response
       switch (status) {
         case 400:
           ElMessage.error('请求参数错误（HTTP 400）')
@@ -126,7 +127,22 @@ service.interceptors.response.use(
           ElMessage.error(`请求地址不存在：${config.url}（HTTP 404）`)
           break
         case 500:
-          ElMessage.error('服务器内部错误（HTTP 500）')
+         // 核心修改：判断500错误是否包含“未登录”相关提示
+        // const isLoginError = data?.msg?.includes('未登录') || data?.msg?.includes('登录态') || data?.msg?.includes('token');
+        // if (isLoginError) {
+        //   // 500但属于登录态问题：触发登录跳转
+        //   ElMessageBox.confirm('登录状态异常，请重新登录', '提示', {
+        //     confirmButtonText: '重新登录',
+        //     cancelButtonText: '取消',
+        //     type: 'warning',
+        //   }).then(() => {
+        //     localStorage.removeItem('authToken');
+        //     window.location.href = '/login';
+        //   });
+        // } else {
+          // 普通500错误：仅提示
+          ElMessage.error('服务器内部错误（HTTP 500）');
+        // }
           break
 
         default:

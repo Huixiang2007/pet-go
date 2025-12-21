@@ -457,7 +457,7 @@ const initMap = () => {
         // 地图加载完成后，获取用户地址并定位
         getUserHomeAddress();
 
-        ElMessage.success('地图加载成功');
+        // ElMessage.success('地图加载成功');
         loading.close();
     }).catch((err) => {
         console.error('地图加载失败:', err);
@@ -597,7 +597,7 @@ const load = async () => {
                 currentPage.value++;
 
             } else {
-                ElMessage.info('已加载全部数据');
+                // ElMessage.info('已加载全部数据');
             }
 
             // 更新地图标记

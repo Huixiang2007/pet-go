@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-yellow-50 min-h-screen flex flex-col">
+  <div class="bg-orange-50 min-h-screen flex flex-col">
     <SellerManHeader />
 
     <div class="flex flex-1 overflow-hidden">
@@ -11,278 +11,198 @@
             店铺信息设置
           </h1>
 
-          <form class="space-y-8" @submit.prevent="saveShopSetting">
-            <!-- 商铺基本信息 -->
-            <div class="space-y-4">
-              <div class="flex items-center border-b border-gray-200 pb-3 mb-2">
-                <i class="fa fa-store text-[#f77e21] text-xl mr-3"></i>
-                <h2 class="text-xl font-semibold text-gray-800">商铺基本信息</h2>
-              </div>
+        <form class="space-y-8">
+        <!-- 商铺基本信息 -->
+        <div class="space-y-4">
+          <div class="flex items-center border-b border-orange-100 pb-2">
+            <i class="fa fa-store text-orange-600 text-xl mr-3"></i>
+            <h2 class="text-xl font-semibold text-gray-800">商铺基本信息</h2>
+          </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- 商铺名称 + 即时验证提示 -->
-                <div class="space-y-2">
-                  <label for="shop-name" class="block text-sm font-medium text-gray-700">
-                    商铺名称 <span class="text-red-500">*</span>
-                  </label>
-                  <input type="text" id="shop-name"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                    placeholder="请输入商铺名称" required v-model="shopInfo.name" @blur="validateShopName" />
-                  <p v-if="shopNameError" class="text-xs text-red-500 mt-1">{{ shopNameError }}</p>
-                </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="shop-name" class="block text-sm font-medium text-gray-700">
+                商铺名称 <span class="text-red-500">*</span>
+              </label>
+              <input type="text" id="shop-name" v-model="form.shopName"
+                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all outline-none placeholder:text-gray-400"
+                placeholder="请输入商铺名称" required />
+            </div>
+            <div class="space-y-2">
+              <label for="shop-type" class="block text-sm font-medium text-gray-700">
+                店铺类型 <span class="text-red-500">*</span>   <span class="text-xs">({{ form.shopType }}) </span>
+              </label>
+              <select id="shop-type" v-model="form.shopType"
+                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all outline-none bg-white"
+                required>
+                <option value="" class="text-gray-400" id="shopType">请选择店铺类型</option>
+                <option value="个人店">个人店</option>
+                <option value="企业店">企业店</option>
+                <option value="旗舰店">旗舰店</option>
+              </select>
+            </div>
+          </div>
 
-                <!-- 店铺类型 -->
-                <div class="space-y-2">
-                  <label for="shop-type" class="block text-sm font-medium text-gray-700">
-                    店铺类型 <span class="text-red-500">*</span>
-                  </label>
-                  <select id="shop-type"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white"
-                    required v-model="shopInfo.type">
-                    <option value="" class="text-gray-400">请选择店铺类型</option>
-                    <option value="1">个人店</option>
-                    <option value="2">企业店</option>
-                    <option value="3">旗舰店</option>
-                    <option value="4">专卖店</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <label for="shop-avatar" class="block text-sm font-medium text-gray-700">
-                    商铺头像
-                  </label>
-                  <div class="flex flex-col gap-3">
-                    <div v-if="previewAvatar"
-                      class="w-24 h-24 rounded-lg overflow-hidden border border-gray-200 relative group">
-                      <img :src="previewAvatar" alt="商铺头像" class="w-full h-full object-cover" />
-                      <button type="button"
-                        class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="clearAvatar">
-                        <i class="fa fa-times text-xs"></i>
-                      </button>
-                    </div>
-                    <div
-                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
-                      <label for="shop-avatar-file" class="cursor-pointer flex flex-col items-center justify-center">
-                        <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
-                        <span class="text-gray-600">点击重新上传商铺头像</span>
-                        <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
-                      </label>
-                      <input type="file" class="hidden" id="shop-avatar-file" accept="image/*"
-                        @change="handleAvatarUpload" />
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 营业执照-->
-                <div class="space-y-2" id="business-license-section">
-                  <label for="business-license" class="block text-sm font-medium text-gray-700">
-                    营业执照照片
-                  </label>
-                  <div class="flex flex-col gap-3">
-                    <div v-if="previewLicense"
-                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
-                      <img :src="previewLicense" alt="营业执照" class="w-full h-full object-cover" />
-                      <button type="button"
-                        class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="clearLicense">
-                        <i class="fa fa-times text-xs"></i>
-                      </button>
-                    </div>
-                    <div
-                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
-                      <label for="business-license-file"
-                        class="cursor-pointer flex flex-col items-center justify-center">
-                        <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
-                        <span class="text-gray-600">点击重新上传营业执照</span>
-                        <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
-                      </label>
-                      <input type="file" class="hidden" id="business-license-file" accept="image/*"
-                        @change="handleLicenseUpload" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 身份证正反面-->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <label for="id-card-front" class="block text-sm font-medium text-gray-700">
-                    身份证正面
-                  </label>
-                  <div class="flex flex-col gap-3">
-                    <div v-if="previewIdCardFront"
-                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
-                      <img :src="previewIdCardFront" alt="身份证正面" class="w-full h-full object-cover" />
-                      <button type="button"
-                        class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="clearIdCardFront">
-                        <i class="fa fa-times text-xs"></i>
-                      </button>
-                    </div>
-                    <div
-                      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
-                      <label for="id-card-front-file" class="cursor-pointer flex flex-col items-center justify-center">
-                        <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
-                        <span class="text-gray-600">点击重新上传身份证正面</span>
-                        <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
-                      </label>
-                      <input type="file" class="hidden" id="id-card-front-file" accept="image/*"
-                        @change="handleIdCardFrontUpload" />
-                    </div>
-                  </div>
-                </div>
-                <div class="space-y-2">
-                  <label for="id-card-back" class="block text-sm font-medium text-gray-700">
-                    身份证反面
-                  </label>
-                  <div class="flex flex-col gap-3">
-                    <div v-if="previewIdCardBack"
-                      class="w-48 h-32 rounded-lg overflow-hidden border border-gray-200 relative group">
-                      <img :src="previewIdCardBack" alt="身份证反面" class="w-full h-full object-cover" />
-                      <button type="button"
-                        class="absolute top-1 right-1 bg-red-500/80 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        @click="clearIdCardBack">
-                        <i class="fa fa-times text-xs"></i>
-                      </button>
-                    </div>
-                    <div
-                      class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#f77e21] hover:bg-[#fdf5ed]/50 transition-all cursor-pointer">
-                      <label for="id-card-back-file" class="cursor-pointer flex flex-col items-center justify-center">
-                        <i class="fa fa-cloud-upload text-4xl text-[#f77e21]/70 mb-2"></i>
-                        <span class="text-gray-600">点击重新上传身份证反面</span>
-                        <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
-                      </label>
-                      <input type="file" class="hidden" id="id-card-back-file" accept="image/*"
-                        @change="handleIdCardBackUpload" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">
+                商铺头像 <span class="text-red-500">*</span>
+              </label>
+              <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'shopAvatar')">
+                <template #default>
+                  <i class="fa fa-cloud-upload text-4xl text-orange-500 mb-2"></i>
+                  <span class="text-gray-600">点击上传商铺头像</span>
+                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
+                </template>
+              </FileUpload>
+               <div v-if="imagePreviews.shopAvatar" class="mt-2">
+    <img :src="imagePreviews.shopAvatar" class="w-24 h-24 rounded-lg object-cover" alt="商铺头像预览">
+  </div>
             </div>
 
-            <!-- 商铺拥有者-->
-            <div class="space-y-4">
-              <div class="flex items-center border-b border-gray-200 pb-3 mb-2">
-                <i class="fa fa-user text-[#f77e21] text-xl mr-3"></i>
-                <h2 class="text-xl font-semibold text-gray-800">商铺拥有者信息</h2>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                  <label for="contact-name" class="block text-sm font-medium text-gray-700">
-                    拥有者姓名 <span class="text-red-500">*</span>
-                  </label>
-                  <input type="text" id="contact-name"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                    placeholder="请输入拥有者姓名" required v-model="ownerInfo.name" />
-                </div>
-                <div class="space-y-2">
-                  <label for="contact-phone" class="block text-sm font-medium text-gray-700">
-                    拥有者电话 <span class="text-red-500">*</span>
-                  </label>
-                  <input type="tel" id="contact-phone"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                    placeholder="请输入拥有者电话" required v-model="ownerInfo.phone" @blur="validatePhone" />
-                  <p v-if="phoneError" class="text-xs text-red-500 mt-1">{{ phoneError }}</p>
-                </div>
-              </div>
-              <div class="space-y-2">
-                <label for="contact-email" class="block text-sm font-medium text-gray-700">
-                  拥有者邮箱 <span class="text-red-500">*</span>
-                </label>
-                <input type="email" id="contact-email"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                  placeholder="请输入拥有者邮箱" required v-model="ownerInfo.email" @blur="validateEmail" />
-                <p v-if="emailError" class="text-xs text-red-500 mt-1">{{ emailError }}</p>
-              </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">
+                营业执照照片 <span class="text-red-500">*</span>
+              </label>
+              <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'businessLicense')">
+                <template #default>
+                  <i class="fa fa-file-image-o text-4xl text-orange-500 mb-2"></i>
+                  <span class="text-gray-600">点击上传营业执照</span>
+                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
+                </template>
+              </FileUpload>
+               <div v-if="imagePreviews.businessLicense" class="mt-2">
+    <img :src="imagePreviews.businessLicense" class="w-24 h-24 rounded-lg object-cover" alt="营业执照预览">
+  </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 商家信息 -->
+        <div class="space-y-4">
+          <div class="flex items-center border-b border-orange-100 pb-2">
+            <i class="fa fa-user text-orange-600 text-xl mr-3"></i>
+            <h2 class="text-xl font-semibold text-gray-800">商家信息</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="contact-name" class="block text-sm font-medium text-gray-700">
+                联系人姓名 <span class="text-red-500">*</span>
+              </label>
+              <input type="text" id="contact-name" v-model="form.contactName"
+                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all outline-none placeholder:text-gray-400"
+                placeholder="请输入联系人姓名" required />
+            </div>
+            <div class="space-y-2">
+              <label for="contact-phone" class="block text-sm font-medium text-gray-700">
+                联系人电话 <span class="text-red-500">*</span>
+              </label>
+              <input type="tel" id="contact-phone" v-model="form.contactPhone"
+                class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all outline-none placeholder:text-gray-400"
+                placeholder="请输入联系人电话" required />
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="contact-email" class="block text-sm font-medium text-gray-700">
+              联系人邮箱 <span class="text-red-500">*</span>
+            </label>
+            <input type="email" id="contact-email" v-model="form.contactEmail"
+              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all outline-none placeholder:text-gray-400"
+              placeholder="请输入联系人邮箱" required />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">
+                身份证正面 <span class="text-red-500">*</span>
+              </label>
+              <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'idCardFront')">
+                <template #default>
+                  <i class="fa fa-id-card-o text-4xl text-orange-500 mb-2"></i>
+                  <span class="text-gray-600">点击上传身份证正面</span>
+                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
+                </template>
+              </FileUpload>
+               <div v-if="imagePreviews.idCardFront" class="mt-2">
+    <img :src="imagePreviews.idCardFront" class="w-24 h-24 rounded-lg object-cover" alt="商铺头像预览">
+  </div>
             </div>
 
-            <!-- 商铺地址信息 -->
-            <div class="space-y-4">
-              <div class="flex items-center border-b border-gray-200 pb-3 mb-2">
-                <i class="fa fa-map-marker text-[#f77e21] text-xl mr-3"></i>
-                <h2 class="text-xl font-semibold text-gray-800">商铺地址信息</h2>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="space-y-2">
-                  <label for="province" class="block text-sm font-medium text-gray-700">
-                    所在省份 <span class="text-red-500">*</span>
-                  </label>
-                  <select id="province" v-model="selectedProvince" @change="handleProvinceChange"
-                    class="block w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white">
-                    <option value="">请选择</option>
-                    <option v-for="value in provinceList" :key="value.id" :value="value.id">
-                      {{ value.name }}
-                    </option>
-                  </select>
-                </div>
-
-                <div class="space-y-2">
-                  <label for="city" class="block text-sm font-medium text-gray-700">
-                    所在城市 <span class="text-red-500">*</span>
-                  </label>
-                  <select id="city" v-model="selectedCity" @change="handleCityChange" :disabled="!cityList.length"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white"
-                    required>
-                    <option value="">请选择</option>
-                    <option v-for="city in cityList" :key="city.id" :value="city.id">
-                      {{ city.name }}
-                    </option>
-                  </select>
-                </div>
-                <div class="space-y-2">
-                  <label for="district" class="block text-sm font-medium text-gray-700">
-                    所在区县 <span class="text-red-500">*</span>
-                  </label>
-                  <select id="district" v-model="selectedDistrict" :disabled="!districtList.length"
-                    class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none bg-white"
-                    required>
-                    <option value="">请选择</option>
-                    <option v-for="(district, index) in districtList" :key="index" :value="district">
-                      {{ district }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="space-y-2">
-                <label for="address" class="block text-sm font-medium text-gray-700">
-                  详细地址 <span class="text-red-500">*</span>
-                </label>
-                <input type="text" id="address"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400"
-                  placeholder="请输入详细地址" v-model="addressInfo.detail" required />
-              </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700">
+                身份证反面 <span class="text-red-500">*</span>
+              </label>
+              <FileUpload accept="image/*" @file-change="(files) => handleFileChange(files, 'idCardBack')">
+                <template #default>
+                  <i class="fa fa-id-card text-4xl text-orange-500 mb-2"></i>
+                  <span class="text-gray-600">点击上传身份证反面</span>
+                  <p class="text-xs text-gray-400 mt-1">支持JPG、PNG格式，大小不超过5MB</p>
+                </template>
+              </FileUpload>
+               <div v-if="imagePreviews.idCardBack" class="mt-2">
+    <img :src="imagePreviews.idCardBack" class="w-24 h-24 rounded-lg object-cover" alt="商铺头像预览">
+  </div>
             </div>
+          </div>
+        </div>
 
-            <!-- 商铺简介 -->
-            <div class="space-y-4">
-              <div class="flex items-center border-b border-gray-200 pb-3 mb-2">
-                <i class="fa fa-info-circle text-[#f77e21] text-xl mr-3"></i>
-                <h2 class="text-xl font-semibold text-gray-800">商铺简介</h2>
-              </div>
-              <div class="space-y-2">
-                <label for="shop-desc" class="block text-sm font-medium text-gray-700">
-                  商铺介绍 <span class="text-red-500">*</span>
-                </label>
-                <textarea id="shop-desc"
-                  class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f77e21]/30 focus:border-[#f77e21] transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
-                  placeholder="请输入商铺介绍（如经营品类、店铺特色等）" required v-model="shopInfo.desc"></textarea>
-                <p class="text-xs text-gray-400 mt-1">最多输入500个字符</p>
-              </div>
-            </div>
+        <!-- 地址信息 -->
+        <div class="space-y-4">
+          <div class="flex items-center border-b border-orange-100 pb-2">
+            <i class="fa fa-map-marker text-orange-600 text-xl mr-3"></i>
+            <h2 class="text-xl font-semibold text-gray-800">商铺地址信息</h2>
+          </div>
 
-            <div class="mt-8">
-              <button
-                class="w-full py-3 bg-[#f77e21] text-white font-medium rounded-lg hover:bg-[#e67010] active:bg-[#d56300] transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-                type="submit" :disabled="isSubmitting">
-                <i v-if="isSubmitting" class="fa fa-spinner fa-spin"></i>
-                <span>{{ isSubmitting ? '保存中...' : '保存店铺设置' }}</span>
-              </button>
-            </div>
-          </form>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              选择地区 <span class="text-red-500">*</span>
+            </label>
+            <AddressSelect v-model="addressObject" class="w-full border rounded-xl p-3" />
+            <div class="text-xs text-gray-500 mt-1">当前选择: {{ addressDisplayText }}</div>
+          </div>
+
+          <div class="space-y-2">
+            <label for="address" class="block text-sm font-medium text-gray-700">
+              详细地址 <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="address" v-model="form.address"
+              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all outline-none placeholder:text-gray-400"
+              placeholder="请输入详细地址" required />
+          </div>
+        </div>
+
+        <!-- 商铺简介 -->
+        <div class="space-y-4">
+          <div class="flex items-center border-b border-orange-100 pb-2">
+            <i class="fa fa-info-circle text-orange-600 text-xl mr-3"></i>
+            <h2 class="text-xl font-semibold text-gray-800">商铺简介</h2>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">
+              商铺介绍 <span class="text-red-500">*</span>
+            </label>
+            <textarea v-model="form.description"
+              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-300 focus:border-orange-400 transition-all outline-none placeholder:text-gray-400 resize-y min-h-[120px]"
+              placeholder="请输入商铺介绍" required></textarea>
+          </div>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="mt-8">
+          <button
+            class="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-medium rounded-xl hover:from-orange-600 hover:to-orange-700 active:from-orange-700 active:to-orange-800 transition-all shadow-md hover:shadow-lg"
+            type="button" @click="submitForm" :disabled="isSubmitting">
+            <span v-if="!isSubmitting">提交更改</span>
+            <span v-if="isSubmitting"> <i class="fa fa-spinner fa-spin mr-2"></i>提交中... </span>
+          </button>
+          <p class="text-center text-gray-500 text-sm mt-4">
+            提交后将在1-3个工作日内审核，请保持电话畅通
+          </p>
+        </div>
+      </form>
         </div>
       </div>
     </div>
@@ -290,234 +210,229 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, type Ref } from 'vue'
+// 脚本部分无需修改，保持原逻辑即可
+import { reactive, ref, computed, watch, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
+import AddressSelect from '@/components/business/AddressSelect.vue'
+import FileUpload from '@/components/common/FileUpload.vue'
+import {updateShopInfo,getShopDetail} from '../../../api/pet-shop/shop'
+import provincesData from 'china-division/dist/provinces.json'
+import citiesData from 'china-division/dist/cities.json'
+import districtsData from 'china-division/dist/areas.json'
 
-// 定义数据类型
-interface Province {
-  id: number
-  name: string
-  city: City[]
-}
-interface City {
-  id: number
-  name: string
-  district: string[]
-}
-
-// 店铺基本信息（模拟回显数据）
-const shopInfo = ref({
-  name: '小明官方旗舰店',
-  type: '3',
-  desc: '本店主营宠物食品、宠物玩具、宠物用品等，专注为宠物提供高品质的产品和服务，欢迎各位铲屎官选购！',
-})
-
-// 拥有者信息（模拟回显数据）
-const ownerInfo = ref({
-  name: '王小明',
-  phone: '18888888888',
-  email: 'xiaoming@example.com',
-})
-
-// 地址信息（模拟回显数据）
-const addressInfo = ref({
-  detail: '北京市海淀区中关村大街1号',
-})
-
-// 图片预览相关
-const previewAvatar = ref('') // 头像预览
-const previewLicense = ref('') // 营业执照预览
-const previewIdCardFront = ref('') // 身份证正面预览
-const previewIdCardBack = ref('') // 身份证反面预览
-
-// 表单验证错误提示
-const shopNameError = ref('')
-const phoneError = ref('')
-const emailError = ref('')
-
-// 提交状态（防重复提交）
 const isSubmitting = ref(false)
-
-// 模拟城市数据
-const provinceList: Province[] = [
-  {
-    id: 1,
-    name: '北京市',
-    city: [{ id: 101, name: '北京市', district: ['东城区', '西城区', '海淀区', '朝阳区'] }],
+const imagePreviews = ref({
+  shopAvatar: '',
+  businessLicense: '',
+  idCardFront: '',
+  idCardBack: '',
+})
+const imageData = ref({
+  shopAvatar: '',
+  businessLicense: '',
+  idCardFront: '',
+  idCardBack: '',
+  otherDocs: '',
+})
+const addressObject = ref({
+  province: '',
+  city: '',
+  district: '',
+})
+const form = reactive({
+  shopName: '',
+  shopType: '',
+  contactName: '',
+  contactPhone: '',
+  contactEmail: '',
+  province: '',
+  city: '',
+  district: '',
+  address: '',
+  description: '',
+})
+watch(
+  addressObject,
+  (newValue) => {
+    form.province = newValue.province
+    form.city = newValue.city
+    form.district = newValue.district
   },
-  {
-    id: 2,
-    name: '上海市',
-    city: [{ id: 201, name: '上海市', district: ['黄浦区', '浦东新区', '静安区', '徐汇区'] }],
-  },
-  {
-    id: 3,
-    name: '天津市',
-    city: [{ id: 301, name: '天津市', district: ['和平区', '南开区', '东丽区'] }],
-  },
-  {
-    id: 4,
-    name: '重庆市',
-    city: [{ id: 401, name: '重庆市', district: ['江北区', '九龙坡区', '渝北区'] }],
-  },
-  {
-    id: 5,
-    name: '河北省',
-    city: [
-      { id: 501, name: '石家庄市', district: ['长安区', '桥西区', '裕华区'] },
-      { id: 502, name: '唐山市', district: ['路南区', '路北区', '丰南区'] },
-    ],
-  },
-  {
-    id: 6,
-    name: '山西省',
-    city: [
-      { id: 601, name: '太原市', district: ['小店区', '迎泽区', '杏花岭区'] },
-      { id: 602, name: '大同市', district: ['平城区', '云冈区', '新荣区'] },
-    ],
-  },
-]
+  { deep: true },
+)
 
-// 地址选择相关状态
-const selectedProvince = ref<string>('1') // 默认选中北京市
-const selectedCity = ref<string>('101') // 默认选中北京市
-const selectedDistrict = ref<string>('海淀区') // 默认选中海淀区
-const cityList = ref<City[]>([])
-const districtList = ref<string[]>([])
-
-// 省份切换逻辑
-const handleProvinceChange = () => {
-  selectedCity.value = ''
-  selectedDistrict.value = ''
-  const currentProv = provinceList.find((p) => p.id === Number(selectedProvince.value))
-  if (currentProv) {
-    cityList.value = currentProv.city.map((c) => ({ id: c.id, name: c.name, district: c.district }))
-  } else {
-    cityList.value = []
-  }
-}
-
-// 城市切换逻辑
-const handleCityChange = () => {
-  selectedDistrict.value = ''
-  const currentProv = provinceList.find((p) => p.id === Number(selectedProvince.value))
-  if (currentProv) {
-    const currentCity = currentProv.city.find((c) => c.id === Number(selectedCity.value))
-    if (currentCity) {
-      districtList.value = currentCity.district
-    } else {
-      districtList.value = []
-    }
-  } else {
-    districtList.value = []
-  }
-}
-
-// 图片上传预览逻辑 + 大小限制（5MB）
-const handleFileUpload = (e: Event, previewRef: Ref<string>) => {
-  const target = e.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-
-  // 文件大小限制：5MB
-  const maxSize = 5 * 1024 * 1024
-  if (file.size > maxSize) {
-    console.error('文件大小不能超过5MB，请重新选择！')
-    target.value = ''
+//根据api来获取商铺信息
+  const shopId = Number(localStorage.getItem('shopId'))
+  console.log('商铺ID:', shopId)
+onMounted(async()=>{
+  if(!shopId){
+    ElMessage.error('请先登录')
     return
   }
+try{
+    const res = await getShopDetail(shopId)
+    const shop = res
+    console.log('商铺信息:', shop)
+       form.shopName = shop.shopName
+    form.shopType = shop.shopType
+        form.contactName = shop.contactName
+        form.contactPhone = shop.contactPhone
+        form.contactEmail = shop.contactEmail
+        form.province = shop.province
+        form.city = shop.city
+        form.district = shop.district
+        form.address = shop.address
+        form.description = shop.description
 
-  previewRef.value = URL.createObjectURL(file)
-}
+        // 图片数据回显
+        imageData.value.shopAvatar = shop.shopAvatar || ''
+        imageData.value.businessLicense = shop.businessLicense || ''
+        imageData.value.idCardFront = shop.idCardFront || ''
+        imageData.value.idCardBack = shop.idCardBack || ''
 
+        // 图片预览回显
+        imagePreviews.value.shopAvatar = shop.shopAvatar || ''
+        imagePreviews.value.businessLicense = shop.businessLicense || ''
+        imagePreviews.value.idCardFront = shop.idCardFront || ''
+        imagePreviews.value.idCardBack = shop.idCardBack || ''
 
-const handleAvatarUpload = (e: Event) => handleFileUpload(e, previewAvatar)
-const handleLicenseUpload = (e: Event) => handleFileUpload(e, previewLicense)
-const handleIdCardFrontUpload = (e: Event) => handleFileUpload(e, previewIdCardFront)
-const handleIdCardBackUpload = (e: Event) => handleFileUpload(e, previewIdCardBack)
+        // 地区选择器同步更新
+        addressObject.value = {
+          province: shop.province,
+          city: shop.city ,
+          district: shop.district
+        }
 
+        // 存储店铺ID用于后续更新
+        localStorage.setItem('shopId', shop.id?.toString() || shopId.toString())
 
-const clearAvatar = () => (previewAvatar.value = '')
-const clearLicense = () => (previewLicense.value = '')
-const clearIdCardFront = () => (previewIdCardFront.value = '')
-const clearIdCardBack = () => (previewIdCardBack.value = '')
-
-const validateShopName = () => {
-  if (!shopInfo.value.name.trim()) {
-    shopNameError.value = '商铺名称不能为空！'
-  } else if (shopInfo.value.name.length > 50) {
-    shopNameError.value = '商铺名称不能超过50个字符！'
-  } else {
-    shopNameError.value = ''
+  } catch(error: any){
+    console.error('获取商铺信息失败:', error)
+    ElMessage.error('获取商铺信息失败，请稍后重试')
   }
-}
+})
 
-// 验证手机号
-const validatePhone = () => {
-  const phoneReg = /^1[3-9]\d{9}$/
-  if (!phoneReg.test(ownerInfo.value.phone)) {
-    phoneError.value = '请输入正确的11位手机号！'
-  } else {
-    phoneError.value = ''
-  }
-}
-
-// 验证邮箱
-const validateEmail = () => {
-  const emailReg = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-  if (!emailReg.test(ownerInfo.value.email)) {
-    emailError.value = '请输入正确的邮箱格式！'
-  } else {
-    emailError.value = ''
-  }
-}
-
-const saveShopSetting = async () => {
-
-  validateShopName()
-  validatePhone()
-  validateEmail()
-
-  if (shopNameError.value || phoneError.value || emailError.value) {
-    return
-  }
-
-  isSubmitting.value = true
+const addressDisplayText = computed(() => {
+  let provinceName = ''
+  let cityName = ''
+  let districtName = ''
   try {
-
-    const formData = {
-      shopInfo: shopInfo.value,
-      ownerInfo: ownerInfo.value,
-      addressInfo: {
-        province: selectedProvince.value,
-        city: selectedCity.value,
-        district: selectedDistrict.value,
-        detail: addressInfo.value.detail,
-      },
-
-      imageInfo: {
-        avatar: previewAvatar.value,
-        license: previewLicense.value,
-        idCardFront: previewIdCardFront.value,
-        idCardBack: previewIdCardBack.value,
-      },
+    const province = provincesData.find((p) => p.code === addressObject.value.province)
+    provinceName = province ? province.name : `(${addressObject.value.province})`
+    if (addressObject.value.city) {
+      const city = citiesData.find((c) => c.code === addressObject.value.city)
+      cityName = city ? city.name : `(${addressObject.value.city})`
     }
-
-
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    console.log('保存店铺设置：', formData)
-    console.log('店铺设置保存成功！')
+    if (addressObject.value.district) {
+      const district = districtsData.find((d) => d.code === addressObject.value.district)
+      districtName = district ? district.name : `(${addressObject.value.district})`
+    }
   } catch (error) {
-    console.error('保存失败：', error)
-    console.log('店铺设置保存失败，请重试！')
+    console.error('地址名称转换失败:', error)
+  }
+  return [provinceName, cityName, districtName].filter(Boolean).join(' - ')
+})
+const handleFileChange = (files: any[], type: keyof typeof imageData.value) => {
+  try {
+    if (files && files.length > 0) {
+      const fileUrl = files[0].url
+      if (fileUrl) {
+        imageData.value[type] = fileUrl
+        imagePreviews.value[type as keyof typeof imagePreviews.value] = fileUrl
+        ElMessage.success('文件上传成功')
+      }
+    }
+  } catch (error) {
+    console.error(`处理文件上传时出错:`, error)
+    ElMessage.error('文件处理失败，请重试')
+  }
+}
+const validateForm = (): boolean => {
+  const requiredFields = [
+    { value: form.shopName, field: '商铺名称' },
+    { value: form.contactName, field: '联系人姓名' },
+    { value: form.contactPhone, field: '联系人电话' },
+    { value: form.contactEmail, field: '联系人邮箱' },
+    { value: form.address, field: '详细地址' },
+    { value: form.description, field: '商铺介绍' },
+  ]
+  for (const field of requiredFields) {
+    if (!field.value) {
+      ElMessage.error(`请填写${field.field}！`)
+      return false
+    }
+  }
+  const phoneRegex = /^1[3-9]\d{9}$/
+  if (!phoneRegex.test(form.contactPhone)) {
+    ElMessage.error('请输入正确的手机号码！')
+    return false
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(form.contactEmail)) {
+    ElMessage.error('请输入正确的邮箱地址！')
+    return false
+  }
+  return true
+}
+const submitForm = async () => {
+  if (!validateForm()||isSubmitting.value) return
+  try {
+    isSubmitting.value = true
+    let provinceName = ''
+    let cityName = ''
+    let districtName = ''
+    if (addressObject.value.province) {
+      const province = provincesData.find((p) => p.code === addressObject.value.province)
+      provinceName = province ? province.name : ''
+    }
+    if (addressObject.value.city) {
+      const city = citiesData.find((c) => c.code === addressObject.value.city)
+      cityName = city ? city.name : ''
+    }
+    if (addressObject.value.district) {
+      const district = districtsData.find((d) => d.code === addressObject.value.district)
+      districtName = district ? district.name : ''
+    }
+    const userId = Number(localStorage.getItem('userId'))
+    if (!userId) {
+      ElMessage.error('用户未登录，请先登录！')
+      isSubmitting.value = false
+      return
+    }
+    const data = {
+      shopId: shopId,
+      shopName: form.shopName,
+      shopType: form.shopType,
+      contactName: form.contactName,
+      contactPhone: form.contactPhone,
+      contactEmail: form.contactEmail,
+      province: provinceName,
+      city: cityName,
+      district: districtName,
+      address: form.address,
+      description: form.description,
+      shopAvatar: imageData.value.shopAvatar,
+      businessLicense: imageData.value.businessLicense,
+      idCardFront: imageData.value.idCardFront,
+      idCardBack: imageData.value.idCardBack,
+    }
+    console.log('提交数据:', data)
+    try{
+    const response = await updateShopInfo(data)
+    ElMessage.success('提交成功，等待审核！')
+    console.log('提交成功', response)
+    }
+      catch(error: any){
+      console.error('提交失败:', error)
+    if (error.response && error.response.data && error.response.data.message) {
+      ElMessage.error(`提交失败: ${error.response.data.message}`)
+    }
+    }
   } finally {
     isSubmitting.value = false
   }
 }
 
-onMounted(() => {
-  handleProvinceChange()
-  handleCityChange()
-})
 </script>
 
 <style scoped>
@@ -525,19 +440,17 @@ img {
   object-fit: cover;
 }
 
-
 button:disabled {
   background-color: #f9a857 !important;
   cursor: not-allowed;
 }
 
-
 @media (max-width: 768px) {
-  .grid-cols-1 md:grid-cols-2 {
+  .grid-cols-1.md\:grid-cols-2 {
     grid-template-columns: 1fr;
   }
 
-  .grid-cols-1 md:grid-cols-3 {
+  .grid-cols-1.md\:grid-cols-3 {
     grid-template-columns: 1fr;
   }
 }

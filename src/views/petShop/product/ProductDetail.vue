@@ -307,7 +307,7 @@ interface MediaItem { //定义媒体资源
 
 interface SkuInfo {
   //定义SKU信息
-  skuId: number
+  skuId: number|bigint
   productId: number
   skuSn: string
   specJson: string | null

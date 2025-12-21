@@ -4,7 +4,7 @@
     <template #header>
       <div class="card-header">
         <h3 class="header-title">选择寄养日期</h3>
-        <span class="header-subtitle">最多可选择 {{ maxStayDays }} 天</span>
+        <span class="header-subtitle mt-3">最多可选择 {{ maxStayDays }} 天</span>
       </div>
     </template>
 

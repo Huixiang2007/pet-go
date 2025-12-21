@@ -31,6 +31,23 @@
           </div>
         </div>
         <div v-else class="text-sm text-gray-500 mt-4">暂无商品图片</div>
+
+
+          <div v-if="props.product.videoUrl" class="mt-6">
+          <h4 class="font-semibold text-gray-700 mb-2">商品视频</h4>
+          <video
+            :src="props.product.videoUrl"
+            class="w-full rounded-lg border border-gray-100"
+            controls
+            autoplay
+            muted
+            loop
+            preload="metadata"
+          >
+            您的浏览器不支持视频播放
+          </video>
+        </div>
+
       </div>
 
       <!-- 右侧信息区域 -->
@@ -150,7 +167,7 @@ interface ProductDetail {
   productName: string
   productType: string
   productSn: string
-  price: string
+  price: number
   stock: number
   status: string
   shelfTime: string
@@ -162,12 +179,13 @@ interface ProductDetail {
   brandName: string
   marketPrice: number
   productWeight: number
-  sales: number
+  sales?: number
   reviewCount: number
   productScore: number
   warrantyTip: string
   detail: string
   subTitle: string
+  videoUrl?: string
 }
 // Props
 const props = defineProps<{

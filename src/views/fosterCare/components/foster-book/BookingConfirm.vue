@@ -229,9 +229,10 @@ const formatDisplayDate = (dateStr: string): string => {
         gap: 8px;
 
         .additional-service-item {
-            display: flex;
-            justify-content: space-between;
+
+
             padding: 4px 0;
+
 
             .service-name {
                 color: #475569;
@@ -240,6 +241,7 @@ const formatDisplayDate = (dateStr: string): string => {
             .service-price {
                 color: #409eff;
                 font-weight: 500;
+                margin-left: 6px;
             }
         }
     }

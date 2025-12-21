@@ -78,3 +78,43 @@ export interface BookingSubmitParams {
   pictureUrlList: string[]
   userNotes: string
 }
+interface AdditionalService {
+  serviceName: string
+  price: number
+}
+//寄养订单列表
+export interface FosterOrderList extends FosterOrder {
+  orderNo: number
+  orderStatusDesc: string
+  createTime: string
+  serviceName: string
+  totalDays: number
+  totalAmount: number
+}
+
+// 寄养订单详情类型
+export interface FosterOrder {
+  orderNo: number
+  orderStatusDesc: string
+  createTime: string
+  updateTime: string
+  startDate: string
+  endDate: string
+  totalDays: number
+  specialRequirements: string
+  emergencyPhone: string
+  userNotes: string
+  pictureUrl: string
+  dailyPrice: number
+  totalAmount: number
+  actualPayAmount: number
+  serviceName: string
+  petType: string
+  petName: string
+  fosterProviderType: string
+  fosterProviderName: string
+  providerName: string
+  providerPhone: string
+  providerAvatar: string
+  additionalServices: AdditionalService[]
+}

@@ -10,6 +10,7 @@ export const useBookingForm = () => {
   const myPets = ref([])
   const getPets = async () => {
     const res = await getMyPets(Number(userId))
+    console.log('获取宠物数据成功', res)
     if (res.code === 0) {
       myPets.value = res.data.map((pet) => ({
         id: pet.id,

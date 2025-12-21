@@ -9,13 +9,10 @@
     </div>
 
     <div class="verification-button-container">
-      <button type="button" class="layui-btn layui-btn-fluid layui-btn-primary " 
-          :class="[
-                 buttonClass,
-                 isDisabled ? 'layui-btn-disabled' : ''  
-            ]"
-         @click="sendCode"
-        :disabled="isDisabled">
+      <button type="button" class="layui-btn layui-btn-fluid layui-btn-primary " :class="[
+        buttonClass,
+        isDisabled ? 'layui-btn-disabled' : ''
+      ]" @click="sendCode" :disabled="isDisabled">
         {{ buttonText }}
       </button>
     </div>
@@ -23,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted, readonly, defineProps, defineEmits, defineExpose } from 'vue'
+import { ref, computed, watch, onUnmounted, readonly } from 'vue'
 import { ElMessage } from 'element-plus'
 
 // 1. 定义Props（替代Vue2的props选项）

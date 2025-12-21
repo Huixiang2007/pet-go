@@ -40,23 +40,23 @@
       <div class="step-actions">
         <el-button v-if="currentStep > 1 && currentStep < 5" @click="previousStep" :disabled="processing"
           class="prev-btn">
-          <el-icon>
+          <el-icon class="mr-2">
             <ArrowLeft />
           </el-icon>
           上一步
         </el-button>
 
-        <el-button v-if="currentStep < 3" type="primary" @click="nextStep" :disabled="!canProceed" :loading="processing"
-          class="next-btn">
+        <el-button v-if="currentStep < 3 || (currentStep == 3 && isReserved)" type="primary" @click="nextStep"
+          :disabled="!canProceed" :loading="processing" class="next-btn">
           下一步
-          <el-icon>
+          <el-icon class="ml-2">
             <ArrowRight />
           </el-icon>
         </el-button>
 
-        <el-button v-if="currentStep === 3" type="primary" @click="confirmBooking" :loading="processing"
+        <el-button v-if="currentStep === 3 && !isReserved" type="primary" @click="confirmBooking" :loading="processing"
           class="confirm-booking-btn">
-          <el-icon>
+          <el-icon class="mr-2">
             <Check />
           </el-icon>
           确定预约
@@ -93,38 +93,9 @@
       </el-dialog>
 
       <!-- 支付确认弹窗 -->
-      <el-dialog v-model="showPayConfirmDialog" title="确认支付" width="500px" :close-on-click-modal="false">
-        <div class="pay-confirm-content">
-          <div class="pay-info-item">
-            <span class="info-label">订单编号：</span>
-            <span class="info-value">{{ orderNo }}</span>
-          </div>
-          <div class="pay-info-item">
-            <span class="info-label">应付金额：</span>
-            <span class="info-value amount">{{ calculateTotalPrice }} 元</span>
-          </div>
-          <div class="pay-info-item">
-            <span class="info-label">账户余额：</span>
-            <span class="info-value" :class="{ 'text-red-500': userBalance < calculateTotalPrice }">
-              {{ userBalance }} 元
-              <span v-if="userBalance < calculateTotalPrice" class="balance-tip">（余额不足）</span>
-            </span>
-          </div>
-          <div v-if="userBalance < calculateTotalPrice" class="recharge-tip">
-            <el-icon class="tip-icon">
-              <Warning />
-            </el-icon>
-            <span>余额不足，是否前往充值？</span>
-            <el-button type="primary" size="small" class="recharge-btn" @click="goToRecharge">立即充值</el-button>
-          </div>
-        </div>
-        <template #footer>
-          <el-button @click="showPayConfirmDialog = false">取消</el-button>
-          <el-button type="primary" @click="handlePayConfirm" :disabled="userBalance < calculateTotalPrice">
-            确认支付
-          </el-button>
-        </template>
-      </el-dialog>
+      <FosterPayConfirm v-if="showPayConfirmDialog" :orderNo=orderNo :calculateTotalPrice=calculateTotalPrice
+        :userBalance=userBalance @go-to-recharge="goToRecharge" v-model=showPayConfirmDialog
+        @pay-success="handlePayConfirm" />
     </div>
   </div>
 </template>
@@ -133,7 +104,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ArrowLeft, ArrowRight, Check, Warning } from '@element-plus/icons-vue'
+import { ArrowLeft, ArrowRight, Check } from '@element-plus/icons-vue'
 
 // 组件
 import NavBar from '@/components/common/NavBar.vue'
@@ -142,7 +113,7 @@ import BookingStep2Date from './components/foster-book/BookingDate.vue'
 import BookingStep3Confirm from './components/foster-book/BookingConfirm.vue'
 import BookingStep4Pay from './components/foster-book/BookingPay.vue'
 import BookingStep5Success from './components/foster-book/BookingSuccess.vue'
-
+import FosterPayConfirm from '@/components/common/FosterPayConfirm.vue'
 // Composables
 import { useBookingSteps } from '@/composables/foster/use-booking-steps'
 import { useDateCalculator } from '@/composables/foster/use-date-cal'
@@ -205,12 +176,13 @@ const step4Ref = ref<InstanceType<typeof BookingStep4Pay>>()
 // 订单相关
 const orderNo = ref(0)
 const bookingNo = ref('')
-
+const isReserved = ref(false)
 // 获取用户余额
 const getUserBalance = async () => {
   try {
     const res = await getBalance()
     if (res.code === 0) {
+
       userBalance.value = res.data
     }
   } catch (error) {
@@ -222,7 +194,7 @@ const getUserBalance = async () => {
 // 确定预约
 const confirmBooking = async () => {
   processing.value = true
-
+  isReserved.value = true
   try {
     const formData = new FormData()
     formData.append('serviceId', String(serviceId))
@@ -282,7 +254,7 @@ const handlePayConfirm = async () => {
 // 支付确认
 const confirmPayment = async () => {
   if (!canConfirmPayment.value) {
-    ElMessage.warning('请完成所有必要信息并同意服务协议')
+    ElMessage.warning('请同意服务协议')
     return
   }
 
@@ -293,7 +265,7 @@ const confirmPayment = async () => {
       orderNo: orderNo.value,
       couponId: null
     })
-    if (res.data === '支付成功' || res.code === 0) {
+    if (res.code === 0) {
       currentStep.value = 5 // 进入支付成功页面
       ElMessage.success('支付成功！')
       userBalance.value -= calculateTotalPrice.value

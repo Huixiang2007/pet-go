@@ -148,7 +148,6 @@ const handleSubmit = () => {
   if (isSubmitting.value) return
   isSubmitting.value = true
 
-  // 构造提交数据
   const submitData = {
     ...productForm,
     images: productForm.imagesList.join(',')

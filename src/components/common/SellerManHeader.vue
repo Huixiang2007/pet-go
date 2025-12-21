@@ -47,9 +47,10 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import { ArrowDown } from '@element-plus/icons-vue';
+import { ElMessageBox, ElMessage } from 'element-plus';
+import {logout} from '../../api/pet-shop/shop'
 
 const router = useRouter();
-const emit = defineEmits(['logout']);
 
 function handleBack() {
   router.push('/shop');
@@ -57,7 +58,19 @@ function handleBack() {
 }
 
 function handleLogout() {
-   emit('logout', true);
+const shopId = localStorage.getItem('userId')
+  ElMessageBox.confirm('确认注销登录？').then(() =>async () => {
+    try{
+      const res = await logout(Number(shopId))
+      console.log(res)
+     router.push('/shop')
+     ElMessage.success('注销成功！')
+    }
+    catch(error){
+    console.log(error)
+    ElMessage.error('注销失败！')
+    }
+  })
 }
 function handleProfile() {
   router.push('/persons');

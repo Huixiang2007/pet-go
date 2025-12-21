@@ -1,5 +1,12 @@
 <template>
   <NavBar />
+<InfiniteScroll
+  :is-loading="isLoading"
+  :has-more="hasmore"
+  @load-more="getProducts"
+  :enable-back-to-top="true"
+  :back-to-top-threshold="300"
+>
   <div
     class="bg-gradient-to-b from-amber-50 to-orange-50 min-h-screen pt-24 flex flex-col items-center"
   >
@@ -131,18 +138,21 @@
       </div>
     </div>
   </div>
+  </InfiniteScroll>
   <ShopFoot />
+
 </template>
 
 <script lang="ts" setup>
-import { ref ,onMounted} from 'vue'
+import { ref ,onMounted } from 'vue'
+import InfiniteScroll from './components/infiniteScroll.vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 const router = useRoute()
 const shopid = router.query.id
 
 
-// 定义更详细的商品数据结构
+// 定义商品数据
 interface Product {
   id: string | number
   name: string
@@ -155,140 +165,19 @@ interface Product {
   isNew?: boolean
   description?: string
 }
-const products = ref<Product[]>([
-  {
-    id: 1,
-    name: '麦富迪成犬通用狗粮',
-    price: 29,
-    spec: '1kg装 | 鸡肉味 | 无谷低敏',
-    image: 'https://picsum.photos/id/237/300/300',
-    category: 'food',
-    rating: 5,
-    sales: '2.3万',
-    isNew: false,
-  },
-  {
-    id: 2,
-    name: '希宝进口猫咪零食罐',
-    price: 15,
-    spec: '85g/罐 | 吞拿鱼味 | 慕斯质地',
-    image: 'https://picsum.photos/id/1074/300/300',
-    category: 'food',
-    rating: 4,
-    sales: '1.8万',
-    isNew: true,
-  },
-  {
-    id: 3,
-    name: '耐咬橡胶宠物玩具球',
-    price: 12,
-    spec: '直径8cm | 磨牙洁齿 | 弹力十足',
-    image: 'https://picsum.photos/id/1025/300/300',
-    category: 'toy',
-    rating: 5,
-    sales: '3.1万',
-    isNew: false,
-  },
-  {
-    id: 4,
-    name: '雪貂留香宠物沐浴露',
-    price: 35,
-    spec: '500ml | 抑菌除螨 | 蓬松毛发',
-    image: 'https://picsum.photos/id/1069/300/300',
-    category: 'wash',
-    rating: 4,
-    sales: '1.5万',
-    isNew: false,
-  },
-  {
-    id: 5,
-    name: '幼猫专用羊奶粉',
-    price: 59,
-    spec: '200g | 接近母乳 | 易吸收',
-    image: 'https://picsum.photos/id/1084/300/300',
-    category: 'food',
-    rating: 5,
-    sales: '9000',
-    isNew: true,
-  },
-  {
-    id: 6,
-    name: '自动逗猫棒激光笔',
-    price: 28,
-    spec: 'USB充电 | 多模式 | 静音设计',
-    image: 'https://picsum.photos/id/1059/300/300',
-    category: 'toy',
-    rating: 4,
-    sales: '1.2万',
-    isNew: true,
-  },
-  {
-    id: 7,
-    name: '宠物外出便携背包',
-    price: 89,
-    spec: '小号 | 透气网布 | 承重10斤',
-    image: 'https://picsum.photos/id/1038/300/300',
-    category: 'tool',
-    rating: 5,
-    sales: '7000',
-    isNew: false,
-  },
-  {
-    id: 8,
-    name: '宠物指甲剪套装',
-    price: 19,
-    spec: '不锈钢 | 带锉刀 | 防飞溅',
-    image: 'https://picsum.photos/id/1048/300/300',
-    category: 'tool',
-    rating: 4,
-    sales: '2.5万',
-    isNew: false,
-  },
-  {
-    id: 9,
-    name: '大型犬耐咬牛骨头',
-    price: 25,
-    spec: '1根装 | 磨牙补钙 | 天然牛骨',
-    image: 'https://picsum.photos/id/1024/300/300',
-    category: 'toy',
-    rating: 5,
-    sales: '1.1万',
-    isNew: false,
-  },
-  {
-    id: 10,
-    name: '宠物除臭喷雾',
-    price: 22,
-    spec: '300ml | 植物配方 | 持久留香',
-    image: 'https://picsum.photos/id/1040/300/300',
-    category: 'wash',
-    rating: 4,
-    sales: '1.7万',
-    isNew: false,
-  },
-  {
-    id: 11,
-    name: '猫抓板瓦楞纸窝',
-    price: 39,
-    spec: '大号 | 可磨爪 | 可当猫窝',
-    image: 'https://picsum.photos/id/1072/300/300',
-    category: 'tool',
-    rating: 5,
-    sales: '2万',
-    isNew: false,
-  },
-  {
-    id: 12,
-    name: '狗狗生理裤姨妈巾',
-    price: 18,
-    spec: 'M码 | 可水洗 | 防漏设计',
-    image: 'https://picsum.photos/id/1056/300/300',
-    category: 'tool',
-    rating: 4,
-    sales: '8000',
-    isNew: true,
-  },
-])
+// const products = ref<Product[]>([
+//   {
+//     id: 1,
+//     name: '麦富迪成犬通用狗粮',
+//     price: 29,
+//     spec: '1kg装 | 鸡肉味 | 无谷低敏',
+//     image: 'https://picsum.photos/id/237/300/300',
+//     category: 'food',
+//     rating: 5,
+//     sales: '2.3万',
+//     isNew: false,
+//   },
+// ])
 interface shop {
   shopName: string;
   shopAvatar: string;
@@ -307,7 +196,7 @@ const shopItem = ref<shop>({
   openTime: '',
   creditScore: ''
 })
-
+//获取的商铺的信息
 const getstore=()=>{
   axios.request({
     url: `/server/api/shop/shops/detail/${shopid}`,
@@ -323,8 +212,52 @@ const getstore=()=>{
     console.log('接口返回数据:', err.response.data)
   })
 }
+const products = ref<Product[]>([])
+const page = ref(1)
+const pageSize = ref(12) //每页有10挑
+const isLoading = ref(false) //是否正在加载数据
+const hasmore = ref(true) //是否还有更多数据\
+const token =localStorage.getItem('authToken')
+console.log('token:', token)
+const getProducts = () => {
+  if (!isLoading.value && hasmore.value) {
+    isLoading.value = true
+    axios
+      .request({
+        url: '/server/api/shop/shops/list',
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        data: {
+          pageNum: 1,
+          pageSize: 10,
+        },
+      })
+      .then((response: any) => {
+          isLoading.value = false
+        console.log(response)
+        console.log(response.data)
+        const newProducts = response.data.data.list
+        products.value = [...products.value, ...newProducts]
+        if (newProducts.length < pageSize.value) {
+          hasmore.value = false
+          console.log('没有更多数据了')
+        } else {
+          page.value++
+        }
+      })
+      .catch((error) => {
+          isLoading.value = false
+        console.error('获取商品数据失败:', error.response.data)
+        console.error('获取商品数据失败:', error)
+      })
+  }
+}
+
 onMounted(() => {
   getstore()
+  getProducts()
 })
 
 

@@ -1,7 +1,7 @@
 <template>
   <div
     class="bg-white shadow-sm sticky mt-4 overflow-hidden rounded-md transition-all duration-300"
-    :class="{ 'w-48': isCollapsed, 'w-16': !isCollapsed }"
+    :class="{ 'w-48': isCollapsed, 'w-20': !isCollapsed }"
   >
     <nav class="py-4 px-4 h-full flex flex-col">
       <div class="flex justify-between items-center pr-4 pl-2">
@@ -13,7 +13,7 @@
         >
           <i
             class="fa-solid fa-angle-left hover:text-blue-500 text-gray-500 transition-all duration-300"
-            :class="{ 'rotate-180 pr-4': !isCollapsed }"
+            :class="{ 'rotate-180 pr-3': !isCollapsed }"
           ></i>
         </button>
       </div>

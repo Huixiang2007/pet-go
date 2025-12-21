@@ -1,5 +1,10 @@
 <template>
   <NavBar />
+    <InfiniteScroll
+    :is-loading="isLoading"
+    :has-more="hasmore"
+    @load-more="getProducts"
+  >
   <header class="bg-white shadow-md top-[85px] left-0 right-0 z-50" :class="{ shadow: isScrolledPast50 }">
     <ShopCategoryNav v-model="currentCategory" @categoryChange="handleCategoryChange" />
   </header>
@@ -151,6 +156,7 @@
           </div>
         </div>
       </div>
+
       <!-- 商品 -->
       <div class="products mt-8">
         <div class="flex justify-between items-center mb-4">
@@ -209,14 +215,12 @@
       </div>
     </div>
   </div>
-  <!-- 返回顶部按钮 -->
-  <img v-show="showBackToTop" @click="scrollToTop"
-    class="fixed bottom-6 right-4 z-50 w-20 h-20 hover:scale-105 transition-transform" aria-label="回到顶部"
-    src="/img/火箭.gif" />
+ </InfiniteScroll>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch, onUnmounted } from 'vue'
+  import InfiniteScroll from './components/infiniteScroll.vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 
@@ -233,8 +237,6 @@ const carouselItems = ref([
 const currentSlide = ref(0)
 const popupVisible = ref(false)
 const carouselInterval = ref<number | null>(null)
-const scrollY = ref(0)
-const showBackToTop = ref(false)
 const isScrolledPast50 = ref(false)
 
 interface Products {
@@ -261,7 +263,7 @@ const getProducts = () => {
         url: '/server/api/shop/product/list',
         method: 'POST',
         data: {
-          page: 1,
+          pageNum: 1,
           pageSize: 12,
         },
       })
@@ -280,6 +282,7 @@ const getProducts = () => {
       })
       .catch((error) => {
           isLoading.value = false
+            console.error('获取商品数据失败:', error.response.data)
         console.error('获取商品数据失败:', error)
       })
   }
@@ -304,28 +307,6 @@ const aiServer = () => {
     path: '/customer-service',
   })
 }
-// 滚动
-watch(scrollY, (newval) => {
-  showBackToTop.value = newval > 300
-  isScrolledPast50.value = newval > 50
-})
-const handleScroll = () => {
-  scrollY.value = window.scrollY
-  const scrollTop = window.scrollY
-  const clientHeight = document.documentElement.clientHeight
-  const scrollHeight = document.documentElement.scrollHeight
-
-  if (scrollTop + clientHeight >= scrollHeight) {
-    console.log('触发加载更多')
-    getProducts()
-  }
-}
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  })
-}
 
 const handleCategoryChange = (newCategory: string) => {
   currentCategory.value = newCategory
@@ -344,12 +325,8 @@ onMounted(() => {
   carouselInterval.value = window.setInterval(() => {
     currentSlide.value = (currentSlide.value + 1) % carouselItems.value.length
   }, 3000)
-  window.addEventListener('scroll', handleScroll, { passive: true })
-  getProducts()
-})
 
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  getProducts()
 })
 
 onBeforeUnmount(() => {
@@ -357,7 +334,6 @@ onBeforeUnmount(() => {
     clearInterval(carouselInterval.value)
     carouselInterval.value = null
   }
-  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 

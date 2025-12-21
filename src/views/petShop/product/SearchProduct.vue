@@ -270,13 +270,13 @@ const productsTotal = ref(0)
 
 
 const filters = ref({
-  title: '', 
-  brandName: '', 
-  region: '', 
+  title: '',
+  brandName: '',
+  region: '',
 })
 
 // 排序类型（1-价格升序/2-价格降序/3-销量升序/4-销量降序）
-const sortType = ref<number>(0) 
+const sortType = ref<number>(0)
 
 // 滚动相关状态
 const scrollY = ref(0)
@@ -348,7 +348,7 @@ const SearchProducts = () => {
         pageNum: currentPage.value,
         pageSize: pageSize.value,
         title: filters.value.title,
-        brandName: filters.value.brandName, 
+        brandName: filters.value.brandName,
         region: filters.value.region,
         sortType: sortType.value,
       },
@@ -358,7 +358,7 @@ const SearchProducts = () => {
       idLoading.value = false
       const newSearchProducts = res.data.data?.list || []
       products.value = [...products.value, ...newSearchProducts]
-      productsTotal.value = res.data.data.total 
+      productsTotal.value = res.data.data.total
 
       if (newSearchProducts.length < pageSize.value) {
         hasmore.value = false
@@ -419,6 +419,7 @@ const getBrands = () => {
     })
     .catch((error) => {
       console.error('获取品牌列表失败:', error)
+      console.log('获取地区列表失败:', error.response.data)
     })
 }
 
@@ -442,6 +443,7 @@ const getRegions = () => {
     })
     .catch((error) => {
       console.error('获取地区列表失败:', error)
+      console.log('获取地区列表失败:', error.response.data)
     })
 }
 
@@ -451,7 +453,7 @@ const selectBrand = (brand: string) => {
     filters.value.brandName = ''
   } else {
     selectedBrands.value = brand
-    filters.value.brandName = brand 
+    filters.value.brandName = brand
   }
   filterBrand.value = !!selectedBrands.value
 }

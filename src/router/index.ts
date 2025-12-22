@@ -35,6 +35,12 @@ const routes: RouteRecordRaw[] = [
       requiresAuth: true,
     },
   },
+  //寄养订单
+  {
+    path: '/foster-order',
+    name: 'fosterOrder',
+    component: () => import('@/views/fosterCare/foster-orders.vue'),
+  },
   // 电商的首页
   {
     path: '/shop',
@@ -402,7 +408,7 @@ router.beforeEach((to, from, next) => {
     // 如果访问的是管理员页面且已登录，需要进一步验证权限
     // 获取存储在localStorage中的用户角色信息
     const userRole = localStorage.getItem('userRole')
-    
+
     if (userRole === '管理员') {
       // 是管理员，允许访问
       next()

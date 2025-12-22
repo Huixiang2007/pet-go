@@ -17,7 +17,7 @@
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <h4 class="font-semibold text-blue-500 text-lg">{{ packageItem.title }}</h4>
-                            <p class="text-gray-600 text-sm mt-1">{{ packageItem.description }}</p>
+                            <p class="text-gray-600 text-sm mt-5">{{ packageItem.description }}</p>
                         </div>
                         <div class="text-right">
                             <div class="text-2xl font-bold text-blue-500">
@@ -31,37 +31,38 @@
 
                     <!-- 套餐特色 -->
                     <div class="mb-4">
-                        <div class="text-sm text-gray-600 mb-2  items-center">
+                        <div class="text-sm text-gray-600 mb-5  items-center">
                             <span class="little-title">套餐包含</span>
                         </div>
-                        <div class="flex flex-wrap gap-2">
+                        <!-- <div class="flex flex-wrap gap-2">
                             <span v-for="feature in packageItem.additionalServices" :key="feature.id"
                                 class="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs border border-blue-200 hover:bg-blue-100 transition-all">
                                 {{ feature.title }}
                             </span>
-                        </div>
-                    </div>
-
-                    <!-- 附加服务 -->
-                    <div class="mb-4">
-                        <div class="text-sm text-gray-600 mb-2 flex items-center">
-                            <i class="el-icon-plus mr-2 text-blue-400"></i>
-                        </div>
+                        </div> -->
                         <div v-if="!packageItem.additionalServices || packageItem.additionalServices.length === 0"
                             class="text-gray-400 text-xs italic">
                             暂无可选附加服务
                         </div>
-                        <div v-else class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div v-else class="grid grid-cols-1 sm:grid-cols-1 gap-2">
                             <div v-for="service in packageItem.additionalServices" :key="service.id"
                                 class="bg-white border border-gray-100 rounded-lg p-2 hover:border-blue-300 hover:bg-f0f8ff transition-all">
-                                <div class="flex justify-between items-center">
+                                <div class="flex justify-between items-center fle">
                                     <span class="text-sm text-gray-700">{{ service.title }}</span>
-                                    <span class="text-sm font-bold text-orange-500">+¥{{ service.price }}/次</span>
+                                    <span class="text-sm font-bold text-orange-500">¥{{ service.price }}/次</span>
                                 </div>
 
                             </div>
                         </div>
                     </div>
+
+                    <!-- 附加服务 -->
+                    <!-- <div class="mb-4">
+                        <div class="text-sm text-gray-600 mb-2 flex items-center">
+                            <i class="el-icon-plus mr-2 text-blue-400"></i>
+                        </div>
+                        
+                    </div> -->
 
                     <!-- 服务详情 -->
                     <div class=" text-sm ">

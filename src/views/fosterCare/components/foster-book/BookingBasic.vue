@@ -91,9 +91,10 @@
                     <span>上传疫苗本</span>
                     <el-tooltip content="请上传宠物的疫苗接种记录" placement="top"> </el-tooltip>
                 </div>
-                <el-form-item prop="vaccineFiles" class="w-full">
+                <el-form-item prop="vaccineFiles">
                     <FileUpload ref="vaccineUploadRef" :accept="'.jpg,.jpeg,.png,.pdf'" :max-size-mb=5
-                        :chunk-threshold=5 accept-description="JPG、PNG、PDF格式" @file-change="handleVaccineChange" />
+                        :chunk-threshold=5 accept-description="JPG、PNG、PDF格式" @file-change="handleVaccineChange"
+                        class="w-full" />
 
                 </el-form-item>
 
@@ -178,6 +179,7 @@ const handleVaccineChange = (files: FileItem[]) => {
             display: flex;
             justify-content: space-between;
             width: 100%;
+            gap: 5px;
         }
 
         .service-title {

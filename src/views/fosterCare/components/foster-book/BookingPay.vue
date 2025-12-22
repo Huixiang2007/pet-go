@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { Wallet, Money, Warning } from '@element-plus/icons-vue'
 
 // Props
@@ -78,6 +78,9 @@ const emit = defineEmits<{
     'update:agreedToTerms': [value: boolean] // 更新协议勾选状态
 }>()
 const localAgreedToTerms = ref(props.agreedToTerms)
+watch(localAgreedToTerms, (newValue) => {
+    emit('update:agreedToTerms', newValue)
+})
 const changeShowAgreement = () => {
     const newShowAgreement = !props.showAgreement
     emit('update:showAgreement', newShowAgreement)
@@ -145,7 +148,7 @@ const changeShowAgreement = () => {
         background-color: #f8fafc;
         border-radius: 8px;
         width: 100%;
-        max-width: 300px;
+        max-width: 345px;
         font-size: 15px;
         color: #1e293b;
         transition: all 0.2s ease;

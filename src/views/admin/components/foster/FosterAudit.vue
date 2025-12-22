@@ -21,7 +21,7 @@
               size="default"
               class="filter-select"
             >
-              <el-option label="全部状态" value="" />
+              <el-option label="全部状态" value="all" />
               <el-option label="待审核" value="pending" />
               <el-option label="已通过" value="passed" />
        
@@ -30,7 +30,7 @@
           <el-col :span="10">
             <el-input
               v-model="auditKeyword"
-              placeholder="搜索寄养家庭名称/联系人"
+              placeholder="搜索寄养机构名称/联系人"
               size="default"
               prefix-icon="el-icon-search"
               class="search-input"
@@ -43,7 +43,7 @@
             <el-button size="default" class="reset-btn" @click="resetFilter">
               <el-icon><Refresh /></el-icon> 重置
             </el-button>
-            <el-button size="default" class="export-btn">
+            <el-button size="default" class="export-btn" @click="exportData">
               <el-icon><Download /></el-icon> 导出
             </el-button>
           </el-col>
@@ -77,7 +77,8 @@
               :class="getPetTypeClass(type)"
               style="margin-right: 5px; margin-top: 5px;"
             >
-              {{ type === '猫' ? '猫咪寄养' : type === '狗' ? '狗狗寄养' : type }}
+              {{ type === '猫' ? '猫咪寄养' : type === '狗' ? '狗狗寄养' :type === '魚' ? '鱼类寄养' 
+              :type === '鸟' ? '鸟类寄养' :type }}
             </el-tag>
           </template>
         </el-table-column>
@@ -162,9 +163,11 @@ import { ref, onMounted, watch } from 'vue'
 import FosterStatsCard from './FosterCard.vue'
 import { getFosterListByCondition, getCardData } from '@/api/admin/foster'
 import type { FosterInfo, fourCard } from '@/api/admin/foster'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
 // 筛选条件
-const auditStatus = ref('全部状态')
+const auditStatus = ref('all')
 const auditKeyword = ref('')
 const loading = ref(false)
 // 分页参数
@@ -172,6 +175,7 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const auditTotal = ref(0)
 const auditList = ref<FosterInfo[]>([])
+const exportLoading = ref(false)
 
 // 卡片数据
 const cardData = ref<fourCard>({
@@ -187,6 +191,10 @@ const getPetTypeClass = (type: string) => {
     return 'cat-type-tag'
   } else if (type === '狗') {
     return 'dog-type-tag'
+  }else if (type === '鸟') {
+    return 'bird-type-tag'
+  }else if (type === '魚') {
+    return 'fish-type-tag'
   } else {
     return 'type-tag'
   }
@@ -275,17 +283,25 @@ const handleCurrentChange = (val: number) => {
   fetchAuditList()
 }
 
-// 操作事件（仅静态）
-const handleView = (row: any) => {
-  console.log('查看审核详情:', row)
+
+// 初始化路由实例
+const router = useRouter()
+
+
+const handleView = (row: FosterInfo) => {
+  // 1. 校验ID是否存在（避免无效跳转）
+  if (!row.id) {
+    ElMessage.warning('寄养方ID无效，无法查看详情')
+    return
+  }
+
+  // 2. 跳转到详情页，并传递ID参数（关键：和详情页的 route.params.id 对应）
+  router.push({
+    path: '/foster/detail/' + row.id, // 方式1：路径拼接ID（推荐）
+    
+  })
 }
-// const handlePass = (row: any) => {
-//   console.log('通过审核:', row)
-// }
-// const handleReject = (row: any) => {
-//   console.log('拒绝审核:', row)
-// }
-// // 监听筛选条件变化
+
 watch([auditStatus, auditKeyword], () => {
   currentPage.value = 1
   fetchAuditList()
@@ -296,6 +312,112 @@ onMounted(() => {
   fetchCardData()
   fetchAuditList()
 })
+const exportData = async () => {
+  exportLoading.value = true
+  try {
+    // 显示导出加载状态
+   
+    
+    // 获取当前筛选条件下的所有数据
+    const params: any = {
+      pageNum: 1,
+      pageSize: 9999, // 获取所有数据
+    }
+
+    if (auditStatus.value === 'pending') {
+      params.status = 0
+    } else if (auditStatus.value === 'passed') {
+      params.status = 1
+    }
+
+    // 如果有关键词搜索
+    if (auditKeyword.value) {
+      params.keyword = auditKeyword.value
+    }
+
+    const res = await getFosterListByCondition(params)
+    
+    if (res.code === 0 && res.data) {
+      const records = res.data.list || []
+      const exportList = records.map((item: any) => ({
+        ...item,
+        status: item.status === '待审核' ? '待审核' : item.status === '已审核' ? '已通过' : '已拒绝',
+        homeName: item.name,
+        applyTime: item.createTime,
+        serviceType: item.providerType,
+        petTypes: Array.isArray(item.petTypes) 
+          ? item.petTypes.join(', ')
+          : typeof item.petTypes === 'string' 
+            ? item.petTypes
+            : ''
+      }))
+      
+      // 创建 CSV 内容
+      const csvContent = convertToCSV(exportList);
+      
+      // 下载 CSV 文件
+      downloadCSV(csvContent, '寄养服务机构审核列表.csv');
+      
+      ElMessage.success('导出成功');
+    } else {
+      throw new Error('数据获取失败');
+    }
+  } catch (error) {
+    console.error('导出失败:', error);
+    ElMessage.error('导出失败，请重试');
+  } finally {
+    // 恢复按钮状态
+   exportLoading.value = false;
+  }
+};
+
+// 将数据转换为 CSV 格式
+const convertToCSV = (data: any[]) => {
+  if (!data.length) return '';
+  
+  // 定义表头
+  const headers = ['机构名称', '联系人', '联系电话', '类型', '服务类型', '申请时间', '审核状态'];
+  
+  // 添加表头
+  const csvRows = [
+    headers.join(',')
+  ];
+  
+  // 添加数据行
+  for (const row of data) {
+    const values = [
+      `"${row.homeName || ''}"`,
+      `"${row.contactName || ''}"`,
+      `"${row.contactPhone || ''}"`,
+      `"${row.serviceType || ''}"`,
+      `"${row.petTypes || ''}"`,
+      `"${row.applyTime || ''}"`,
+      `"${row.status || ''}"`
+    ];
+    csvRows.push(values.join(','));
+  }
+  
+  return csvRows.join('\n');
+};
+
+// 下载 CSV 文件
+const downloadCSV = (csvContent: string, filename: string) => {
+  // 添加 BOM 以支持中文
+  const BOM = '\uFEFF';
+  const csvBlob = new Blob([BOM, csvContent], { type: 'text/csv;charset=utf-8;' });
+  
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(csvBlob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  link.style.visibility = 'hidden';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 </script>
 
 <style scoped lang="scss">
@@ -392,6 +514,19 @@ onMounted(() => {
     color: #ff69b4; /* 粉色文字 */
     border-radius: 6px;
     border-color: #fbd1e6;
+  }
+   .bird-type-tag {
+  background-color: #bdc4f34a;
+    color: #655ae6de;
+    border-radius: 6px;
+    border-color: #c2c9ec;
+
+  }
+  .fish-type-tag {
+    background-color: #f6dcb652; 
+    color: #ec895f; /* 粉色文字 */
+    border-radius: 6px;
+    border-color: #f4c682;
   }
 
   .dog-type-tag {

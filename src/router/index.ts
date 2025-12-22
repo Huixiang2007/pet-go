@@ -213,7 +213,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'petLogin',
-    component: () => import('@/views/enterPet/LoginPet.vue'),
+    component: () => import('@/views/enterPet/login-pet.vue'),
     meta: { title: '欢迎登录 PetGo', requiresAuth: false },
   },
   {
@@ -254,7 +254,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/register',
     name: 'register',
-    component: () => import('@/views/enterPet/RegisterPet.vue'),
+    component: () => import('@/views/enterPet/register-pet.vue'),
     meta: { title: '欢迎注册 PetGo', requiresAuth: false },
   },
 
@@ -269,20 +269,20 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/forget',
     name: 'forget',
-    component: () => import('@/views/enterPet/ForgetPassword.vue'),
+    component: () => import('@/views/enterPet/forget-password.vue'),
     meta: { title: '找回密码', requiresAuth: false },
   },
 
   {
     path: '/persons',
     name: 'PersonalCenter',
-    component: () => import('@/views/userCenter/PersonCenter.vue'),
+    component: () => import('@/views/userCenter/person-center.vue'),
     meta: { title: '个人中心' },
   },
   //后台管理
   {
     path: '/admin',
-    component: () => import('@/views/admin/HomePage.vue'),
+    component: () => import('@/views/admin/home-page.vue'),
     meta: { title: '后台管理', requiresAuth: true },
     children: [
       // 数据概览
@@ -303,7 +303,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'user',
         name: 'user',
-        component: () => import('@/views/admin/components/AllUser.vue'),
+        component: () => import('@/views/admin/components/user/AllUser.vue'),
         meta: {
           title: '用户管理',
           icon: 'el-icon-user',
@@ -320,6 +320,13 @@ const routes: RouteRecordRaw[] = [
         }
        
       },
+      // router/index.ts
+{
+  path: '/foster/detail/:id',
+  name: 'FosterDetail',
+  component: () => import('@/views/admin/components/foster/FosterDetail.vue'),
+  meta: { title: '寄养方详情' }
+},
       //活动管理路由
       {
         path: 'active',

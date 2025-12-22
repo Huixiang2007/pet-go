@@ -53,25 +53,38 @@ export interface ProductEditForm {
   videoUrl?: string
   warrantyTip?: string
 }
+export interface SkuInfo {
+  skuId: string | number
+  productId: number
+  skuSn: string
+  specJson: string | null
+  specText: string
+  imageUrl?: string
+  price?: number
+  stock?: number
+  volume?: number
+  weight?: number
+}
+
 // 商品详情接口
 export interface ProductDetail {
-  id: string;
-  productName: string;
-  productSn: string;
-  brandId: number;
-  brandName?: Type
-  typeParent?:Type
-  typeChild?: Type
-  currentPrice: number;
-  marketPrice: number;
-  costPrice: number;
-  stock: number;
-  status: number;
-  detail: string;
-  mainImage: string;
-  imagesList: string[];
-  videoUrl?: string;
-  warrantyTip?: string;
+  id: number
+  shopName: string
+  shopId: string
+  name: string
+  productScore: number
+  reviewCount: number
+  currentPrice: number
+  marketPrice: number
+  detail: string
+  images: string
+  mainImage: string
+  videoUrl: string
+  productSn: string
+  brandName: string
+  productWeight: number
+  warrantyTip: string
+  skuList: SkuInfo[]
 }
 //面向用户的商品接口
 export interface Products {
@@ -84,4 +97,19 @@ export interface Products {
   originalPrice: number
   warrantyTip: string
   title: string
+}
+//购物车
+export interface CartItem {
+  productName?: string;
+  skuSpecText?: string;
+  mainImage?: string;
+  id: number
+  name: string
+  price: number
+  imgUrl: string
+  spec: string
+  quantity: number
+  selected: boolean |string
+  status?: string
+  invalidReason?: string
 }

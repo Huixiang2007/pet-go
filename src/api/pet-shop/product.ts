@@ -172,3 +172,8 @@ export const searchApi = async (productData: Record<string, any>)=>{
   const response = await request('/server/api/shop/shops/list', 'POST', productData)
   return response.data || { list: [], total: 0 }
 }
+//添加到购物车
+export const addCartApi = async (CarData: Record<string, any>) => {
+  const response = await request('/server/api/shop/shop-cart/add', 'POST', CarData);
+  return response.data;
+}

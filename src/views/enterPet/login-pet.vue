@@ -398,12 +398,7 @@ body {
   background-position: right top;
 }
 
-.btn-donate:is(:focus, :focus-visible, :active) {
-  outline: none;
-  box-shadow:
-    0 0 0 3px var(--btn-bg-color),
-    0 0 0 6px var(--btn-bg-2);
-}
+
 
 @media (prefers-reduced-motion: reduce) {
   .btn-donate {

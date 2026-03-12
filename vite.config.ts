@@ -32,7 +32,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/server': {
-        target: 'http://39.105.134.176:5173',
+        target: 'http://39.105.134.176:8085',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/server/, ''),
       },

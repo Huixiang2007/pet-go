@@ -2,7 +2,7 @@
 
 import * as path from 'node:path'
 import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue' 
+import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 // 引入按需引入插件
@@ -32,7 +32,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/server': {
-        target: 'http://8.131.100.56:8085',
+        target: 'http://39.105.134.176:5173',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/server/, ''),
       },

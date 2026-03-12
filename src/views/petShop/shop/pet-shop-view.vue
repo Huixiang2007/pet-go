@@ -253,7 +253,7 @@
 </template>
 
 <script setup lang="ts">
-   import InfiniteScroll from './components/infiniteScroll.vue';
+import InfiniteScroll from './components/infiniteScroll.vue';
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'

@@ -260,11 +260,10 @@ const handleSubmit = async () => {
       // 注册成功后清空表单并跳转到登录页
       registerStore.clearForm()
       router.push('/foster-care')
-    } else {
-      ElMessage.error(response.msg || '注册失败')
-    }
+    } 
   } catch (error) {
-    ElMessage.error('注册失败: ' + (error as Error).message)
+    // ElMessage.error('注册失败: ' + (error as Error).message)
+    console.log(error)
   } finally {
     registerActive.value = false
   }
@@ -380,12 +379,12 @@ const toProtocal = () => {
   background-position: right top;
 }
 
-.btn-donate:is(:focus, :focus-visible, :active) {
+/* .btn-donate:is(:focus, :focus-visible, :active) {
   outline: none;
   box-shadow:
     0 0 0 3px var(--btn-bg-color),
     0 0 0 6px var(--btn-bg-2);
-}
+} */
 
 @media (prefers-reduced-motion: reduce) {
   .btn-donate {

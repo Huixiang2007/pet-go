@@ -127,6 +127,7 @@ const passwordForm = ref({
 const isSendingCode = ref(false)
 const countDown = ref(60)
 let timer: NodeJS.Timeout | null = null
+// let timer: number | null = null
 const showOldPassword = ref(false)
 const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)

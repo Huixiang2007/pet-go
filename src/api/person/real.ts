@@ -33,7 +33,7 @@ export interface RealNameInfoData {
 
 }
 /**
- * 获取实名认证状态（仅基础请求封装，无业务逻辑）
+ * 获取实名认证状态
  */
 export const getRealNameInfo=(): Promise<ApiResponse<RealNameInfoData>>=> {
   return request('/server/api/user/getUserAuth', 'GET');

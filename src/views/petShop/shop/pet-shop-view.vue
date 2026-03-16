@@ -1,25 +1,29 @@
-
 <template>
   <NavBar />
-    <InfiniteScroll
-    :is-loading="isLoading"
-    :has-more="hasmore"
-    @load-more="getProducts"
-  >
-  <header class="bg-white shadow-md top-[85px] left-0 right-0 z-100" :class="{ shadow: isScrolledPast50 }">
-    <ShopCategoryNav v-model="currentCategory" @categoryChange="handleCategoryChange" />
-  </header>
+  <InfiniteScroll :is-loading="isLoading" :has-more="hasmore" @load-more="getProducts">
+    <header
+      class="bg-white shadow-md top-[85px] left-0 right-0 z-100"
+      :class="{ shadow: isScrolledPast50 }"
+    >
+      <ShopCategoryNav v-model="currentCategory" @categoryChange="handleCategoryChange" />
+    </header>
 
     <div class="min-h-screen bg-amber-50 pt-1">
       <div class="absolute top-40 right-0 w-64 h-64 bg-yellow-200/30 rounded-full"></div>
-      <div class="absolute top-[1500px] left-0 w-64 h-64 bg-yellow-200/30 rounded-full"></div>
+      <div
+        class="absolute top-[1100px] left-0 w-64 h-64 bg-yellow-200/30 rounded-full"
+        id="pointBottom"
+      ></div>
 
       <div class="pet-shop-container mx-auto px-4 sm:px-6 lg:px-8 py-6 relative">
-        <div class="carousel bg-white rounded-3xl overflow-hidden shadow-lg mb-8 transform hover:shadow-xl transition-all duration-500">
+        <div
+          class="carousel bg-white rounded-3xl overflow-hidden shadow-lg mb-8 transform hover:shadow-xl transition-all duration-500"
+        >
           <div class="relative h-80 sm:h-96">
             <button
               class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-amber-100 hover:bg-amber-200 text-amber-600 rounded-full flex items-center justify-center transition-all z-10 shadow-md hover:scale-105"
-              @click="prevSlide">
+              @click="prevSlide"
+            >
               <i class="fa fa-chevron-left text-lg"></i>
             </button>
 
@@ -37,10 +41,10 @@
 
             <button
               class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-amber-100 hover:bg-amber-200 text-amber-600 rounded-full flex items-center justify-center transition-all z-10 shadow-md hover:scale-105"
-              @click="nextSlide">
+              @click="nextSlide"
+            >
               <i class="fa fa-chevron-right text-lg"></i>
             </button>
-
 
             <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-3">
               <button
@@ -51,51 +55,63 @@
                   'bg-amber-500 w-8': currentSlide === index,
                   'bg-white/70 hover:bg-amber-300': currentSlide !== index,
                 }"
-                @click="currentSlide = index">
-              </button>
+                @click="currentSlide = index"
+              ></button>
             </div>
 
             <!-- 轮播角标：黄色系宠物爪印装饰 -->
-            <div class="absolute top-4 left-4 bg-amber-100/90 rounded-full px-3 py-1 text-sm font-medium text-amber-700 shadow-sm flex items-center">
+            <div
+              class="absolute top-4 left-4 bg-amber-100/90 rounded-full px-3 py-1 text-sm font-medium text-amber-700 shadow-sm flex items-center"
+            >
               <i class="fa fa-paw mr-1"></i>宠物资讯
             </div>
           </div>
         </div>
-
 
         <div class="features grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 mb-8">
           <div
             @click="FlashSale"
             class="feature-card bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl p-5 text-center hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-amber-200/50"
           >
-          <img src="/img/秒杀.gif" alt="秒杀" class="h-[120px] w-[120px] absolute top-[-20px]" />
-            <div class="w-20 h-20 bg-amber-200/50 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
-              <i class="fa fa-fire text-3xl text-amber-600 transition-transform duration-500 hover:rotate-12"></i>
+            <img src="/img/秒杀.gif" alt="秒杀" class="h-[120px] w-[120px] absolute top-[-20px]" />
+            <div
+              class="w-20 h-20 bg-amber-200/50 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden"
+            >
+              <i
+                class="fa fa-fire text-3xl text-amber-600 transition-transform duration-500 hover:rotate-12"
+              ></i>
               <div class="absolute bottom-1 right-1 w-4 h-4 bg-amber-400 rounded-full"></div>
             </div>
             <h3 class="font-medium text-amber-800 mt-2 text-lg">爆款秒杀</h3>
             <p class="text-sm text-amber-600 mt-1">万人关注的爆款商品秒杀</p>
           </div>
 
-
           <div
             @click="aiServer"
             class="feature-card bg-gradient-to-br from-yellow-50 to-amber-100 rounded-2xl p-5 text-center hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-amber-200/50"
           >
-            <div class="w-20 h-20 bg-amber-200/50 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
-              <i class="fa fa-headphones text-3xl text-amber-600 transition-transform duration-500 hover:rotate-12"></i>
+            <div
+              class="w-20 h-20 bg-amber-200/50 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden"
+            >
+              <i
+                class="fa fa-headphones text-3xl text-amber-600 transition-transform duration-500 hover:rotate-12"
+              ></i>
               <div class="absolute bottom-1 right-1 w-4 h-4 bg-amber-400 rounded-full"></div>
             </div>
-            <h3 class="font-medium text-amber-800 mt-2 text-lg">AI客服</h3>
-            <p class="text-sm text-amber-600 mt-1">AI专业客服，科学养宠为TA护航</p>
+            <h3 class="font-medium text-amber-800 mt-2 text-lg">专业客服</h3>
+            <p class="text-sm text-amber-600 mt-1">专业客服，科学养宠贴心陪伴</p>
           </div>
 
           <div
             @click="goCart"
             class="feature-card bg-gradient-to-br from-amber-50 to-yellow-100 rounded-2xl p-5 text-center hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-2 border border-amber-200/50"
           >
-            <div class="w-20 h-20 bg-amber-200/50 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden">
-              <i class="fa fa-truck text-3xl text-amber-600 transition-transform duration-500 hover:rotate-12"></i>
+            <div
+              class="w-20 h-20 bg-amber-200/50 rounded-full flex items-center justify-center mx-auto mb-4 relative overflow-hidden"
+            >
+              <i
+                class="fa fa-truck text-3xl text-amber-600 transition-transform duration-500 hover:rotate-12"
+              ></i>
               <div class="absolute bottom-1 right-1 w-4 h-4 bg-amber-400 rounded-full"></div>
             </div>
             <h3 class="font-medium text-amber-800 mt-2 text-lg">购物车</h3>
@@ -103,7 +119,9 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-r from-amber-100 to-yellow-200 rounded-3xl p-6 shadow-lg mb-10 mt-3 border border-amber-200/30">
+        <div
+          class="bg-gradient-to-r from-amber-100 to-yellow-200 rounded-3xl p-6 shadow-lg mb-10 mt-3 border border-amber-200/30"
+        >
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center">
               <i class="fa fa-ticket text-amber-600 text-2xl mr-3"></i>
@@ -115,10 +133,12 @@
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <div class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20">
-
-              <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"></div>
+            <div
+              class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20"
+            >
+              <div
+                class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"
+              ></div>
               <div class="absolute top-3 right-3 text-amber-300">
                 <i class="fa fa-paw text-2xl"></i>
               </div>
@@ -127,13 +147,19 @@
                 <span class="text-gray-500 ml-2 mb-1">满500可用</span>
               </div>
               <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
-              <button class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm">
+              <button
+                class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm"
+              >
                 立即领取
               </button>
             </div>
 
-            <div class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20">
-              <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"></div>
+            <div
+              class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20"
+            >
+              <div
+                class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"
+              ></div>
               <div class="absolute top-3 right-3 text-amber-300">
                 <i class="fa fa-paw text-2xl"></i>
               </div>
@@ -142,13 +168,19 @@
                 <span class="text-gray-500 ml-2 mb-1">满300可用</span>
               </div>
               <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
-              <button class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm">
+              <button
+                class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm"
+              >
                 立即领取
               </button>
             </div>
 
-            <div class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20">
-              <div class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"></div>
+            <div
+              class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20"
+            >
+              <div
+                class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"
+              ></div>
               <div class="absolute top-3 right-3 text-amber-300">
                 <i class="fa fa-paw text-2xl"></i>
               </div>
@@ -157,34 +189,44 @@
                 <span class="text-gray-500 ml-2 mb-1">无门槛</span>
               </div>
               <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
-              <button class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm">
+              <button
+                class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm"
+              >
                 立即领取
               </button>
             </div>
           </div>
 
-          <div class="flex flex-col md:flex-row items-center justify-between py-4 px-6 bg-white/80 rounded-2xl mt-6 border border-amber-200/20 backdrop-blur-sm">
+          <div
+            class="flex flex-col md:flex-row items-center justify-between py-4 px-6 bg-white/80 rounded-2xl mt-6 border border-amber-200/20 backdrop-blur-sm"
+          >
             <div class="flex items-center mb-3 md:mb-0">
-              <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-3">
+              <div
+                class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-3"
+              >
                 <i class="fas fa-paw text-amber-700"></i>
               </div>
               <div class="text-amber-700 text-sm">不错过每一次优惠</div>
             </div>
             <div class="flex gap-3">
-              <button class="bg-amber-100 text-amber-700 text-sm px-4 py-2 rounded-full transition-all duration-300 hover:bg-amber-200 hover:scale-105" @click="popupVisible = true">
+              <button
+                class="bg-amber-100 text-amber-700 text-sm px-4 py-2 rounded-full transition-all duration-300 hover:bg-amber-200 hover:scale-105"
+                @click="popupVisible = true"
+              >
                 查看规则
               </button>
             </div>
           </div>
         </div>
 
-
         <div class="products mt-8">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-xl font-bold text-amber-800 flex items-center">
               <i class="fa fa-star text-amber-500 mr-2"></i>热门商品
 
-              <span class="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">新品</span>
+              <span class="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full"
+                >新品</span
+              >
             </h2>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -200,14 +242,18 @@
                   :alt="product.title"
                   class="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
                 />
-                <div class="absolute top-3 right-3 bg-amber-500 text-white text-xs px-2 py-1 rounded-full">
+                <div
+                  class="absolute top-3 right-3 bg-amber-500 text-white text-xs px-2 py-1 rounded-full"
+                >
                   热销
                 </div>
               </div>
 
               <div class="p-5">
                 <div class="mb-3">
-                  <h3 class="font-medium text-gray-800 line-clamp-1 text-base">{{ product.title }}</h3>
+                  <h3 class="font-medium text-gray-800 line-clamp-1 text-base">
+                    {{ product.title }}
+                  </h3>
                   <p class="text-xs text-amber-600 mt-1">品牌：{{ product.brandName }}</p>
                 </div>
 
@@ -219,10 +265,16 @@
 
                 <div class="flex justify-between items-center">
                   <div>
-                    <span class="text-amber-600 font-bold text-lg">¥{{ product.currentPrice }}</span>
-                    <span class="text-xs text-gray-400 ml-2 line-through">{{ product.warrantyTip }}</span>
+                    <span class="text-amber-600 font-bold text-lg"
+                      >¥{{ product.currentPrice }}</span
+                    >
+                    <span class="text-xs text-gray-400 ml-2 line-through">{{
+                      product.warrantyTip
+                    }}</span>
                   </div>
-                  <button class="w-10 h-10 bg-amber-50 hover:bg-amber-100 rounded-full flex items-center justify-center transition-colors shadow-sm hover:scale-110">
+                  <button
+                    class="w-10 h-10 bg-amber-50 hover:bg-amber-100 rounded-full flex items-center justify-center transition-colors shadow-sm hover:scale-110"
+                  >
                     <i class="fa fa-shopping-cart text-amber-600 text-lg"></i>
                   </button>
                 </div>
@@ -233,13 +285,21 @@
       </div>
     </div>
 
-    <div v-if="popupVisible" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div class="bg-white rounded-3xl w-full sm:w-3/4 lg:w-1/2 max-h-[80vh] overflow-auto p-6 shadow-xl border border-amber-200/30 transform scale-95 hover:scale-100 transition-all duration-300">
+    <div
+      v-if="popupVisible"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm"
+    >
+      <div
+        class="bg-white rounded-3xl w-full sm:w-3/4 lg:w-1/2 max-h-[80vh] overflow-auto p-6 shadow-xl border border-amber-200/30 transform scale-95 hover:scale-100 transition-all duration-300"
+      >
         <div class="flex justify-between items-center mb-4 pb-2 border-b border-amber-100">
           <h2 class="text-xl font-bold text-amber-800 flex items-center">
             <i class="fa fa-paw text-amber-500 mr-2"></i>优惠规则
           </h2>
-          <button class="text-gray-500 hover:text-amber-600 transition-colors" @click="popupVisible = false">
+          <button
+            class="text-gray-500 hover:text-amber-600 transition-colors"
+            @click="popupVisible = false"
+          >
             <i class="fa fa-times text-xl"></i>
           </button>
         </div>
@@ -253,7 +313,7 @@
 </template>
 
 <script setup lang="ts">
-import InfiniteScroll from './components/infiniteScroll.vue';
+import InfiniteScroll from './components/infiniteScroll.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -302,7 +362,7 @@ const getProducts = () => {
         },
       })
       .then((response: any) => {
-          isLoading.value = false
+        isLoading.value = false
         console.log(response)
         console.log(response.data)
         const newProducts = response.data.data.list
@@ -315,8 +375,8 @@ const getProducts = () => {
         }
       })
       .catch((error) => {
-          isLoading.value = false
-            console.error('获取商品数据失败:', error.response.data)
+        isLoading.value = false
+        console.error('获取商品数据失败:', error.response.data)
         console.error('获取商品数据失败:', error)
       })
   }
@@ -372,7 +432,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-
 .pet-shop-container {
   max-width: 1200px;
   margin: 0px auto;
@@ -467,7 +526,7 @@ onBeforeUnmount(() => {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
-.z-100{
+.z-100 {
   z-index: 100;
 }
 

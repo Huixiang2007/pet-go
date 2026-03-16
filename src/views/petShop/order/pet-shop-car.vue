@@ -378,15 +378,24 @@ const Cartlist = async (isLoadMore = false) => {
     const res = await getCartItems(CpageNum.value, CpageSize.value);
     console.log('cartlist响应', res);
 
-    if (!res || !Array.isArray(res)) {
+    let rawCartItems = [];
+    // 处理API返回数据
+    if (Array.isArray(res)) {
+      // getCartItems函数已直接返回CartItem[]数组
+      rawCartItems = res;
+    } else {
       console.error('API返回数据格式错误:', res);
       if (isLoadMore) {
         CpageNum.value--;
       }
+      // 即使数据格式错误，也需要确保cartItems为空数组，避免显示加载状态
+      if (!isLoadMore) {
+        cartItems.value = [];
+      }
+      ElMessage.warning('购物车数据加载异常，请稍后再试');
       return;
     }
 
-    const rawCartItems = res;
     const formattedItems = rawCartItems.map((item) => ({
       id: item.id || 0,
       name: item.productName || '未知商品',
@@ -420,6 +429,10 @@ const Cartlist = async (isLoadMore = false) => {
     console.error('获取购物车失败', error);
     if (isLoadMore) {
       CpageNum.value--;
+    }
+    // 确保在错误情况下cartItems为空数组
+    if (!isLoadMore) {
+      cartItems.value = [];
     }
     ElMessage.error('获取购物车失败，请稍后再试');
   } finally {

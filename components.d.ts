@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AddressSelect: typeof import('./src/components/business/AddressSelect.vue')['default']
+    AIChat: typeof import('./src/components/common/AIChat.vue')['default']
     CaptchaLoad: typeof import('./src/components/common/CaptchaLoad.vue')['default']
     ConfirmCode: typeof import('./src/components/common/ConfirmCode.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']

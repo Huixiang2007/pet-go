@@ -80,7 +80,6 @@
         </template>
       </div>
 
-      <!-- 仅在人工客服模式下显示侧边栏 -->
       <SidebarInfo v-if="!isSystemNotice" :active-shop="activeShop" />
     </div>
   </div>

@@ -1,0 +1,69 @@
+import type {CartItem} from '../../types/shop'
+import request from '@/utils/request'
+//获取购物车的商品列表
+export const getCartItems = async (pageNum: number, pageSize: number): Promise<CartItem[]> => {
+ const response = await request(
+    `/server/api/shop/shop-cart/page-list?pageNum=${pageNum}&pageSize=${pageSize}`,
+    'GET'
+  );
+  return response.data.list || [];
+};
+//修改购物车的数量
+export const updateCartItemQuantity = async (cartId: string, quantity: number): Promise<void> => {
+  await request('/server/api/shop/shop-cart/update-quantity', 'POST', {
+    cartId,
+    quantity
+  })
+}
+//购物车商品总数量
+export const getCartTotalCount = async (): Promise<any> => {
+  const response = await request('/server/api/shop/shop-cart/total-count', 'GET')
+  return response || 0
+}
+//购物车商品总价格
+export const getCartTotalCountPrice = async (): Promise<any> => {
+  const response = await request('/server/api/shop/shop-cart/total-price', 'GET')
+  return response || 0
+}
+//购物车商品优惠总价格
+export const discountTotalCountPrice = async (): Promise<any> => {
+  const response = await request('/server/api/shop/shop-cart/total-price-coupon', 'GET')
+  return response || 0
+}
+//购物车选中/取消选中
+export const updateCartItemSelected = async (cartId: string, selected:number): Promise<any> => {
+  const response =  await request('/server/api/shop/shop-cart/select', 'POST', {
+    cartId,
+    selected
+  })
+  return response || 0
+}
+//购物车全选
+export const selectAllCartItems = async (selected:number): Promise<any> => {
+  const response = await request('/server/api/shop/shop-cart/select-all?selected='+selected, 'POST')
+  return response || 0
+}
+//单个删除
+export const deleteCartItem = async (cartId: string): Promise<any> => {
+  const response = await request('/server/api/shop/shop-cart/remove/'+cartId, 'POST')
+  return response || 0
+}
+//批量删除
+export const deleteCartItems = async (cartIds: string[]): Promise<any> => {
+  const response = await request('/server/api/shop/shop-cart/batch-remove', 'POST',
+    cartIds
+  )
+  return response || 0
+}
+//清空购物车
+export const clearCartItems = async (): Promise<any> => {
+  const response = await request('/server/api/shop/shop-cart/clear', 'POST')
+  return response || 0
+}
+//批量选中
+export const selectCartItems = async (cartIds: string[]): Promise<any> => {
+  const response = await request('/server/api/shop/shop-cart/batch-select', 'POST', {
+    cartIds
+  })
+  return response || 0
+}

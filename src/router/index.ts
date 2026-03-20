@@ -45,7 +45,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/shop',
     name: 'shop',
-    component: () => import('@/views/petShop/shop/PetShopView.vue'),
+    component: () => import('@/views/petShop/shop/pet-shop-view.vue'),
     meta: {
       requiresAuth: true,
       title: '欢迎来到宠物商城',
@@ -55,7 +55,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/pet-cart',
     name: 'petCart',
-    component: () => import('@/views/petShop/order/PetShopCar.vue'),
+    component: () => import('@/views/petShop/order/pet-shop-car.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo购物车',
@@ -65,7 +65,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/order',
     name: 'order',
-    component: () => import('@/views/petShop/order/OrderCheckout.vue'),
+    component: () => import('@/views/petShop/order/order-checkout.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo订单结算',
@@ -75,13 +75,13 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/products/:category?',
     name: 'products',
-    component: () => import('@/views/petShop/product/ProductList.vue'),
+    component: () => import('@/views/petShop/product/product-list.vue'),
   },
   //  商品详情
   {
     path: '/product-detail/:id',
     name: 'productsDetail',
-    component: () => import('@/views/petShop/product/ProductDetail.vue'),
+    component: () => import('@/views/petShop/product/product-detail.vue'),
     meta: {
       title: 'PetGo商品详情',
     },
@@ -90,7 +90,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/order-list',
     name: 'OrderList ',
-    component: () => import('@/views/petShop/order/OrderList.vue'),
+    component: () => import('@/views/petShop/order/order-list.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo订单列表',
@@ -100,7 +100,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/package-info',
     name: 'PackageInfo',
-    component: () => import('@/views/petShop/server/PackageInfo.vue'),
+    component: () => import('@/views/petShop/server/package-info.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo物流信息',
@@ -110,7 +110,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/search',
     name: 'Search',
-    component: () => import('@/views/petShop/product/SearchProduct.vue'),
+    component: () => import('@/views/petShop/product/search-product.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo搜索',
@@ -120,7 +120,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/store',
     name: 'Store',
-    component: () => import('@/views/petShop/shop/ShopStore.vue'),
+    component: () => import('@/views/petShop/shop/shop-store.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo店铺',
@@ -130,7 +130,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/seller-order-manager',
     name: 'SellerOrderManager',
-    component: () => import('@/views/petShop/order/SellerOrderMana.vue'),
+    component: () => import('@/views/petShop/order/seller-order-mana.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo订单管理',
@@ -141,7 +141,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/seller-user-manager',
     name: 'SellerUserManager',
-    component: () => import('@/views/petShop/user/SellerUserMana.vue'),
+    component: () => import('@/views/petShop/user/seller-user-mana.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo用户管理',
@@ -151,7 +151,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/coupon-management',
     name: 'CouponManagement',
-    component: () => import('@/views/petShop/marketing/CouponManagement.vue'),
+    component: () => import('@/views/petShop/marketing/coupon-management.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo优惠卷管理',
@@ -161,7 +161,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/seller-item-manager',
     name: 'SellerItemManager',
-    component: () => import('@/views/petShop/product/SellerItemMana.vue'),
+    component: () => import('@/views/petShop/product/seller-item-mana.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo商品管理',
@@ -171,7 +171,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/shop-setting',
     name: '/ShopSetting',
-    component: () => import('@/views/petShop/shop/ShopSetting.vue'),
+    component: () => import('@/views/petShop/shop/shop-setting.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo店铺设置',
@@ -181,7 +181,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/analytics',
     name: 'Analytics',
-    component: () => import('@/views/petShop/data/SalesAnalytics.vue'),
+    component: () => import('@/views/petShop/data/sales-analytics.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo销售分析',
@@ -191,7 +191,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/flash-sale',
     name: 'FlashSale',
-    component: () => import('@/views/petShop/marketing/FlashSale.vue'),
+    component: () => import('@/views/petShop/marketing/flash-sale.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo秒杀',
@@ -201,7 +201,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/customer-service',
     name: 'CustomerService',
-    component: () => import('@/views/petShop/server/CustomerService.vue'),
+    component: () => import('@/views/petShop/server/customer-service.vue'),
     meta: {
       requiresAuth: true,
       title: 'PetGo消息',
@@ -211,7 +211,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/add-product',
     name: 'AddProduct',
-    component: () => import('@/views/petShop/product/AddProduct.vue'),
+    component: () => import('@/views/petShop/product/add-product.vue'),
     meta: { title: 'PetGo添加商品', requiresAuth: true },
   },
   //登录

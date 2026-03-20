@@ -148,16 +148,17 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
+import { uploadWithChunk } from '../../../../utils/chunk-uploads'; // 对应你的chunk-upload.ts路径
 
-const props = defineProps<{  //父组件传递的信息的属性
+
+const props = defineProps<{
   mainImage: string
   imagesList: { name: string; url: string; isImage: boolean }[]
   videoUrl: string
 }>()
 
-const emit = defineEmits<{ //向父组件传递信息的属性
+const emit = defineEmits<{
   (e: 'update:mainImage', value: string): void
   (e: 'update:imagesList', value: { name: string; url: string; isImage: boolean }[]): void
   (e: 'update:videoUrl', value: string): void
@@ -166,110 +167,46 @@ const emit = defineEmits<{ //向父组件传递信息的属性
 const mainImageUrl = ref(props.mainImage)
 const detailImages = ref(props.imagesList)
 const videoUrl = ref(props.videoUrl)
-// 监听父组件传递的变化，更新本地预览
-watch(
-  () => props.mainImage,
-  (newVal) => {
-    mainImageUrl.value = newVal
-  },
-)
-watch(
-  () => props.imagesList,
-  (newVal) => {
-    detailImages.value = newVal
-  },
-)
-watch(
-  () => props.videoUrl,
-  (newVal) => {
-    videoUrl.value = newVal
-  },
-)
-//上传的不同信息不同上传规则
+
+// 监听父组件数据变化
+watch(() => props.mainImage, (newVal) => {
+  mainImageUrl.value = newVal
+})
+watch(() => props.imagesList, (newVal) => {
+  detailImages.value = newVal
+})
+watch(() => props.videoUrl, (newVal) => {
+  videoUrl.value = newVal
+})
+
 const uploadConfig = {
   mainImage: {
     accept: 'image/*',
-    maxSizeMB: 2,
+    maxSizeMB: 1024,
     uploadUrl: '/server/api/file/upload',
   },
   detailImage: {
     accept: 'image/*',
-    maxSizeMB: 2,
+    maxSizeMB: 1024,
     maxCount: 5,
     uploadUrl: '/server/api/file/upload',
   },
   video: {
     accept: 'video/mp4',
-    maxSizeMB: 10,
+    maxSizeMB: 1024,
     uploadUrl: '/server/api/file/upload',
   },
 }
-//上传方法
-const uploadFile = async (
-  file: File,
-  config: { uploadUrl: string; maxSizeMB: number; accept: string },
-// uploadUrl：后端文件上传接口地址
-// maxSizeMB：文件大小
-// accept：允许的文件格式
-): Promise<string> => {
-  try {
-    //先验证
-    //大小和格式
-    if (file.size > config.maxSizeMB * 1024 * 1024) {
-      throw new Error(`文件大小不能超过${config.maxSizeMB}MB`)
-    }
-    const acceptTypes = config.accept.split(',').map((t) => t.trim())
-    const fileType = file.type.toLowerCase()
-    const fileName = file.name.toLowerCase()
-    const isValidType = acceptTypes.some((type) => {
-      if (type === '*/*') return true
-        // 匹配 MIME以image/开头，或文件名后缀是.jpg/.png
-      if (type.endsWith('/*')) {
-        return (
-          fileType.startsWith(type.split('/')[0] + '/') ||
-          fileName.endsWith(`.${type.split('/')[0]}`)
-        )
-      }
-      return fileType === type || fileName.endsWith(`.${type.split('/')[1]}`)
-    })
-
-    if (!isValidType) {
-      throw new Error(`文件格式不支持，请上传${config.accept}格式`)
-    }
-
-    const formData = new FormData()
-    formData.append('file', file)
-
-    let response
-    if (typeof request === 'function' ) {
-      response = await request(config.uploadUrl, 'POST', formData)
-    }
-
-    if (!response || !response.data) {
-      throw new Error('上传失败，接口返回空数据')
-    }
-   console.log(response)
-    const finalUrl = response.data
-    if (!finalUrl) {
-      throw new Error('上传失败，未获取到文件URL')
-    }
 
 
-    return finalUrl.length > 255 ? finalUrl.substring(0, 255) : finalUrl
-  } catch (error) {
-    console.error('文件上传失败:', error)
-    throw error
-  }
-}
-
-// 主图上传逻辑
 const handleMainImageUpload = async (e: Event) => {
   const target = e.target as HTMLInputElement
   const file = target.files?.[0]
   if (!file) return
 
   try {
-    const url = await uploadFile(file, uploadConfig.mainImage)
+    // 调用chunk-upload.ts的uploadWithChunk
+    const url = await uploadWithChunk(file, uploadConfig.mainImage);
     mainImageUrl.value = url
     emit('update:mainImage', url)
     ElMessage.success('主图上传成功')
@@ -286,23 +223,18 @@ const removeMainImage = () => {
   ElMessage.info('主图已移除')
 }
 
-// 详情图上传逻辑
 const handleDetailImagesUpload = async (e: Event) => {
   const target = e.target as HTMLInputElement
   const files = target.files
   if (!files || files.length === 0) return
 
-  // 计算剩余可上传数量
   const remaining = uploadConfig.detailImage.maxCount - detailImages.value.length
   if (files.length > remaining) {
-    ElMessage.warning(
-      `最多只能上传${uploadConfig.detailImage.maxCount}张图片，还可上传${remaining}张`,
-    )
+    ElMessage.warning(`最多只能上传${uploadConfig.detailImage.maxCount}张图片，还可上传${remaining}张`)
     target.value = ''
     return
   }
 
-  // 批量上传
   const fileList = Array.from(files)
   const newImages = [...detailImages.value]
   let successCount = 0
@@ -312,7 +244,8 @@ const handleDetailImagesUpload = async (e: Event) => {
   await Promise.all(
     fileList.map(async (file) => {
       try {
-        const url = await uploadFile(file, uploadConfig.detailImage)
+        // 调用chunk-upload.ts的uploadWithChunk
+        const url = await uploadWithChunk(file, uploadConfig.detailImage);
         newImages.push({
           name: file.name,
           url,
@@ -325,7 +258,6 @@ const handleDetailImagesUpload = async (e: Event) => {
     }),
   )
 
-  // 更新列表
   detailImages.value = [...newImages]
   emit('update:imagesList', detailImages.value)
 
@@ -333,7 +265,6 @@ const handleDetailImagesUpload = async (e: Event) => {
     ElMessage.success(`成功上传${successCount}张详情图`)
   }
 
-  // 重置输入框
   target.value = ''
 }
 
@@ -345,14 +276,14 @@ const removeDetailImage = (index: number) => {
   ElMessage.info('详情图已移除')
 }
 
-//视频上传逻辑
 const handleVideoUpload = async (e: Event) => {
   const target = e.target as HTMLInputElement
   const file = target.files?.[0]
   if (!file) return
 
   try {
-    const url = await uploadFile(file, uploadConfig.video)
+    // 调用chunk-upload.ts的uploadWithChunk
+    const url = await uploadWithChunk(file, uploadConfig.video);
     videoUrl.value = url
     emit('update:videoUrl', url)
     ElMessage.success('视频上传成功')

@@ -9,7 +9,7 @@ export const registerShop = async (shopData: ShopRegisterForm) => {
 //首页展示
 // @param shopId 店铺ID
 export const getShopInfo = async (product:Record<string,any>) => {
-  const res = await request(`/server/api/shop/shops/list`, 'GET',{product})
+  const res = await request(`/server/api/shop/product/list`, 'POST',product)
   return res.data
 }
 //获取店铺信息

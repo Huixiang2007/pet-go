@@ -28,8 +28,8 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-vercode"></i>
               </div>
-             <input type="text" name="vercode" v-model="form.vercode"
-                lay-verify="required" placeholder="验证码" lay-reqtext="请填写验证码" autocomplete="off" class="layui-input" 
+              <input type="text" name="vercode" v-model="form.vercode" lay-verify="required" placeholder="验证码"
+                lay-reqtext="请填写验证码" autocomplete="off" class="layui-input"
                 :class="{ 'error-border': errors.vercode }" />
               <div v-if="errors.vercode" class="error-text">{{ errors.vercode }}</div>
             </div>
@@ -39,12 +39,11 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-               <input :type="passwordVisible ? 'text' : 'password'" name="password" lay-verify="required|password" v-model="form.password"
-                placeholder="密码" autocomplete="off" class="layui-input layui-input-password" id="reg-password"
-                :class="{ 'error-border': errors.password }" @blur="validatePassword" />
-                 <div class="layui-input-suffix">
-                <i class="layui-icon" 
-                  :class="passwordVisible ? 'layui-icon-eye' : 'layui-icon-eye-invisible'" 
+              <input :type="passwordVisible ? 'text' : 'password'" name="password" lay-verify="required|password"
+                v-model="form.password" placeholder="密码" autocomplete="off" class="layui-input layui-input-password"
+                id="reg-password" :class="{ 'error-border': errors.password }" @blur="validatePassword" />
+              <div class="layui-input-suffix">
+                <i class="layui-icon" :class="passwordVisible ? 'layui-icon-eye' : 'layui-icon-eye-invisible'"
                   @click="togglePasswordVisibility('password')"></i>
               </div>
               <div v-if="errors.password" class="error-text">{{ errors.password }}</div>
@@ -55,12 +54,12 @@
               <div class="layui-input-prefix">
                 <i class="layui-icon layui-icon-password"></i>
               </div>
-              <input :type="confirmPasswordVisible ? 'text' : 'password'" name="confirmPassword" lay-verify="required|confirmPassword" v-model="form.confirm"
-                placeholder="确认密码" autocomplete="off" class="layui-input layui-input-password" id="confirm-password"
+              <input :type="confirmPasswordVisible ? 'text' : 'password'" name="confirmPassword"
+                lay-verify="required|confirmPassword" v-model="form.confirm" placeholder="确认密码" autocomplete="off"
+                class="layui-input layui-input-password" id="confirm-password"
                 :class="{ 'error-border': errors.confirm }" @blur="validateConfirmPassword" />
               <div class="layui-input-suffix">
-                <i class="layui-icon" 
-                  :class="confirmPasswordVisible ? 'layui-icon-eye' : 'layui-icon-eye-invisible'" 
+                <i class="layui-icon" :class="confirmPasswordVisible ? 'layui-icon-eye' : 'layui-icon-eye-invisible'"
                   @click="togglePasswordVisibility('confirm')"></i>
               </div>
               <div v-if="errors.confirm" class="error-text">{{ errors.confirm }}</div>
@@ -72,15 +71,15 @@
                 <i class="layui-icon layui-icon-username"></i>
               </div>
               <input type="text" name="nickname" lay-verify="required|nickname" placeholder="账号" v-model="form.name"
-                autocomplete="off" class="layui-input" lay-affix="clear"
-                :class="{ 'error-border': errors.name }" @blur="validateNickname" />
+                autocomplete="off" class="layui-input" lay-affix="clear" :class="{ 'error-border': errors.name }"
+                @blur="validateNickname" />
               <div v-if="errors.name" class="error-text">{{ errors.name }}</div>
             </div>
           </div>
           <div class="layui-form-item">
             <div class="agreement-item">
-              <input v-model="isAgreed" type="checkbox" id="agree" class="agreement-checkbox"
-                style="display: block" lay-ignore />
+              <input v-model="isAgreed" type="checkbox" id="agree" class="agreement-checkbox" style="display: block"
+                lay-ignore />
               <label class="agreement-label">
                 我已阅读并同意<span class="agreement-link" @click="toProtocal">用户服务协议</span>
               </label>
@@ -209,27 +208,27 @@ const validateForm = () => {
   Object.keys(errors).forEach(key => {
     delete errors[key as keyof FormErrors]
   })
-  
+
   // 验证所有字段
   const isPasswordValid = validatePassword()
   const isConfirmValid = validateConfirmPassword()
   const isNicknameValid = validateNickname()
-  
+
   errors.vercode = validateVercode()
-  
+
   return isPasswordValid && isConfirmValid && isNicknameValid && !errors.vercode
 }
 
 const handleSubmit = async () => {
   if (registerActive.value) return
   registerActive.value = true
-  
+
   // 校验表单
   if (!validateForm()) {
     registerActive.value = false
     return
   }
-  
+
   // 校验协议勾选状态
   if (!isAgreed.value) {
     showError.value = true
@@ -239,7 +238,7 @@ const handleSubmit = async () => {
     registerActive.value = false
     return
   }
-  
+
   try {
     // 调用注册接口
     const response = await register({
@@ -248,19 +247,19 @@ const handleSubmit = async () => {
       password: form.password,
       account: form.name,
     })
-    
+
     if (response.code === 0) {
       const { token, userId } = response.data
-      
+
       // 存储token到localStorage
       localStorage.setItem('authToken', token)
       localStorage.setItem('userId', userId)
       ElMessage.success('注册成功')
-      
+
       // 注册成功后清空表单并跳转到登录页
       registerStore.clearForm()
       router.push('/foster-care')
-    } 
+    }
   } catch (error) {
     // ElMessage.error('注册失败: ' + (error as Error).message)
     console.log(error)
@@ -277,11 +276,11 @@ const SendVerificationCode = async (email: string) => {
       ElMessage.error(errorMsg)
       return
     }
-    
+
     isSending.value = true
-    
-    const response =await sendVerificationCode({ email: email })
-    
+
+    const response = await sendVerificationCode({ email: email })
+
     if (response.code == 0) {
       ElMessage.success('验证码发送成功')
       setTimeout(() => {
@@ -302,7 +301,7 @@ const SendVerificationCode = async (email: string) => {
 
 
 onMounted(() => {
-  
+
   isRegister.value = true
   const agreementCheck = route.query.isAgreed === 'true'
   if (agreementCheck) {
@@ -327,8 +326,6 @@ const toProtocal = () => {
 </script>
 
 <style scoped>
-
-
 .layui-input-suffix {
   position: absolute;
   right: 8px;
@@ -336,8 +333,10 @@ const toProtocal = () => {
   transform: translateY(-50%);
   cursor: pointer;
   color: #999;
-    z-index: 10; /* 确保图标在输入框上方 */
-  pointer-events: auto; /* 确保可以接收点击事件 */
+  z-index: 10;
+  /* 确保图标在输入框上方 */
+  pointer-events: auto;
+  /* 确保可以接收点击事件 */
   cursor: pointer;
 }
 
@@ -352,6 +351,7 @@ const toProtocal = () => {
 .layui-input {
   padding-right: 30px;
 }
+
 .btn-donate {
   --clr-font-main: hsla(0 0% 20% / 100);
   --btn-bg-1: hsla(165, 80%, 60%, 1);
@@ -509,13 +509,13 @@ const toProtocal = () => {
 }
 
 .error-text {
-    top: -9px;
-    position: relative;
-    height: 10px;
-    color: #f44f4f;
-    font-size: 12px;
-    margin-top: 2px;
-    text-align: left;
+  top: -9px;
+  position: relative;
+  height: 10px;
+  color: #f44f4f;
+  font-size: 12px;
+  margin-top: 2px;
+  text-align: left;
 }
 
 .layui-checkbox:hover .layui-checkbox {

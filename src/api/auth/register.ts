@@ -12,6 +12,7 @@ interface RegisterData {
 interface RegisterResponse {
   token: string
   userId: string
+  fosterProviderIds: number
 }
 
 // 发送验证码数据类型
@@ -23,30 +24,20 @@ interface SendCodeData {
  * 用户注册
  */
 export function register(data: RegisterData) {
-  return request<RegisterResponse>(
-    '/server/api/user/register',
-    'POST',
-    data,
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }
-    }
-  )
+  return request<RegisterResponse>('/server/api/user/register', 'POST', data, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  })
 }
 
 /**
  * 发送验证码
  */
 export function sendVerificationCode(data: SendCodeData) {
-  return request(
-    '/server/api/user/sendCode',
-    'POST',
-    data,
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      }
-    }
-  )
+  return request('/server/api/user/sendCode', 'POST', data, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  })
 }

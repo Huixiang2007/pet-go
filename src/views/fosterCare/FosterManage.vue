@@ -3,25 +3,18 @@
     <!-- 简洁的店铺管理头部 -->
     <div class="dashboard-header">
       <div class="header-left">
-        <h2 class="page-title">店铺管理中心</h2>
+
+        <h2 class="page-title">
+          <span
+            class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-400 rounded-xl mr-3 shadow-md">
+            <el-icon class="text-white text-xl cursor-pointer" @click="goBack">
+              <ArrowLeft />
+            </el-icon>
+          </span>店铺管理中心
+        </h2>
         <p class="page-subtitle">管理您的宠物寄养服务与经营数据</p>
       </div>
-      <div class="header-right">
-        <div class="quick-stats">
-          <div class="stat-badge">
-            <i class="el-icon-s-order"></i>
-            <span class="stat-text">今日订单：{{ todayOrders }}</span>
-          </div>
-          <div class="stat-badge">
-            <i class="el-icon-chat-dot-round"></i>
-            <span class="stat-text">待回复：{{ pendingReplies }}</span>
-          </div>
-          <div class="stat-badge">
-            <i class="el-icon-date"></i>
-            <span class="stat-text">进行中：{{ ongoingServices }}</span>
-          </div>
-        </div>
-      </div>
+
     </div>
 
     <!-- 主要内容区域 -->
@@ -44,21 +37,17 @@
               <div class="metric-item">
                 <div class="metric-label">总收入</div>
                 <div class="metric-value">¥{{ formatNumber(totalIncome) }}</div>
-                <div class="metric-change positive">
-                  <i class="el-icon-top"></i> {{ incomeChange }}%
-                </div>
+
               </div>
               <div class="metric-item">
                 <div class="metric-label">总订单</div>
                 <div class="metric-value">{{ totalOrders }}</div>
-                <div class="metric-change positive">
-                  <i class="el-icon-top"></i> {{ ordersChange }}%
-                </div>
+
               </div>
               <div class="metric-item">
                 <div class="metric-label">完成率</div>
                 <div class="metric-value">{{ completionRate }}%</div>
-                <div class="metric-change"><i class="el-icon-bottom"></i> 2%</div>
+
               </div>
             </div>
 
@@ -66,11 +55,7 @@
             <div class="chart-area">
               <div class="chart-header">
                 <span>近7天收入趋势</span>
-                <el-select v-model="chartType" size="small" style="width: 120px">
-                  <el-option label="日收入" value="daily"></el-option>
-                  <el-option label="周收入" value="weekly"></el-option>
-                  <el-option label="月收入" value="monthly"></el-option>
-                </el-select>
+
               </div>
               <div class="chart-container">
                 <!-- 这里可以放置图表组件，暂时用模拟数据展示 -->
@@ -89,60 +74,13 @@
           </div>
         </el-card>
 
-        <!-- 快捷操作卡片 -->
-        <el-card class="quick-actions-card" shadow="never">
-          <template #header>
-            <div class="card-header">
-              <i class="header-icon el-icon-menu"></i>
-              <span>快捷操作</span>
-            </div>
-          </template>
-          <div class="action-grid">
-            <div class="action-item" @click="showAddPackageDialog">
-              <div class="action-icon add">
-                <i class="el-icon-circle-plus"></i>
-              </div>
-              <span class="action-text">添加套餐</span>
-            </div>
-            <div class="action-item" @click="showEditShopDialog">
-              <div class="action-icon edit">
-                <i class="el-icon-edit"></i>
-              </div>
-              <span class="action-text">店铺设置</span>
-            </div>
-            <div class="action-item" @click="goToBookings">
-              <div class="action-icon calendar">
-                <i class="el-icon-date"></i>
-              </div>
-              <span class="action-text">预约管理</span>
-            </div>
-            <div class="action-item" @click="goToReviews">
-              <div class="action-icon message">
-                <i class="el-icon-chat-line-square"></i>
-              </div>
-              <span class="action-text">评价管理</span>
-            </div>
-            <div class="action-item" @click="exportData">
-              <div class="action-icon export">
-                <i class="el-icon-download"></i>
-              </div>
-              <span class="action-text">导出数据</span>
-            </div>
-            <div class="action-item" @click="viewAnalytics">
-              <div class="action-icon analytics">
-                <i class="el-icon-data-analysis"></i>
-              </div>
-              <span class="action-text">数据分析</span>
-            </div>
-          </div>
-        </el-card>
 
         <!-- 最近活动 -->
         <el-card class="recent-activity" shadow="never">
           <template #header>
             <div class="card-header">
-              <i class="header-icon el-icon-alarm-clock"></i>
-              <span>最近活动</span>
+              <!-- <i class="header-icon el-icon-alarm-clock"></i> -->
+              <span>最近订单</span>
             </div>
           </template>
           <div class="activity-list">
@@ -172,11 +110,9 @@
                 <el-tag size="small" class="count-tag">{{ packages.length }}个套餐</el-tag>
               </div>
               <div class="header-right">
-                <el-button type="primary" size="small" @click="showAddPackageDialog">
+                <el-button type="primary" size=“default” color="#F0EBFF" text-color="#ffffff"
+                  @click="showAddPackageDialog">
                   <i class="el-icon-circle-plus"></i>新增套餐
-                </el-button>
-                <el-button size="small" @click="batchManage">
-                  <i class="el-icon-set-up"></i>批量管理
                 </el-button>
               </div>
             </div>
@@ -186,68 +122,56 @@
           <div class="packages-grid">
             <el-card v-for="pkg in packages" :key="pkg.id" class="package-card" shadow="hover">
               <!-- 套餐状态标签 -->
-              <div class="package-status" :class="{ 'status-active': pkg.status === 'active' }">
-                {{ pkg.status === 'active' ? '上架中' : '已下架' }}
-              </div>
-
-              <div class="package-header">
-                <div class="package-title-section">
-                  <h3 class="package-title">{{ pkg.name }}</h3>
-                  <el-rate v-model="pkg.rating" disabled show-score text-color="#ff9900" score-template="{value}"
-                    size="small" />
+              <div class="package-status">
+                <div :class="{ 'status-active': pkg.status === 'active' }">
+                  {{ pkg.status === 'active' ? '上架中' : '已下架' }}
                 </div>
                 <div class="package-actions">
                   <el-dropdown trigger="click">
                     <span class="el-dropdown-link">
-                      <i class="el-icon-more"></i>
+                      <el-icon>
+                        <MoreFilled />
+                      </el-icon>
                     </span>
-                    <template #dropdown>
-                      <el-dropdown-menu>
-                        <el-dropdown-item @click="editPackage(pkg)">
-                          <i class="el-icon-edit"></i>编辑套餐
-                        </el-dropdown-item>
-                        <el-dropdown-item @click="togglePackageStatus(pkg)"
-                          :class="{ 'warning-text': pkg.status === 'active' }">
-                          <i class="el-icon-switch-button"></i>
-                          {{ pkg.status === 'active' ? '下架套餐' : '上架套餐' }}
-                        </el-dropdown-item>
-                        <el-dropdown-item @click="viewPackageStats(pkg)">
-                          <i class="el-icon-data-line"></i>查看数据
-                        </el-dropdown-item>
-                        <el-dropdown-item @click="deletePackage(pkg.id)" divided class="danger-text">
-                          <i class="el-icon-delete"></i>删除套餐
-                        </el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
+
                   </el-dropdown>
                 </div>
               </div>
 
+              <div class="package-header">
+                <div class="package-title-section">
+                  <h3 class="package-title">{{ pkg.title }}</h3>
+
+                </div>
+              </div>
               <p class="package-desc">{{ pkg.description }}</p>
 
               <!-- 宠物类型标签 -->
               <div class="package-tags">
                 <el-tag v-for="pet in pkg.petTypes" :key="pet" size="small" class="pet-tag">
-                  <i class="el-icon-sunny"></i>{{ pet }}
+                  {{ pet }}
                 </el-tag>
               </div>
 
               <!-- 套餐特色 -->
               <div class="package-features">
-                <div class="features-title">套餐包含：</div>
+                <div class="features-title">附加服务：</div>
                 <ul class="features-list">
-                  <li v-for="(feature, index) in pkg.features" :key="index">
-                    <i class="el-icon-check"></i>{{ feature }}
+                  <li v-for="(feature, index) in pkg.features" :key="index" class="feature-item-with-price">
+                    <el-icon>
+                      <Check />
+                    </el-icon>
+                    <span class="feature-name">{{ feature.title }}</span>
+                    <span v-if="typeof feature !== 'string' && feature.price > 0" class="feature-price">+¥{{
+                      feature.price
+                      }}</span>
                   </li>
                 </ul>
               </div>
 
               <!-- 套餐信息 -->
               <div class="package-info">
-                <div class="info-item">
-                  <i class="el-icon-time"></i>
-                  <span>{{ pkg.serviceTime }}</span>
-                </div>
+
                 <div class="info-item">
                   <i class="el-icon-sold-out"></i>
                   <span>已售{{ pkg.soldCount }}</span>
@@ -261,17 +185,22 @@
               <!-- 价格和操作 -->
               <div class="package-footer">
                 <div class="price-section">
-                  <div class="price-main">¥{{ pkg.price }}/天</div>
-                  <div class="price-original" v-if="pkg.originalPrice">
-                    ¥{{ pkg.originalPrice }}/天
-                  </div>
+                  <div class="price-main">¥{{ pkg.basePrice }}/天</div>
+
                 </div>
                 <div class="action-buttons">
-                  <el-button size="small" @click="viewPackageDetails(pkg)" class="detail-btn">
+                  <!-- <el-button size="small" @click="viewPackageDetails(pkg)" class="detail-btn">
                     查看详情
-                  </el-button>
+                  </el-button> -->
                   <el-button type="primary" size="small" @click="editPackage(pkg)" class="edit-btn">
-                    <i class="el-icon-edit"></i>编辑
+                    <el-icon>
+                      <Edit />
+                    </el-icon>编辑
+                  </el-button>
+                  <el-button type="danger" size="small" @click="deletePackage(pkg.id)" class="delete-btn">
+                    <el-icon>
+                      <Delete />
+                    </el-icon>删除
                   </el-button>
                 </div>
               </div>
@@ -287,68 +216,59 @@
         <el-tabs v-model="activeTab">
           <!-- 基本信息 -->
           <el-tab-pane label="基本信息" name="basic">
-            <el-form-item label="套餐名称" prop="name">
-              <el-input v-model="packageForm.name" placeholder="请输入套餐名称，如：基础营养套餐" maxlength="20" show-word-limit />
+            <el-form-item label="套餐名称" prop="title">
+              <el-input v-model="packageForm.title" placeholder="请输入套餐名称，如：基础营养套餐" maxlength="20" show-word-limit />
             </el-form-item>
             <el-form-item label="套餐描述" prop="description">
               <el-input v-model="packageForm.description" type="textarea" :rows="2" placeholder="简要描述套餐特点"
                 maxlength="100" show-word-limit />
             </el-form-item>
-            <el-form-item label="服务时长" prop="serviceTime">
-              <el-input v-model="packageForm.serviceTime" placeholder="如：24小时照顾" />
-            </el-form-item>
+
             <el-form-item label="宠物类型" prop="petTypes">
               <el-select v-model="packageForm.petTypes" multiple placeholder="请选择适合的宠物类型" style="width: 100%">
                 <el-option v-for="item in petTypeOptions" :key="item.value" :label="item.label" :value="item.value" />
               </el-select>
             </el-form-item>
-          </el-tab-pane>
 
-          <!-- 价格与名额 -->
-          <el-tab-pane label="价格设置" name="price">
-            <el-form-item label="价格（元/天）" prop="price">
-              <el-input-number v-model="packageForm.price" :min="0" :step="10" controls-position="right"
-                style="width: 200px" />
-              <span class="form-tip">建议定价在80-300元之间</span>
+            <el-form-item label="基础价格" prop="basePrice">
+              <el-input v-model="packageForm.basePrice" placeholder="请输入基础价格：元/天" maxlength="10" show-word-limit />
             </el-form-item>
-            <el-form-item label="原价（可选）">
-              <el-input-number v-model="packageForm.originalPrice" :min="0" :step="10" controls-position="right"
-                style="width: 200px" />
-              <span class="form-tip">设置原价可显示折扣</span>
+
+            <el-form-item label="宠物数量" prop="maxPets">
+              <el-input-number v-model="packageForm.maxPets" :min="1" :max="100" placeholder="最大宠物数量" />
             </el-form-item>
-            <el-form-item label="名额限制" prop="quota">
-              <el-input-number v-model="packageForm.quota" :min="1" :max="100" controls-position="right"
-                style="width: 200px" />
-              <span class="form-tip">同时可服务的最大宠物数量</span>
-            </el-form-item>
-            <el-form-item label="上架状态">
-              <el-switch v-model="packageForm.status" active-value="active" inactive-value="inactive" active-text="立即上架"
-                inactive-text="暂不上架" />
+
+            <el-form-item label="最大体重" prop="maxWeight">
+              <el-input-number v-model="packageForm.maxWeight" :min="1" :max="200" placeholder="最大体重（斤）" />
             </el-form-item>
           </el-tab-pane>
-
-          <!-- 服务内容 -->
-          <el-tab-pane label="服务内容" name="features">
-            <el-form-item label="服务特色" prop="features">
+          <!-- 附加服务 -->
+          <el-tab-pane label="附加服务" name="features">
+            <el-form-item label="附加服务" prop="features">
               <div class="features-editor">
+                <div v-if="isEditing" style="color: #909399; padding: 10px; margin-bottom: 10px;">
+                  <i class="el-icon-info" style="margin-right: 5px;"></i>附加服务不可编辑，仅可查看
+                </div>
                 <div class="features-list">
                   <div v-for="(feature, index) in packageForm.features" :key="index" class="feature-item">
-                    <el-input v-model="packageForm.features[index]" placeholder="请输入服务内容"
-                      style="width: 80%; margin-right: 10px" />
-                    <el-button type="danger" size="small" circle @click="removeFeature(index)"
-                      :disabled="packageForm.features.length <= 1">
-                      <i class="el-icon-minus"></i>
-                    </el-button>
+                    <div class="feature-content">
+                      <el-input v-model="feature.title" placeholder="请输入服务名称" style="width: 60%; margin-right: 10px"
+                        :disabled="isEditing" />
+                      <el-input-number v-model="feature.price" :min="0" :precision="0" :step="5" placeholder="价格"
+                        style="width: 120px; margin-right: 10px" :disabled="isEditing" />
+                      <el-button type="danger" size="small" circle @click="removeFeature(index)" :disabled="true"
+                        class="delete-btn">
+                        <el-icon>
+                          <Delete />
+                        </el-icon>
+                      </el-button>
+                    </div>
                   </div>
                 </div>
-                <el-button type="primary" plain @click="addFeature" class="add-feature-btn">
+                <el-button v-if="!isEditing" type="primary" plain @click="addFeature" class="add-feature-btn">
                   <i class="el-icon-plus"></i>添加服务项
                 </el-button>
               </div>
-            </el-form-item>
-            <el-form-item label="注意事项">
-              <el-input v-model="packageForm.notes" type="textarea" :rows="3" placeholder="可填写服务限制、特殊要求等"
-                maxlength="200" show-word-limit />
             </el-form-item>
           </el-tab-pane>
         </el-tabs>
@@ -389,11 +309,7 @@
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
-        <el-form-item label="特色标签">
-          <el-select v-model="shopForm.tags" multiple placeholder="选择店铺特色标签" style="width: 100%">
-            <el-option v-for="tag in shopTagOptions" :key="tag" :label="tag" :value="tag" />
-          </el-select>
-        </el-form-item>
+
       </el-form>
       <template #footer>
         <span class="dialog-footer">
@@ -407,20 +323,18 @@
 
 <script lang="ts" setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
+import { getFosterService, getAddService, addFosterService, addAdditionalService, updateFosterService, deleteFosterService } from '@/api/foster-care/manage'
 
-// 头部统计数据
-const todayOrders = ref(8)
-const pendingReplies = ref(3)
-const ongoingServices = ref(12)
 
 // 经营数据
 const totalIncome = ref(28740)
 const totalOrders = ref(156)
 const completionRate = ref(98)
-const incomeChange = ref(12.5)
-const ordersChange = ref(8.2)
-const chartType = ref('daily')
+
+
+// 套餐相关
+const hasPackages = ref(false)
 
 // 模拟收入数据
 const incomeData = ref([
@@ -484,65 +398,88 @@ const petTypeOptions = [
   { value: '其他', label: '其他' },
 ]
 
-// 店铺标签选项
-const shopTagOptions = [
-  '24小时照顾',
-  '专业宠物医生',
-  '环境优美',
-  '交通便利',
-  '免费接送',
-  '实时监控',
-  '个性定制',
-  '经验丰富',
-]
+// 套餐类型定义
+interface PackageItem {
+  id: number
+  title: string
+  description: string
+  features: Array<{ id: number; serviceId: number; title: string; price: number }>
+  petTypes: string[]
+  basePrice: number
+  quota: number
+  soldCount: number
+  status: 'active' | 'inactive'
+}
 
-// 套餐数据
-const packages = ref([
-  {
-    id: 1,
-    name: '基础营养套餐',
-    description: '适合短期营养的基础服务',
-    features: ['每日两次邀约', '定时喂食', '基础清洁', '日常互动', '定期照片反馈'],
-    petTypes: ['猫', '狗'],
-    serviceTime: '24小时照顾',
-    price: 120,
-    originalPrice: 150,
-    quota: 3,
-    soldCount: 42,
-    rating: 4.8,
-    status: 'active',
-    notes: '',
-  },
-  {
-    id: 2,
-    name: '豪华呵护套餐',
-    description: '为爱宠提供全方位贴心照顾',
-    features: ['全天候看护', '定制饮食', '每日梳毛', '专业训练', '视频连线'],
-    petTypes: ['猫', '狗', '兔'],
-    serviceTime: '24小时精心照顾',
-    price: 200,
-    originalPrice: 250,
-    quota: 5,
-    soldCount: 28,
-    rating: 4.9,
-    status: 'active',
-    notes: '需提前3天预约',
-  },
-  {
-    id: 3,
-    name: '小型宠物专享',
-    description: '专为小型宠物设计的舒适空间',
-    features: ['独立空间', '特殊饮食照顾', '温度调控', '安静环境'],
-    petTypes: ['兔', '鸟', '其他'],
-    serviceTime: '24小时专业照顾',
-    price: 80,
-    quota: 8,
-    soldCount: 15,
-    rating: 4.7,
-    status: 'inactive',
-    notes: '仅限2kg以下小型宠物',
-  },
-])
+const packages = ref<PackageItem[]>([])
+const provider = localStorage.getItem('fosterProviderIds')
+console.log('provider:', provider)
+
+// 获取套餐数据
+const fetchFosterService = async (showLoading: boolean = true) => {
+
+
+  let loading: any = null
+  if (showLoading) {
+    loading = ElLoading.service({ text: '加载套餐中...' })
+  }
+
+  try {
+    const res = await getFosterService({ providerId: Number(provider) })
+    if (res.code === 0 && res.data) {
+      // 转换数据格式
+      const packageList = res.data.list || []
+      packages.value = packageList.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description,
+        features: [], // 暂时为空，后续通过fetchAddService获取
+        petTypes: item.petTypes?.split(',') || [],
+        basePrice: item.basePrice,
+        quota: item.quota || 5,
+        soldCount: item.soldCount || 0,
+
+      }))
+
+      // 为每个套餐获取附加服务
+      for (const pkg of packages.value) {
+        await fetchAddService(pkg.id, pkg)
+      }
+
+      hasPackages.value = packages.value.length > 0
+    } else {
+      ElMessage.error(res.msg || '获取套餐失败')
+      hasPackages.value = false
+    }
+  } catch (error) {
+    console.error('获取套餐失败:', error)
+    ElMessage.error('网络错误，请稍后重试')
+    hasPackages.value = false
+  } finally {
+    if (loading) {
+      loading.close()
+    }
+  }
+}
+
+// 获取附加服务
+const fetchAddService = async (serviceId: number, packageItem: PackageItem) => {
+  try {
+    const res = await getAddService(serviceId)
+    if (res.code === 0 && res.data) {
+      // 转换附加服务格式
+      const additionalServices = res.data.list || []
+      packageItem.features = additionalServices.map((service: any) => ({
+        id: service.id,
+        serviceId: service.serviceId,
+        title: service.title,
+        price: service.price,
+      }))
+    }
+  } catch (error) {
+    console.error('获取附加服务失败:', error)
+  }
+}
 
 // 套餐对话框
 const packageDialogVisible = ref(false)
@@ -555,20 +492,19 @@ const packageFormRef = ref()
 const dialogTitle = computed(() => (isEditing.value ? '编辑套餐' : '添加新套餐'))
 
 const packageForm = reactive({
-  name: '',
+  title: '',
   description: '',
-  serviceTime: '24小时照顾',
-  price: 120,
-  originalPrice: 0,
-  quota: 5,
+  basePrice: 0, // 基础价格
   petTypes: [] as string[],
-  features: ['每日两次邀约', '定时喂食', '基础清洁'],
-  notes: '',
+  maxPets: 5, // 最大宠物数量
+  maxWeight: 60, // 最大体重
+  features: [],
   status: 'active',
+  quota: 5,
 })
 
 const packageRules = {
-  name: [
+  title: [
     { required: true, message: '请输入套餐名称', trigger: 'blur' },
     { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' },
   ],
@@ -576,15 +512,19 @@ const packageRules = {
     { required: true, message: '请输入套餐描述', trigger: 'blur' },
     { min: 5, max: 100, message: '长度在 5 到 100 个字符', trigger: 'blur' },
   ],
-  serviceTime: [{ required: true, message: '请输入服务时长', trigger: 'blur' }],
+
   petTypes: [{ required: true, message: '请至少选择一种宠物类型', trigger: 'change' }],
-  price: [
+  basePrice: [
     { required: true, message: '请设置价格', trigger: 'blur' },
     { type: 'number', min: 0, message: '价格不能为负数', trigger: 'blur' },
   ],
-  quota: [
-    { required: true, message: '请设置名额限制', trigger: 'blur' },
-    { type: 'number', min: 1, max: 100, message: '名额限制在1-100之间', trigger: 'blur' },
+  maxPets: [
+    { required: true, message: '请设置最大宠物数量', trigger: 'blur' },
+    { type: 'number', min: 1, max: 100, message: '最大宠物数量在1-100之间', trigger: 'blur' },
+  ],
+  maxWeight: [
+    { required: true, message: '请设置最大体重', trigger: 'blur' },
+    { type: 'number', min: 1, max: 200, message: '最大体重在1-200之间', trigger: 'blur' },
   ],
 }
 
@@ -620,7 +560,7 @@ const showAddPackageDialog = () => {
   editingPackageId.value = null
   activeTab.value = 'basic'
   resetPackageForm()
-
+  //清除表单验证状态
   if (packageFormRef.value) {
     packageFormRef.value.clearValidate()
   }
@@ -629,21 +569,23 @@ const showAddPackageDialog = () => {
 }
 
 // 编辑套餐
-const editPackage = (pkg: any) => {
+const editPackage = (pkg: PackageItem) => {
   isEditing.value = true
   editingPackageId.value = pkg.id
   activeTab.value = 'basic'
 
-  packageForm.name = pkg.name
+  // 使用正确的字段名称回显数据
+  packageForm.title = pkg.title
   packageForm.description = pkg.description
-  packageForm.serviceTime = pkg.serviceTime
-  packageForm.price = pkg.price
-  packageForm.originalPrice = pkg.originalPrice || 0
-  packageForm.quota = pkg.quota
+  packageForm.basePrice = pkg.basePrice
+  packageForm.maxPets = pkg.quota  // 使用quota作为maxPets
+  packageForm.maxWeight = 60  // 默认值，因为接口返回的数据中没有这个字段
   packageForm.petTypes = [...pkg.petTypes]
-  packageForm.features = [...pkg.features]
-  packageForm.notes = pkg.notes || ''
-  packageForm.status = pkg.status
+  // 回显附加服务（只读）
+  packageForm.features = pkg.features.map(f => ({
+    title: f.title,
+    price: f.price
+  }))
 
   if (packageFormRef.value) {
     packageFormRef.value.clearValidate()
@@ -661,46 +603,39 @@ const deletePackage = (id: number) => {
     confirmButtonClass: 'el-button--danger',
   })
     .then(() => {
-      packages.value = packages.value.filter((pkg) => pkg.id !== id)
-      ElMessage.success('套餐删除成功')
+      // 调用删除接口
+      deleteFosterService(id).then(res => {
+        if (res.code === 0) {
+          packages.value = packages.value.filter((pkg) => pkg.id !== id)
+          ElMessage.success('套餐删除成功')
+        } else {
+          ElMessage.error(res.msg || '删除失败')
+        }
+      })
     })
     .catch(() => {
       // 用户取消删除
     })
 }
 
-// 切换套餐状态
-const togglePackageStatus = (pkg: any) => {
-  const newStatus = pkg.status === 'active' ? 'inactive' : 'active'
-  const action = newStatus === 'active' ? '上架' : '下架'
 
-  ElMessageBox.confirm(`确定要${action}这个套餐吗？`, `${action}确认`, {
-    confirmButtonText: `确定${action}`,
-    cancelButtonText: '取消',
-    type: 'info',
-  }).then(() => {
-    pkg.status = newStatus
-    ElMessage.success(`套餐已${action}`)
-  })
-}
 
 // 重置套餐表单
 const resetPackageForm = () => {
-  packageForm.name = ''
+  packageForm.title = ''
   packageForm.description = ''
-  packageForm.serviceTime = '24小时照顾'
-  packageForm.price = 120
-  packageForm.originalPrice = 0
+  packageForm.basePrice = 120
   packageForm.quota = 5
   packageForm.petTypes = []
-  packageForm.features = ['每日两次邀约', '定时喂食', '基础清洁']
-  packageForm.notes = ''
+  packageForm.features = [
+    { title: '', price: 0 }
+  ]
   packageForm.status = 'active'
 }
 
 // 添加服务项
 const addFeature = () => {
-  packageForm.features.push('')
+  packageForm.features.push({ title: '', price: 0 })
 }
 
 // 删除服务项
@@ -712,49 +647,102 @@ const removeFeature = (index: number) => {
 
 // 保存套餐
 const savePackage = async () => {
+  console.log("点击添加套餐")
   if (!packageFormRef.value) return
 
   try {
     await packageFormRef.value.validate()
     saving.value = true
 
-    // 模拟保存操作
-    setTimeout(() => {
-      const features = packageForm.features.filter((f) => f.trim())
-
-      const newPackage = {
-        id: isEditing.value ? editingPackageId.value! : packages.value.length + 1,
-        name: packageForm.name,
+    if (isEditing.value) {
+      // 编辑操作：调用更新接口
+      const updateData = {
+        title: packageForm.title,
         description: packageForm.description,
-        features: features,
-        petTypes: packageForm.petTypes,
-        serviceTime: packageForm.serviceTime,
-        price: packageForm.price,
-        originalPrice: packageForm.originalPrice > 0 ? packageForm.originalPrice : undefined,
-        quota: packageForm.quota,
-        soldCount: isEditing.value
-          ? packages.value.find((p) => p.id === editingPackageId.value)?.soldCount || 0
-          : 0,
-        rating: isEditing.value
-          ? packages.value.find((p) => p.id === editingPackageId.value)?.rating || 4.5
-          : 4.5,
-        status: packageForm.status,
-        notes: packageForm.notes,
+        serviceType: 1,
+        basePrice: packageForm.basePrice,
+        petTypes: packageForm.petTypes.join(','),
+        maxPets: packageForm.maxPets,
+        maxWeight: packageForm.maxWeight
       }
 
-      if (isEditing.value) {
-        const index = packages.value.findIndex((p) => p.id === editingPackageId.value)
+      const updateRes = await updateFosterService(editingPackageId.value, updateData)
+      console.log("更新套餐数据：", updateRes)
+      if (updateRes.code === 0) {
+        // 更新本地数据
+        const index = packages.value.findIndex(pkg => pkg.id === editingPackageId.value)
         if (index !== -1) {
-          packages.value[index] = newPackage
+          packages.value[index] = {
+            ...packages.value[index],
+            title: packageForm.title,
+            description: packageForm.description,
+            basePrice: packageForm.basePrice,
+            petTypes: packageForm.petTypes,
+            quota: packageForm.maxPets,
+          }
         }
+
+        packageDialogVisible.value = false
+        ElMessage.success('套餐修改成功')
+        saving.value = false
       } else {
-        packages.value.push(newPackage)
+        ElMessage.error(updateRes.msg || '修改套餐失败')
+        saving.value = false
+      }
+    } else {
+      // 创建操作：调用添加接口
+      const serviceData = {
+        title: packageForm.title,
+        description: packageForm.description,
+        basePrice: packageForm.basePrice,
+        petTypes: packageForm.petTypes.join(','),
+        maxPets: packageForm.maxPets,
+        maxWeight: packageForm.maxWeight,
+        serviceType: 1
       }
 
-      packageDialogVisible.value = false
-      ElMessage.success(isEditing.value ? '套餐修改成功' : '套餐创建成功')
-      saving.value = false
-    }, 500)
+      const serviceRes = await addFosterService(serviceData)
+      if (serviceRes.code === 0) {
+        const serviceId = serviceRes.data.serviceId
+
+        // 处理附加服务
+        const features = packageForm.features.filter((f) => f.title.trim())
+        if (features.length > 0) {
+          // 为每个附加服务调用接口
+          for (const feature of features) {
+            const additionalServiceData = {
+              serviceId: serviceId,
+              title: feature.title,
+              price: feature.price
+            }
+            await addAdditionalService(additionalServiceData)
+          }
+        }
+
+        // 添加到本地数据
+        const newPackage: PackageItem = {
+          id: serviceId,
+          title: packageForm.title,
+          description: packageForm.description,
+          features: packageForm.features.filter((f) => f.title.trim()),
+          petTypes: packageForm.petTypes,
+          basePrice: packageForm.basePrice,
+          quota: packageForm.maxPets,
+          soldCount: 0,
+          status: 'active',
+
+        }
+        packages.value.push(newPackage)
+        hasPackages.value = true
+
+        packageDialogVisible.value = false
+        ElMessage.success('套餐创建成功')
+        saving.value = false
+      } else {
+        ElMessage.error(serviceRes.msg || '创建套餐失败')
+        saving.value = false
+      }
+    }
   } catch (error) {
     console.error(error)
     saving.value = false
@@ -762,9 +750,9 @@ const savePackage = async () => {
 }
 
 // 显示编辑店铺对话框
-const showEditShopDialog = () => {
-  shopDialogVisible.value = true
-}
+// const showEditShopDialog = () => {
+//   shopDialogVisible.value = true
+// }
 
 // 处理封面图片上传
 const handleAvatarChange = (file: any) => {
@@ -795,43 +783,23 @@ const saveShopInfo = async () => {
   }
 }
 
-// 其他功能
-const goToBookings = () => {
-  ElMessage.info('跳转到预约管理页面')
-}
 
-const goToReviews = () => {
-  ElMessage.info('跳转到评价管理页面')
-}
-
-const exportData = () => {
-  ElMessage.success('数据导出功能开发中')
-}
-
-const viewAnalytics = () => {
-  ElMessage.info('跳转到数据分析页面')
-}
-
-const viewPackageDetails = (pkg: any) => {
-  ElMessage.info(`查看套餐详情：${pkg.name}`)
-}
-
-const batchManage = () => {
-  ElMessage.info('批量管理功能开发中')
-}
-
-const viewPackageStats = (pkg: any) => {
-  ElMessage.info(`查看套餐数据：${pkg.name}`)
-}
 
 // 工具函数
 const formatNumber = (num: number) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
+// 返回上一页
+const goBack = () => {
+  window.history.back()
+}
+
 onMounted(() => {
   // 初始化数据
   console.log('店铺管理页面加载完成')
+  // 获取套餐数据
+  fetchFosterService()
 })
 </script>
 
@@ -1260,17 +1228,21 @@ onMounted(() => {
 
     .package-status {
       position: absolute;
-      top: 12px;
+      top: 14px;
       right: 12px;
-      padding: 2px 8px;
-      background: #f0f0ff;
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      align-items: center;
       color: #8a7fd9;
       font-size: 12px;
-      border-radius: 4px;
 
       &.status-active {
         background: #f6ffed;
         color: #52c41a;
+        padding: 2px 8px;
+        border-radius: 4px;
+
       }
     }
 
@@ -1344,13 +1316,32 @@ onMounted(() => {
         li {
           font-size: 13px;
           color: #666;
-          margin-bottom: 4px;
+          margin-bottom: 6px;
           line-height: 1.5;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
 
           i {
             color: #7b5fff;
             margin-right: 6px;
             font-size: 12px;
+          }
+
+          &.feature-item-with-price {
+            .feature-name {
+              flex: 1;
+            }
+
+            .feature-price {
+              font-size: 12px;
+              color: #ff6b9d;
+              font-weight: 500;
+              margin-left: 10px;
+              padding: 2px 6px;
+              background: #fff0f6;
+              border-radius: 4px;
+            }
           }
         }
       }
@@ -1389,11 +1380,11 @@ onMounted(() => {
           color: #ff6b9d;
         }
 
-        .price-original {
-          font-size: 14px;
-          color: #a99eff;
-          text-decoration: line-through;
-        }
+        // .price-original {
+        //   font-size: 14px;
+        //   color: #a99eff;
+        //   text-decoration: line-through;
+        // }
       }
 
       .action-buttons {
@@ -1409,6 +1400,12 @@ onMounted(() => {
           background: linear-gradient(135deg, #9b7bff 0%, #7b5fff 100%);
           border: none;
           color: white;
+
+
+        }
+
+        i {
+          margin-right: 5px;
         }
       }
     }
@@ -1465,9 +1462,40 @@ onMounted(() => {
       margin-bottom: 16px;
 
       .feature-item {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
+        border: 1px solid #f0f0ff;
+        border-radius: 8px;
+        padding: 12px;
+        background: #f9f7ff;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: #d9d1ff;
+          background: #f0ebff;
+        }
+
+        .feature-content {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .el-input {
+            flex: 1;
+          }
+
+          .el-input-number {
+            width: 120px;
+          }
+
+          .delete-btn {
+            transition: all 0.3s ease;
+
+            &:hover {
+              transform: scale(1.1);
+              box-shadow: 0 2px 8px rgba(255, 77, 79, 0.3);
+            }
+          }
+        }
       }
     }
 
@@ -1475,10 +1503,15 @@ onMounted(() => {
       width: 100%;
       border: 1px dashed #d9d1ff;
       color: #7b5fff;
+      padding: 12px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
 
       &:hover {
         border-color: #7b5fff;
         background: #f9f7ff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(123, 95, 255, 0.15);
       }
     }
   }

@@ -293,15 +293,16 @@ const handleLogin = async (formData: LoginForm) => {
 
     if (response.code === 0) {
       const { token } = response.data
-      const {userId,userRole}=response.data.userInfo
-      const shopId=response.data.shopInfo.shopId
-      
+      const { userId, userRole } = response.data.userInfo
+      const shopId = response.data.shopInfo.shopId
+      const fosterProviderIds = response.data.fosterProviderIds
 
       // 存储token到localStorage
       localStorage.setItem('authToken', token)
       localStorage.setItem('userId', userId)
-        localStorage.setItem('userRole', userRole)
-        localStorage.setItem('shopId', shopId)
+      localStorage.setItem('userRole', userRole)
+      localStorage.setItem('shopId', shopId)
+      localStorage.setItem('fosterProviderIds', fosterProviderIds.toString())
 
       if (shouldRemember) {
         localStorage.setItem('rememberedLoginId', encrypt(formData.loginId))
@@ -313,15 +314,15 @@ const handleLogin = async (formData: LoginForm) => {
         localStorage.removeItem('rememberedPassword')
         localStorage.removeItem('rememberedLoginType')
       }
-    if(userRole==='管理员'){
-      showMessage('success', '登录成功，欢迎进入PetGO管理系统!')
-      router.push('/admin');
-    }else{
-       showMessage('success', '登录成功，欢迎进入PetGO!')
-      const redirect = router.currentRoute.value.query.redirect as string;
-      router.push(redirect || '/foster-care');
-    }
-    
+      if (userRole === '管理员') {
+        showMessage('success', '登录成功，欢迎进入PetGO管理系统!')
+        router.push('/admin');
+      } else {
+        showMessage('success', '登录成功，欢迎进入PetGO!')
+        const redirect = router.currentRoute.value.query.redirect as string;
+        router.push(redirect || '/foster-care');
+      }
+
     } else {
       const errorMsg = response.msg
       ElMessage.error(errorMsg)

@@ -2,7 +2,8 @@
     <div class="ai-chat-container">
         <!-- 悬浮按钮 -->
         <button v-if="!isOpen" class="chat-button" @click="openChat" @mouseenter="showTooltip = true"
-            @mouseleave="showTooltip = false">
+            @mouseleave="showTooltip = false" @mousedown="handleDragStart" @touchstart="handleDragStart"
+            :style="{ transform: `translate(${buttonPosition.x}px, ${buttonPosition.y}px)` }">
             <div class="pet-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
                     <path
@@ -331,7 +332,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 // 状态管理
 const isOpen = ref(false)
@@ -341,9 +342,24 @@ const messageInput = ref('')
 const isTyping = ref(false)
 const isSidebarOpen = ref(true)
 
+// 拖动功能
+const buttonPosition = ref({ x: 0, y: 0 })
+const isDragging = ref(false)
+const dragOffset = ref({ x: 0, y: 0 })
+
+// 初始化按钮位置
+const initButtonPosition = () => {
+    buttonPosition.value = {
+        x: window.innerWidth - 90,
+        y: window.innerHeight - 90
+    }
+}
+
 // 打开聊天
 const openChat = () => {
-    isOpen.value = true
+    if (!isDragging.value) {
+        isOpen.value = true
+    }
 }
 
 // 关闭聊天
@@ -392,13 +408,72 @@ const sendQuickQuestion = (question: string) => {
     messageInput.value = question
     sendMessage()
 }
+
+// 拖动开始
+const handleDragStart = (e: MouseEvent | TouchEvent) => {
+    isDragging.value = false
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
+
+    // 计算鼠标相对于按钮左上角的偏移量
+    const buttonElement = e.currentTarget as HTMLElement
+    const rect = buttonElement.getBoundingClientRect()
+
+    dragOffset.value = {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+    }
+
+    document.addEventListener('mousemove', handleDragMove)
+    document.addEventListener('mouseup', handleDragEnd)
+    document.addEventListener('touchmove', handleDragMove)
+    document.addEventListener('touchend', handleDragEnd)
+}
+
+// 拖动中
+const handleDragMove = (e: MouseEvent | TouchEvent) => {
+    isDragging.value = true
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
+
+    // 计算新的按钮位置（相对于视口左上角）
+    const newX = clientX - dragOffset.value.x
+    const newY = clientY - dragOffset.value.y
+
+    // 限制拖动范围，防止超出屏幕
+    const maxX = window.innerWidth - 60
+    const maxY = window.innerHeight - 60
+
+    buttonPosition.value = {
+        x: Math.max(0, Math.min(newX, maxX)),
+        y: Math.max(0, Math.min(newY, maxY))
+    }
+}
+
+// 拖动结束
+const handleDragEnd = () => {
+    document.removeEventListener('mousemove', handleDragMove)
+    document.removeEventListener('mouseup', handleDragEnd)
+    document.removeEventListener('touchmove', handleDragMove)
+    document.removeEventListener('touchend', handleDragEnd)
+
+    // 延迟重置拖动状态，避免触发点击事件
+    setTimeout(() => {
+        isDragging.value = false
+    }, 100)
+}
+
+// 组件挂载时初始化按钮位置
+onMounted(() => {
+    initButtonPosition()
+})
 </script>
 
 <style scoped lang="scss">
 .ai-chat-container {
     position: fixed;
-    bottom: 30px;
-    right: 30px;
+    top: 0;
+    left: 0;
     z-index: 1000;
 }
 
@@ -410,15 +485,16 @@ const sendQuickQuestion = (question: string) => {
     background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
     border: none;
     box-shadow: 0 4px 20px rgba(249, 115, 22, 0.4);
-    cursor: pointer;
+    cursor: move;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: absolute;
+    user-select: none;
+    -webkit-user-select: none;
 
     &:hover {
-        transform: scale(1.1) rotate(5deg);
         box-shadow: 0 6px 24px rgba(249, 115, 22, 0.5);
     }
 

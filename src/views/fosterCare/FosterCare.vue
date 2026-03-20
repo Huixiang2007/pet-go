@@ -169,7 +169,7 @@
                                                         <div class="flex justify-between items-start">
                                                             <h3 class="font-bold text-lg text-gray-800">{{
                                                                 foster.name
-                                                            }}
+                                                                }}
                                                             </h3>
                                                             <span
                                                                 class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs">
@@ -182,15 +182,15 @@
                                                                 class="mr-2"></el-rate>
                                                             <span class="text-sm text-gray-600">({{
                                                                 foster.reviewCount
-                                                            }})</span>
+                                                                }})</span>
                                                         </div>
                                                         <p class="text-gray-600 text-sm mt-1 truncate">{{
                                                             foster.address
-                                                        }}
+                                                            }}
                                                         </p>
                                                         <div class="flex justify-between items-center mt-2">
                                                             <span class="text-blue-500 font-bold">{{ foster.price
-                                                            }}元/天</span>
+                                                                }}元/天</span>
                                                             <div class="flex items-center">
                                                                 <span class="text-xs text-gray-500 mr-2"
                                                                     v-if="currentLocation.lat">
@@ -270,7 +270,7 @@ const goToPerson = () => {
 const mapContainer = ref<HTMLElement>()
 let map: any = null
 let markers: any = []
-let geocoder: any | null = null
+// let geocoder: any | null = null
 let AMapInstance: any | null = null
 const mapLoadError = ref('')
 
@@ -342,6 +342,223 @@ interface FosterHome {
 
 
 // 获取用户家庭住址
+// const getUserHomeAddress = async () => {
+//     const loading = ElLoading.service({ text: '获取家庭住址中...' })
+//     try {
+//         const response = await request(
+//             '/server/api/user/getDefaultUserAddress',
+//             'GET'
+//         );
+//         if (response.code === 0) {
+//             console.log('获取用户地址响应:', response.data.detailAddress);
+//             userHomeAddress.value = response.data.detailAddress;
+
+//             // 获取地址后解析经纬度
+//             await parseAddressToLatLng(userHomeAddress.value);
+//         } else {
+//             locationError.value = '未获取到您的家庭住址，请先完善个人信息';
+//             return;
+//         }
+//     } catch (err) {
+//         console.error('获取家庭住址失败:', err);
+//         locationError.value = '获取地址失败，请刷新重试';
+//     } finally {
+//         loading.close();
+//     }
+// }
+// interface GeocodeResult {
+//     geocodes: {
+//         location: {
+//             lat: number;
+//             lng: number;
+//         };
+//         formattedAddress: string;
+//     }[];
+//     info: string;
+// }
+// 地址转经纬度
+// const parseAddressToLatLng = async (address: string) => {
+//     if (!geocoder) {
+//         locationError.value = '地图服务未就绪，请稍等';
+//         return;
+//     }
+
+//     return new Promise((resolve) => {
+//         geocoder.getLocation(address, (status: string, result: GeocodeResult) => {
+//             if (status === 'complete' && result.geocodes != undefined && result.geocodes.length > 0) {
+//                 const { location, formattedAddress } = result.geocodes[0]!;
+//                 if (location && !isNaN(location.lat) && !isNaN(location.lng)) {
+//                     currentLocation.lat = location.lat;
+//                     currentLocation.lng = location.lng;
+//                     currentLocation.address = formattedAddress;
+//                     locationError.value = '';
+//                     console.log(requestParams.value);
+//                     // 更新地图中心
+//                     if (map) {
+//                         map.setCenter([currentLocation.lng, currentLocation.lat]);
+//                         map.setZoom(15);
+//                     }
+
+//                     // 初始化请求数据
+//                     nextTick(() => {
+//                         load();
+//                     });
+//                     resolve(true);
+//                 } else {
+//                     locationError.value = '地址解析失败，无法获取有效位置';
+//                     resolve(false);
+//                 }
+//             } else {
+//                 locationError.value = `地址解析失败: ${result.info || '未知错误'}`;
+//                 resolve(false);
+//             }
+//         });
+//     });
+// }
+
+
+
+// 初始化地图
+
+const initMap = () => {
+    if (!mapContainer.value) {
+        mapLoadError.value = '地图容器未找到';
+        return;
+    }
+
+    mapLoadError.value = '';
+    const loading = ElLoading.service({ text: '加载地图中...' });
+
+    window._AMapSecurityConfig = {
+        securityJsCode: "76efd4e49a820ee84255d33dffeb374f",
+    };
+
+    AMapLoader.load({
+        key: "f9a61d8c1043186ca29b9675925160ff",
+        version: "2.0",
+        plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder"],
+    }).then((AMap: any
+    ) => {
+        AMapInstance = AMap;
+
+        map = new AMap.Map("custom-map-container", {
+            viewMode: "3D",
+            zoom: 12,
+            center: [113.9274, 35.2869]
+        });
+
+        // 添加地图控件
+        map.addControl(new AMap.ToolBar());
+        map.addControl(new AMap.Scale());
+
+        // 初始化地理编码器
+        // geocoder = new AMap.Geocoder({ city: "全国" });
+
+        // 地图加载完成后，直接定位到用户当前位置
+        locateUserPosition();
+
+        // ElMessage.success('地图加载成功');
+        loading.close();
+    }).catch((err) => {
+        console.error('地图加载失败:', err);
+        mapLoadError.value = `地图加载失败: ${err.message || '请检查API密钥'}`;
+        loading.close();
+    });
+}
+
+// 定位用户当前位置
+const locateUserPosition = () => {
+    if (!navigator.geolocation) {
+        ElMessage.error('您的浏览器不支持地理定位');
+        // 如果不支持地理定位，尝试使用用户默认地址
+        // getUserHomeAddress();
+        return;
+    }
+
+    ElMessage.info('正在获取您的位置...');
+
+    navigator.geolocation.getCurrentPosition(
+        // 成功回调
+        async (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            currentLocation.lat = lat;
+            currentLocation.lng = lng;
+
+            // 使用高德逆地理编码获取地址
+            try {
+                const geocoder = new AMapInstance.Geocoder();
+                geocoder.getAddress([lng, lat], (status: string, result: any) => {
+                    if (status === 'complete' && result.regeocode) {
+                        currentLocation.address = result.regeocode.formattedAddress;
+                        userHomeAddress.value = result.regeocode.formattedAddress;
+                    } else {
+                        currentLocation.address = '位置获取成功';
+                        userHomeAddress.value = '位置获取成功';
+                    }
+
+                    // 移动地图中心到当前位置，设置合适的缩放级别
+                    map.setCenter([lng, lat]);
+                    map.setZoom(15); // 显示当前位置所在的区域
+
+                    // 初始化请求数据
+                    nextTick(() => {
+                        load();
+                    });
+
+                    ElMessage.success('位置获取成功');
+                });
+            } catch (error) {
+                console.error('逆地理编码失败:', error);
+                currentLocation.address = '位置获取成功';
+                userHomeAddress.value = '位置获取成功';
+
+                // 移动地图中心到当前位置
+                map.setCenter([lng, lat]);
+                map.setZoom(15);
+
+                // 初始化请求数据
+                nextTick(() => {
+                    load();
+                });
+
+                ElMessage.success('位置获取成功');
+            }
+        },
+        // 失败回调
+        (error) => {
+            console.error('定位失败:', error);
+            let errorMsg = '位置获取失败';
+
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMsg = '用户拒绝提供位置信息';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMsg = '位置信息不可用';
+                    break;
+                case error.TIMEOUT:
+                    errorMsg = '获取位置信息超时';
+                    break;
+            }
+
+            ElMessage.error(errorMsg);
+
+            // 定位失败时，尝试使用用户默认地址
+            // getUserHomeAddress();
+        },
+        // 选项
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000,
+        },
+    );
+}
+
+// 获取用户家庭住址（保留原代码，作为备选方案）
+/*
 const getUserHomeAddress = async () => {
     const loading = ElLoading.service({ text: '获取家庭住址中...' })
     try {
@@ -366,17 +583,10 @@ const getUserHomeAddress = async () => {
         loading.close();
     }
 }
-interface GeocodeResult {
-    geocodes: {
-        location: {
-            lat: number;
-            lng: number;
-        };
-        formattedAddress: string;
-    }[];
-    info: string;
-}
-// 地址转经纬度
+*/
+
+// 地址转经纬度（保留原代码，作为备选方案）
+/*
 const parseAddressToLatLng = async (address: string) => {
     if (!geocoder) {
         locationError.value = '地图服务未就绪，请稍等';
@@ -415,56 +625,7 @@ const parseAddressToLatLng = async (address: string) => {
         });
     });
 }
-
-
-
-// 初始化地图
-
-const initMap = () => {
-    if (!mapContainer.value) {
-        mapLoadError.value = '地图容器未找到';
-        return;
-    }
-
-    mapLoadError.value = '';
-    const loading = ElLoading.service({ text: '加载地图中...' });
-
-    window._AMapSecurityConfig = {
-        securityJsCode: "76efd4e49a820ee84255d33dffeb374f",
-    };
-
-    AMapLoader.load({
-        key: "f9a61d8c1043186ca29b9675925160ff",
-        version: "2.0",
-        plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder"],
-    }).then((AMap: any
-    ) => {
-        AMapInstance = AMap;
-
-        map = new AMap.Map("custom-map-container", {
-            viewMode: "3D",
-            zoom: 12,
-            center: [113.9274, 35.2869]
-        });
-
-        // 添加地图控件
-        map.addControl(new AMap.ToolBar());
-        map.addControl(new AMap.Scale());
-
-        // 初始化地理编码器
-        geocoder = new AMap.Geocoder({ city: "全国" });
-
-        // 地图加载完成后，获取用户地址并定位
-        getUserHomeAddress();
-
-        // ElMessage.success('地图加载成功');
-        loading.close();
-    }).catch((err) => {
-        console.error('地图加载失败:', err);
-        mapLoadError.value = `地图加载失败: ${err.message || '请检查API密钥'}`;
-        loading.close();
-    });
-}
+*/
 
 // 更新地图标记
 const updateMapMarkers = () => {

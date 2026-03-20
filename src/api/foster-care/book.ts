@@ -9,22 +9,13 @@ export const getForecast = (serviceId: number): Promise<ApiResponse<number[]>> =
 export const getAdditionalServices = (
   serviceId: number,
 ): Promise<ApiResponse<AdditionalServicePageData>> => {
-  return request(
-    '/server/api/user/fosterServices/getAdditionalServices', // 替换为实际接口地址
-    'GET',
-    { serviceId },
-  )
+  return request('/server/api/user/fosterServices/getAdditionalServices', 'GET', { serviceId })
 }
 //提交预约
 export const submitBookingOrder = (data: any): Promise<ApiResponse<any>> => {
-  return request(
-    '/server/api/user/foster-orders/reserveFoster', // 替换为实际提交接口地址
-    'POST',
-    data,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    },
-  )
+  return request('/server/api/user/foster-orders/reserveFoster', 'POST', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
 }
 //获取我的宠物列表
 export const getMyPets = (id: number): Promise<ApiResponse<any>> => {

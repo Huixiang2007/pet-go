@@ -1,3 +1,4 @@
+d:\vcode\pet-go-web\src\views\petShop\server\components\ChatContent.vue
 <template>
   <div class="flex-1 p-4 overflow-y-auto space-y-6" ref="chatContentRef">
     <div
@@ -60,7 +61,7 @@
         <!-- 商家消息 -->
         <template v-else>
           <img
-            :src="activeShop.avatar"
+            :src="safeActiveShop.avatar"
             alt="商家头像"
             class="w-10 h-10 rounded-full object-cover"
           />
@@ -77,7 +78,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 
 const props = defineProps<{
   activeShop: any
@@ -96,9 +97,19 @@ const props = defineProps<{
 const emit = defineEmits(['withdraw-message'])
 const chatContentRef = ref<HTMLDivElement>(null)
 
+// 确保activeShop始终是有效的对象
+const safeActiveShop = computed(() => {
+  return props.activeShop || { avatar: 'https://picsum.photos/id/237/120/120' }
+})
+
+// 确保chatRecords始终是有效的数组
+const safeChatRecords = computed(() => {
+  return Array.isArray(props.chatRecords) ? props.chatRecords : []
+})
+
 // 自动滚动到底部
 watch(
-  () => props.chatRecords,
+  () => safeChatRecords.value,
   () => {
     if (chatContentRef.value) {
       chatContentRef.value.scrollTop = chatContentRef.value.scrollHeight
@@ -115,6 +126,10 @@ onMounted(() => {
 
 // 触发撤回
 const handleWithdraw = (recordId: string) => {
+  if (!recordId) {
+    console.error('无效的消息ID')
+    return
+  }
   emit('withdraw-message', recordId)
 }
 </script>

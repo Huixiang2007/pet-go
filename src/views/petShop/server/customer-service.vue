@@ -1,3 +1,4 @@
+d:\vcode\pet-go-web\src\views\petShop\server\customer-service.vue
 <template>
   <div class="min-h-screen bg-blue-50 py-8 flex justify-center items-center px-4 sm:px-6 lg:px-8">
     <div
@@ -76,7 +77,7 @@
             :chat-records="chatRecords[activeShop.id] || []"
             @withdraw-message="handleWithdrawMessage"
           />
-          <MessageInput v-model="message" @send="sendMessage" />
+          <MessageInput v-model="message" :active-shop-id="activeShop.id" @send="sendMessage" />
         </template>
       </div>
 
@@ -86,16 +87,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import ChatList from './components/ChatList.vue'
 import ChatContent from './components/ChatContent.vue'
 import SystemNoticeChat from './components/SystemNoticeChat.vue'
 import SidebarInfo from './components/SidebarInfo.vue'
 import MessageInput from './components/MessageInput.vue'
 import { systemNotices } from './data/noticeData'
-import { defaultActiveShop } from './data/shopData'
+import { defaultActiveShop, shopList } from './data/shopData'
+import { getChatRecords } from '@/api/pet-shop/chat'
 
 const message = ref('')
+const route = useRoute()
 const isSystemNotice = ref(false)
 
 const activeShop = ref(defaultActiveShop)
@@ -139,9 +143,50 @@ const unreadNoticeCount = computed(() => {
   return systemNotices.value.filter((notice) => !notice.read).length
 })
 
+// 加载聊天记录函数
+const loadChatRecords = async (shopId: string) => {
+  if (!shopId) return
+  const res = await getChatRecords(1, 100, Number(shopId))
+  console.log(res)
+  try {
+    if (!chatRecords.value[shopId]) {
+      chatRecords.value[shopId] = []
+    }
+  } catch (error) {
+    console.error('加载聊天记录失败:', error)
+  }
+}
+
 onMounted(() => {
   isSystemNotice.value = false
+  const shopId = route.query.shopId as string
+  if (shopId) {
+    const shop = shopList.find((s) => s.id === shopId)
+    if (shop) {
+      activeShop.value = shop
+      loadChatRecords(shop.id)
+    }
+  } else {
+    // 初始化时加载默认店铺的聊天记录
+    if (activeShop.value.id) {
+      loadChatRecords(activeShop.value.id)
+    }
+  }
 })
+
+// 监听路由参数变化
+watch(
+  () => route.query.shopId,
+  (newShopId) => {
+    if (newShopId) {
+      const shop = shopList.find((s) => s.id === newShopId)
+      if (shop) {
+        activeShop.value = shop
+        loadChatRecords(shop.id)
+      }
+    }
+  },
+)
 
 // 切换到系统通知
 const switchToSystemNotice = () => {
@@ -167,36 +212,26 @@ const handleMarkNoticeRead = (noticeId: string) => {
 }
 
 // 自动回复逻辑
-const sendMessage = (msg: string | { type: 'image'; file: File }) => {
+const sendMessage = async (records: any[]) => {
   if (!activeShop.value.id) return
   const shopId = activeShop.value.id
-  const now = new Date()
-  const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`
-  const recordId = `msg_${Date.now()}`
 
-  // 添加用户消息
-  if (typeof msg === 'string') {
-    chatRecords.value[shopId].push({
-      id: recordId,
-      type: 'user',
-      content: msg,
-      time: time,
-    })
-  } else if (msg.type === 'image') {
-    const imageUrl = URL.createObjectURL(msg.file)
-    chatRecords.value[shopId].push({
-      id: recordId,
-      type: 'user',
-      content: '[图片]',
-      time: time,
-      isImage: true,
-      imageUrl: imageUrl,
-    })
+  // 更新聊天记录
+  if (records && records.length > 0) {
+    chatRecords.value[shopId] = records.map((record) => ({
+      id: `msg_${record.msgId}`,
+      type: record.senderId === Number(localStorage.getItem('userId')) ? 'user' : 'shop',
+      content: record.content,
+      time: new Date(record.sendTime).toLocaleTimeString().slice(0, 5),
+      isImage: !!record.image,
+      imageUrl: record.image,
+    }))
   }
 
   // 商家自动回复
   setTimeout(() => {
     const replyContent = getShopAutoReply(shopId)
+    const time = new Date().toLocaleTimeString().slice(0, 5)
     chatRecords.value[shopId].push({
       id: `msg_${Date.now()}`,
       type: 'shop',
@@ -208,7 +243,7 @@ const sendMessage = (msg: string | { type: 'image'; file: File }) => {
   message.value = ''
 }
 
-// 撤回消息（不变）
+// 撤回消息
 const handleWithdrawMessage = (recordId: string) => {
   const shopId = activeShop.value.id
   const records = chatRecords.value[shopId]
@@ -235,17 +270,6 @@ const getShopAutoReply = (shopId: string) => {
   return replyMap[shopId as keyof typeof replyMap] || '您好，很高兴为您服务！'
 }
 </script>
-
-<style scoped>
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-thumb {
-  background-color: #3b82f6;
-  border-radius: 3px;
-}
-</style>
 
 <style scoped>
 ::-webkit-scrollbar {

@@ -11,7 +11,13 @@
           >
             <div class="text-lg font-bold text-gray-800">商品管理</div>
             <div class="flex flex-row gap-2">
-             <el-input placeholder="请输入商品名/商品编号" v-model="searchForm.keyword" @change="handleSearch" clearable style="width: 200px">
+              <el-input
+                placeholder="请输入商品名/商品编号"
+                v-model="searchForm.keyword"
+                @change="handleSearch"
+                clearable
+                style="width: 200px"
+              >
                 <template #prefix>
                   <i class="fas fa-search text-md text-gray-300"></i>
                 </template>
@@ -32,10 +38,10 @@
             </div>
           </div>
           <el-table
-           ref="productTable"
-  :data="tableData"
-  @selection-change="onSelectionChange"
-  style="width: 100%"
+            ref="productTable"
+            :data="tableData"
+            @selection-change="onSelectionChange"
+            style="width: 100%"
             stripe
             :cell-style="{ padding: '14px 0', borderRight: '1px solid #f0f0f0' }"
             :header-cell-style="{
@@ -174,21 +180,20 @@
     </div>
   </div>
 
-
-<DetailDialog
-  :visible="detailDialogVisible"
-  :product="currentProduct"
-  @close="detailDialogVisible = false"
-  @update:visible="detailDialogVisible = $event"
-/>
+  <DetailDialog
+    :visible="detailDialogVisible"
+    :product="currentProduct"
+    @close="detailDialogVisible = false"
+    @update:visible="detailDialogVisible = $event"
+  />
 
   <!-- 商品编辑弹窗组件 -->
-<EditDialog
-  v-model:visible="editDialogVisible"
-  :product="currentEditProduct"
-  @close="editDialogVisible = false"
-  @update="handleEditUpdate"
-/>
+  <EditDialog
+    v-model:visible="editDialogVisible"
+    :product="currentEditProduct"
+    @close="editDialogVisible = false"
+    @update="handleEditUpdate"
+  />
   <!-- sku弹窗组件 -->
   <SkuManange
     :visible="skuDialogVisible"
@@ -202,23 +207,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch} from 'vue'
-import { ElMessage, ElMessageBox} from 'element-plus'
+import { ref, reactive, onMounted, watch } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import DetailDialog from './components/DetailDialog.vue'
 import EditDialog from './components/EditDialog.vue'
 import SkuManange from './components/SkuManange.vue'
-import { addSkuApi,deleteSkuApi ,searchApi,getProductList} from '@/api/pet-shop/product'
+import { addSkuApi, deleteSkuApi, searchApi, getProductList } from '@/api/pet-shop/product'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-
-
-const originalNum = 2000766464265654274;
-console.log(originalNum);
-const maxSafe = Number.MAX_SAFE_INTEGER;
-console.log(originalNum > maxSafe);
-
+const originalNum = 2000766464265654274
+console.log(originalNum)
+const maxSafe = Number.MAX_SAFE_INTEGER
+console.log(originalNum > maxSafe)
 
 const openAdd = () => {
   router.push('/add-product')
@@ -229,8 +231,8 @@ interface TableRow {
   productName: string
   productType: string
   productSn: string
-  price: number;
-  stock: number;
+  price: number
+  stock: number
   status: string
   stockStatus: string
 }
@@ -253,11 +255,11 @@ const getItem = async () => {
   try {
     const requestParams = {
       pageSize: pageSize.value,
-      pageNum: currentPage.value
+      pageNum: currentPage.value,
     }
 
     const res = await getProductList(requestParams)
-      console.log(res)
+    console.log(res)
     if (res) {
       tableData.value = res.list
       total.value = res.total
@@ -279,11 +281,11 @@ const handleSearch = async () => {
     const requestParams = {
       pageSize: pageSize.value,
       pageNum: currentPage.value,
-      title:searchForm.value.keyword || ''
+      title: searchForm.value.keyword || '',
     }
 
     const res = await searchApi(requestParams)
-   console.log(res.list)
+    console.log(res.list)
     if (res.list) {
       tableData.value = res.list
       total.value = res.total
@@ -308,7 +310,7 @@ const handleSizeChange = (val: number) => {
   currentPage.value = 1
   getItem()
 }
-  const selectedRows = ref<TableRow[]>([])
+const selectedRows = ref<TableRow[]>([])
 function onSelectionChange(rows: TableRow[]) {
   selectedRows.value = rows || []
 }
@@ -355,13 +357,12 @@ const handleRemove = (row: TableRow) => {
         console.log(res)
         if (row.status === '上架') {
           ElMessage.success('商品需下架后才能移除！')
-        }
-        else{
+        } else {
           console.log(1111)
           console.log(res)
           ElMessage.success('商品移除成功！')
           getItem()
-          }
+        }
       })
       .catch((error) => {
         console.log(error)
@@ -385,16 +386,13 @@ const handleBatchRemove = () => {
       })
       .then((res: any) => {
         console.log(res)
-        if (selectedRows.map((item) => item.status).every((status) => status === '上架')) {
+        if (selectedRows.map((item) => item.status).some((status) => status === '上架')) {
           ElMessage.success('商品需下架后才能移除！')
-        }
-        else{
-          console.log(1111)
+        } else {
           console.log(res)
           ElMessage.success('商品移除成功！')
           getItem()
-          }
-
+        }
       })
       .catch((error) => {
         console.log(error)
@@ -418,9 +416,9 @@ interface ProductDetail extends TableRow {
   productScore: number
   warrantyTip: string
   detail: string
-  costPrice?:number
+  costPrice?: number
   subTitle: string
-  videoUrl?:string
+  videoUrl?: string
 }
 // 商品详情
 const productDetailMap: Record<string, ProductDetail> = {}
@@ -451,7 +449,7 @@ const currentProduct = reactive<ProductDetail>({
   warrantyTip: '',
   detail: '',
   subTitle: '',
-  videoUrl:''
+  videoUrl: '',
 })
 
 let detailRequestCancel: (() => void) | null = null
@@ -462,7 +460,7 @@ const openDetailDialog = (row: TableRow) => {
     detailRequestCancel = null
   }
 
-    detailDialogVisible.value = true
+  detailDialogVisible.value = true
   Object.assign(currentProduct, {
     ...row,
     shelfTime: '',
@@ -480,50 +478,49 @@ const openDetailDialog = (row: TableRow) => {
     warrantyTip: '',
     detail: '',
     subTitle: '',
-    videoUrl:''
+    videoUrl: '',
   })
 
-  axios.request({
-    url: '/server/api/shop/shops/list/' + row.id,
-    method: 'GET',
-    headers: { Authorization: 'Bearer ' + authToken },
-  })
-  .then((res: any) => {
-    console.log('接口返回数据：', res.data.data)
-    const apiData = res.data.data || {}
-    currentProduct.brandName = apiData.brandName || ''
-    currentProduct.currentPrice = apiData.currentPrice || 0
-    currentProduct.price = (apiData.currentPrice || 0).toFixed(2)
-    currentProduct.detail = apiData.detail || '暂无描述'
-    currentProduct.mainImage = apiData.mainImage || ''
-    currentProduct.marketPrice = apiData.marketPrice || 0
-    currentProduct.productScore = apiData.productScore || 0
-    currentProduct.productWeight = apiData.productWeight || 0
-    currentProduct.shelfTime = apiData.shelfTime || '暂无上架时间'
-    currentProduct.reviewCount = apiData.reviewCount || 0
-    currentProduct.sales = apiData.sales || 0
-    currentProduct.subTitle = apiData.subTitle || apiData.subtitle || ''
-    currentProduct.warrantyTip = apiData.warrantyTip || ''
-    currentProduct.stockStatus = apiData.stockStatus || row.stockStatus
+  axios
+    .request({
+      url: '/server/api/shop/shops/list/' + row.id,
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + authToken },
+    })
+    .then((res: any) => {
+      console.log('接口返回数据：', res.data.data)
+      const apiData = res.data.data || {}
+      currentProduct.brandName = apiData.brandName || ''
+      currentProduct.currentPrice = apiData.currentPrice || 0
+      currentProduct.price = (apiData.currentPrice || 0).toFixed(2)
+      currentProduct.detail = apiData.detail || '暂无描述'
+      currentProduct.mainImage = apiData.mainImage || ''
+      currentProduct.marketPrice = apiData.marketPrice || 0
+      currentProduct.productScore = apiData.productScore || 0
+      currentProduct.productWeight = apiData.productWeight || 0
+      currentProduct.shelfTime = apiData.shelfTime || '暂无上架时间'
+      currentProduct.reviewCount = apiData.reviewCount || 0
+      currentProduct.sales = apiData.sales || 0
+      currentProduct.subTitle = apiData.subTitle || apiData.subtitle || ''
+      currentProduct.warrantyTip = apiData.warrantyTip || ''
+      currentProduct.stockStatus = apiData.stockStatus || row.stockStatus
 
-    currentProduct.videoUrl = apiData.videoUrl || ''
-    currentProduct.images = apiData.images ? apiData.images.split(',').filter(Boolean) : []
-    currentProduct.imageList = [...currentProduct.images]
+      currentProduct.videoUrl = apiData.videoUrl || ''
+      currentProduct.images = apiData.images ? apiData.images.split(',').filter(Boolean) : []
+      currentProduct.imageList = [...currentProduct.images]
 
-    currentProduct.params = Array.isArray(apiData.params) ? apiData.params : []
+      currentProduct.params = Array.isArray(apiData.params) ? apiData.params : []
 
-
-productDetailMap[row.id] = { ...currentProduct } as ProductDetail;
-  })
-  .catch((err) => {
-    console.error('接口请求失败：', err.response.data.msg)
-    if(err.response.data.msg=='空指针异常，系统内部错误，请联系管理员'){
-      ElMessage.error('商品正在审核中，请稍后再试！')
-    }
-    else{
-      ElMessage.error('获取商品详情失败！')
-    }
-  })
+      productDetailMap[row.id] = { ...currentProduct } as ProductDetail
+    })
+    .catch((err) => {
+      console.error('接口请求失败：', err.response.data.msg)
+      if (err.response.data.msg == '空指针异常，系统内部错误，请联系管理员') {
+        ElMessage.error('商品正在审核中，请稍后再试！')
+      } else {
+        ElMessage.error('获取商品详情失败！')
+      }
+    })
 }
 watch(detailDialogVisible, (newVal) => {
   if (!newVal && detailRequestCancel) {
@@ -532,34 +529,31 @@ watch(detailDialogVisible, (newVal) => {
   }
 })
 
-
-
-
 // 编辑弹窗显示
 
 const editDialogVisible = ref(false)
 // 添加Type接口
 export interface Type {
-  id: number;
-  name: string;
+  id: number
+  name: string
 }
 // 编辑弹窗显示
 interface ProductEdit extends TableRow {
-  id: string;
-  productName: string;
-  productSn: string;
-  brandId: number;
-  typeParent: Type;
-  typeChild: Type;
-  currentPrice: number;
-  marketPrice: number;
-  costPrice: number;
-  stock: number;
-  status: string;
-  videoUrl:string;
-  detail: string;
-  warrantyTip: string;
-  mainImage: string;
+  id: string
+  productName: string
+  productSn: string
+  brandId: number
+  typeParent: Type
+  typeChild: Type
+  currentPrice: number
+  marketPrice: number
+  costPrice: number
+  stock: number
+  status: string
+  videoUrl: string
+  detail: string
+  warrantyTip: string
+  mainImage: string
 }
 
 const currentEditProduct = reactive<ProductEdit>({
@@ -581,7 +575,7 @@ const currentEditProduct = reactive<ProductEdit>({
   detail: '',
   warrantyTip: '',
   mainImage: '',
-  videoUrl:''
+  videoUrl: '',
 })
 // 打开编辑弹窗
 // 打开编辑弹窗
@@ -594,7 +588,7 @@ const openEditDialog = (row: TableRow | ProductEdit) => {
     shelfTime: '未知',
     detail: '',
     params: [],
-    costPrice:0,
+    costPrice: 0,
     currentPrice: 0,
     brandName: '',
     marketPrice: 0,
@@ -603,59 +597,60 @@ const openEditDialog = (row: TableRow | ProductEdit) => {
     productScore: 0,
     warrantyTip: '',
     subTitle: '',
-    videoUrl:''
-  };
+    videoUrl: '',
+  }
 
   // 从API获取商品详情
-  axios.request({
-    url: '/server/api/shop/shops/list/' + row.id,
-    method: 'GET',
-    headers: { Authorization: 'Bearer ' + authToken },
-  })
-  .then((res: any) => {
-    console.log('接口返回数据：', res.data.data);
-    const apiData = res.data.data || {};
-    const fullDetail = {
-      ...row,
-      brandName: apiData.brandName || '',
-      currentPrice: apiData.currentPrice || 0,
-      price: (apiData.currentPrice || 0).toFixed(2),
-      detail: apiData.detail || '暂无描述',
-      mainImage: apiData.mainImage || '',
-      marketPrice: apiData.marketPrice || 0,
-      productScore: apiData.productScore || 0,
-      productWeight: apiData.productWeight || 0,
-      shelfTime: apiData.shelfTime || '暂无上架时间',
-      reviewCount: apiData.reviewCount || 0,
-      costPrice: apiData.sales || 0,
-      subTitle: apiData.subTitle || apiData.subtitle || '',
-      warrantyTip: apiData.warrantyTip || '',
-      stockStatus: apiData.stockStatus || row.stockStatus,
-      images: apiData.images ? apiData.images.split(',').filter(Boolean) : [],
-      imageList: apiData.images ? apiData.images.split(',').filter(Boolean) : [],
-      params: Array.isArray(apiData.params) ? apiData.params : [],
-      videoUrl: apiData.videoUrl || '',
-    };
+  axios
+    .request({
+      url: '/server/api/shop/shops/list/' + row.id,
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + authToken },
+    })
+    .then((res: any) => {
+      console.log('接口返回数据：', res.data.data)
+      const apiData = res.data.data || {}
+      const fullDetail = {
+        ...row,
+        brandName: apiData.brandName || '',
+        currentPrice: apiData.currentPrice || 0,
+        price: (apiData.currentPrice || 0).toFixed(2),
+        detail: apiData.detail || '暂无描述',
+        mainImage: apiData.mainImage || '',
+        marketPrice: apiData.marketPrice || 0,
+        productScore: apiData.productScore || 0,
+        productWeight: apiData.productWeight || 0,
+        shelfTime: apiData.shelfTime || '暂无上架时间',
+        reviewCount: apiData.reviewCount || 0,
+        costPrice: apiData.sales || 0,
+        subTitle: apiData.subTitle || apiData.subtitle || '',
+        warrantyTip: apiData.warrantyTip || '',
+        stockStatus: apiData.stockStatus || row.stockStatus,
+        images: apiData.images ? apiData.images.split(',').filter(Boolean) : [],
+        imageList: apiData.images ? apiData.images.split(',').filter(Boolean) : [],
+        params: Array.isArray(apiData.params) ? apiData.params : [],
+        videoUrl: apiData.videoUrl || '',
+      }
 
-    productDetailMap[row.id] = { ...fullDetail };
+      productDetailMap[row.id] = { ...fullDetail }
 
-    // 进行深拷贝，确保数据的独立性
-    const detailForEdit = JSON.parse(JSON.stringify(fullDetail));
-    //浅拷贝
-    Object.assign(currentEditProduct, defaultDetail, detailForEdit);
+      // 进行深拷贝，确保数据的独立性
+      const detailForEdit = JSON.parse(JSON.stringify(fullDetail))
+      //浅拷贝
+      Object.assign(currentEditProduct, defaultDetail, detailForEdit)
 
-    editDialogVisible.value = true;
-  })
-  .catch((err) => {
-    console.error('获取商品详情失败：', err);
-    ElMessage.error('获取商品详情失败！');
+      editDialogVisible.value = true
+    })
+    .catch((err) => {
+      console.error('获取商品详情失败：', err)
+      ElMessage.error('获取商品详情失败！')
 
-    // API请求失败，使用基础数据打开编辑弹窗
-    const detail = JSON.parse(JSON.stringify(row));
-    Object.assign(currentEditProduct, defaultDetail, detail);
-    editDialogVisible.value = true;
-  });
-};
+      // API请求失败，使用基础数据打开编辑弹窗
+      const detail = JSON.parse(JSON.stringify(row))
+      Object.assign(currentEditProduct, defaultDetail, detail)
+      editDialogVisible.value = true
+    })
+}
 //编辑
 const handleEditUpdate = (updatedForm: any) => {
   console.log('handleEditUpdate被调用，参数：', updatedForm)
@@ -675,7 +670,7 @@ const handleEditUpdate = (updatedForm: any) => {
       targetRow.productName = updatedForm.productName
       targetRow.productType = updatedForm.productType
       targetRow.productSn = updatedForm.productSn
-      targetRow.price =Number(priceStr)
+      targetRow.price = Number(priceStr)
       targetRow.stock = updatedForm.stock
       targetRow.status = updatedForm.status
     }
@@ -690,38 +685,39 @@ const handleEditUpdate = (updatedForm: any) => {
         status: updatedForm.status,
         mainImage: updatedForm.mainImage,
         detail: updatedForm.detail,
-        currentPrice: priceValue
+        currentPrice: priceValue,
       }
     }
 
-    axios.request({
-      url: '/server/api/shop/product/update/' + updatedForm.id,
-      method: 'post',
-      headers: { Authorization: 'Bearer ' + authToken },
-      data: {
-        stock: updatedForm.stock,
-        productSn: updatedForm.productSn,
-        title: updatedForm.productName,
-        brandId: updatedForm.brandId,
-        typeParentId: updatedForm.typeParent.id,
-        typeChildId: updatedForm.typeChild.id,
-        currentPrice: priceStr,
-        costPrice: updatedForm.costPrice,
-        mainImage: updatedForm.mainImage,
-        videoUrl: updatedForm.videoUrl,
-        detail: updatedForm.detail,
-        warrantyTip: updatedForm.warrantyTip
-      }
-    })
-    .then((res) => {
-      console.log('商品编辑成功', res)
+    axios
+      .request({
+        url: '/server/api/shop/product/update/' + updatedForm.id,
+        method: 'post',
+        headers: { Authorization: 'Bearer ' + authToken },
+        data: {
+          stock: updatedForm.stock,
+          productSn: updatedForm.productSn,
+          title: updatedForm.productName,
+          brandId: updatedForm.brandId,
+          typeParentId: updatedForm.typeParent.id,
+          typeChildId: updatedForm.typeChild.id,
+          currentPrice: priceStr,
+          costPrice: updatedForm.costPrice,
+          mainImage: updatedForm.mainImage,
+          videoUrl: updatedForm.videoUrl,
+          detail: updatedForm.detail,
+          warrantyTip: updatedForm.warrantyTip,
+        },
+      })
+      .then((res: any) => {
+        console.log('商品编辑成功', res)
         ElMessage.success(res.data.msg || '商品编辑成功')
         getItem()
-    })
-    .catch((err) => {
-      ElMessage.error('商品编辑失败！')
-      console.log('商品编辑失败：', err)
-    })
+      })
+      .catch((err) => {
+        ElMessage.error('商品编辑失败！')
+        console.log('商品编辑失败：', err)
+      })
   } else {
     ElMessage.error('商品价格格式不正确！')
     return
@@ -736,15 +732,15 @@ const currentSkuProductName = ref('')
 
 // 修复后的代码
 const openSkuManageDialog = (row: TableRow) => {
-  currentSkuProductId.value = row.id;
-  console.log(row.id);
-  currentSkuProductName.value = row.productName;
-  console.log(row.productName);
-  skuDialogVisible.value = true;
+  currentSkuProductId.value = row.id
+  console.log(row.id)
+  currentSkuProductName.value = row.productName
+  console.log(row.productName)
+  skuDialogVisible.value = true
 }
 
 // 处理SKU更新
-const handleSkuUpdate = async(skuList: any[]) => {
+const handleSkuUpdate = async (skuList: any[]) => {
   console.log('SKU列表更新:', skuList)
   axios
     .request({
@@ -752,49 +748,49 @@ const handleSkuUpdate = async(skuList: any[]) => {
       method: 'post',
       data: skuList,
     })
-    .then((res) => {
+    .then((res: any) => {
       ElMessage.success(res.data.msg || 'SKU列表更新成功！')
       console.log(res)
     })
     .catch((err) => {
       ElMessage.error('SKU列表更新失败！')
-      console.log('SKU列表更新失败！',err)
-
+      console.log('SKU列表更新失败！', err)
     })
 }
 // 处理SKU删除
-const handleSkuDelete = async(skuId: string|number|bigint) => {
+const handleSkuDelete = async (skuId: string | number | bigint) => {
   try {
-    await ElMessageBox.confirm('确定删除该SKU吗？', '删除确认', { type: 'warning' });
-    console.log(skuId);
-    const response = await deleteSkuApi(skuId);
-    console.log('删除成功:', response);
-    ElMessage.success('SKU删除成功！');
+    await ElMessageBox.confirm('确定删除该SKU吗？', '删除确认', { type: 'warning' })
+    console.log(skuId)
+    const response = await deleteSkuApi(skuId)
+    console.log('删除成功:', response)
+    ElMessage.success('SKU删除成功！')
   } catch (err: any) {
     if (err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') {
-      console.log('用户取消了删除操作');
-      return;
+      console.log('用户取消了删除操作')
+      return
     }
-    console.error('删除失败:', err);
+    console.error('删除失败:', err)
   }
 }
 // 处理SKU新增
-const handleSkuAdd = async (sku: any) => { // 参数改为单个SKU对象
-  console.log('待新增的SKU:', [sku]);
+const handleSkuAdd = async (sku: any) => {
+  // 参数改为单个SKU对象
+  console.log('待新增的SKU:', [sku])
   if (!sku) {
-    ElMessage.warning('SKU数据为空，无法新增');
-    return;
+    ElMessage.warning('SKU数据为空，无法新增')
+    return
   }
 
-  const skuArray = [sku];
+  const skuArray = [sku]
   try {
-    const response = await addSkuApi(currentSkuProductId.value, skuArray);
-    console.log('新增成功:', response);
-    ElMessage.success('SKU新增成功！');
+    const response = await addSkuApi(currentSkuProductId.value, skuArray)
+    console.log('新增成功:', response)
+    ElMessage.success('SKU新增成功！')
   } catch (err) {
-    console.error('新增失败详情:', err);
+    console.error('新增失败详情:', err)
   }
-};
+}
 // 上/下架商品
 const handleToggleShelve = (row: TableRow) => {
   const isCurrentlyOff = row.status === '下架(审核不通过或主动下架)'

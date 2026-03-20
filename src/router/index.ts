@@ -20,6 +20,12 @@ const routes: RouteRecordRaw[] = [
     name: 'fosterDetail',
     component: () => import('@/views/fosterCare/FosterDetail.vue'),
   },
+    //促销活动详情
+  {
+    path: '/promotion',
+    name: 'promotionDetail',
+    component: () => import('@/views/petShop/shop/PromotionDetail.vue'),
+  },
   // 寄养预订
   {
     path: '/foster-book/:fosterId/:serviceId',

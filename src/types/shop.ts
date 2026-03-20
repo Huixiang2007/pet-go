@@ -68,23 +68,33 @@ export interface SkuInfo {
 
 // 商品详情接口
 export interface ProductDetail {
-  id: number
-  shopName: string
-  shopId: string
+  id: number | string
+  brandId: string | number
+  couponsList: Array<{
+    denomination: number
+    minAmount: number
+  }>
+  currentPrice: number
+  detail: string | null
+    brandName: string
+  images: string | null
+  mainImage: string
+  marketPrice: number
   name: string
   productScore: number
-  reviewCount: number
-  currentPrice: number
-  marketPrice: number
-  detail: string
-  images: string
-  mainImage: string
-  videoUrl: string
   productSn: string
-  brandName: string
   productWeight: number
-  warrantyTip: string
+  reviewCount: number
+  sales: number
+  shopId: string
+  shopName: string
+  shopType: string
   skuList: SkuInfo[]
+  subTitle: string
+  title: string
+  typeId: number
+  videoUrl: string
+  warrantyTip: string
 }
 //面向用户的商品接口
 export interface Products {
@@ -109,7 +119,7 @@ export interface CartItem {
   imgUrl: string
   spec: string
   quantity: number
-  selected: boolean |string
-  status?: string
+  selected: boolean,
+    status?: string
   invalidReason?: string
 }

@@ -116,13 +116,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import SystemNoticeItem from './SystemNoticeItem.vue'
 import { shopList } from '../data/shopData'
 import { ElMessage } from 'element-plus' // 引入提示组件
 
 // 接收主页面传递的参数
-defineProps<{
+const props = defineProps<{
   latestNotice: { id: string; content: string; time: string }
   unreadCount: number
   activeShopId: string // 当前选中的店铺ID
@@ -131,25 +131,35 @@ defineProps<{
 // 触发给主页面的事件
 const emit = defineEmits(['switch-to-system-notice', 'switch-shop', 'save-auto-reply'])
 
-// 自动回复设置相关状态
+// 自动回复设置
 const showAutoReplySettings = ref(false)
 const autoReplyContent = ref('')
 
-// 初始化：从本地缓存加载配置
+// 确保shopList有效
+const safeShopList = computed(() => {
+  return Array.isArray(shopList) ? shopList : []
+})
+
+// 从本地缓存加载配置
 onMounted(() => {
   const savedContent = localStorage.getItem('auto_reply_welcome')
   if (savedContent) {
     autoReplyContent.value = savedContent
   }
+
+  // 如果没有选中的店铺且有店铺列表，自动选中第一个
+  if (!props.activeShopId && safeShopList.value.length > 0) {
+    handleSwitchShop(safeShopList.value[0])
+  }
 })
 
-// 保存自动回复配置
+// 保存自动回复
 const saveAutoReply = () => {
   if (!autoReplyContent.value.trim()) {
     ElMessage.warning('欢迎语不能为空！')
     return
   }
-  // 通知父组件（可选）
+  // 通知父组件
   emit('save-auto-reply', {
     content: autoReplyContent.value,
   })

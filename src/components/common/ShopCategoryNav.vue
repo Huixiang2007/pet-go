@@ -22,8 +22,10 @@
             <span class="text-[14px] relative">
               {{ category.name }}
               <span
-                v-if="activeCategory === category.id ||
-                      (activeSubCategory && activeSubCategory.startsWith(`${category.id}-`))"
+                v-if="
+                  activeCategory === category.id ||
+                  (activeSubCategory && activeSubCategory.startsWith(`${category.id}-`))
+                "
                 class="absolute bottom-[-6px] left-0 w-full h-[2px] bg-gradient-to-r from-[#FF9E7D] to-[#FF7043] transition-all duration-300"
               ></span>
             </span>
@@ -108,7 +110,7 @@ import { getProductListId } from '../../api/pet-shop/shop'
 
 // 类型定义
 interface ApiCategory {
-  id: string | number // 兼容数字/字符串ID
+  id: string | number
   name: string
   children: ApiCategory[] | null
 }
@@ -124,16 +126,19 @@ interface Category {
   children?: SubCategory[]
 }
 interface Props {
+  promotionValue?: string
   modelValue?: string
   subModelValue?: string
 }
 
 // Props和Emit
 const props = withDefaults(defineProps<Props>(), {
+  promotionValue: '',
   modelValue: '',
   subModelValue: '',
 })
 const emit = defineEmits<{
+  'update:promotionValue': [value: string]
   'update:modelValue': [value: string]
   'update:subModelValue': [value: string]
   categoryChange: [category: Category]
@@ -147,13 +152,12 @@ const router = useRouter()
 // 核心数据
 const categories = ref<Category[]>([
   { id: 'all', name: '首页', path: '/shop', children: [] },
-  { id: 'sale', name: '促销', path: '/sale', children: [] },
+  { id: 'promotion', name: '促销', path: '/promotion', children: [] },
 ])
 const activeCategory = ref(props.modelValue) // 选中的父分类ID
 const activeSubCategory = ref(props.subModelValue) // 选中的子分类标识
 const isSubOpen = ref<Record<string, boolean>>({}) // 下拉框展开状态
 const categoriesLoaded = ref(false) // 分类数据加载完成标记
-
 
 const formatApiCategory = (apiCat: ApiCategory): Category => {
   const category: Category = {
@@ -196,6 +200,7 @@ const loadCategories = async () => {
 }
 
 // 匹配路由ID到分类
+// 匹配路由ID到分类
 const matchRouteIdToCategory = async () => {
   if (!categoriesLoaded.value) {
     console.log('分类数据尚未加载完成，暂不匹配')
@@ -208,18 +213,29 @@ const matchRouteIdToCategory = async () => {
   const rawTypeIdFromParams = route.params.category
 
   let targetTypeId = ''
- if (rawTypeIdFromParams) {
+  if (rawTypeIdFromParams) {
     targetTypeId = Array.isArray(rawTypeIdFromParams)
       ? rawTypeIdFromParams[0]
       : String(rawTypeIdFromParams)
   }
 
+  // 如果没有找到分类ID，根据当前路径匹配分类
+  if (!targetTypeId || targetTypeId === '0') {
+    // 检查当前路径是否为促销页面
+    if (route.path === '/promotion') {
+      targetTypeId = 'promotion'
+    } else {
+      targetTypeId = 'all'
+    }
+  }
+
   console.log('获取到的分类ID:', {
     fromParams: rawTypeIdFromParams,
-    targetTypeId
+    targetTypeId,
+    currentPath: route.path,
   })
 
-  // 如果没有找到分类ID，默认显示"首页"
+  // 如果仍然没有找到分类ID，默认显示"首页"
   if (!targetTypeId || targetTypeId === '0') {
     activeCategory.value = ''
     activeSubCategory.value = ''
@@ -234,7 +250,7 @@ const matchRouteIdToCategory = async () => {
   // 检查是否为子分类
   for (const parent of categories.value) {
     if (parent.children && parent.children.length > 0) {
-      const matchedSub = parent.children.find(sub => sub.id === targetTypeId)
+      const matchedSub = parent.children.find((sub) => sub.id === targetTypeId)
       if (matchedSub) {
         parentId = parent.id
         subId = targetTypeId
@@ -245,7 +261,7 @@ const matchRouteIdToCategory = async () => {
 
   // 如果不是子分类，检查是否为父分类
   if (!parentId) {
-    const matchedParent = categories.value.find(cat => cat.id === targetTypeId)
+    const matchedParent = categories.value.find((cat) => cat.id === targetTypeId)
     if (matchedParent) {
       parentId = targetTypeId
       subId = ''
@@ -269,11 +285,11 @@ const matchRouteIdToCategory = async () => {
     subId,
     activeCategory: activeCategory.value,
     activeSubCategory: activeSubCategory.value,
-    categories: categories.value.map(cat => ({
+    categories: categories.value.map((cat) => ({
       id: cat.id,
       name: cat.name,
-      hasChildren: !!cat.children?.length
-    }))
+      hasChildren: !!cat.children?.length,
+    })),
   })
 }
 
@@ -283,7 +299,7 @@ watch(
   () => {
     matchRouteIdToCategory()
   },
-  { immediate: true, flush: 'post' }
+  { immediate: true, flush: 'post' },
 )
 
 // 监听父组件Props变化
@@ -291,13 +307,13 @@ watch(
   () => props.modelValue,
   (val) => {
     activeCategory.value = val
-  }
+  },
 )
 watch(
   () => props.subModelValue,
   (val) => {
     activeSubCategory.value = val
-  }
+  },
 )
 
 // 切换下拉框展开/关闭
@@ -325,7 +341,7 @@ const handleCategoryClick = (categoryId: string) => {
     // 跳转页面，并携带typeId参数
     router.push({
       path: category.path,
-      query: { typeId: categoryId, pageNum: 1, pageSize: 10 }
+      query: { typeId: categoryId, pageNum: 1, pageSize: 10 },
     })
   }
 }
@@ -343,7 +359,7 @@ const handleSubCategoryClick = (mainId: string, sub: SubCategory) => {
   // 跳转页面，携带子分类对应的typeId
   router.push({
     path: sub.path,
-    query: { typeId: sub.id, pageNum: 1, pageSize: 10 }
+    query: { typeId: sub.id, pageNum: 1, pageSize: 10 },
   })
 
   // 关闭下拉框

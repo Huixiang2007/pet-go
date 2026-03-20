@@ -3,11 +3,17 @@
     <!-- 上传区域（大图二样式） -->
     <div
       class="upload-area border-2 border-dashed border-blue-200 rounded-lg p-8 text-center hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer"
-      :class="{ 'opacity-50': disabled || isMaxReached }" @click="handleUploadClick"
-      @dragover.prevent="isDragOver = true" @dragleave.prevent="isDragOver = false" @drop.prevent="handleDrop">
+      :class="{ 'opacity-50': disabled || isMaxReached }"
+      @click="handleUploadClick"
+      @dragover.prevent="isDragOver = true"
+      @dragleave.prevent="isDragOver = false"
+      @drop.prevent="handleDrop"
+    >
       <!-- 拖拽状态提示 -->
-      <div v-if="isDragOver"
-        class="drag-overlay absolute inset-0 bg-blue-100 rounded-lg flex items-center justify-center">
+      <div
+        v-if="isDragOver"
+        class="drag-overlay absolute inset-0 bg-blue-100 rounded-lg flex items-center justify-center"
+      >
         <div class="text-blue-600">
           <i class="fa fa-cloud-upload text-4xl mb-2"></i>
           <p>松开上传文件</p>
@@ -29,10 +35,18 @@
     <div v-if="fileList.length > 0" class="preview-section mt-4">
       <p class="text-sm text-gray-600 mb-3">已上传文件：</p>
       <div class="preview-list flex flex-wrap gap-3">
-        <div v-for="(file, index) in fileList" :key="index"
-          class="preview-item relative bg-white rounded-md shadow-sm overflow-hidden border border-gray-100">
+        <div
+          v-for="(file, index) in fileList"
+          :key="index"
+          class="preview-item relative bg-white rounded-md shadow-sm overflow-hidden border border-gray-100"
+        >
           <!-- 图片预览 -->
-          <img v-if="file.isImage" :src="file.url" :alt="file.name" class="w-24 h-24 object-cover" />
+          <img
+            v-if="file.isImage"
+            :src="file.url"
+            :alt="file.name"
+            class="w-24 h-24 object-cover"
+          />
 
           <!-- 非图片文件图标 -->
           <div v-else class="w-24 h-24 bg-gray-50 flex items-center justify-center">
@@ -45,9 +59,11 @@
           </div>
 
           <!-- 删除按钮（悬停显示） -->
-          <button type="button"
+          <button
+            type="button"
             class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 hover:opacity-100 transition-opacity"
-            @click.stop="removeFile(index)">
+            @click.stop="removeFile(index)"
+          >
             ×
           </button>
         </div>
@@ -73,14 +89,13 @@ interface Props {
   chunkThreshold?: number
 }
 
-
 const props = withDefaults(defineProps<Props>(), {
   accept: 'image/*',
   maxSizeMB: 5,
   maxCount: 99,
   disabled: false,
   uploadUrl: '/server/api/file/upload',
-  chunkThreshold: 5
+  chunkThreshold: 5,
 })
 
 const emit = defineEmits<{
@@ -89,16 +104,10 @@ const emit = defineEmits<{
   'upload-progress': [progress: number]
 }>()
 
-const {
-  isUploading,
-  uploadProgress,
-  fileList,
-  uploadFiles,
-  removeFile,
-} = useUpload({
+const { isUploading, uploadProgress, fileList, uploadFiles, removeFile } = useUpload({
   accept: props.accept,
   maxSizeMB: props.maxSizeMB,
-  chunkThreshold: props.chunkThreshold * 1024 * 1024 // 转成字节
+  chunkThreshold: props.chunkThreshold * 1024 * 1024, // 转成字节
 })
 
 watch(uploadProgress, (progress) => {
@@ -139,11 +148,13 @@ const handleFileSelect = async (e: Event) => {
   if (!input.files || input.files.length === 0) return
 
   const files = Array.from(input.files)
-  const validFiles = files.filter(file => {
-    const { isValid, message } = validateFile(file, props.accept, props.maxSizeMB)
-    if (!isValid) ElMessage.error(message)
-    return isValid
-  }).slice(0, props.maxCount - fileList.value.length)
+  const validFiles = files
+    .filter((file) => {
+      const { isValid, message } = validateFile(file, props.accept, props.maxSizeMB)
+      if (!isValid) ElMessage.error(message)
+      return isValid
+    })
+    .slice(0, props.maxCount - fileList.value.length)
 
   if (validFiles.length === 0) return
 
@@ -168,11 +179,13 @@ const handleDrop = async (e: DragEvent) => {
   if (props.disabled || isMaxReached.value) return
 
   const files = Array.from(e.dataTransfer?.files || [])
-  const validFiles = files.filter(file => {
-    const { isValid, message } = validateFile(file, props.accept, props.maxSizeMB)
-    if (!isValid) ElMessage.error(message)
-    return isValid
-  }).slice(0, props.maxCount - fileList.value.length)
+  const validFiles = files
+    .filter((file) => {
+      const { isValid, message } = validateFile(file, props.accept, props.maxSizeMB)
+      if (!isValid) ElMessage.error(message)
+      return isValid
+    })
+    .slice(0, props.maxCount - fileList.value.length)
 
   if (validFiles.length === 0) return
 
@@ -183,8 +196,6 @@ const handleDrop = async (e: DragEvent) => {
   } catch (error) {
     console.error('上传失败：', error)
   }
-
-
 }
 onUnmounted(() => {
   if (fileInput.value) {
@@ -196,9 +207,8 @@ defineExpose({
   removeFile,
   fileList,
   isUploading,
-  uploadProgress
+  uploadProgress,
 })
-
 </script>
 <style scoped>
 .file-upload-wrapper {
@@ -220,7 +230,7 @@ defineExpose({
 
 .upload-prompt {
   position: relative;
-  z-index: 10;
+  z-index: 8;
 }
 
 .preview-item {

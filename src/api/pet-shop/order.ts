@@ -50,11 +50,10 @@ export const deleteCartItem = async (cartId: string): Promise<any> => {
 }
 //批量删除
 export const deleteCartItems = async (cartIds: string[]): Promise<any> => {
-  const response = await request('/server/api/shop/shop-cart/batch-remove', 'POST',
-    cartIds
-  )
+  const response = await request('/server/api/shop/shop-cart/batch-remove', 'POST', cartIds)
   return response || 0
 }
+
 //清空购物车
 export const clearCartItems = async (): Promise<any> => {
   const response = await request('/server/api/shop/shop-cart/clear', 'POST')
@@ -62,8 +61,7 @@ export const clearCartItems = async (): Promise<any> => {
 }
 //批量选中
 export const selectCartItems = async (cartIds: string[]): Promise<any> => {
-  const response = await request('/server/api/shop/shop-cart/batch-select', 'POST', {
-    cartIds
-  })
+  const response = await request('/server/api/shop/shop-cart/batch-select', 'POST',
+    cartIds)
   return response || 0
 }

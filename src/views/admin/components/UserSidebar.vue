@@ -39,6 +39,18 @@
           <el-icon><House /></el-icon>
           <span v-if="isOpened ">寄养服务管理</span>
       </el-menu-item>
+      <!-- 电商管理 -->
+    
+       <el-sub-menu index="/admin/shop">
+        <template #title>
+          <el-icon><Shop /></el-icon>
+          <span v-if="isOpened ">电商管理</span>
+        </template>
+        <el-menu-item index="/admin/shop/store">商铺管理</el-menu-item>
+        <el-menu-item index="/admin/shop/product">商品管理</el-menu-item>
+        <el-menu-item index="/admin/shop/sku">Sku管理</el-menu-item>
+       
+      </el-sub-menu>
       <!-- 活动管理 -->
       <el-sub-menu index="/admin/active">
         <template #title>

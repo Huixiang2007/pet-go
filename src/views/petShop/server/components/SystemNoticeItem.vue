@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center p-4 border-b border-gray-100 bg-blue-50 cursor-pointer hover:bg-blue-100 transition-colors"
+    class="flex items-center p-4 border-b border-gray-100 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
     @click="handleNoticeClick"
   >
     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
@@ -8,8 +8,6 @@
     </div>
     <div class="ml-3 flex-1 min-w-0">
       <h1 class="text-base font-bold text-gray-800">系统通知</h1>
-      <p class="text-xs text-gray-500 truncate">有一条新的消息</p>
-        <!-- <p class="text-xs text-gray-500 truncate">{{ latestNotice.content }}</p> -->
     </div>
     <!-- 未读角标 -->
     <span
@@ -21,13 +19,11 @@
 </template>
 
 <script lang="ts" setup>
-
 // 接收通知数据和未读数
 defineProps<{
-  latestNotice: { id: string; content: string; time: string }; // 最新一条通知
-  unreadCount: number; // 未读数量
+  latestNotice: { id: string; content: string; time: string } // 最新一条通知
+  unreadCount: number
 }>()
-
 
 // 点击通知项的事件
 const emit = defineEmits(['click'])

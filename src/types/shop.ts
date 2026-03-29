@@ -74,6 +74,7 @@ export interface ProductDetail {
     denomination: number
     minAmount: number
   }>
+  shopOwnerId: number
   currentPrice: number
   detail: string | null
     brandName: string

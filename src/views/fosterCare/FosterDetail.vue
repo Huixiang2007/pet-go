@@ -8,11 +8,17 @@
       <FosterHomeBasicInfo :fosterHome="fosterHome" @preview-image="handleImagePreview" />
 
       <!-- 套餐展示组件 -->
-      <FosterServicePackage :provider-id="fosterHomeId" :max-pets="fosterHome.maxPets"
-        @select-package="handleSelectPackage" />
+      <FosterServicePackage
+        :provider-id="fosterHomeId"
+        :max-pets="fosterHome.maxPets"
+        @select-package="handleSelectPackage"
+      />
 
       <!-- 评价系统组件 -->
-      <FosterReviewSystem :total-score="fosterHome.totalScore" :service-score="fosterHome.serviceScore" />
+      <FosterReviewSystem
+        :total-score="fosterHome.totalScore"
+        :service-score="fosterHome.serviceScore"
+      />
     </div>
 
     <!-- 图片预览弹窗 -->
@@ -26,10 +32,10 @@
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useBookingPackageStore } from '@/stores/booking'
-import NavBar from '@/components/common/NavBar.vue';
-import FosterHomeBasicInfo from '@/views/fosterCare/components/foster-detail/DetailBasic.vue';
-import FosterServicePackage from '@/views/fosterCare/components/foster-detail/DetailPackage.vue';
-import FosterReviewSystem from '@/views/fosterCare/components/foster-detail/DetailReview.vue';
+import NavBar from '@/components/common/NavBar.vue'
+import FosterHomeBasicInfo from '@/views/fosterCare/components/foster-detail/DetailBasic.vue'
+import FosterServicePackage from '@/views/fosterCare/components/foster-detail/DetailPackage.vue'
+import FosterReviewSystem from '@/views/fosterCare/components/foster-detail/DetailReview.vue'
 import type { FosterHomeDetail, FosterServiceItem } from '@/types/foster'
 import { fosterHomeDetail } from '@/api/foster-care'
 
@@ -78,6 +84,7 @@ const previewImage = ref('')
 const getFosterHomeDetail = async (id: number) => {
   try {
     const res = await fosterHomeDetail(id)
+    console.log('获取寄养家庭详情成功：', res)
     if (res.code === 0) {
       Object.assign(fosterHome, res.data)
       if (typeof fosterHome.environmentPhotos === 'string') {
@@ -130,8 +137,6 @@ onMounted(async () => {
     box-shadow: 0 8px 16px rgba(74, 144, 226, 0.15);
   }
 }
-
-
 
 .cute-btn {
   background: linear-gradient(135deg, #6bc4ff, #4a90e2);

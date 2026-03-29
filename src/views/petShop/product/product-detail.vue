@@ -180,8 +180,18 @@
                   {{ product.shopName }}
                 </div>
               </div>
-
-              <h1 class="mt-4 text-2xl font-bold break-words">{{ product.name }}</h1>
+              <div class="flex items-center gap-24">
+                <div>
+                  <h1 class="text-2xl font-bold break-words">{{ product.name }}</h1>
+                </div>
+                <div class="shop-btn flex justify-center md:justify-start gap-4">
+                  <router-link
+                    :to="`/customer-service?id=${product.shopOwnerId}&type=shop`"
+                    class="bg-white text-orange-500 px-6 py-2 rounded-full text-sm border-2 border-orange-500 hover:bg-orange-50 transition-all active:scale-95"
+                    >联系客服</router-link
+                  >
+                </div>
+              </div>
 
               <div class="flex items-center gap-3 mt-3 flex-wrap">
                 <div class="flex items-center text-yellow-400">
@@ -368,6 +378,7 @@ const product = ref<ProductDetail>({
   id: 0,
   brandId: 0,
   shopName: '',
+  shopOwnerId: 0,
 
   name: '',
   productScore: 0,
@@ -424,7 +435,7 @@ const hasVideo = computed(() => {
   return mediaList.value.some((item) => item.type === 'video')
 })
 
-// 计算规格组（适配接口的 specJson 格式）
+// 计算规格组
 const specGroups = computed<SpecGroup[]>(() => {
   const groups: SpecGroup[] = []
   const specMap = new Map<string, Set<string>>()

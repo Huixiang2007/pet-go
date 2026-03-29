@@ -79,15 +79,6 @@
                   {{ shopItem.description }}
                 </p>
               </div>
-              <div>
-                <div class="shop-btn flex mt-20 justify-center md:justify-start gap-4">
-                  <router-link
-                    :to="`/customer-service?shopId=${shopItem.shopId}`"
-                    class="bg-white text-orange-500 px-6 py-2 rounded-full text-sm border-2 border-orange-500 hover:bg-orange-50 transition-all active:scale-95"
-                    >联系客服</router-link
-                  >
-                </div>
-              </div>
             </div>
           </div>
         </div>

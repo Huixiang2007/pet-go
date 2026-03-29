@@ -170,15 +170,6 @@
           class="flex flex-col md:flex-row justify-between items-center py-6 px-6 bg-amber-50/80 rounded-b-2xl"
         >
           <div class="flex items-center mb-4 md:mb-0 gap-4">
-            <!-- <div class="flex items-center gap-2">
-              <input
-                type="checkbox"
-                v-model="selectAll"
-                @change="batchSelectItems(selectAll)"
-                class="rounded text-amber-500 focus:ring-amber-500 w-5 h-5"
-              />
-              <label class="text-amber-800 font-medium">全选</label>
-            </div> -->
             <button
               @click="removeSelectedItems"
               class="text-sm flex items-center gap-1 rounded-md bg-red-50 hover:bg-red-100 text-red-600 hover:text-red-700 border border-red-200 px-3 py-1.5 transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1"
@@ -286,6 +277,7 @@
 <script setup lang="ts">
 import type { CartItem } from '../../../types/shop'
 import infiniteScroll from '../shop/components/infiniteScroll.vue'
+import getRecommendApi from '../../../api/pet-shop/product'
 import {
   getCartItems,
   updateCartItemQuantity,
@@ -298,7 +290,6 @@ import {
   clearCartItems,
   discountTotalCountPrice,
 } from '../../../api/pet-shop/order'
-import { getShopInfo } from '../../../api/pet-shop/shop'
 import { ref, onMounted, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 
@@ -401,15 +392,25 @@ const Cartlist = async (isLoadMore = false) => {
 // 获取推荐商品
 const recommendProduct = async () => {
   try {
-    const res = await getShopInfo({ pageNum: 1, pageSize: 8 })
-    recommendProducts.value = (res.list || []).map((item) => ({
+    const response = await getRecommendApi({ pageNum: 1, pageSize: 10 })
+    console.log('推荐商品响应:', response)
+    let newProducts: any[] = []
+    if (response && response.data && response.data.data && response.data.data.list) {
+      newProducts = response.data.data.list
+    } else if (Array.isArray(response)) {
+      newProducts = response
+    }
+
+    recommendProducts.value = newProducts.map((item: any) => ({
       id: item.id || 0,
-      name: item.title || '未命名',
+      name: item.productName || item.name || '未知商品',
       price: Number(item.price) || 0,
-      imgUrl: item.mainImage || '/img/宠物1.jpg',
+      imgUrl: item.mainImage || item.imgUrl || '/img/宠物1.jpg',
     }))
-  } catch (e) {
-    console.error(e)
+  } catch (error: any) {
+    console.error('获取推荐商品失败:', error)
+    console.error('获取推荐商品失败详情:', error.response?.data)
+    ElMessage.warning('获取推荐商品失败，使用默认推荐')
   }
 }
 

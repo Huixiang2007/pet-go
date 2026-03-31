@@ -41,7 +41,9 @@
       <el-button size="small" type="danger">驳回</el-button> -->
               </template>
             </el-table-column>
-            <!-- 分页 -->
+           
+          </el-table>
+           <!-- 分页 -->
             <el-pagination
               class="pagination-wrapper"
               v-model:current-page="pageParams.pageNum"
@@ -53,7 +55,6 @@
               @current-change="handlePageChange"
               style="text-align: right; margin-top: 50px"
             />
-          </el-table>
         </el-tab-pane>
 
         <!-- 更新商铺审核 -->

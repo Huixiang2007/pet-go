@@ -386,6 +386,18 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/admin/components/shop/productAuditDetail.vue'),
             meta: { title: '商品审核详情' },
           },
+          {
+            path: 'style',
+            name: 'styleDetail',
+            component: () => import('@/views/admin/components/shop/skuDetail.vue'),
+            meta: { title: 'sku详情' },
+          },
+          {
+            path: 'specific',
+            name: 'specficDetail',
+            component: () => import('@/views/admin/components/shop/skuAuditDetail.vue'),
+            meta: { title: 'sku详情' },
+          },
         ],
       },
       //活动管理路由

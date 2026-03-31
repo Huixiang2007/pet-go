@@ -97,7 +97,7 @@
           type="textarea"
           rows="4"
           :disabled="auditData.auditResult !== '待审核'"
-          placeholder="请输入审批理由（驳回时必填）"
+          placeholder="请输入审批理由"
           class="reason-input"
         />
       </div>
@@ -121,7 +121,7 @@
 import { ref, onMounted } from 'vue'
 
 import { useRoute, useRouter } from 'vue-router'
-import { getShopAuditDetail } from '@/api/admin/shop'
+import { getShopAuditDetail,updataShopAudit,addShopAudit } from '@/api/admin/shop'
 import type { StoreAudit } from '@/api/admin/shop'
 const route = useRoute()
 const router = useRouter()
@@ -172,33 +172,71 @@ const goBack = () => {
 }
 
 // 审核通过
-const handlePass = () => {
+const handlePass = async() => {
   if (!auditReason.value) {
-    ElMessage.warning('请输入审批理由')
+    ElMessage.warning("请输入审批理由")
     return
   }
-  // 模拟提交：更新审批状态
-  auditData.value.auditResult = '审核通过'
-  auditData.value.auditorName = '当前管理员'
-  auditData.value.auditTime = new Date().toLocaleString()
-  auditData.value.auditReason = auditReason.value
-  ElMessage.success('商铺审核已通过')
-  router.go(-1)
+  try{
+    const params={
+      auditContentId: auditData.value.shopId,
+      auditRecordId:auditData.value.id,
+      auditResult: '审核通过', 
+      auditReason: auditReason.value,
+    }
+    let res
+    if(auditData.value.auditType === '添加审核'){
+      res = await addShopAudit(params)
+    }else{
+      res = await updataShopAudit(params)
+    }
+    if (res.ok) {
+      ElMessage.success('商铺审核已通过')
+      router.go(-1)
+    } else {
+      ElMessage.error(res.msg || '审核失败')
+    }
+  }catch(err){
+    console.error('审核失败', err)
+  }
+  
 }
 
 // 驳回申请
-const handleReject = () => {
+const handleReject = async() => {
   if (!auditReason.value) {
-    ElMessage.warning('请输入驳回理由')
+    ElMessage.warning('请填写驳回理由')
     return
   }
-  // 模拟提交：更新审批状态
-  auditData.value.auditResult = '审核不通过'
-  auditData.value.auditorName = '当前管理员'
-  auditData.value.auditTime = new Date().toLocaleString()
-  auditData.value.auditReason = auditReason.value
-  ElMessage.warning('已驳回该商铺申请')
-  router.go(-1)
+  try {
+    const params = {
+      auditContentId: auditData.value.shopId,
+      auditRecordId: auditData.value.id,
+      auditResult: '审核不通过',
+      auditReason: auditReason.value
+    }
+
+    let res
+    // 根据审批类型选择接口
+    if (auditData.value.auditType === '更新审核') {
+      res = await updateShopAudit(params)
+    } else if (auditData.value.auditType === '添加审核') {
+      res = await addShopAudit(params)
+    } else {
+      ElMessage.error('未知的审批类型')
+      return
+    }
+
+    if (res.ok) {
+      ElMessage.warning('已驳回该商铺申请')
+      router.go(-1)
+    } else {
+      ElMessage.error(res.msg || '驳回失败')
+    }
+  } catch (err) {
+    console.error('驳回申请失败', err)
+    ElMessage.error('操作失败，请重试')
+  }
 }
 </script>
 

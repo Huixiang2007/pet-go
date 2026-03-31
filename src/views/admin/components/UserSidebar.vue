@@ -93,7 +93,34 @@ const route = useRoute()
 // 侧边栏折叠状态
 
 // 当前激活菜单
-const activeMenu = computed(() => route.path ||'/admin/data')
+const activeMenu = computed(() =>{
+  const currentPath = route.path
+  
+  // 如果是详情页，返回对应的列表页路径
+  if (currentPath === '/admin/shop/detail') {
+    return '/admin/shop/store'
+  }
+  if (currentPath === '/admin/shop/audit') {
+    return '/admin/shop/store'
+  }
+  if (currentPath === '/admin/shop/goods') {
+    return '/admin/shop/product'
+  }
+  if (currentPath === '/admin/shop/update') {
+    return '/admin/shop/product'
+  }
+  if (currentPath === '/admin/shop/style') {
+    return '/admin/shop/sku'
+  }
+  if (currentPath === '/admin/shop/specific') {
+    return '/admin/shop/sku'
+  }
+  
+  // 默认返回当前路径
+  return currentPath || '/admin/data'
+})
+
+
 defineProps<{
   isOpened: boolean
 }>()

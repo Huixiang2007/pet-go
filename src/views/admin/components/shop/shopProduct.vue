@@ -192,13 +192,13 @@ function handleSizeChange(size: number) {
 // 审核列表分页改变
 function handleAuditPageChange(page: number) {
   auditPageParams.value.pageNum = page
-  loadAuditList()
+  auditProductList()
 }
 
 // 审核列表每页条数改变
 function handleAuditSizeChange(size: number) {
   auditPageParams.value.pageSize = size
-  loadAuditList()
+  auditProductList()
 }
 function getStatusTag(status: string): 'success' | 'warning' | 'danger' | 'info' | 'primary' {
   const statusMap: Record<string, 'success' | 'warning' | 'danger' | 'info' | 'primary'> = {

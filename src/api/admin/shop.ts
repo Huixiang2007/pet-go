@@ -114,12 +114,67 @@ export interface ProductAudit{
 				auditType: string
 }
 
+export interface SkuInfo{
+        skuId: string,
+				productId: string,
+				skuSn: string,
+				specJson: string,
+				specText: string,
+				price: number,
+				marketPrice: number,
+				costPrice: number,
+				stock:  number,
+				sales:  number,
+				imageUrl: string,
+				weight:  number,
+				volume:  number,
+				status: string,
+				publishTime: string,
+				createTime: string,
+				updateTime: string,
+				isDeleted: number
+}
+
+export interface SkuAudit{
+        id: string,
+				skuId: string,
+				auditResult: string,
+				auditorId: number,
+				auditorName: string,
+				auditReason: string,
+				auditTime: string,
+				productId: string,
+				skuSn: string,
+				specJson: string,
+				specText: string,
+				price: number,
+				marketPrice: number,
+				costPrice: number,
+				stock:  number,
+				imageUrl: string,
+				weight:  number,
+				volume:  number,
+				createTime: string,
+				updateTime: string,
+				auditType: string
+}
+
+// 新增：审批商品更新的请求参数类型
+export interface UpdateProductParams {
+  auditContentId: number;
+  auditRecordId: number;
+  auditResult: string; 
+  auditReason: string; 
+}
+
 
 // 分页返回数据类型（对应接口里的 data 字段）
 export type ShopPageResult = PageResult<StoreInfo>
 export type ShopAuditResult = PageResult<StoreAudit>
 export type ProductPageResult = PageResult<ProductInfo>
 export type ProductAuditResult = PageResult<ProductAudit>
+export type SkuPageResult = PageResult<SkuInfo>
+export type SkuAuditResult = PageResult<SkuAudit>
 
 
 // 完整接口返回类型
@@ -127,6 +182,8 @@ export type ShopListResponse = ApiResponse<ShopPageResult>
 export type ShopAuditResponse = ApiResponse<ShopAuditResult>
 export type ProductListResponse = ApiResponse<ProductPageResult>
 export type ProductAuditResponse = ApiResponse<ProductAuditResult>
+export type SkuListResponse = ApiResponse<SkuPageResult>
+export type SkuAuditResponse = ApiResponse<SkuAuditResult>
 //获取所有商铺列表
 export const getShopPageList=(params: PageParams) => {
    return request<ShopListResponse>(
@@ -158,6 +215,24 @@ export const getProductAuditList =(param:PageParams) =>{
     'POST',
     param
   )}
+
+//获取所有SKU列表
+export const getSkuList =(param:PageParams) =>{
+  return request<SkuListResponse>(
+    '/server/api/shop-admin/sku/page-sku-list',
+    'POST',
+    param
+  )
+}
+//获取SKU审批列表
+export const getSkuAuditList =(param:PageParams) =>{
+  return request<SkuAuditResponse>(
+    '/server/api/shop-admin/sku/page-audit-sku-list',
+    'POST',
+    param
+  )}
+
+
 // 获取商铺详情
 export const getShopDetail = (shopId: string) => {
   return request<ApiResponse<StoreInfo>>(
@@ -197,5 +272,68 @@ export const deleteProduct = (productId: string) => {
     'POST'
   )
 }
-//审批结果
+//更新商品审批结果
+// 审批商品更新
+export const updateProductAudit = (data: UpdateProductParams) => {
+  return request<ApiResponse<any>>(
+    '/server/api/shop-admin/product/audit/update-product',
+    'POST',
+    data
+  );
+};
+
+export const addProductAudit = (data: UpdateProductParams) => {
+  return request<ApiResponse<any>>(
+    '/server/api/shop-admin/product/audit/add-product',
+    'POST',
+    data
+  );
+};
+
+//获取SKU详情
+export const getSkuDetail = (skuId: string) => {
+  return request<ApiResponse<SkuInfo>>(
+    `/server/api/shop-admin/sku/detail-sku/${skuId}`,
+    'GET'
+  )
+}
+//获取SKU审批详情
+export const getSkuAuditDetail = (auditId: string) => {
+  return request<ApiResponse<SkuAudit>>(
+    `/server/api/shop-admin/sku/detail-audit-sku/${auditId}`,
+    'GET'
+  )
+}
+//审批sku更新
+export const updateSkuAudit = (data: UpdateProductParams) => {
+  return request<ApiResponse<any>>(
+    '/server/api/shop-admin/sku/audit/update-sku',
+    'POST',
+    data
+  );
+};
+//审批商品添加
+export const addSkuAudit = (data: UpdateProductParams) => {
+  return request<ApiResponse<any>>(
+    '/server/api/shop-admin/sku/audit/add-sku',
+    'POST',
+    data
+  );
+};
+//审批商铺更新
+export const updateShopAudit = (data: UpdateProductParams) => {
+  return request<ApiResponse<any>>(
+    '/server/api/shop-admin/shop/audit/update-shop',
+    'POST',
+    data
+  );
+};
+//审批商铺添加
+export const addShopAudit = (data: UpdateProductParams) => {
+  return request<ApiResponse<any>>(
+    '/server/api/shop-admin/shop/audit/add-shop',
+    'POST',
+    data
+  );
+};
 

@@ -15,6 +15,7 @@ declare module 'vue' {
     AIChat: typeof import('./src/components/common/AIChat.vue')['default']
     CaptchaLoad: typeof import('./src/components/common/CaptchaLoad.vue')['default']
     ConfirmCode: typeof import('./src/components/common/ConfirmCode.vue')['default']
+    EditHistory: typeof import('./src/components/common/EditHistory.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']

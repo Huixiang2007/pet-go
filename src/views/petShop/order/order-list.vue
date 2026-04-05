@@ -46,11 +46,11 @@
 
               <div class="border-t border-gray-100">
                 <nav class="p-2">
-                    <button
+                  <button
                     @click="activeTab = 'keep-pet'"
                     class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1"
                     :class="
-                      activeTab === 'comments'
+                      activeTab === 'keep-pet'
                         ? 'bg-orange-50 text-orange-600 font-medium'
                         : 'text-gray-600 hover:bg-gray-50'
                     "
@@ -58,13 +58,7 @@
                     <i class="fa fa-comment w-5 text-center mr-3"></i>
                     寄养订单
                   </button>
-                  <a
-                    href="/pet-cart"
-                    class="flex items-center px-3 py-2.5 rounded-lg text-gray-600 hover:bg-gray-50 transition-all mb-1"
-                  >
-                    <i class="fa fa-shopping-cart w-5 text-center mr-3"></i>
-                    我的购物车
-                  </a>
+
                   <button
                     @click="activeTab = 'coupons'"
                     class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1"
@@ -89,7 +83,6 @@
                     <i class="fa fa-comment w-5 text-center mr-3"></i>
                     评论管理
                   </button>
-
                 </nav>
               </div>
             </div>
@@ -128,10 +121,12 @@
                 <p class="text-gray-500 mb-6 max-w-md mx-auto">
                   您还没有相关订单，快去挑选心仪的商品吧～
                 </p>
-                <router-link to="/petShop" class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg transition-colors">
+                <router-link
+                  to="/petShop"
                   class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg transition-colors"
                 >
-                  去逛逛
+                  class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg
+                  transition-colors" > 去逛逛
                 </router-link>
               </div>
               <div v-else class="space-y-4">
@@ -151,6 +146,7 @@
               </div>
             </div>
 
+            <!-- 评论管理 -->
             <div class="mt-8 mb-8" v-else-if="activeTab === 'comments'">
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-gray-800">
@@ -160,34 +156,39 @@
               </div>
 
               <div class="bg-white rounded-xl shadow-sm p-5">
-                <Comments />
+                <Comments
+                  :page-num="pageNum"
+                  :page-size="pageSize"
+                  @page-change="handlePageChange"
+                  @update:total="total = $event"
+                />
               </div>
             </div>
 
-            <div class="flex justify-center mt-8">
-              <nav class="inline-flex items-center bg-white rounded-lg shadow-sm overflow-hidden">
-                <button
-                  class="w-10 h-10 flex items-center justify-center text-gray-400 border-r border-gray-100 disabled:cursor-not-allowed"
-                  disabled
-                >
-                  <i class="fa fa-chevron-left text-xs"></i>
-                </button>
-                <button
-                  v-for="page in 5"
-                  :key="page"
-                  class="w-10 h-10 flex items-center justify-center transition-colors border-r border-gray-100 last:border-r-0"
-                  :class="
-                    page === 1 ? 'bg-orange-500 text-white' : 'hover:bg-gray-50 text-gray-700'
-                  "
-                >
-                  {{ page }}
-                </button>
-                <button
-                  class="w-10 h-10 flex items-center justify-center text-gray-700 hover:bg-gray-50 transition-colors"
-                >
-                  <i class="fa fa-chevron-right text-xs"></i>
-                </button>
-              </nav>
+            <!-- //寄养的管理 -->
+            <div class="mt-8 mb-8" v-else-if="activeTab === 'keep-pet'">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                  <i class="fa fa-comment text-[#FF7043] mr-2"></i>
+                  寄养管理
+                </h2>
+              </div>
+
+              <div class="bg-white rounded-xl shadow-sm p-5">
+                <ForserOrderList />
+              </div>
+            </div>
+
+            <div class="mt-6 flex justify-center">
+              <el-pagination
+                v-model:current-page="pageNum"
+                v-model:page-size="pageSize"
+                page-sizes="[5, 10, 15, 20]"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="total"
+                @size-change="handlePageChange"
+                @current-change="handlePageChange"
+              />
             </div>
           </main>
         </div>
@@ -202,11 +203,19 @@ import { type Order } from './components/OrderCard.vue'
 import Comments from './components/MyComments.vue'
 import Coupons from './components/MyCoupons.vue'
 import { ref, computed } from 'vue'
+import { ElMessage } from 'element-plus'
 
 // 筛选状态
 const activeStatus = ref('all')
 const activeTab = ref('orders')
+const pageNum = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 
+// 分页切换
+const handlePageChange = () => {
+  ElMessage.info('切换页码：' + pageNum.value)
+}
 // 筛选选项数据
 const statusFilters = [
   { label: '全部订单', value: 'all' },

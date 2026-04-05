@@ -69,6 +69,7 @@
         </div>
       </div>
       <router-link
+        v-if="hasShopId"
         to="/seller-item-manager"
         class="border-[1px] border-orange-400 ml-12 rounded-full px-5 py-2 text-orange-700 font-medium flex bg-gradient-to-r from-[#FF9E7D]/0 to-[#FF7043]/30 items-center gap-2 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group hidden xl:flex cursor-pointer"
       >
@@ -144,7 +145,6 @@ const emit = defineEmits<{
   categoryChange: [category: Category]
   subCategoryChange: [mainId: string, sub: SubCategory]
 }>()
-
 // 路由实例
 const route = useRoute()
 const router = useRouter()
@@ -174,12 +174,23 @@ const formatApiCategory = (apiCat: ApiCategory): Category => {
   }
   return category
 }
-
 // 初始化下拉框状态
 const initDropdownStates = () => {
   categories.value.forEach((cat) => (isSubOpen.value[cat.id] = false))
 }
 
+import { computed } from 'vue'
+
+const hasShopId = computed(() => {
+  const shopId = Number(localStorage.getItem('shopId'))
+  console.log('localStorage 真实值:', shopId, '类型:', typeof shopId)
+  if (isNaN(shopId)) {
+    return false
+  } else {
+    return true
+  }
+})
+console.log('hasShopId:', hasShopId.value)
 // 加载分类数据
 const loadCategories = async () => {
   try {
@@ -199,7 +210,6 @@ const loadCategories = async () => {
   }
 }
 
-// 匹配路由ID到分类
 // 匹配路由ID到分类
 const matchRouteIdToCategory = async () => {
   if (!categoriesLoaded.value) {

@@ -68,6 +68,7 @@
             :chat-type="chatType"
             :active-shop="activeShop"
             :chat-records="chatRecords[`${chatType}_${activeShop.userId}`] || []"
+            @load-more="handleLoadMore"
           />
           <MessageInput
             v-model="message"
@@ -124,12 +125,20 @@ const allFosterLists = ref<any[]>([])
 const activeShop = ref(defaultActiveShop)
 const chatContainer = ref(null)
 
+// 分页加载（无限滚动）
+const pageNum = ref(1)
+const pageSize = 20
+const noMoreData = ref(false)
+const loading = ref(false)
+
 // 聊天类型
 const chatType = computed(() => (route.query.type as 'shop' | 'foster') || 'shop')
-console.log('聊天类型:', chatType.value)
+
 // 切换聊天类型（电商/寄养）
 const switchChatType = (type: 'shop' | 'foster') => {
   isSystemNotice.value = false
+  pageNum.value = 1
+  noMoreData.value = false
   router.replace({ query: { ...route.query, type } })
 }
 
@@ -141,60 +150,70 @@ watch(
   async (newType) => {
     chatRecords.value = {}
     activeShop.value = defaultActiveShop
+    pageNum.value = 1
+    noMoreData.value = false
 
     if (newType === 'shop') {
       await shopList()
       allShops.value = [...getShopList]
-      console.log('加载电商列表成功:', getShopList)
     } else {
       await forserList()
       allFosterLists.value = getFosterList.map((item) => ({
         ...item,
         userId: item.userId || extractNumberFromStr(route.query.type as string),
-        shopId: item.shopId || item.fosterProviderId,
-        shopName: item.shopName || item.fosterProviderName,
-        shopAvataravatar: item.shopAvatar || item.fosterProviderAvatar,
+        shopId: item.fosterProviderId,
+        shopName: item.fosterProviderName,
+        shopAvatar: item.fosterProviderAvatar,
       }))
-      console.log('加载寄养列表成功:', allFosterLists.value)
     }
 
     const currentList = newType === 'shop' ? allShops.value : allFosterLists.value
     if (currentList.length > 0) {
       activeShop.value = currentList[0]
       loadChatRecords(activeShop.value.userId)
-      console.log('切换tab，默认选中第一个，userId:', activeShop.value.userId)
     }
   },
   { immediate: true },
 )
 
 // 加载聊天记录
-const loadChatRecords = async (userId: number) => {
-  if (!userId) return
+const loadChatRecords = async (userId: number, isLoadMore = false) => {
+  if (!userId || loading.value || noMoreData.value) return
+  if (!isLoadMore) {
+    pageNum.value = 1
+    noMoreData.value = false
+  }
+
   try {
+    loading.value = true
     let res
     if (chatType.value === 'shop') {
-      res = await getChatRecords(userId, 1, 100000)
+      res = await getChatRecords(userId, pageNum.value, pageSize)
+      console.log('电商聊天记录:', res)
     } else {
-      res = await getFosterChatRecords(userId, 1, 100000)
-      console.log('寄养聊天记录', res)
+      res = await getFosterChatRecords(userId, pageNum.value, pageSize)
+      console.log('寄养聊天记录:', res)
     }
 
     const currentUserId = +(localStorage.getItem('userId') || 0)
     const key = `${chatType.value}_${userId}`
+    const list = res.records || []
 
-    chatRecords.value[key] = res.records
+    if (list.length < pageSize) {
+      noMoreData.value = true
+    }
+
+    const formatRecords = list
       .sort((a: any, b: any) => new Date(a.sendTime).getTime() - new Date(b.sendTime).getTime())
       .map((item: any) => {
         const base = {
           id: String(item.msgId),
           type: item.senderId === currentUserId ? 'user' : 'shop',
-          time: new Date(item.sendTime).toLocaleTimeString().slice(0, 5),
+          time: formatDateTime(item.sendTime),
           isWithdrawn: false,
           msgType: item.msgType,
         }
 
-        // 文本消息
         if (item.msgType === 'text') {
           return {
             ...base,
@@ -206,7 +225,6 @@ const loadChatRecords = async (userId: number) => {
           }
         }
 
-        // 商品消息
         if (item.msgType === 'product') {
           return {
             ...base,
@@ -224,7 +242,6 @@ const loadChatRecords = async (userId: number) => {
           }
         }
 
-        //  寄养服务消息
         if (item.msgType === 'service') {
           return {
             ...base,
@@ -233,16 +250,16 @@ const loadChatRecords = async (userId: number) => {
             isImage: false,
             content: '',
             serviceInfo: {
-              id: item.shopId || item.msgId,
-              title: item.shopTitle || '商品',
-              currentPrice: item.shopPrice || 0,
-              sales: item.shopSales || 0,
-              mainImage: item.shopMainImage || '',
+              title: item.serviceTitle || item.shopTitle || '寄养服务',
+              currentPrice: item.servicePrice || item.shopPrice || 0,
+              mainImage: item.shopMainImage || item.senderAvatar || '',
+              petTypes: item.petTypes || item.servicePetType || '通用',
+              serviceDescription: item.serviceDescription || '专业宠物寄养',
+              id: item.msgId,
             },
           }
         }
 
-        // 兜底
         return {
           ...base,
           content: item.content || '',
@@ -253,11 +270,27 @@ const loadChatRecords = async (userId: number) => {
         }
       })
 
-    scrollToBottom()
+    if (isLoadMore) {
+      chatRecords.value[key] = [...formatRecords, ...(chatRecords.value[key] || [])]
+    } else {
+      chatRecords.value[key] = formatRecords
+    }
+
+    if (!isLoadMore) scrollToBottom()
   } catch (e) {
     console.error('加载聊天记录失败', e)
+  } finally {
+    loading.value = false
   }
 }
+
+// 无限滚动加载更多
+const handleLoadMore = () => {
+  if (noMoreData.value || loading.value) return
+  pageNum.value++
+  loadChatRecords(activeShop.value.userId, true)
+}
+
 // 发送消息
 const sendMessage = (record: any) => {
   let uid = activeShop.value.userId
@@ -273,8 +306,6 @@ const sendMessage = (record: any) => {
     time: new Date(record.sendTime).toLocaleTimeString().slice(0, 5),
     isWithdrawn: false,
     msgType: record.msgType || 'text',
-
-    // 必须补齐，否则模板判断不生效！
     isGoods: false,
     isService: false,
     content: '',
@@ -282,15 +313,11 @@ const sendMessage = (record: any) => {
     imageUrl: '',
   }
 
-  // 文本
   if (newRecord.msgType === 'text') {
     newRecord.content = record.content || ''
     newRecord.isImage = !!record.isImage
     newRecord.imageUrl = record.imageUrl || ''
-  }
-
-  // 商品
-  else if (newRecord.msgType === 'product') {
+  } else if (newRecord.msgType === 'product') {
     newRecord.isGoods = true
     newRecord.goodsInfo = {
       id: record.id,
@@ -299,17 +326,16 @@ const sendMessage = (record: any) => {
       sales: record.sales || 0,
       mainImage: record.mainImage || '',
     }
-  }
-
-  // 服务
-  else if (newRecord.msgType === 'service') {
+  } else if (newRecord.msgType === 'service') {
     newRecord.isService = true
     newRecord.serviceInfo = {
-      id: record.id,
+      id: record.msgId,
       title: record.title || '寄养服务',
-      currentPrice: record.price || 0,
-      sales: record.sales || 0,
-      mainImage: record.mainImage || '',
+      currentPrice: record.servicePrice || record.shopPrice || 0,
+      mainImage: record.shopMainImage || record.senderAvatar || '',
+      petTypes: record.petTypes || record.servicePetType || '通用',
+      serviceDescription: record.serviceDescription || '专业宠物寄养',
+      sales: record.servicePrice || 0,
     }
   }
 
@@ -323,7 +349,7 @@ const handleSSEMessage = (data: any) => {
     const currentUserId = Number(localStorage.getItem('userId') || 0)
     const type: 'user' | 'shop' = data.senderId === currentUserId ? 'user' : 'shop'
     const key = `${chatType.value}_${data.targetUserId || activeShop.value.userId}`
-    // 基础消息结构
+
     const base = {
       id: String(data.msgId || `msg_${Date.now()}`),
       type,
@@ -333,7 +359,7 @@ const handleSSEMessage = (data: any) => {
     }
 
     let record: ChatRecord
-    // 文本消息
+
     if (data.msgType === 'text') {
       record = {
         ...base,
@@ -343,9 +369,7 @@ const handleSSEMessage = (data: any) => {
         isGoods: false,
         isService: false,
       }
-    }
-    //  商品消息
-    else if (data.msgType === 'product') {
+    } else if (data.msgType === 'product') {
       record = {
         ...base,
         isGoods: true,
@@ -360,10 +384,7 @@ const handleSSEMessage = (data: any) => {
           mainImage: data.shopMainImage || '',
         },
       }
-    }
-
-    // 寄养服务消息
-    else if (data.msgType === 'service') {
+    } else if (data.msgType === 'service') {
       record = {
         ...base,
         isGoods: false,
@@ -372,16 +393,15 @@ const handleSSEMessage = (data: any) => {
         content: '',
         serviceInfo: {
           id: data.shopId || data.msgId,
-          title: data.shopTitle || '寄养服务',
-          currentPrice: data.shopPrice || 0,
-          sales: data.shopSales || 0,
-          mainImage: data.shopMainImage || '',
+          title: data.serviceTitle || data.shopTitle || '寄养服务',
+          currentPrice: data.servicePrice || data.shopPrice || 0,
+          mainImage: data.shopMainImage || data.senderAvatar || '',
+          petTypes: data.petTypes || data.servicePetType || '通用',
+          serviceDescription: data.serviceDescription || '专业宠物寄养',
+          sales: data.servicePrice || 0,
         },
       }
-    }
-
-    // 兜底
-    else {
+    } else {
       record = {
         ...base,
         content: data.content || '',
@@ -392,10 +412,7 @@ const handleSSEMessage = (data: any) => {
       }
     }
 
-    // 确保数组存在
-    if (!chatRecords.value[key]) {
-      chatRecords.value[key] = []
-    }
+    if (!chatRecords.value[key]) chatRecords.value[key] = []
     const exists = chatRecords.value[key].some((item) => item.id === record.id)
     if (!exists) {
       chatRecords.value[key].push(record)
@@ -405,6 +422,7 @@ const handleSSEMessage = (data: any) => {
     console.error('处理 SSE 消息失败:', error)
   }
 }
+
 // 新增电商店铺到列表
 const addShopToList = (newShop: any) => {
   const isExist = allShops.value.some((shop) => shop.userId === newShop.userId)
@@ -412,7 +430,15 @@ const addShopToList = (newShop: any) => {
     allShops.value.unshift(newShop)
   }
 }
-
+const formatDateTime = (time: any): string => {
+  const date = new Date(time)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  return `${year}-${month}-${day} ${hours}:${minutes}`
+}
 // 新增寄养店铺到列表
 const addFosterToList = (newFoster: any) => {
   const fosterWithUserId = {
@@ -420,7 +446,7 @@ const addFosterToList = (newFoster: any) => {
     userId: extractNumberFromStr(route.query.id as string),
     shopId: newFoster.fosterProviderId,
     shopName: newFoster.fosterProviderName,
-    avatar: newFoster.fosterProviderAvatar,
+    shopAvatar: newFoster.fosterProviderAvatar,
   }
   const isExist = allFosterLists.value.some((item) => item.userId === fosterWithUserId.userId)
   if (!isExist) {
@@ -429,19 +455,18 @@ const addFosterToList = (newFoster: any) => {
   return fosterWithUserId
 }
 
-//对获取到的id进性一个正则检验
+// 正则提取数字ID
 const extractNumberFromStr = (str: string): number => {
   const match = str.match(/^\d+/)
   return match ? Number(match[0]) : NaN
 }
-
+// 切换店铺/寄养
 onMounted(async () => {
   if (!route.query.type) {
-    router.replace({
-      query: { ...route.query, type: 'shop' },
-    })
+    router.replace({ query: { ...route.query, type: 'shop' } })
     return
   }
+
   if (chatType.value === 'shop') {
     await shopList()
     allShops.value = [...getShopList]
@@ -454,20 +479,17 @@ onMounted(async () => {
       shopAvatar: item.fosterProviderAvatar,
     }))
   }
-
+  // 切换店铺/寄养后默认选中第一个店铺
   const currentList = chatType.value === 'shop' ? allShops.value : allFosterLists.value
   if (currentList.length > 0) {
     activeShop.value = currentList[0]
-    console.log('11111', activeShop)
-    console.log('初始化，默认选中第一个，userId:', activeShop.value.userId)
   }
-  isSystemNotice.value = false
 
+  isSystemNotice.value = false
   const urlUserId = extractNumberFromStr(route.query.id as string)
   if (urlUserId) {
     const targetId = Number(urlUserId)
     const currentList = chatType.value === 'shop' ? allShops.value : allFosterLists.value
-
     const targetItem = currentList.find((s: any) => s.userId === targetId)
 
     if (!targetItem) {
@@ -479,44 +501,36 @@ onMounted(async () => {
           if (info) {
             activeShop.value = info
             loadChatRecords(info.userId)
-            console.log('新增成功，userId:', info.userId)
           }
         } else {
           info = await getFosterBaseInfoByUserId(targetId)
-          console.log('获取未聊天寄养信息成功:', info)
-          addFosterToList(info)
-          if (info) {
-            activeShop.value = info.fosterProviderId
-            loadChatRecords(info.fosterProviderId)
+          const fosterItem = addFosterToList(info)
+          if (fosterItem) {
+            activeShop.value = fosterItem
+            loadChatRecords(fosterItem.userId)
           }
         }
       } catch (e) {
-        console.error('获取未聊天店铺/寄养信息失败', e)
+        console.error('获取店铺/寄养信息失败', e)
       }
     } else {
       activeShop.value = targetItem
       loadChatRecords(targetItem.userId)
     }
   } else {
-    if (activeShop.value.userId) {
-      loadChatRecords(activeShop.value.userId)
-    }
+    if (activeShop.value.userId) loadChatRecords(activeShop.value.userId)
   }
 
-  //  建立SSE连接
+  // SSE
   const userId = Number(localStorage.getItem('userId'))
-  if (!userId || isNaN(userId)) {
-    console.error('userId 无效！')
-    return
-  }
+  if (!userId || isNaN(userId)) return
   sseInstance = createSSE(userId)
   sseInstance.onmessage = (event) => {
-    console.log('SSE 收到消息:', event.data)
     try {
       const data = JSON.parse(event.data)
       handleSSEMessage(data)
     } catch (error) {
-      console.error('解析SSE消息失败:', error)
+      console.error('解析SSE失败', error)
     }
   }
 })
@@ -525,21 +539,18 @@ watch(
   () => route.query.id,
   async (newUserId) => {
     if (!newUserId) return
-    const targetId = Number(extractNumberFromStr(newUserId as string))
+    const targetId = extractNumberFromStr(newUserId as string)
     const currentList = chatType.value === 'shop' ? allShops.value : allFosterLists.value
     const targetItem = currentList.find((s: any) => s.userId === targetId)
 
     if (targetItem) {
       activeShop.value = targetItem
       loadChatRecords(targetItem.userId)
-      console.log('URL id 变化，跳转到对象，userId:', targetId)
-    } else {
-      console.warn('URL id 未找到对应对象，不修改当前选中，targetId:', targetId)
     }
   },
 )
 
-// 滚动到聊天底部
+// 滚动到底部
 const scrollToBottom = () =>
   nextTick(() => {
     if (chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight
@@ -549,45 +560,36 @@ const scrollToBottom = () =>
 const handleSwitchShop = (shop: any) => {
   activeShop.value = shop
   isSystemNotice.value = false
+  pageNum.value = 1
+  noMoreData.value = false
   loadChatRecords(shop.userId)
 }
-
-// 最新系统通知
+//最后的一系统通知
 const latestSystemNotice = computed(
   () => systemNotices.value[0] || { id: '', content: '', time: '' },
 )
-
-// 未读系统通知数量
+//未读
 const unreadNoticeCount = computed(() => systemNotices.value.filter((n) => !n.read).length)
-
 // 切换到系统通知
 const switchToSystemNotice = () => (isSystemNotice.value = true)
-
 // 保存自动回复
 const handleSaveAutoReply = (d: any) => console.log(d)
-
-// 删除系统通知
+// 删除
 const handleDelete = (id: string) => {
   systemNotices.value = systemNotices.value.filter((i) => i.id !== id)
 }
-
-// 批量删除系统通知
+// 批量删除
 const handleBatchDelete = (ids: string[]) => {
   systemNotices.value = systemNotices.value.filter((i) => !ids.includes(i.id))
 }
-
-// 标记系统通知已读（
+// 标记已读
 const handleMarkNoticeRead = (id: string) => {
   const n = systemNotices.value.find((i) => i.id === id)
   if (n) n.read = true
 }
-
-// SSE销毁
 let sseInstance: any = null
 onUnmounted(() => {
-  if (sseInstance) {
-    closeSSE(sseInstance)
-  }
+  if (sseInstance) closeSSE(sseInstance)
 })
 </script>
 

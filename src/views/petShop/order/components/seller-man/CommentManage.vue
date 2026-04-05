@@ -3,28 +3,14 @@
     <!-- 筛选栏 -->
     <div class="flex flex-row justify-between items-center border-b-[1px] px-8 py-2">
       <div class="text-md font-bold">评价管理</div>
-      <div class="flex flex-row gap-2">
-        <el-select v-model="commentFilter" placeholder="全部评价" clearable size="small">
-          <el-option label="全部评价" value=""></el-option>
-          <el-option label="好评" value="好评"></el-option>
-          <el-option label="中评" value="中评"></el-option>
-          <el-option label="差评" value="差评"></el-option>
-          <el-option label="未回复" value="未回复"></el-option>
-        </el-select>
-        <el-input placeholder="商品名称/订单号" v-model="commentSearchInput" clearable size="small">
-          <template #prefix>
-            <i class="fas fa-search text-md text-gray-300"></i>
-          </template>
-        </el-input>
-        <el-button size="small" @click="searchComment">搜索</el-button>
-      </div>
     </div>
 
-    <!-- 评价表格 -->
+    <!-- 评价表格（精简核心信息） -->
     <el-table
       :data="commentData"
       style="width: 100%"
       stripe
+      :loading="loading"
       :cell-style="{ padding: '12px 0' }"
       :header-cell-style="{
         background: '#fafafa',
@@ -32,19 +18,19 @@
         fontWeight: '500',
       }"
     >
-      <el-table-column prop="commentId" label="评价ID" width="100" />
-      <el-table-column prop="orderId" label="订单号" width="140" />
-      <el-table-column prop="productName" label="商品名称" width="200">
+      <el-table-column prop="id" label="评价ID" width="140" />
+      <el-table-column prop="orderItemId" label="订单号" width="120" />
+      <el-table-column prop="productName" label="商品名称" min-width="180">
         <template #default="scope">
-          <div class="text-ellipsis overflow-hidden" :title="scope.row.productName">
-            {{ scope.row.productName }}
+          <div class="text-ellipsis overflow-hidden" :title="scope.row.productName || '商品名称'">
+            {{ scope.row.productName || '商品名称' }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="userName" label="买家昵称" width="100" />
-      <el-table-column prop="star" label="评分" width="80">
+      <el-table-column prop="userNickname" label="买家昵称" width="110" />
+      <el-table-column prop="productScore" label="商品评分" width="90">
         <template #default="scope">
-          <el-rate v-model="scope.row.star" disabled size="small" />
+          <el-rate v-model="scope.row.productScore" disabled size="small" />
         </template>
       </el-table-column>
       <el-table-column prop="content" label="评价内容" min-width="200">
@@ -54,15 +40,15 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="commentTime" label="评价时间" width="160" />
+      <el-table-column prop="createTime" label="评价时间" width="170" />
       <el-table-column prop="replyStatus" label="回复状态" width="100">
         <template #default="scope">
-          <el-tag :type="scope.row.replyStatus === '已回复' ? 'success' : 'warning'" size="small">
-            {{ scope.row.replyStatus }}
+          <el-tag :type="scope.row.replyCount === 0 ? 'warning' : 'success'" size="small">
+            {{ scope.row.replyCount === 0 ? '未回复' : '已回复' }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="160">
+      <el-table-column label="操作" width="200">
         <template #default="scope">
           <div class="flex gap-2">
             <el-button
@@ -70,10 +56,11 @@
               type="text"
               class="text-blue-600"
               @click="openCommentDetail(scope.row)"
-              >查看</el-button
             >
+              查看详情
+            </el-button>
             <el-button
-              v-if="scope.row.replyStatus === '未回复'"
+              v-if="scope.row.replyCount === 0"
               size="mini"
               type="text"
               class="text-green-600"
@@ -88,56 +75,150 @@
 
     <!-- 分页 -->
     <div class="px-6 py-3 border-t flex justify-between items-center">
-      <div class="text-sm text-gray-500">共 {{ commentData.length }} 条记录</div>
-      <el-pagination layout="prev, pager, next" :total="commentData.length" :page-size="10" />
+      <div class="text-sm text-gray-500">
+        共 {{ total }} 条记录，当前第 {{ pageNum }} / {{ totalPage }} 页
+      </div>
+      <el-pagination
+        v-model:current-page="pageNum"
+        v-model:page-size="pageSize"
+        layout="prev, pager, next"
+        :total="total"
+        @size-change="getCommentList"
+        @current-change="getCommentList"
+      />
     </div>
   </div>
 
-  <!-- 评价详情弹窗 -->
+  <!-- 评价详情弹窗（完整展示所有后端返回字段） -->
   <el-dialog
     v-model="commentDetailVisible"
     title="评价详情"
-    width="600px"
+    width="700px"
     :close-on-click-modal="false"
+    :destroy-on-close="true"
   >
     <div v-if="currentComment" class="space-y-4">
+      <!-- 基础信息 -->
       <div class="flex justify-between items-center pb-2 border-b">
-        <div class="font-bold">评价信息</div>
-        <el-tag :type="currentComment.replyStatus === '已回复' ? 'success' : 'warning'">
-          {{ currentComment.replyStatus }}
+        <div class="font-bold">基础信息</div>
+        <el-tag :type="currentComment.replyCount === 0 ? 'warning' : 'success'">
+          {{ currentComment.replyCount === 0 ? '未回复' : '已回复' }}
         </el-tag>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
-        <div>
-          <p class="text-sm text-gray-500">评价ID：{{ currentComment.commentId }}</p>
-          <p class="text-sm text-gray-500">订单编号：{{ currentComment.orderId }}</p>
-          <p class="text-sm text-gray-500">买家昵称：{{ currentComment.userName }}</p>
-          <p class="text-sm text-gray-500">评价时间：{{ currentComment.commentTime }}</p>
+        <div class="space-y-2">
+          <p class="text-sm text-gray-500">评价ID：{{ currentComment.id }}</p>
+          <p class="text-sm text-gray-500">订单编号：{{ currentComment.orderItemId || '-' }}</p>
+          <p class="text-sm text-gray-500">商品ID：{{ currentComment.productId || '-' }}</p>
+          <p class="text-sm text-gray-500">买家ID：{{ currentComment.userId }}</p>
+          <p class="text-sm text-gray-500">买家昵称：{{ currentComment.userNickname }}</p>
+          <p class="text-sm text-gray-500">匿名状态：{{ currentComment.isAnonymous }}</p>
+          <p class="text-sm text-gray-500">点赞数：{{ currentComment.likeCount }}</p>
+          <p class="text-sm text-gray-500">回复数：{{ currentComment.replyCount }}</p>
         </div>
-        <div>
-          <p class="text-sm text-gray-500">商品名称：{{ currentComment.productName }}</p>
+        <div class="space-y-2">
           <p class="text-sm text-gray-500">
-            评分：<el-rate v-model="currentComment.star" disabled size="small" />
+            商品名称：{{ currentComment.productName || '商品名称' }}
           </p>
+          <p class="text-sm text-gray-500">
+            商品评分：<el-rate v-model="currentComment.productScore" disabled size="small" />
+          </p>
+          <p class="text-sm text-gray-500">
+            物流评分：<el-rate v-model="currentComment.logisticsScore" disabled size="small" />
+          </p>
+          <p class="text-sm text-gray-500">
+            服务评分：<el-rate v-model="currentComment.serviceScore" disabled size="small" />
+          </p>
+          <p class="text-sm text-gray-500">评价时间：{{ currentComment.createTime }}</p>
+          <p class="text-sm text-gray-500">评价状态：{{ currentComment.status }}</p>
         </div>
       </div>
 
+      <!-- 评价内容 -->
       <div class="pt-2 border-t">
         <h4 class="font-medium mb-2">评价内容</h4>
         <p class="text-sm bg-gray-50 p-3 rounded">{{ currentComment.content }}</p>
       </div>
 
+      <!-- 评价图片 -->
+      <div v-if="currentComment.imageUrls && currentComment.imageUrls.trim()" class="pt-2 border-t">
+        <h4 class="font-medium mb-2">评价图片</h4>
+        <div class="flex gap-2 flex-wrap">
+          <el-image
+            v-for="(img, index) in currentComment.imageUrls.split(',').filter((url) => url.trim())"
+            :key="index"
+            :src="img"
+            fit="cover"
+            style="width: 80px; height: 80px; border-radius: 4px"
+            :preview-src-list="currentComment.imageUrls.split(',').filter((url) => url.trim())"
+          />
+        </div>
+      </div>
+
+      <!-- 评价视频 -->
+      <div v-if="currentComment.videoUrl && currentComment.videoUrl.trim()" class="pt-2 border-t">
+        <h4 class="font-medium mb-2">评价视频</h4>
+        <video
+          :src="currentComment.videoUrl"
+          controls
+          style="width: 100%; max-height: 300px; border-radius: 4px"
+        ></video>
+      </div>
+
+      <!-- 追加评价 -->
+      <div
+        v-if="currentComment.appendContent && currentComment.appendContent.trim()"
+        class="pt-2 border-t"
+      >
+        <h4 class="font-medium mb-2">追加评价（{{ currentComment.appendTime }}）</h4>
+        <p class="text-sm bg-gray-50 p-3 rounded">{{ currentComment.appendContent }}</p>
+        <!-- 追加图片 -->
+        <div
+          v-if="currentComment.appendImageUrls && currentComment.appendImageUrls.trim()"
+          class="mt-2"
+        >
+          <div class="flex gap-2 flex-wrap">
+            <el-image
+              v-for="(img, index) in currentComment.appendImageUrls
+                .split(',')
+                .filter((url) => url.trim())"
+              :key="index"
+              :src="img"
+              fit="cover"
+              style="width: 80px; height: 80px; border-radius: 4px"
+              :preview-src-list="
+                currentComment.appendImageUrls.split(',').filter((url) => url.trim())
+              "
+            />
+          </div>
+        </div>
+        <!-- 追加视频 -->
+        <div
+          v-if="currentComment.appendVideoUrl && currentComment.appendVideoUrl.trim()"
+          class="mt-2"
+        >
+          <video
+            :src="currentComment.appendVideoUrl"
+            controls
+            style="width: 100%; max-height: 300px; border-radius: 4px"
+          ></video>
+        </div>
+      </div>
+
+      <!-- 商家回复 -->
       <div v-if="currentComment.replyContent" class="pt-2 border-t">
         <h4 class="font-medium mb-2">商家回复</h4>
-        <p class="text-sm bg-blue-50 p-3 rounded">{{ currentComment.replyContent }}</p>
+        <p class="text-sm bg-blue-50 p-3 rounded">
+          {{ currentComment.replyContent }}
+        </p>
       </div>
     </div>
 
     <template #footer>
       <el-button @click="commentDetailVisible = false">关闭</el-button>
       <el-button
-        v-if="currentComment && currentComment.replyStatus === '未回复'"
+        v-if="currentComment && currentComment.replyCount === 0"
         type="primary"
         @click="openReplyCommentModal(currentComment)"
       >
@@ -154,8 +235,8 @@
     :close-on-click-modal="false"
   >
     <div v-if="currentComment" class="space-y-4">
-      <p class="text-sm">评价ID：{{ currentComment.commentId }}</p>
-      <p class="text-sm">商品名称：{{ currentComment.productName }}</p>
+      <p class="text-sm">评价ID：{{ currentComment.id }}</p>
+      <p class="text-sm">商品名称：{{ currentComment.productName || '商品名称' }}</p>
       <p class="text-sm text-gray-500 mb-2">评价内容：{{ currentComment.content }}</p>
 
       <el-form :model="replyForm" label-width="80px">
@@ -172,108 +253,153 @@
 
     <template #footer>
       <el-button @click="replyCommentVisible = false">取消</el-button>
-      <el-button type="primfary" @click="confirmReplyComment">确认回复</el-button>
+      <el-button type="primary" @click="confirmReplyComment"> 确认回复 </el-button>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { getShopCommentList, replyComment } from '@/api/pet-shop/comment'
 
-// 基础数据
-const commentSearchInput = ref('')
-const commentFilter = ref('')
+// 分页参数
+const pageNum = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
+const totalPage = computed(() => Math.ceil(total.value / pageSize.value))
+
+// 加载状态
+const loading = ref(false)
+
+// 查询条件
+const queryParams = reactive({
+  keyword: '',
+  score: '',
+  sortType: 0,
+})
+
+// 弹窗状态
 const commentDetailVisible = ref(false)
 const replyCommentVisible = ref(false)
 const currentComment = ref<any>(null)
 
-// 回复评价表单
+// 回复表单
 const replyForm = ref({
   content: '',
 })
 
-// 评价数据
+// 评价列表类型定义
 interface CommentRow {
-  commentId: string
-  orderId: string
+  // 基础信息
+  id: string
+  orderItemId: string
+  productId: string
   productName: string
-  userName: string
+  userId: number
+  userNickname: string
+  userAvatar: string
+  isAnonymous: string
+  status: string
+  // 评分相关
   star: number
+  productScore: number
+  logisticsScore: number
+  serviceScore: number
+  // 评价内容
   content: string
-  commentTime: string
-  replyStatus: string
+  imageUrls: string
+  videoUrl: string
+  // 追加评价
+  appendContent: string
+  appendImageUrls: string
+  appendVideoUrl: string
+  appendTime: string
+  // 互动相关
+  likeCount: number
+  replyCount: number
   replyContent?: string
+  // 时间
+  createTime: string
+}
+const commentData = ref<CommentRow[]>([])
+
+// 获取评论列表
+const getCommentList = async () => {
+  loading.value = true
+  try {
+    const res = await getShopCommentList({
+      pageNum: pageNum.value,
+      pageSize: pageSize.value,
+      keyword: queryParams.keyword,
+      score: queryParams.score === '未回复' ? '' : queryParams.score,
+      sortType: queryParams.sortType,
+      searchCount: true,
+    })
+    console.log(res)
+    const list = res.data?.list || res.list || []
+    total.value = res.data?.total || res.total || 0
+
+    // 处理未回复筛选
+    if (queryParams.score === '未回复') {
+      commentData.value = list.filter((item: CommentRow) => item.replyCount === 0)
+      total.value = commentData.value.length
+    } else {
+      commentData.value = list
+    }
+  } catch (err) {
+    ElMessage.error('获取评论列表失败，请重试')
+    console.error(err)
+  } finally {
+    loading.value = false
+  }
 }
 
-const commentData = ref<CommentRow[]>([
-  {
-    commentId: 'CM2016050401',
-    orderId: '20160504',
-    productName: '进口宠物冻干零食-三文鱼味',
-    userName: '小虎同学',
-    star: 5,
-    content: '味道很好，狗狗很爱吃，性价比超高！',
-    commentTime: '2016-05-05 10:20:30',
-    replyStatus: '已回复',
-    replyContent: '感谢您的好评！我们会继续努力提供更好的产品和服务～',
-  },
-  {
-    commentId: 'CM2016050201',
-    orderId: '20160502',
-    productName: '宠物零食大礼包-鸡肉味',
-    userName: '小虎同学',
-    star: 3,
-    content: '还可以，就是分量有点少，希望商家改进。',
-    commentTime: '2016-05-04 14:30:20',
-    replyStatus: '未回复',
-  },
-  {
-    commentId: 'CM2016050101',
-    orderId: '20160501',
-    productName: '宠物主食罐-牛肉味',
-    userName: '小虎同学',
-    star: 1,
-    content: '太难吃了，狗狗一点都不吃，差评！',
-    commentTime: '2016-05-03 09:15:45',
-    replyStatus: '未回复',
-  },
-])
-
-// 核心方法
-const searchComment = () => {
-  console.log('搜索评价:', commentSearchInput.value, commentFilter.value)
-}
-
+// 打开评价详情
 const openCommentDetail = (row: CommentRow) => {
   currentComment.value = row
   commentDetailVisible.value = true
 }
 
+// 打开回复弹窗
 const openReplyCommentModal = (row: CommentRow) => {
   currentComment.value = row
-  replyForm.value = { content: '' }
+  replyForm.value.content = ''
   replyCommentVisible.value = true
+  commentDetailVisible.value = false
 }
 
-const confirmReplyComment = () => {
+// 提交回复
+const confirmReplyComment = async () => {
   if (!replyForm.value.content.trim()) {
     ElMessage.warning('回复内容不能为空！')
     return
   }
 
-  ElMessageBox.confirm('确认回复该评价吗？', '提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'info',
-  }).then(() => {
-    currentComment.value.replyStatus = '已回复'
-    currentComment.value.replyContent = replyForm.value.content
+  try {
+    await ElMessageBox.confirm('确认回复该评价吗？', '提示', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'info',
+    })
+
+    const res = await replyComment({
+      commentId: currentComment.value.id,
+      content: replyForm.value.content,
+    })
+    console.log(res)
     replyCommentVisible.value = false
-    commentDetailVisible.value = false
+    getCommentList()
     ElMessage.success('评价回复成功！')
-  })
+  } catch {
+    ElMessage.info('已取消回复')
+  }
 }
+
+// 初始化加载
+onMounted(() => {
+  getCommentList()
+})
 </script>
 
 <style scoped>

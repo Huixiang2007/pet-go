@@ -74,10 +74,21 @@
               </button>
               <button
                 class="px-6 py-3 text-gray-500"
-                :class="{ 'text-orange-500 border-b-2 border-orange-500': activeTab === 'review' }"
-                @click="activeTab = 'review'"
+                :class="{
+                  'text-orange-500 border-b-2 border-orange-500': activeTab === 'allReview',
+                }"
+                @click="activeTab = 'allReview'"
               >
-                用户评价
+                全部评价
+              </button>
+              <button
+                class="px-6 py-3 text-gray-500"
+                :class="{
+                  'text-orange-500 border-b-2 border-orange-500': activeTab === 'question',
+                }"
+                @click="activeTab = 'question'"
+              >
+                问大家
               </button>
             </div>
 
@@ -143,29 +154,23 @@
             </div>
 
             <!-- 用户评价 -->
-            <div v-if="activeTab === 'review'" class="p-6 md:p-8">
-              <h2 class="text-lg font-semibold mb-4">用户评价</h2>
-              <p class="text-gray-600 mb-4">共 {{ product.reviewCount || 0 }} 条评价</p>
-              <div class="review-item mb-6 pb-6 border-b border-gray-100">
-                <div class="review-star text-yellow-400 mb-2">
-                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i
-                  ><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                </div>
-                <p><strong>用户：张先生</strong></p>
-                <p class="text-gray-600">商品质量很好，颜值也高，宠物很喜欢！</p>
-              </div>
-              <div class="review-item">
-                <div class="review-star text-yellow-400 mb-2">
-                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i
-                  ><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i>
-                </div>
-                <p><strong>用户：李女士</strong></p>
-                <p class="text-gray-600">发货很快，包装严实，和描述一致，值得购买~</p>
-              </div>
+            <div v-if="activeTab === 'allReview'" class="p-6 md:p-8">
+              <CommentList
+                :shopId="Number(product.shopId)"
+                :activeTab="activeTab"
+                :productId="product.id"
+              />
+            </div>
+            <!-- 问大家 -->
+            <div v-if="activeTab === 'question'" class="p-6 md:p-8">
+              <QuestionUs
+                :shopId="Number(product.shopId)"
+                :activeTab="activeTab"
+                :productId="product.id"
+              />
             </div>
           </div>
         </div>
-
         <!-- 右侧信息 -->
         <div class="lg:block lg:col-span-1 mt-20 mb-5">
           <div
@@ -347,6 +352,8 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
+import CommentList from './components/CommentList.vue'
+import QuestionUs from './components/QuestionUs.vue'
 import { addCartApi, getProductDetail } from '../../../api/pet-shop/product'
 import type { ProductDetail, SkuInfo } from '../../../types/shop'
 const router = useRouter()

@@ -41,5 +41,7 @@ export interface  ChatRecord {
     currentPrice: number
     sales: number
     mainImage: string
+    petTypes?: string
+    serviceDescription?: string
   }
 }

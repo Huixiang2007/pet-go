@@ -1,5 +1,5 @@
 <template>
-  <div class="flex-1 p-4 overflow-y-auto space-y-6" ref="chatContentRef">
+  <div class="flex-1 p-4 overflow-y-auto space-y-6" ref="chatContentRef" @scroll="handleScroll">
     <!-- 无聊天记录状态 -->
     <div
       v-if="safeChatRecords.length === 0"
@@ -9,13 +9,12 @@
       <p>暂无聊天记录，开始和商家聊聊吧～</p>
     </div>
 
+    <!-- 加载提示 -->
+    <div v-if="loading" class="text-center text-gray-400 text-sm py-2">加载中...</div>
+    <div v-if="noMore" class="text-center text-gray-400 text-sm py-2">没有更多记录了</div>
+
     <!-- 有聊天记录 -->
     <template v-else>
-      <!-- 日期分割线 -->
-      <div class="flex justify-center mb-2">
-        <span class="text-xs bg-gray-200 text-gray-600 px-3 py-1 rounded-full">今天</span>
-      </div>
-
       <div
         v-for="record in safeChatRecords"
         :key="record.id"
@@ -23,17 +22,7 @@
         :class="{ 'justify-end': record.type === 'user' }"
       >
         <template v-if="record.type === 'user'">
-          <div class="max-w-[70%] relative group">
-            <!-- 撤回按钮 -->
-            <button
-              v-if="record.content !== '你撤回了一条消息' && !record.isWithdrawn"
-              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10"
-              @click.stop="handleWithdraw(record.id)"
-              title="撤回消息"
-            >
-              撤回
-            </button>
-
+          <div class="max-w-[70%] relative">
             <!-- 文本消息 -->
             <div
               v-if="
@@ -41,11 +30,8 @@
                 (!record.isImage && !record.isGoods && !record.isService)
               "
               class="bg-blue-500 p-4 rounded-tr-none rounded-lg shadow-sm text-white"
-              :class="{ 'opacity-60 line-through': record.isWithdrawn }"
             >
-              <p class="text-sm">
-                {{ record.isWithdrawn ? '你撤回了一条消息' : record.content }}
-              </p>
+              <p class="text-sm">{{ record.content }}</p>
             </div>
 
             <!-- 图片消息 -->
@@ -54,14 +40,11 @@
                 :src="record.imageUrl"
                 alt="图片"
                 class="max-w-[200px] max-h-[200px] rounded-lg shadow-sm object-cover"
-                :class="{ 'opacity-60': record.isWithdrawn }"
                 @click="previewImage(record.imageUrl)"
               />
-              <span v-if="record.isWithdrawn" class="text-xs text-gray-400 block text-right mt-1">
-                你撤回了一张图片
-              </span>
             </div>
 
+            <!-- 商品卡片 -->
             <div
               v-else-if="record.msgType === 'product' && record.goodsInfo"
               class="bg-blue-500 p-2 rounded-tr-none rounded-lg shadow-sm"
@@ -81,6 +64,7 @@
               </div>
             </div>
 
+            <!-- 寄养服务卡片 -->
             <div
               v-else-if="record.msgType === 'service' && record.serviceInfo"
               class="bg-blue-500 p-2 rounded-tr-none rounded-lg shadow-sm"
@@ -95,10 +79,10 @@
                   {{ record.serviceInfo.title }}
                 </div>
                 <div class="text-blue-500 text-sm font-bold mt-1">
-                  ¥{{ record.serviceInfo.basePrice }}
+                  ¥{{ record.serviceInfo.currentPrice }}
                 </div>
                 <div class="text-xs text-gray-500 mt-1">
-                  适用宠物：{{ record.serviceInfo.petTypes }}
+                  适用宠物：{{ record.serviceInfo.petTypes || '通用' }}
                 </div>
               </div>
             </div>
@@ -132,7 +116,7 @@
               <p class="text-sm">{{ record.content }}</p>
             </div>
 
-            <!-- 2. 图片消息 -->
+            <!-- 图片消息 -->
             <div v-else-if="record.isImage" class="bg-transparent">
               <img
                 :src="record.imageUrl"
@@ -164,19 +148,23 @@
               class="overflow-hidden bg-white rounded-xl shadow-sm w-[200px] border border-gray-100"
             >
               <img
-                v-if="record.serviceInfo.mainImage"
                 :src="record.serviceInfo.mainImage"
                 class="w-full h-[120px] object-cover"
+                @error="(e) => (e.target.src = 'https://picsum.photos/id/237/200/120')"
               />
+
               <div class="p-2">
                 <div class="text-sm font-medium text-gray-800 line-clamp-2">
-                  {{ record.serviceInfo.title }}
+                  {{ record.serviceInfo.title || '寄养服务' }}
                 </div>
                 <div class="mt-1 text-blue-600 font-bold text-base">
-                  ¥{{ record.serviceInfo.currentPrice }}
+                  ¥{{ record.serviceInfo.currentPrice || 0 }}
                 </div>
                 <div class="text-xs text-gray-400 mt-0.5">
-                  已售 {{ record.serviceInfo.sales }} 件
+                  适用宠物：{{ record.serviceInfo.petTypes || '通用' }}
+                </div>
+                <div class="text-xs text-gray-500 mt-1 line-clamp-2">
+                  {{ record.serviceInfo.serviceDescription || '专业宠物寄养服务' }}
                 </div>
               </div>
             </div>
@@ -206,31 +194,33 @@ interface ActiveShop {
 const props = defineProps<{
   activeShop?: ActiveShop
   chatRecords?: ChatRecord[]
+  loading?: boolean
+  noMore?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'withdraw-message', recordId: string): void
   (e: 'preview-image', url: string): void
+  (e: 'load-more'): void
 }>()
 
 const chatContentRef = ref<HTMLDivElement>(null)
-
 const safeActiveShop = computed(() => ({
   avatar: 'https://picsum.photos/id/237/120/120',
   name: '商家',
   ...props.activeShop,
 }))
-
 const safeChatRecords = computed(() => (Array.isArray(props.chatRecords) ? props.chatRecords : []))
 
-const handleWithdraw = (recordId: string) => {
-  if (!recordId) return
-  emit('withdraw-message', recordId)
+// 滚动加载
+const handleScroll = () => {
+  const dom = chatContentRef.value
+  if (!dom) return
+  if (dom.scrollTop <= 20) {
+    emit('load-more')
+  }
 }
 
-const previewImage = (url: string) => {
-  emit('preview-image', url)
-}
+const previewImage = (url: string) => emit('preview-image', url)
 
 const scrollToBottom = () => {
   setTimeout(() => {

@@ -39,6 +39,18 @@
           <el-icon><House /></el-icon>
           <span v-if="isOpened ">寄养服务管理</span>
       </el-menu-item>
+      <!-- 电商管理 -->
+    
+       <el-sub-menu index="/admin/shop">
+        <template #title>
+          <el-icon><Shop /></el-icon>
+          <span v-if="isOpened ">电商管理</span>
+        </template>
+        <el-menu-item index="/admin/shop/store">商铺管理</el-menu-item>
+        <el-menu-item index="/admin/shop/product">商品管理</el-menu-item>
+        <el-menu-item index="/admin/shop/sku">Sku管理</el-menu-item>
+       
+      </el-sub-menu>
       <!-- 活动管理 -->
       <el-sub-menu index="/admin/active">
         <template #title>
@@ -81,7 +93,34 @@ const route = useRoute()
 // 侧边栏折叠状态
 
 // 当前激活菜单
-const activeMenu = computed(() => route.path ||'/admin/data')
+const activeMenu = computed(() =>{
+  const currentPath = route.path
+  
+  // 如果是详情页，返回对应的列表页路径
+  if (currentPath === '/admin/shop/detail') {
+    return '/admin/shop/store'
+  }
+  if (currentPath === '/admin/shop/audit') {
+    return '/admin/shop/store'
+  }
+  if (currentPath === '/admin/shop/goods') {
+    return '/admin/shop/product'
+  }
+  if (currentPath === '/admin/shop/update') {
+    return '/admin/shop/product'
+  }
+  if (currentPath === '/admin/shop/style') {
+    return '/admin/shop/sku'
+  }
+  if (currentPath === '/admin/shop/specific') {
+    return '/admin/shop/sku'
+  }
+  
+  // 默认返回当前路径
+  return currentPath || '/admin/data'
+})
+
+
 defineProps<{
   isOpened: boolean
 }>()

@@ -26,7 +26,7 @@
         <div class="stat-label">今日寄养订单</div>
         <div class="stat-value">{{ cardData.todayOrderCount }}</div>
         <div class="stat-trend">
-          <el-icon><ArrowUp /></el-icon> {{ cardData.chainGrowth }} 环比增长
+          <el-icon><ArrowUp /></el-icon> {{ cardData.chainGrowth=='NaN'?'--':cardData.chainGrowth }} 环比增长
         </div>
       </div>
       <div class="stat-icon">

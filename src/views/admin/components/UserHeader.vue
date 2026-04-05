@@ -12,7 +12,7 @@
     </div>
 
     <!-- 中间：全局搜索框 -->
-    <div class="header-search" v-show="!isMobile || (isMobile && sidebarOpened)">
+    <!-- <div class="header-search" v-show="!isMobile || (isMobile && sidebarOpened)">
       <el-input
         v-model="searchValue"
         placeholder="搜索用户、订单、服务ID/名称..."
@@ -25,7 +25,7 @@
           <el-button icon="Search" type="primary" size="small" @click="handleSearch"></el-button>
         </template>
       </el-input>
-    </div>
+    </div> -->
 
     <!-- 右侧：功能入口区 -->
     <div class="header-right">
@@ -33,7 +33,7 @@
      
 
       <!-- 消息通知（简化 dropdown 插槽写法） -->
-      <el-dropdown trigger="click" class="notification-dropdown">
+      <!-- <el-dropdown trigger="click" class="notification-dropdown">
         <el-button
           icon="Bell"
           circle
@@ -78,7 +78,7 @@
             </div>
           </div>
         </template>
-      </el-dropdown>
+      </el-dropdown> -->
 
     <!--退出登录 -->
    
@@ -104,32 +104,13 @@ const router = useRouter()
 
 // 导入所需图标（根据你的 Element 版本调整，Element Plus 需手动导入）
 
-interface NotificationItem {
-  type: string
-  title: string
-  content: string
-  time: string
-  read: boolean
-}
 // 其他逻辑（变量、方法）保持不变...
 const isMobile = ref(false)
 const sidebarOpened = ref(false)
-const searchValue = ref('')
-const unreadCount = ref(0)
-const notificationList = ref<NotificationItem[]>([])
 
 
-const handleSearch = () => {
-  // 搜索逻辑
-}
 
-const getIconClass = (type: string) => {
-  // 图标类名逻辑
-}
 
-const getIconComponent = (type: string) => {
-  // 图标组件逻辑
-}
 
 const LoginOut = async (): Promise<void> => {
   window.layui.layer.confirm('确定要退出登录吗？', {

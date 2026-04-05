@@ -9,10 +9,7 @@
       <el-tabs v-model="activeTab" class="cute-tabs" @tab-change="handleTabChange">
         <!-- 商铺总览 -->
         <el-tab-pane label="商铺总览" name="add">
-          <div class="filter-bar">
-            <el-input v-model="keyword" placeholder="搜索商铺名" class="w240" />
-            <el-button type="primary"><Search /> 搜索</el-button>
-          </div>
+         
 
           <el-table :data="addList" border class="data-table">
             <el-table-column label="商铺ID" prop="id" />
@@ -127,7 +124,7 @@ import { useRouter } from 'vue-router'
 import type { PageParams } from '@/api/admin'
 const activeTab = ref('add')
 
-const keyword = ref('')
+
 const router = useRouter()
 
 const goToDetail = (id: string) => {

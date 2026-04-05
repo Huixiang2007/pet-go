@@ -299,7 +299,7 @@ const routes: RouteRecordRaw[] = [
       // 数据概览
       {
         path: '', // 空路径 = /admin 默认子路由
-        redirect: '/admin/data', // 等价于 /admin/data
+        redirect: '/admin/user', 
         name: 'homePage',
       },
       {

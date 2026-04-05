@@ -74,6 +74,7 @@
             @cancel="cancelWord"
           />
           <AddressManager v-if="currentTab === 3" @refresh="getAddressList" />
+          <MyWallet v-if="currentTab === 4" @refresh="getUserMoney" :balance='userBalance' />
         </div>
       </main>
     </div>
@@ -88,6 +89,7 @@ import { getUserInfo, updateUserInfo, uploadAvatar, logout } from '@/api/person/
 import { getRealNameInfo, submitRealNameAuth, submitAgain } from '@/api/person/real'
 import { getUserAddresses } from '@/api/person/address'
 import { changePasswords } from '@/api/person/change'
+import {getMoney} from '@/api/person/money'
 // 导入子组件
 import PersonalAvatar from '@/views/userCenter/components/PersonAvatar.vue'
 import PersonalNav from '@/views/userCenter/components/PersonalNav.vue'
@@ -95,6 +97,7 @@ import BaseInfo from '@/views/userCenter/components/BaseInfo.vue'
 import RealNameAuth from '@/views/userCenter/components/RealNameAuth.vue'
 import ChangePassword from '@/views/userCenter/components/ChangePassword.vue'
 import AddressManager from '@/views/userCenter/components/AddressManager.vue'
+import MyWallet from '@/views/userCenter/components/MyWallet.vue'
 const isRealNameRejected = ref(false)
 
 declare global {
@@ -111,6 +114,8 @@ const navItems = [
   { name: '实名认证', icon: 'layui-icon-auz' },
   { name: '修改密码', icon: 'layui-icon-password' },
   { name: '我的地址', icon: 'layui-icon-home' },
+  { name: '钱包充值', icon: 'layui-icon-rmb' },
+
 ]
 
 // 全局状态
@@ -139,6 +144,7 @@ const realNameInfo = ref({
 })
 const isFetching = ref(false)
 const router = useRouter()
+const userBalance = ref(0)
 
 const bgColor = ref(localStorage.getItem('profileBgColor') || '#f5f5f5')
 const showPicker = ref(false) // 控制选择器弹窗显示/隐藏
@@ -192,6 +198,9 @@ onMounted(() => {
     }
     if (currentTab.value === 1) {
       getRealNameStatus()
+    }
+    if (currentTab.value === 4) {
+      getUserMoney()
     }
   })
 })
@@ -313,7 +322,19 @@ const getRealNameStatus = async () => {
     isFetching.value = false
   }
 }
+//获取用户余额
 
+const getUserMoney = async () => {
+  try {
+    const response = await getMoney()
+    if (response.code === 0) {
+    
+      userBalance.value = response.data
+    }
+  } catch (error) {
+    console.error('获取余额失败:', error)
+  }
+}
 // 获取地址列表
 const getAddressList = async () => {
   console.log('addressPagination:', addressPagination)

@@ -22,11 +22,11 @@
       router
     >
       <!-- 数据概览 1-->
-      <el-menu-item index="/admin/data">
+      <!-- <el-menu-item index="/admin/data">
         <el-icon><PieChart /></el-icon>
-        <!-- 补充数据概览图标 -->
+  
         <span v-if="isOpened ">数据概览</span>
-      </el-menu-item>
+      </el-menu-item> -->
       <!-- 用户管理 1 -->
       <el-menu-item index="/admin/user">
           <el-icon><User /></el-icon>
@@ -52,7 +52,7 @@
        
       </el-sub-menu>
       <!-- 活动管理 -->
-      <el-sub-menu index="/admin/active">
+      <!-- <el-sub-menu index="/admin/active">
         <template #title>
           <el-icon><Shop /></el-icon>
           <span v-if="isOpened ">运营活动管理</span>
@@ -61,17 +61,17 @@
         <el-menu-item index="/admin/active/manage">活动管理</el-menu-item>
         <el-menu-item index="/admin/active/dashboard">数据看板</el-menu-item>
        
-      </el-sub-menu>
+      </el-sub-menu> -->
 
       <!-- 内容管理 -->
-      <el-sub-menu index="/admin/content">
+      <!-- <el-sub-menu index="/admin/content">
         <template #title>
           <el-icon><Setting /></el-icon>
           <span v-if="isOpened">内容管理</span>
         </template> 
       <el-menu-item index="/admin/content/check">内容审核</el-menu-item>
         <el-menu-item index="/admin/content/comment">评论管理</el-menu-item>
-      </el-sub-menu>
+      </el-sub-menu> -->
   <!-- 通知发布 -->
       <el-menu-item index="/admin/send">
    

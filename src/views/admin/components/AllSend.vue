@@ -40,22 +40,30 @@
                   placeholder="选择通知类型"
                   class="form-select"
                 >
-                  <el-option label="系统公告" value="system" />
-                  <el-option label="活动通知" value="activity" />
-                  <el-option label="温馨提示" value="reminder" />
-                  <el-option label="紧急通知" value="urgent" />
+                  <el-option label="系统通知" value="系统通知" />
+                  <el-option label="活动通知" value="活动通知" />
+                  <el-option label="个人通知" value="个人通知" />
+                  <el-option label="其他通知" value="其他通知" />
                 </el-select>
               </el-form-item>
 
+               <!-- 发布范围：全体 / 个人 -->
               <el-form-item label="发布范围" prop="range">
                 <el-radio-group v-model="noticeForm.range" class="range-group">
                   <el-radio label="全体用户" border class="range-radio" />
-                  <el-radio label="普通用户" border class="range-radio" />
-                  <el-radio label="寄养商家" border class="range-radio" />
-                  <el-radio label="电商卖家" border class="range-radio" />
+                  <el-radio label="个人用户" border class="range-radio" />
                 </el-radio-group>
-              </el-form-item>
 
+                <!-- 选择个人时显示用户ID输入框 -->
+                <el-input
+                  v-if="noticeForm.range === '个人用户'"
+                  v-model="noticeForm.userId"
+                  placeholder="请输入接收用户ID（数字）"
+                  style="width: 200px; margin-left: 10px; position: absolute; left:253px;"
+                  type="number"
+                />
+              </el-form-item>
+<!-- 
               <el-form-item label="发布时间" prop="publishTime">
                 <el-radio-group v-model="noticeForm.timeType" class="time-group">
                   <el-radio label="立即发布" border class="time-radio" />
@@ -66,10 +74,10 @@
                   v-model="noticeForm.publishTime"
                   type="datetime"
                   placeholder="选择定时发布时间"
+                  style="width: 200px; margin-left: 10px; position: absolute; left:253px;"
                   class="time-picker"
                 />
-              </el-form-item>
-
+              </el-form-item> -->
               <!-- 通知内容编辑 -->
               <div class="form-section">
                 <h3 class="section-title">
@@ -87,7 +95,7 @@
                 />
               </el-form-item>
 
-              <el-form-item label="弹窗提醒">
+              <!-- <el-form-item label="弹窗提醒">
                 <el-switch
                   v-model="noticeForm.isPopup"
                   active-text="开启"
@@ -96,7 +104,7 @@
                   inactive-color="#e8d6c4"
                 />
                 <span class="switch-tip">开启后用户登录时将弹窗展示该通知</span>
-              </el-form-item>
+              </el-form-item> -->
 
               <!-- 通知预览 -->
               <div class="form-section">
@@ -111,161 +119,33 @@
                     :type="getTagType()"
                     class="preview-tag"
                   >
-                    {{ getTypeName() }}
+                    {{ noticeForm.type || '【请选择通知类型】' }}
                   </el-tag>
                   <h4 class="preview-title">{{ noticeForm.title || '【请输入通知标题】' }}</h4>
                 </div>
                 <div class="preview-content">
                   {{ noticeForm.content || '这里将实时预览你编辑的通知内容...' }}
                 </div>
-                <div class="preview-footer">
+                <!-- <div class="preview-footer">
                   <span class="preview-time">
                     发布时间：{{ noticeForm.timeType === '立即发布' ? '发布后立即生效' : noticeForm.publishTime || '【请选择定时时间】' }}
                   </span>
                   <span class="preview-range">
                     发布范围：{{ noticeForm.range }}
                   </span>
-                </div>
+                </div> -->
               </el-card>
 
               <!-- 提交按钮组 -->
               <el-form-item class="form-btn-group">
-                <el-button type="primary" class="publish-btn">
-               <el-icon><UploadFilled /></el-icon> 确认发布
+                <el-button type="primary" class="publish-btn" @click="handlePublish">
+                  <el-icon><UploadFilled /></el-icon> 确认发布
                 </el-button>
-                <el-button type="default" class="save-btn">
-                <el-icon><List /></el-icon> 保存草稿
-                </el-button>
-                <el-button type="default" class="reset-btn">
+                <el-button type="default" class="save-btn" @click="resetForm">
                   <el-icon><Refresh /></el-icon> 重置表单
                 </el-button>
               </el-form-item>
             </el-form>
-          </div>
-        </el-tab-pane>
-
-        <!-- 历史通知管理标签页 -->
-        <el-tab-pane label="历史通知管理" name="history">
-          <div class="tab-content">
-            <!-- 筛选区 -->
-            <div class="filter-bar">
-              <el-row :gutter="15">
-                <el-col :span="6">
-                  <el-select
-                    v-model="historyType"
-                    placeholder="选择通知类型"
-                    size="small"
-                    class="filter-select"
-                  >
-                    <el-option label="全部类型" value="" />
-                    <el-option label="系统公告" value="system" />
-                    <el-option label="活动通知" value="activity" />
-                    <el-option label="温馨提示" value="reminder" />
-                    <el-option label="紧急通知" value="urgent" />
-                  </el-select>
-                </el-col>
-                <el-col :span="8">
-                  <el-input
-                    v-model="historyKeyword"
-                    placeholder="搜索通知标题"
-                    size="small"
-                    prefix-icon="Search"
-                    class="search-input"
-                  />
-                </el-col>
-                <el-col :span="10" class="filter-btn-group">
-                  <el-button type="primary" size="small" class="query-btn">
-                    <el-icon><Search /></el-icon> 搜索
-                  </el-button>
-                  <el-button size="small" class="reset-btn">
-                    <el-icon><Refresh /></el-icon> 重置
-                  </el-button>
-                  <el-button size="small" class="export-btn">
-                    <el-icon><Download /></el-icon> 导出记录
-                  </el-button>
-                </el-col>
-              </el-row>
-            </div>
-
-            <!-- 历史通知列表 -->
-            <el-table
-              :data="historyList"
-              border
-              stripe
-              class="history-table"
-              :header-cell-style="{ background: '#f9f7f3', color: '#6b5b45' }"
-            >
-              <el-table-column prop="id" label="通知ID" width="100" />
-              <el-table-column prop="title" label="通知标题" min-width="180">
-                <template #default="scope">
-                  <div class="history-title-item">
-                    <el-tag
-                      :type="getHistoryTagType(scope.row.type)"
-                      size="small"
-                      class="history-type-tag"
-                    >
-                      {{ getHistoryTypeName(scope.row.type) }}
-                    </el-tag>
-                    <span>{{ scope.row.title }}</span>
-                  </div>
-                </template>
-              </el-table-column>
-              <el-table-column prop="range" label="发布范围" width="120" />
-              <el-table-column prop="publishTime" label="发布时间" width="180" />
-              <el-table-column prop="status" label="通知状态" width="120">
-                <template #default="scope">
-                  <el-tag
-                    :type="scope.row.status === 'active' ? 'success' : 'warning'"
-                    size="small"
-                    class="status-tag"
-                  >
-                    {{ scope.row.status === 'active' ? '生效中' : '已过期' }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作" width="200" fixed="right">
-                <template #default="scope">
-                  <el-button
-                    type="primary"
-                    size="small"
-                    class="view-btn"
-                    @click="handleViewHistory(scope.row)"
-                  >
-                    <el-icon><View /></el-icon> 查看
-                  </el-button>
-                  <el-button
-                    type="warning"
-                    size="small"
-                    class="edit-btn"
-                    @click="handleEditHistory(scope.row)"
-                  >
-                    <el-icon><Edit /></el-icon> 编辑
-                  </el-button>
-                  <el-button
-                    type="danger"
-                    size="small"
-                    class="cancel-btn"
-                    @click="handleCancelNotice(scope.row)"
-                  >
-                    <el-icon><Delete /></el-icon> 撤回
-                  </el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-
-            <!-- 分页 -->
-            <div class="pagination-wrapper">
-              <el-pagination
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentChange"
-                :current-page="currentPage"
-                :page-sizes="[10, 20, 50]"
-                :page-size="pageSize"
-                layout="total, sizes, prev, pager, next, jumper"
-                :total="historyTotal"
-                class="history-pagination"
-              />
-            </div>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -283,7 +163,7 @@
         <p class="dialog-tip">你即将发布以下通知，确认发布后将推送至对应用户群体：</p>
         <div class="dialog-preview">
           <h4 class="dialog-title">{{ noticeForm.title }}</h4>
-          <p class="dialog-type">通知类型：{{ getTypeName() }}</p>
+          <p class="dialog-type">通知类型：{{ noticeForm.type }}</p>
           <p class="dialog-range">发布范围：{{ noticeForm.range }}</p>
           <p class="dialog-time">发布时间：{{ noticeForm.timeType === '立即发布' ? '立即生效' : noticeForm.publishTime }}</p>
         </div>
@@ -298,7 +178,10 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-
+import { ElMessage } from 'element-plus'
+import { Bell, EditPen, Document, View, UploadFilled, Refresh } from '@element-plus/icons-vue'
+import { NewsInfo } from '@/api/admin/news'
+import { sendBroadcastMessage, sendPrivateMessage } from '@/api/admin/news'
 
 // 标签页状态
 const activeTab = ref('publish')
@@ -309,7 +192,7 @@ const noticeForm = reactive({
   type: '',
   range: '全体用户',
   timeType: '立即发布',
-  publishTime: '' as Date | '',
+  publishTime: '' as Date | string,
   content: '',
   isPopup: false
 })
@@ -317,127 +200,83 @@ const noticeForm = reactive({
 // 发布确认弹窗
 const publishDialogVisible = ref(false)
 
-// 历史通知筛选条件
-const historyType = ref('')
-const historyKeyword = ref('')
-
-// 历史通知分页参数
-const currentPage = ref(1)
-const pageSize = ref(10)
-const historyTotal = ref(26)
-
-// 历史通知模拟数据
-const historyList = ref([
-  {
-    id: 'NOT2025001',
-    title: '国庆长假宠物寄养8折活动开启',
-    type: 'activity',
-    range: '全体用户',
-    publishTime: '2025-09-25 10:30:45',
-    status: 'active'
-  },
-  {
-    id: 'NOT2025002',
-    title: '系统将于10月1日凌晨进行维护升级',
-    type: 'system',
-    range: '全体用户',
-    publishTime: '2025-09-28 16:20:33',
-    status: 'active'
-  },
-  {
-    id: 'NOT2025003',
-    title: '秋季宠物驱虫温馨提示',
-    type: 'reminder',
-    range: '普通用户',
-    publishTime: '2025-09-20 09:45:12',
-    status: 'expired'
-  },
-  {
-    id: 'NOT2025004',
-    title: '紧急通知：部分寄养家庭资质审核延期',
-    type: 'urgent',
-    range: '寄养商家',
-    publishTime: '2025-09-15 14:15:30',
-    status: 'expired'
-  },
-  {
-    id: 'NOT2025005',
-    title: '宠物电商新品上架通知',
-    type: 'activity',
-    range: '电商卖家',
-    publishTime: '2025-09-10 11:22:55',
-    status: 'active'
+// 打开发布确认弹窗
+const handlePublish = () => {
+  if (!noticeForm.title) {
+    ElMessage.warning('请输入通知标题')
+    return
   }
-])
+  if (!noticeForm.type) {
+    ElMessage.warning('请选择通知类型')
+    return
+  }
+  if (!noticeForm.content) {
+    ElMessage.warning('请输入通知内容')
+    return
+  }
+  publishDialogVisible.value = true
+}
 
 // 获取通知类型对应的标签样式
 const getTagType = () => {
   switch (noticeForm.type) {
-    case 'system': return 'primary'
-    case 'activity': return 'success'
-    case 'reminder': return 'warning'
-    case 'urgent': return 'danger'
+    case '系统通知': return 'danger'
+    case '活动通知': return 'success'
+    case '个人通知': return 'warning'
+    case '其他通知': return 'primary'
     default: return 'info'
   }
 }
 
-// 获取通知类型名称
-const getTypeName = () => {
-  switch (noticeForm.type) {
-    case 'system': return '系统公告'
-    case 'activity': return '活动通知'
-    case 'reminder': return '温馨提示'
-    case 'urgent': return '紧急通知'
-    default: return '未分类通知'
+
+
+// 确认发布（调用广播接口）
+const confirmPublish = async () => {
+  try {
+    const params: NewsInfo = {
+      messageType: noticeForm.type,
+      receiverId: 0,
+      messageTitle: noticeForm.title,
+      messageContent: noticeForm.content,
+      priority: 1,
+      attachment: '',
+      dataId: ''
+    }
+if (noticeForm.range === '个人用户') {
+   params.receiverId = Number(noticeForm.userId)
+  const res= await sendPrivateMessage(params)
+   if(res.code === 0){
+    ElMessage.success('公告发布成功，已推送给个人用户！')
+    publishDialogVisible.value = false
+    resetForm()
+   }
+     
+    }
+ 
+ else{
+   const res=await sendBroadcastMessage(params)
+    if(res.code === 0){
+      ElMessage.success('公告发布成功，已推送给全体用户！')
+      publishDialogVisible.value = false
+      resetForm()
+    }
+    
+ }
+  } catch (err) {
+    ElMessage.error('发布失败：' + err)
   }
 }
 
-// 历史通知标签样式
-const getHistoryTagType = (type: string) => {
-  switch (type) {
-    case 'system': return 'primary'
-    case 'activity': return 'success'
-    case 'reminder': return 'warning'
-    case 'urgent': return 'danger'
-    default: return 'info'
-  }
+// 重置表单
+const resetForm = () => {
+  noticeForm.title = ''
+  noticeForm.type = ''
+  noticeForm.range = '全体用户'
+  noticeForm.timeType = '立即发布'
+  noticeForm.publishTime = ''
+  noticeForm.content = ''
+  noticeForm.isPopup = false
 }
-
-// 历史通知类型名称
-const getHistoryTypeName = (type: string) => {
-  switch (type) {
-    case 'system': return '系统公告'
-    case 'activity': return '活动通知'
-    case 'reminder': return '温馨提示'
-    case 'urgent': return '紧急通知'
-    default: return '未分类'
-  }
-}
-
-// 分页事件
-const handleSizeChange = (val: number) => { pageSize.value = val }
-const handleCurrentChange = (val: number) => { currentPage.value = val }
-
-// 发布相关事件
-const confirmPublish = () => {
-  console.log('发布通知:', noticeForm)
-  publishDialogVisible.value = false
-  // 重置表单
-  Object.assign(noticeForm, {
-    title: '',
-    type: '',
-    range: '全体用户',
-    timeType: '立即发布',
-    publishTime: '',
-    content: '',
-    isPopup: false
-  })
-}
-
-// 历史通知操作事件
-const handleViewHistory = (row: any) => { console.log('查看历史通知:', row) }
-const handleEditHistory = (row: any) => { console.log('编辑历史通知:', row) }
-const handleCancelNotice = (row: any) => { console.log('撤回通知:', row) }
 </script>
 
 <style scoped lang="scss">
@@ -599,98 +438,6 @@ const handleCancelNotice = (row: any) => { console.log('撤回通知:', row) }
       color: #6b5b45;
       padding: 8px 20px;
     }
-  }
-}
-
-// 筛选区
-.filter-bar {
-  margin-bottom: 15px;
-  padding: 15px;
-  background-color: #fff9f2;
-  border-radius: 8px;
-
-  .filter-select,
-  .search-input {
-    border-radius: 8px;
-    border-color: #e8d6c4;
-  }
-
-  .filter-btn-group {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-
-    .query-btn {
-      background-color: #e8a87c;
-      border-color: #e8a87c;
-      border-radius: 8px;
-    }
-
-    .reset-btn, .export-btn {
-      border-radius: 8px;
-      border-color: #e8d6c4;
-      color: #6b5b45;
-    }
-  }
-}
-
-// 历史通知列表
-.history-table {
-  --el-table-border-color: #e8d6c4;
-  --el-table-hover-row-bg-color: #fff9f2;
-  border-radius: 8px;
-  overflow: hidden;
-
-  .history-title-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .history-type-tag {
-      border-radius: 6px;
-    }
-  }
-
-  .status-tag {
-    border-radius: 6px;
-  }
-
-  // 操作按钮
-  .view-btn, .edit-btn, .cancel-btn {
-    border-radius: 6px;
-    margin: 0 2px;
-  }
-
-  .view-btn {
-    background-color: #c3e6cb;
-    border-color: #c3e6cb;
-    color: #28a745;
-  }
-
-  .edit-btn {
-    background-color: #ffeaa7;
-    border-color: #ffeaa7;
-    color: #fd7e14;
-  }
-
-  .cancel-btn {
-    background-color: #f8d7da;
-    border-color: #f8d7da;
-    color: #dc3545;
-  }
-}
-
-// 分页
-.pagination-wrapper {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-
-  .history-pagination {
-    --el-pagination-button-bg-color: #fff;
-    --el-pagination-button-border-color: #e8d6c4;
-    --el-pagination-text-color: #6b5b45;
-    --el-pagination-active-color: #e8a87c;
   }
 }
 

@@ -26,6 +26,7 @@ const navItems = [
   { name: '实名认证', icon: 'layui-icon-auz' },
   { name: '修改密码', icon: 'layui-icon-password' },
   { name: '我的地址', icon: 'layui-icon-home' },
+  { name: '钱包充值', icon: 'layui-icon-rmb' }
 ]
 
 // 接收父组件的激活标签

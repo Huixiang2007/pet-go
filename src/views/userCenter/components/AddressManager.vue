@@ -1,7 +1,11 @@
 <template>
   <LoadingComponent v-if="loading" />
-  <div v-else class="address-manager" >
-    <button class="layui-btn btn-save" @click="handleAdd" v-if="showAddressForm|| addressList.length > 0">
+  <div v-else class="address-manager">
+    <button
+      class="layui-btn btn-save"
+      @click="handleAdd"
+      v-if="showAddressForm || addressList.length > 0"
+    >
       <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
     </button>
 
@@ -11,11 +15,11 @@
         <div class="layui-form-item">
           <label class="layui-form-label">收件人</label>
           <div class="layui-input-block">
-            <input 
-              type="text" 
-              v-model="addressForm.consignee" 
-              placeholder="请输入收件人姓名" 
-              class="layui-input" 
+            <input
+              type="text"
+              v-model="addressForm.receiverName"
+              placeholder="请输入收件人姓名"
+              class="layui-input"
             />
           </div>
         </div>
@@ -23,12 +27,12 @@
         <div class="layui-form-item">
           <label class="layui-form-label">联系电话</label>
           <div class="layui-input-block">
-            <input 
-              type="text" 
-              v-model="addressForm.phone" 
-              lay-verify="phone" 
+            <input
+              type="text"
+              v-model="addressForm.receiverPhone"
+              lay-verify="phone"
               placeholder="请输入联系电话"
-              class="layui-input" 
+              class="layui-input"
             />
           </div>
         </div>
@@ -38,11 +42,11 @@
         <div class="layui-form-item">
           <label class="layui-form-label">详细地址</label>
           <div class="layui-input-block">
-            <textarea 
-              v-model="addressForm.detailAddress" 
-              placeholder="请输入详细地址" 
+            <textarea
+              v-model="addressForm.detailAddress"
+              placeholder="请输入详细地址"
               class="layui-textarea"
-              rows="3" 
+              rows="3"
             ></textarea>
           </div>
         </div>
@@ -50,12 +54,12 @@
         <div class="layui-form-item">
           <label class="layui-form-label">默认地址</label>
           <div class="layui-input-block">
-            <el-switch 
-              style="height: 39px; line-height: 21px" 
-              v-model="addressForm.isDefault" 
+            <el-switch
+              style="height: 39px; line-height: 21px"
+              v-model="isDefaultSwitch"
               active-text="是"
-              inactive-text="否" 
-              active-color="#fd9860" 
+              inactive-text="否"
+              active-color="#fd9860"
             />
           </div>
         </div>
@@ -71,12 +75,10 @@
 
     <!-- 地址列表 -->
     <div class="address-list" v-if="!showAddressForm && addressList.length > 0">
-      
-   
       <div class="address-item" v-for="address in addressList" :key="address.id">
         <div class="address-header">
-          <span class="recipient">{{ address.consignee }} {{ address.phone }}</span>
-          <span class="default-tag" v-if="!address.isDefault">默认地址</span>
+          <span class="recipient">{{ address.receiverName }} {{ address.receiverPhone }}</span>
+          <span class="default-tag" v-if="address.isDefault == '默认地址'">默认地址</span>
         </div>
         <div class="address-content">
           {{ getProvinceName(address.province) }} {{ getCityName(address.city) }}
@@ -84,29 +86,35 @@
         </div>
         <div class="address-actions">
           <button class="layui-btn btn-edit layui-btn-sm" @click="handleEdit(address)">编辑</button>
-          <button class="layui-btn btn-delete layui-btn-sm" @click="handleDelete(address.id)">删除</button>
-          <button class="layui-btn layui-btn-primary layui-btn-sm" @click="handleSetDefault(address.id)"
-            v-if="address.isDefault">设为默认</button>
+          <button class="layui-btn btn-delete layui-btn-sm" @click="handleDelete(address.id)">
+            删除
+          </button>
+          <button
+            class="layui-btn layui-btn-primary layui-btn-sm"
+            @click="handleSetDefault(address.id)"
+            v-if="address.isDefault == '普通地址'"
+          >
+            设为默认
+          </button>
         </div>
       </div>
       <div class="pagination-container">
-        <el-pagination 
-          @current-change="handlePageChange" 
+        <el-pagination
+          @current-change="handlePageChange"
           @size-change="handleSizeChange"
-          :page-sizes="[3, 5, 8, 10]" 
+          :page-sizes="[3, 5, 8, 10]"
           :current-page="pagination.currentPage"
-          :page-size="pagination.pageSize" 
+          :page-size="pagination.pageSize"
           :total="pagination.total"
-          layout="sizes,prev, pager, next, jumper, ->, total" 
-          background 
+          layout="sizes,prev, pager, next, jumper, ->, total"
+          background
         />
       </div>
-   
-</div>
+    </div>
     <!-- 空状态 -->
-      <div class="empty-address" v-if="!showAddressForm && addressList.length === 0">
+    <div class="empty-address" v-if="!showAddressForm && addressList.length === 0">
       <div class="empty-address-content">
-        <i class="layui-icon layui-icon-location" style="font-size: 48px; color: #ccc;"></i>
+        <i class="layui-icon layui-icon-location" style="font-size: 48px; color: #ccc"></i>
         <h3>暂无收货地址</h3>
         <p>您还没有添加任何收货地址</p>
         <button class="layui-btn btn-save" @click="handleAdd">
@@ -118,32 +126,33 @@
 </template>
 
 <script setup lang="ts">
-import {  ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { 
-  getUserAddresses, 
-  getUserAddressDetail, 
-  addUserAddress, 
-  updateUserAddress, 
-  deleteUserAddress, 
-  setDefaultUserAddress 
+import {
+  getUserAddresses,
+  getUserAddressDetail,
+  addUserAddress,
+  updateUserAddress,
+  deleteUserAddress,
+  setDefaultUserAddress,
 } from '@/api/person/address'
 import AddressSelect from '@/components/business/AddressSelect.vue'
-import provincesData from 'china-division/dist/provinces.json';
-import citiesData from 'china-division/dist/cities.json';
-import districtsData from 'china-division/dist/areas.json';
+import provincesData from 'china-division/dist/provinces.json'
+import citiesData from 'china-division/dist/cities.json'
+import districtsData from 'china-division/dist/areas.json'
 import LoadingComponent from '@/components/common/LoadingStatus.vue'
 
 // 类型定义
 interface Address {
   id: string
-  consignee: string
-  phone: string
+  receiverName: string
+  receiverPhone: string
   province: string
   city: string
   district: string
   detailAddress: string
-  isDefault: boolean
+  isDefault: '默认地址' | '普通地址'
+  street: string
 }
 
 interface Area {
@@ -165,21 +174,23 @@ const emit = defineEmits(['refresh'])
 const loading = ref(false)
 // 本地状态
 const addressForm = ref<Partial<Address>>({
-  consignee: '',
-  phone: '',
+  receiverName: '',
+  receiverPhone: '',
   province: '',
   city: '',
   district: '',
   detailAddress: '',
-  isDefault: false
+  isDefault: '普通地址',
+  street: '',
 })
 const selectedAddress = ref({ province: '', city: '', district: '' })
 const addressList = ref<Address[]>([])
+const isDefaultSwitch = ref(false)
 const pagination = ref({
   currentPage: 1,
   pageSize: 5,
   total: 0,
-  pages: 1
+  pages: 1,
 })
 const showAddressForm = ref(false)
 const editingAddressId = ref<string | null>(null)
@@ -190,13 +201,16 @@ onMounted(() => {
 })
 
 // 监听刷新事件（父组件触发）
-watch(() => emit, () => {
-  getAddressList()
-})
+watch(
+  () => emit,
+  () => {
+    getAddressList()
+  },
+)
 
 // 获取地址列表
 const getAddressList = async () => {
-    loading.value = true
+  loading.value = true
   try {
     const userId = localStorage.getItem('userId') || ''
     if (!userId) {
@@ -208,30 +222,23 @@ const getAddressList = async () => {
       pageNum: pagination.value.currentPage,
       pageSize: pagination.value.pageSize,
     })
-    if(response.code === 0){
-      if(response.msg === '操作成功'){
-    addressList.value = (response.data.list || []).map(item => ({
-      ...item,
-      isDefault: item.isDefault === 1
-    }))
-    pagination.value.total = response.data.total || 0
-    pagination.value.pages = response.data.pages || 1
-    if (pagination.value.currentPage === 1 && addressList.value.length === 0) {
-      showAddressForm.value = true
-    }
+    if (response.code === 0) {
+      if (response.msg === '操作成功') {
+        addressList.value = response.data.list || []
+        pagination.value.total = response.data.total || 0
+        pagination.value.pages = response.data.pages || 1
+        if (pagination.value.currentPage === 1 && addressList.value.length === 0) {
+          showAddressForm.value = true
+        }
       }
-      if(response.msg === '用户暂无地址！'){
+      if (response.msg === '用户暂无地址！') {
         ElMessage.warning('您还没有添加收货地址！')
       }
-    
- 
     }
-       
-   
   } catch (error) {
     console.log(error)
     ElMessage.error('获取地址失败！')
-  }finally {
+  } finally {
     // 无论成功失败，结束加载时隐藏加载状态
     loading.value = false
   }
@@ -239,17 +246,17 @@ const getAddressList = async () => {
 
 // 省市区名称转换
 const getProvinceName = (code: string) => {
-  const province = (provincesData as Area[]).find(p => p.code === code)
+  const province = (provincesData as Area[]).find((p) => p.code === code)
   return province ? province.name : code
 }
 
 const getCityName = (code: string) => {
-  const city = (citiesData as City[]).find(c => c.code === code)
+  const city = (citiesData as City[]).find((c) => c.code === code)
   return city ? city.name : code
 }
 
 const getDistrictName = (code: string) => {
-  const district = (districtsData as District[]).find(d => d.code === code)
+  const district = (districtsData as District[]).find((d) => d.code === code)
   return district ? district.name : code
 }
 
@@ -278,20 +285,20 @@ const handleEdit = async (address: Address) => {
     if (response.code === 0 && response.data) {
       const detail = response.data
       addressForm.value = {
-        consignee: detail.consignee,
-        phone: detail.phone,
+        receiverName: detail.receiverName,
+        receiverPhone: detail.receiverPhone,
         province: detail.province,
         city: detail.city,
         district: detail.district,
         detailAddress: detail.detailAddress,
-        isDefault: detail.isDefault === 0,
+        isDefault: detail.isDefault,
+        street: detail.street || '无',
       }
-      selectedAddress.value = {
-        province: detail.province,
-        city: detail.city,
-        district: detail.district,
-      }
-      editingAddressId.value = detail.id
+      selectedAddress.value.province = detail.province
+      selectedAddress.value.city = detail.city
+      selectedAddress.value.district = detail.district
+      editingAddressId.value = detail.id || address.id
+      isDefaultSwitch.value = detail.isDefault === '默认地址'
       showAddressForm.value = true
     }
   } catch (error) {
@@ -303,39 +310,50 @@ const handleEdit = async (address: Address) => {
 // 保存地址
 const handleSave = async () => {
   // 本地验证
-  if (!addressForm.value.consignee) return ElMessage.error('请填写收件人！')
-  if (!addressForm.value.phone) return ElMessage.error('请填写联系电话！')
+  if (!addressForm.value.receiverName) return ElMessage.error('请填写收件人！')
+  if (!addressForm.value.receiverPhone) return ElMessage.error('请填写联系电话！')
   const phoneReg = /^1[3-9]\d{9}$/
-  if (!phoneReg.test(addressForm.value.phone)) return ElMessage.error('请输入正确的手机号码！')
-  
+  if (!phoneReg.test(addressForm.value.receiverPhone))
+    return ElMessage.error('请输入正确的手机号码！')
+
   addressForm.value.province = selectedAddress.value.province
   addressForm.value.city = selectedAddress.value.city
   addressForm.value.district = selectedAddress.value.district
-  
-  if (!addressForm.value.province || !addressForm.value.city || !addressForm.value.district || !addressForm.value.detailAddress) {
+  const provinceName = getProvinceName(selectedAddress.value.province)
+  const cityName = getCityName(selectedAddress.value.city)
+  const districtName = getDistrictName(selectedAddress.value.district)
+
+  if (
+    !addressForm.value.province ||
+    !addressForm.value.city ||
+    !addressForm.value.district ||
+    !addressForm.value.detailAddress
+  ) {
     return ElMessage.error('请填写完整地址信息！')
   }
 
   try {
     const addressData = {
-      id: editingAddressId.value,
-      consignee: addressForm.value.consignee,
-      phone: addressForm.value.phone,
-      province: addressForm.value.province,
-      city: addressForm.value.city,
-      district: addressForm.value.district,
+      addressId: editingAddressId.value || undefined,
+      receiverName: addressForm.value.receiverName,
+      receiverPhone: addressForm.value.receiverPhone,
+      province: provinceName,
+      city: cityName,
+      district: districtName,
       detailAddress: addressForm.value.detailAddress,
-      isDefault: addressForm.value.isDefault ? 0 : 1,
+      isDefault: isDefaultSwitch.value ? '默认地址' : '普通地址',
+      street: addressForm.value.street || '无',
     }
-
+    console.log('发送的地址数据:', addressData)
     let response: any
+    console.log(addressData.id)
+
     if (editingAddressId.value) {
       // 编辑地址
-      response =  await updateUserAddress(editingAddressId.value,
-      addressData)
+      response = await updateUserAddress(addressData)
     } else {
       // 新增地址
-      response = await addUserAddress( addressData)
+      response = await addUserAddress(addressData)
     }
 
     if (response.code === 0) {
@@ -346,7 +364,6 @@ const handleSave = async () => {
     }
   } catch (error) {
     console.log(error)
- 
   }
 }
 
@@ -372,7 +389,7 @@ const handleDelete = (id: string) => {
 // 设为默认地址
 const handleSetDefault = async (id: string) => {
   try {
-    const response =  await setDefaultUserAddress(id)
+    const response = await setDefaultUserAddress(id)
     if (response.code === 0) {
       ElMessage.success('默认地址更改成功！')
       getAddressList()
@@ -387,17 +404,19 @@ const handleSetDefault = async (id: string) => {
 // 重置地址表单
 const resetAddressForm = () => {
   addressForm.value = {
-    consignee: '',
-    phone: '',
+    receiverName: '',
+    receiverPhone: '',
     province: '',
     city: '',
     district: '',
+    street: '',
     detailAddress: '',
-    isDefault: false
+    isDefault: '普通地址',
   }
   selectedAddress.value = { province: '', city: '', district: '' }
   editingAddressId.value = null
   showAddressForm.value = false
+  isDefaultSwitch.value = false
 }
 
 // 取消编辑
@@ -407,10 +426,9 @@ const handleReset = () => {
 </script>
 
 <style scoped>
-
 .layui-btn-primary:hover {
-    border-color: #fd9860 !important;
-    color: #333;
+  border-color: #fd9860 !important;
+  color: #333;
 }
 .layui-input:focus,
 .layui-textarea:focus {
@@ -518,7 +536,7 @@ const handleReset = () => {
 }
 
 :deep(.layui-form-label) {
-  width:87px;
+  width: 87px;
 }
 
 :deep(.el-switch.is-checked .el-switch__core) {

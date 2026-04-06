@@ -26,3 +26,8 @@ export const addAdditionalService = (data: any): Promise<ApiResponse<any>> => {
 export const getAddService = (serviceId: number): Promise<ApiResponse<any>> => {
   return request('/server/api/user/fosterServices/getAdditionalServices', 'GET', { serviceId })
 }
+
+//获取寄养人订单数据
+export const getFosterOrderData = (providerId: number): Promise<ApiResponse<any>> => {
+  return request('/server/api/user/foster-orders/orderTrend', 'POST', { providerId })
+}

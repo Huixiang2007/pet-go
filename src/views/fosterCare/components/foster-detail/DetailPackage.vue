@@ -86,12 +86,7 @@
                 </div>
             </div>
 
-            <!-- 分页组件 -->
-            <div v-if="serviceList.length > 0" class="flex justify-center mt-6">
-                <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" :page-sizes="[5, 10, 20]"
-                    :total="total" layout="total, sizes, prev, pager, next, jumper" @size-change="handleSizeChange"
-                    @current-change="handleCurrentChange" background />
-            </div>
+
         </div>
     </div>
 </template>
@@ -116,9 +111,6 @@ const emit = defineEmits<{
 }>()
 
 // 套餐相关状态
-const pageNum = ref<number>(1)
-const pageSize = ref<number>(10)
-const total = ref<number>(0)
 const serviceList = ref<FosterServiceItem[]>([])
 const loadingService = ref<boolean>(false)
 
@@ -128,14 +120,11 @@ const fetchFosterServiceList = async () => {
     try {
         const res: ApiResponse<FosterServicePageData> = await packageItem({
             providerId: Number(props.providerId),
-            pageNum: pageNum.value,
-            pageSize: pageSize.value
+            pageNum: 1,
+            pageSize: 100 // 加载足够多的套餐，避免分页
         });
         if (res.code === 0) {
             serviceList.value = res.data.list;
-            total.value = res.data.total;
-            pageNum.value = res.data.pageNum;
-            pageSize.value = res.data.pageSize;
 
             // 批量加载附加服务
             await Promise.all(
@@ -164,15 +153,7 @@ const fetchPackageAdditionalServices = async (packageItem: FosterServiceItem) =>
     }
 };
 
-// 分页事件
-const handleSizeChange = (val: number) => {
-    pageSize.value = val;
-    fetchFosterServiceList();
-};
-const handleCurrentChange = (val: number) => {
-    pageNum.value = val;
-    fetchFosterServiceList();
-};
+
 
 // 选择套餐
 const goToBooking = (packageItem: FosterServiceItem) => {
@@ -181,7 +162,6 @@ const goToBooking = (packageItem: FosterServiceItem) => {
 
 // 监听providerId变化重新加载
 watch(() => props.providerId, () => {
-    pageNum.value = 1;
     fetchFosterServiceList();
 }, { immediate: true });
 </script>

@@ -1,9 +1,9 @@
 <template>
     <div class="ai-chat-container">
         <!-- 悬浮按钮 -->
-        <button v-if="!isOpen" class="chat-button" @click="openChat" @mouseenter="showTooltip = true"
-            @mouseleave="showTooltip = false" @mousedown="handleDragStart" @touchstart="handleDragStart"
-            :style="{ transform: `translate(${buttonPosition.x}px, ${buttonPosition.y}px)` }">
+        <DraggableContainer v-if="!isOpen" @click="openChat" @mouseenter="showTooltip = true"
+            @mouseleave="showTooltip = false" :initialPosition="buttonPosition" :preventClickOnDrag="true"
+            :container-style="{ width: '60px', height: '60px' }" class="chat-button">
             <div class="pet-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
                     <path
@@ -20,94 +20,83 @@
             <div v-if="showTooltip" class="chat-tooltip">
                 AI 寄养顾问，解答你的所有问题
             </div>
-        </button>
+        </DraggableContainer>
 
-        <!-- 小屏对话框 -->
-        <div v-else-if="!isFullscreen" class="chat-dialog" @click.stop>
-            <!-- 对话框头部 -->
-            <div class="chat-header">
-                <div class="chat-header-left">
-                    <div class="ai-avatar">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8">
-                            <path
-                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-5-1c-1.1 0-2 .9-2 2v4h4V3H7zm10 0v4h4V3c0-1.1-.9-2-2-2h-2zM7 11H3v10c0 1.1.9 2 2 2h4v-4H7v-8zm10 0v8h4c1.1 0 2-.9 2-2V11h-4zm-4 8h-4v4h4v-4z" />
-                        </svg>
-                    </div>
-                    <div class="chat-title">
-                        <h3>AI 寄养顾问</h3>
-                        <p class="chat-subtitle">随时为你解答寄养相关问题</p>
-                    </div>
-                </div>
-                <div class="chat-header-right">
-                    <button class="header-button" @click="toggleFullscreen">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
-                        </svg>
-                    </button>
-                    <button class="close-button" @click="closeChat">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                            <path
-                                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 聊天内容区 -->
-            <div class="chat-content">
-                <!-- AI 欢迎消息 -->
-                <div class="message ai-message">
-                    <div class="message-bubble">
-                        <p>你好！我是PetGo的AI寄养顾问，有什么可以帮到你的吗？</p>
-                    </div>
-                </div>
-
-                <!-- 用户消息示例 -->
-                <div class="message user-message">
-                    <div class="message-bubble">
-                        <p>寄养服务怎么收费？</p>
-                    </div>
-                </div>
-
-                <!-- AI 回复示例 -->
-                <div class="message ai-message">
-                    <div class="message-bubble">
-                        <p>寄养服务的收费根据宠物类型、寄养天数和服务内容不同而有所差异。一般来说，小型犬猫每天约50-100元，大型犬每天约100-200元。具体价格可以在寄养家庭详情页查看。</p>
-                    </div>
-                </div>
-
-                <!-- 模拟正在输入状态 -->
-                <div v-if="isTyping" class="message ai-message">
-                    <div class="message-bubble typing">
-                        <div class="typing-indicator">
-                            <span></span>
-                            <span></span>
-                            <span></span>
+        <DraggableContainer v-else-if="!isFullscreen" @click.stop :initialPosition="dialogPosition"
+            :preventClickOnDrag="false" :container-style="{ width: '600px', height: '720px' }" class="chat-dialog">
+            <!-- 小屏对话框 -->
+            <div>
+                <!-- 对话框头部 -->
+                <div class="chat-header">
+                    <div class="chat-header-left">
+                        <div class="ai-avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-8 h-8">
+                                <path
+                                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-5-1c-1.1 0-2 .9-2 2v4h4V3H7zm10 0v4h4V3c0-1.1-.9-2-2-2h-2zM7 11H3v10c0 1.1.9 2 2 2h4v-4H7v-8zm10 0v8h4c1.1 0 2-.9 2-2V11h-4zm-4 8h-4v4h4v-4z" />
+                            </svg>
+                        </div>
+                        <div class="chat-title">
+                            <h3>AI 寄养顾问</h3>
+                            <p class="chat-subtitle">随时为你解答寄养相关问题</p>
                         </div>
                     </div>
+                    <div class="chat-header-right">
+                        <button class="header-button" @click="toggleFullscreen">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path
+                                    d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
+                            </svg>
+                        </button>
+                        <button class="close-button" @click="closeChat">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path
+                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 聊天内容区 -->
+                <div class="chat-content">
+                    <!-- AI 欢迎消息 -->
+                    <div class="message-list" ref="messageList">
+                        <div v-for="message in Messages" :key="message.id" class="message"
+                            :class="{ 'user-message': message.sender == 'user', 'ai-message': message.sender == 'ai' }">
+                            <div class="message-bubble">
+                                <p>{{ message.content }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <!-- 常见问题快捷按钮 -->
+                <div class="quick-questions">
+                    <button class="quick-question-btn" @click="sendQuickQuestion('寄养价格')">寄养价格</button>
+                    <button class="quick-question-btn" @click="sendQuickQuestion('宠物饮食要求')">宠物饮食要求</button>
+                    <button class="quick-question-btn" @click="sendQuickQuestion('退订规则')">退订规则</button>
+                    <button class="quick-question-btn" @click="sendQuickQuestion('寄养环境')">寄养环境</button>
+                    <button class="quick-question-btn" @click="sendQuickQuestion('宠物安全')">宠物安全</button>
+                </div>
+
+                <!-- 输入区域 -->
+                <div class="chat-input-area">
+                    <input type="text" class="chat-input" placeholder="输入你的问题..." v-model="messageInput"
+                        @keyup.enter="sendMessage" />
+                    <button class="send-button" @click="sendMessage" :disabled="!messageInput.trim()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <!-- 常见问题快捷按钮 -->
-            <div class="quick-questions">
-                <button class="quick-question-btn" @click="sendQuickQuestion('寄养价格')">寄养价格</button>
-                <button class="quick-question-btn" @click="sendQuickQuestion('宠物饮食要求')">宠物饮食要求</button>
-                <button class="quick-question-btn" @click="sendQuickQuestion('退订规则')">退订规则</button>
-                <button class="quick-question-btn" @click="sendQuickQuestion('寄养环境')">寄养环境</button>
-                <button class="quick-question-btn" @click="sendQuickQuestion('宠物安全')">宠物安全</button>
-            </div>
-
-            <!-- 输入区域 -->
-            <div class="chat-input-area">
-                <input type="text" class="chat-input" placeholder="输入你的问题..." v-model="messageInput"
-                    @keyup.enter="sendMessage" />
-                <button class="send-button" @click="sendMessage" :disabled="!messageInput.trim()">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                    </svg>
-                </button>
-            </div>
-        </div>
+        </DraggableContainer>
 
         <!-- 全屏对话框 -->
         <div v-else class="fullscreen-dialog" @click.stop>
@@ -225,58 +214,45 @@
                     <!-- 聊天消息区 -->
                     <div class="fullscreen-chat-content">
                         <!-- AI 欢迎消息 -->
-                        <div class="message ai-message">
-                            <div class="message-avatar">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                    class="w-6 h-6">
-                                    <path
-                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-                                </svg>
-                            </div>
-                            <div class="message-bubble">
-                                <p>你好！我是PetGo的AI寄养顾问，有什么可以帮到你的吗？</p>
+                        <div class="message-list" ref="messageList">
+                            <div v-for="message in Messages" :key="message.id" class="message"
+                                :class="{ 'user-message': message.sender == 'user', 'ai-message': message.sender == 'ai' }">
+
+                                <template v-if="message.sender == 'ai'">
+                                    <div class="message-avatar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                            class="w-6 h-6">
+                                            <path
+                                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+                                        </svg>
+                                    </div>
+                                    <div v-if="message.isTyping">
+                                        <div class="message-bubble typing">
+                                            <div class="typing-indicator">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <template v-else>
+                                        <div class="message-bubble">
+                                            <span>{{ message.content }}</span>
+                                        </div>
+                                    </template>
+                                </template>
+                                <template v-else>
+                                    <div class="message-bubble">
+                                        <span>{{ message.content }}</span>
+                                    </div>
+                                </template>
                             </div>
                         </div>
 
-                        <!-- 用户消息示例 -->
-                        <div class="message user-message">
-                            <div class="message-bubble">
-                                <p>寄养服务怎么收费？</p>
-                            </div>
-                        </div>
 
-                        <!-- AI 回复示例 -->
-                        <div class="message ai-message">
-                            <div class="message-avatar">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                    class="w-6 h-6">
-                                    <path
-                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-                                </svg>
-                            </div>
-                            <div class="message-bubble">
-                                <p>寄养服务的收费根据宠物类型、寄养天数和服务内容不同而有所差异。一般来说，小型犬猫每天约50-100元，大型犬每天约100-200元。具体价格可以在寄养家庭详情页查看。
-                                </p>
-                            </div>
-                        </div>
 
                         <!-- 模拟正在输入状态 -->
-                        <div v-if="isTyping" class="message ai-message">
-                            <div class="message-avatar">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                    class="w-6 h-6">
-                                    <path
-                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-                                </svg>
-                            </div>
-                            <div class="message-bubble typing">
-                                <div class="typing-indicator">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-                            </div>
-                        </div>
+
                     </div>
 
                     <!-- 快捷问题区 -->
@@ -285,28 +261,21 @@
                         <div class="quick-buttons">
                             <button class="quick-btn" @click="sendQuickQuestion('寄养价格是多少？')">
                                 <span class="btn-icon">💰</span>
-                                <span>寄养价格</span>
+                                <span>项目的简单介绍</span>
                             </button>
                             <button class="quick-btn" @click="sendQuickQuestion('宠物饮食有什么要求？')">
                                 <span class="btn-icon">🍖</span>
-                                <span>饮食要求</span>
+                                <span>宠物寄养注意事项</span>
                             </button>
                             <button class="quick-btn" @click="sendQuickQuestion('退订规则是什么？')">
                                 <span class="btn-icon">📝</span>
-                                <span>退订规则</span>
+                                <span>PetGo宠物信息管理</span>
                             </button>
                             <button class="quick-btn" @click="sendQuickQuestion('寄养环境怎么样？')">
                                 <span class="btn-icon">🏠</span>
-                                <span>寄养环境</span>
+                                <span>寄样预定流程</span>
                             </button>
-                            <button class="quick-btn" @click="sendQuickQuestion('宠物安全如何保障？')">
-                                <span class="btn-icon">🛡️</span>
-                                <span>安全保障</span>
-                            </button>
-                            <button class="quick-btn" @click="sendQuickQuestion('如何预订寄养服务？')">
-                                <span class="btn-icon">📅</span>
-                                <span>预订流程</span>
-                            </button>
+
                         </div>
                     </div>
 
@@ -332,34 +301,53 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-
+import { ref, onMounted, nextTick } from 'vue'
+import DraggableContainer from '@/components/common/DraggableContainer.vue'
+import { getAiChat } from '@/api/ai/ai'
 // 状态管理
 const isOpen = ref(false)
 const isFullscreen = ref(false)
 const showTooltip = ref(false)
 const messageInput = ref('')
-const isTyping = ref(false)
 const isSidebarOpen = ref(true)
-
+interface Message {
+    id: string
+    content: string
+    sender: string
+    isTyping: boolean
+}
+const Messages = ref<Message[]>([])
+const messageList = ref<HTMLElement | null>(null)
+// const chatContainer = ref<HTMLElement | null>(null)
 // 拖动功能
-const buttonPosition = ref({ x: 0, y: 0 })
-const isDragging = ref(false)
-const dragOffset = ref({ x: 0, y: 0 })
+const buttonPosition = ref({
+    x: window.innerWidth - 90,
+    y: window.innerHeight - 90
+})
+const dialogPosition = ref({
+    x: (window.innerWidth - 700) / 2,
+    y: (window.innerHeight - 620) / 2
+})
 
 // 初始化按钮位置
-const initButtonPosition = () => {
+const initPosition = () => {
     buttonPosition.value = {
         x: window.innerWidth - 90,
         y: window.innerHeight - 90
     }
+    dialogPosition.value = {
+        x: (window.innerWidth - 600) / 2,
+        y: (window.innerHeight - 720) / 2
+    }
 }
-
+onMounted(() => {
+    console.log(window.innerWidth)
+    initPosition()
+})
 // 打开聊天
 const openChat = () => {
-    if (!isDragging.value) {
-        isOpen.value = true
-    }
+    isOpen.value = true
+
 }
 
 // 关闭聊天
@@ -374,7 +362,7 @@ const toggleFullscreen = () => {
     isFullscreen.value = !isFullscreen.value
 }
 
-// 切换侧边栏
+// 切换侧边栏 
 const toggleSidebar = () => {
     isSidebarOpen.value = !isSidebarOpen.value
 }
@@ -386,22 +374,112 @@ const createNewChat = () => {
 }
 
 // 发送消息
-const sendMessage = () => {
+const sendMessage = async () => {
     if (messageInput.value.trim()) {
         console.log('发送消息:', messageInput.value)
+
+        // 保存用户输入
+        const userInput = messageInput.value
+
+        // 添加用户消息
+        const userMessage: Message = {
+            id: Date.now().toString(),
+            content: userInput,
+            sender: 'user',
+            isTyping: false
+        };
+        Messages.value.push(userMessage)
+        scrollToBottom()
+
         messageInput.value = ''
-        simulateTyping()
+
+        // 添加 AI 消息占位
+        const aiMessageId = Date.now().toString();
+        const aiMessage = ref({
+            id: aiMessageId,
+            content: '',
+            sender: 'ai',
+            isTyping: true
+        })
+        Messages.value.push(aiMessage.value);
+        // 标记 AI 正在输入
+        aiMessage.value.isTyping = true
+
+        // 滚动到底部
+        scrollToBottom()
+
+        const memoryId = Date.now().toString()
+
+
+        try {
+            console.log('开始请求 AI 聊天接口...')
+            const res = await getAiChat(memoryId, userInput)
+            console.log('API 响应:', res)
+            console.log('响应数据类型:', typeof res.body)
+
+            // 直接处理字符串格式的 SSE 数据
+            if (res.body?.getReader) {
+                // 处理 ReadableStream 格式
+                console.log('处理 ReadableStream 格式...')
+                const reader = res.body.getReader()
+                const decoder = new TextDecoder()
+                let buffer = ''
+
+                while (true) {
+                    const { done, value } = await reader.read()
+                    if (done) break
+
+                    const chunk = decoder.decode(value, { stream: true })
+                    // console.log(chunk);
+                    buffer += chunk
+
+                    const lines = buffer.split('\n')
+                    buffer = lines.pop() || ''
+                    console.log(lines)
+                    for (const line of lines) {
+                        if (line.startsWith('data:')) {
+                            const data = line.slice(5)
+                            if (data.trim() != '[DONE]') {
+                                // 标记 AI 回复完成
+                                aiMessage.value.isTyping = false
+
+                                aiMessage.value.content += data
+                                console.log(aiMessage.value.content)
+                                scrollToBottom()
+                            }
+
+                        }
+
+                    }
+
+                    // console.log(aiMessage.content)
+                }
+
+            } else {
+                throw new Error('Unsupported response format')
+            }
+            console.log(aiMessage.value.content)
+
+            // 标记 AI 回复完成
+
+
+        } catch (error) {
+            console.error('流式请求失败:', error);
+            aiMessage.value.content = aiMessage.value.content || 'AI 回复失败，请重试';
+            // isTyping.value = false;
+        }
     }
 }
 
-// 模拟AI正在输入
-const simulateTyping = () => {
-    isTyping.value = true
-    setTimeout(() => {
-        isTyping.value = false
-        console.log('AI回复')
-    }, 2000)
+// 滚动到底部
+const scrollToBottom = async () => {
+    await nextTick()
+    if (messageList.value) {
+        messageList.value.scrollTop = messageList.value.scrollHeight
+    }
 }
+
+
 
 // 发送快捷问题
 const sendQuickQuestion = (question: string) => {
@@ -409,64 +487,6 @@ const sendQuickQuestion = (question: string) => {
     sendMessage()
 }
 
-// 拖动开始
-const handleDragStart = (e: MouseEvent | TouchEvent) => {
-    isDragging.value = false
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
-
-    // 计算鼠标相对于按钮左上角的偏移量
-    const buttonElement = e.currentTarget as HTMLElement
-    const rect = buttonElement.getBoundingClientRect()
-
-    dragOffset.value = {
-        x: clientX - rect.left,
-        y: clientY - rect.top
-    }
-
-    document.addEventListener('mousemove', handleDragMove)
-    document.addEventListener('mouseup', handleDragEnd)
-    document.addEventListener('touchmove', handleDragMove)
-    document.addEventListener('touchend', handleDragEnd)
-}
-
-// 拖动中
-const handleDragMove = (e: MouseEvent | TouchEvent) => {
-    isDragging.value = true
-    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY
-
-    // 计算新的按钮位置（相对于视口左上角）
-    const newX = clientX - dragOffset.value.x
-    const newY = clientY - dragOffset.value.y
-
-    // 限制拖动范围，防止超出屏幕
-    const maxX = window.innerWidth - 60
-    const maxY = window.innerHeight - 60
-
-    buttonPosition.value = {
-        x: Math.max(0, Math.min(newX, maxX)),
-        y: Math.max(0, Math.min(newY, maxY))
-    }
-}
-
-// 拖动结束
-const handleDragEnd = () => {
-    document.removeEventListener('mousemove', handleDragMove)
-    document.removeEventListener('mouseup', handleDragEnd)
-    document.removeEventListener('touchmove', handleDragMove)
-    document.removeEventListener('touchend', handleDragEnd)
-
-    // 延迟重置拖动状态，避免触发点击事件
-    setTimeout(() => {
-        isDragging.value = false
-    }, 100)
-}
-
-// 组件挂载时初始化按钮位置
-onMounted(() => {
-    initButtonPosition()
-})
 </script>
 
 <style scoped lang="scss">
@@ -490,7 +510,7 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: absolute;
+    position: fixed;
     user-select: none;
     -webkit-user-select: none;
 
@@ -551,9 +571,9 @@ onMounted(() => {
 
 /* 小屏对话框样式 */
 .chat-dialog {
-    width: 400px;
+    width: 700px;
     max-width: 90vw;
-    height: 520px;
+    height: 620px;
     background: white;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
@@ -646,6 +666,7 @@ onMounted(() => {
 
     .message {
         max-width: 85%;
+        margin-bottom: 43px;
 
         &.ai-message {
             align-self: flex-start;
@@ -1131,6 +1152,7 @@ onMounted(() => {
                 display: flex;
                 align-items: flex-start;
                 gap: 12px;
+                margin-bottom: 45px;
 
                 &.ai-message {
                     align-self: flex-start;

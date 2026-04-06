@@ -12,7 +12,7 @@
         @select-package="handleSelectPackage" />
 
       <!-- 评价系统组件 -->
-      <FosterReviewSystem :total-score="fosterHome.totalScore" :service-score="fosterHome.serviceScore" />
+      <FosterReviewSystem :total-score="fosterHome.totalScore" :service-score="fosterHome.serviceScore" @preview-image="handleImagePreview" />
     </div>
 
     <!-- 图片预览弹窗 -->

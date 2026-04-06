@@ -56,7 +56,6 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { ElMessage } from 'element-plus'
 import { Warning } from '@element-plus/icons-vue'
 
 const props = defineProps<{
@@ -80,7 +79,6 @@ watch(
   () => props.modelValue,
   (newVal) => {
     innerVisible.value = newVal
-    // 重置加载状态
     if (!newVal) isPayLoading.value = false
   },
   { immediate: true },
@@ -107,7 +105,7 @@ const handleBeforeClose = () => {
 // 前往充值
 const handleRecharge = () => {
   emit('go-to-recharge')
-  closeDialog() // 充值时关闭弹窗
+  closeDialog()
 }
 
 // 确认支付
@@ -117,11 +115,9 @@ const handlePayConfirm = async () => {
     const res = await new Promise((resolve) => setTimeout(resolve, 1000))
     console.log(res)
     emit('pay-success')
-    ElMessage.success('支付成功')
     closeDialog() // 支付成功后关闭弹窗
   } catch (error) {
     console.error('支付失败：', error)
-    ElMessage.error('支付失败，请重试')
   } finally {
     isPayLoading.value = false
   }

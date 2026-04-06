@@ -315,7 +315,7 @@ import InfiniteScroll from './components/infiniteScroll.vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-
+console.log('pet-shop-view')
 const router = useRouter()
 
 const currentCategory = ref('all')

@@ -1,9 +1,10 @@
+
 import type {CartItem} from '../../types/shop'
 import request from '@/utils/request'
 //获取购物车的商品列表
-export const getCartItems = async (pageNum: number, pageSize: number): Promise<CartItem[]> => {
+export const getCartItems = async (pageNum: number, pageSize: number,selectStatus?:string): Promise<CartItem[]> => {
  const response = await request(
-    `/server/api/shop/shop-cart/page-list?pageNum=${pageNum}&pageSize=${pageSize}`,
+    `/server/api/shop/shop-cart/page-list?pageNum=${pageNum}&pageSize=${pageSize}&selectStatus=${selectStatus}`,
     'GET'
   );
   return response.data.list || [];
@@ -65,3 +66,65 @@ export const selectCartItems = async (cartIds: string[]): Promise<any> => {
     cartIds)
   return response || 0
 }
+
+// 订单
+
+// 获取我的订单
+export const getMyOrders = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/order/my-orders', 'POST', param)
+  return response || 0
+}
+
+// 提交订单
+export const submitOrder = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/order/create-order', 'POST', param)
+  return response
+}
+
+// 支付订单（立即支付）
+export const payOrder = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/order/pay-order-immediate?orderSn=' + param.orderSn, 'POST')
+  return response
+}
+
+// 支付订单（购物车）
+export const payOrderCart = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/order/pay-order', 'POST', param)
+  return response
+}
+
+//  取消订单（立即支付）
+export const cancelOrder = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/order/cancel-immediate?orderSn=' + param.orderSn, 'POST')
+  return response
+}
+
+// 取消订单（购物车批量）
+export const cancelOrderCart = async (orderSn: string[]): Promise<any> => {
+  const response = await request('/server/api/shop/order/cancel', 'POST', { orderSn })
+  return response
+}
+
+// 订单详情
+export const orderDetail = async (orderSn: string): Promise<any> => {
+  const response = await request(`/server/api/shop/order/detail/${orderSn}`, 'GET')
+  return response
+}
+//获取地址/api/shop/user-address-manage/page-query
+
+export const getAddressList = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/user-address-manage/page-query', 'POST', param)
+  return response
+  }
+  //获取默认地址api/shop/user-address-manage/get-default-address
+  export const getDefaultAddress = async (): Promise<any> => {
+    const response = await request('/server/api/shop/user-address-manage/get-default-address', 'POST')
+    return response
+  }
+  //修改默认地址
+  export const updateDefaultAddress = async (addressId: string): Promise<any> => {
+    const response = await request(`/server/api/shop/user-address-manage/set-default-address/${addressId}`, 'POST', {
+      addressId
+    })
+    return response
+  }

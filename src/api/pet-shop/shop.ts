@@ -49,10 +49,15 @@ export const updateShopInfo = async (shopData: ShopRegisterForm) => {
 //注销
 export const logout = async (shopId: number) => {
   const res = await request(`/server/api/shop/shops/delete/` + shopId ,'POST')
-  return res.data
+  return res
 }
 //获取商铺信息（商户可见）
 export const getShopDetail = async (shopId: number) => {
   const res = await request(`/server/api/shop/shops/detail-internal/${shopId}`,'GET')
   return res.data
+}
+//关闭/开店
+export const toggleShopStatus = async (shopId: number, status: number) => {
+  const res = await request(`/server/api/shop/shops/open-close/${shopId}?status=${status}`,'POST')
+  return res
 }

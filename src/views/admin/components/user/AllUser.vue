@@ -179,7 +179,7 @@ const detailLoading = ref(false)
 // 用户列表数据
 const userList = ref<(UserInfo | UserSearchDetail)[]>([])
 
-const userType = ref('unverified') // 初始化默认值，与resetFilters保持一致
+const userType = ref('all') // 初始化默认值，与resetFilters保持一致
 const dialogVisible = ref(false)
 const currentUserDetail = ref<any>(null)
 const selectedUser = ref<any>(null)

@@ -43,9 +43,10 @@
                             </div>
                         </div>
 
-                        <button class="cute-btn bg-white text-blue-500 border border-blue-300 w-full mt-4 py-3">
-                            <i class="el-icon-chat-dot-round mr-2"></i>在线咨询
-                        </button>
+                        <router-link :to="`/customer-service?id=${fosterHome.userId}&type=foster`"
+                            class="cute-btn bg-white text-blue-500 border border-blue-300 w-full mt-4">
+                            <i class="el-icon-chat-dot-round mr-1"></i>在线咨询
+                        </router-link>
                     </div>
                 </div>
             </div>
@@ -71,6 +72,7 @@
             </div>
         </div>
     </div>
+
 </template>
 
 <script setup lang="ts">

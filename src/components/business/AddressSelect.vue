@@ -97,33 +97,40 @@ export default defineComponent({
       showAddressForm: false,
     }
   },
+ 
   watch: {
-    // 监听modelValue变化并更新选择状态
-    modelValue: {
-      handler(newValue: { province?: string; city?: string; district?: string }) {
-        if (newValue) {
-          this.selectedProvince = newValue.province || ''
-          this.selectedCity = newValue.city || ''
-          this.selectedDistrict = newValue.district || ''
+  modelValue: {
+    handler(newValue) {
+      if (!newValue) return
 
-          // 更新联动选项
-          if (this.selectedProvince) {
-            this.cities = (citiesData as City[]).filter(
-              (city) => city.provinceCode === this.selectedProvince,
-            )
-          }
+      // 1. 拿到后端返回的省市区名称
+      const { province: provName, city: cityName, district: distName } = newValue
+      if (!provName) return
 
-          if (this.selectedCity) {
-            this.districts = (districtsData as District[]).filter(
-              (district) => district.cityCode === this.selectedCity,
-            )
-          }
-        }
-      },
-      immediate: true,
-      deep: true,
+      // 2. 第一步：根据名称找到省份code，赋值并加载城市列表
+      const targetProv = this.provinces.find(p => p.name === provName)
+      if (!targetProv) return
+      this.selectedProvince = targetProv.code
+      this.cities = citiesData.filter(c => c.provinceCode === targetProv.code)
+
+      // 3. 第二步：根据名称找到城市code，赋值并加载区县列表
+      if (!cityName) return
+      const targetCity = this.cities.find(c => c.name === cityName)
+      if (!targetCity) return
+      this.selectedCity = targetCity.code
+      this.districts = districtsData.filter(d => d.cityCode === targetCity.code)
+
+      // 4. 第三步：根据名称找到区县code，赋值
+      if (!distName) return
+      const targetDist = this.districts.find(d => d.name === distName)
+      if (targetDist) {
+        this.selectedDistrict = targetDist.code
+      }
     },
-  },
+    immediate: true,
+    deep: true
+  }
+},
   methods: {
     // 处理省份选择变化
     handleProvinceChange(e: Event) {

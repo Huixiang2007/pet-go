@@ -7,3 +7,4 @@ export * from './address';
 export * from './change';
 // 导出实名认证相关接口
 export * from './real';
+export * from './money';

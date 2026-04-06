@@ -127,7 +127,7 @@
               <i class="fa fa-ticket text-amber-600 text-2xl mr-3"></i>
               <h2 class="text-xl font-bold text-amber-800">优惠券中心</h2>
             </div>
-            <a href="#" class="text-amber-600 text-sm hover:underline flex items-center">
+            <a href="/promotion" class="text-amber-600 text-sm hover:underline flex items-center">
               查看全部 <i class="fa fa-arrow-right ml-1 text-xs"></i>
             </a>
           </div>
@@ -268,9 +268,7 @@
                     <span class="text-amber-600 font-bold text-lg"
                       >¥{{ product.currentPrice }}</span
                     >
-                    <span class="text-xs text-gray-400 ml-2 line-through">{{
-                      product.warrantyTip
-                    }}</span>
+                    <span class="text-xs text-gray-400 ml-2">{{ product.warrantyTip }}</span>
                   </div>
                   <button
                     class="w-10 h-10 bg-amber-50 hover:bg-amber-100 rounded-full flex items-center justify-center transition-colors shadow-sm hover:scale-110"

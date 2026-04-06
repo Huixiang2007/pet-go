@@ -85,7 +85,7 @@
         <el-table-column prop="skuSn" label="SKU编号" width="180" />
         <el-table-column label="规格组合" width="200" prop="specText" />
         <el-table-column prop="sales" label="销售价(元)" width="120" />
-      <el-table-column prop="price" label="市场价(元)" width="120" />
+        <el-table-column prop="price" label="市场价(元)" width="120" />
         <el-table-column prop="stock" label="库存" width="100" />
         <!-- 新增：上下架状态列 -->
         <el-table-column label="状态" width="100">
@@ -146,9 +146,6 @@
           <el-descriptions-item label="库存数量">{{ currentSku.stock }} 件</el-descriptions-item>
           <el-descriptions-item label="库存状态">{{
             currentSku.stockStatus || '正常'
-          }}</el-descriptions-item>
-          <el-descriptions-item label="发布时间·">{{
-            currentSku.publishTime || '无'
           }}</el-descriptions-item>
           <el-descriptions-item label="状态">
             <el-tag :type="currentSku.status === '上架' ? 'success' : 'danger'">
@@ -323,14 +320,14 @@ const loadSkuData = async () => {
     const response = await skuListApi(props.productId, 1, 100)
     console.log('skuList:', response)
     if (response) {
-skuList.value = response.list.map((sku) => ({
-  ...sku,
-  skuId: sku.skuId ? (typeof sku.skuId === 'string' ? sku.skuId : BigInt(sku.skuId)) : '',
-  status: sku.status || ' ',
-  price: sku.sellPrice || 0,
-  sales: sku.sales || 0,
-  stock: sku.stock || 0,
-}))
+      skuList.value = response.list.map((sku) => ({
+        ...sku,
+        skuId: sku.skuId ? (typeof sku.skuId === 'string' ? sku.skuId : BigInt(sku.skuId)) : '',
+        status: sku.status || ' ',
+        price: sku.sellPrice || 0,
+        sales: sku.sales || 0,
+        stock: sku.stock || 0,
+      }))
     } else {
       skuList.value = []
       ElMessage.error('该商品的Sku数据为空')
@@ -433,7 +430,7 @@ const handleEdit = async (row: Sku) => {
   editIndex.value = skuList.value.findIndex((sku) => sku.skuId === row.skuId)
 
   const response = await skuDetailApi(row.skuId)
-    const editSku = response|| {}
+  const editSku = response || {}
 
   skuForm.skuSn = editSku.skuSn || ''
   skuForm.stock = editSku.stock || 0
@@ -479,25 +476,25 @@ const submitEdit = async () => {
     }
 
     // 更新列表数据
-skuList[editIndex.value] = {
-  skuId: skuList.value[editIndex.value].skuId,
-  price: skuForm.price || 0.01,
-  marketPrice: skuForm.marketPrice || 0,
-  costPrice: skuForm.costPrice,
-  stock: skuForm.stock,
-  specJson: specJson
-};
-const newSku = {
-  skuId: skuList.value[editIndex.value].skuId,
-  price: skuForm.price || 0.01,
-   skuSn:'',
-  marketPrice: skuForm.marketPrice || 0.01,
-  costPrice: skuForm.costPrice,
-  stock: skuForm.stock,
-  specJson: specJson
-};
-console.log('skuListss:', skuList.value)
-console.log('newSku:', newSku)
+    skuList[editIndex.value] = {
+      skuId: skuList.value[editIndex.value].skuId,
+      price: skuForm.price || 0.01,
+      marketPrice: skuForm.marketPrice || 0,
+      costPrice: skuForm.costPrice,
+      stock: skuForm.stock,
+      specJson: specJson,
+    }
+    const newSku = {
+      skuId: skuList.value[editIndex.value].skuId,
+      price: skuForm.price || 0.01,
+      skuSn: '',
+      marketPrice: skuForm.marketPrice || 0.01,
+      costPrice: skuForm.costPrice,
+      stock: skuForm.stock,
+      specJson: specJson,
+    }
+    console.log('skuListss:', skuList.value)
+    console.log('newSku:', newSku)
 
     emit('update', [newSku as any])
     loadSkuData()
@@ -514,8 +511,7 @@ const deleteSku = async (row: Sku) => {
       ElMessage.error('SKU ID无效，无法删除')
       return
     }
-      emit('delete', row.skuId)
-
+    emit('delete', row.skuId)
   } catch (error: any) {
     console.log('已取消删除', error)
   }

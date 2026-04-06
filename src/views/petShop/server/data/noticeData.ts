@@ -1,35 +1,77 @@
 import { ref } from 'vue'
+import JSONbig from 'json-bigint'
 
-// 系统通知数据（接口请求：axios.get('/api/notices').then(res => systemNotices.value = res.data)）
-export const systemNotices = ref([
-  {
-    id: 'notice1',
-    type: '活动通知',
-    title: '开学季宠物乐园计划',
-    content: '想带你的狗狗出来散步游玩吗，快来参加活动吧，这里的服务超齐全',
-    time: '10:05',
-    date: '今天14:45',
-    publishTime: '发布后立即生效',
-    read: false
-  },
-  {
-    id: 'notice2',
-    type: '系统通知',
-    title: '账户余额提醒',
-    content: '账户余额不足，已自动暂停自动续费服务',
-    time: '09:30',
-    date: '今天14:45',
-    publishTime: '2026-03-12 09:25',
-    read: false
-  },
-  {
-    id: 'notice3',
-    type: '优惠通知',
-    title: '新用户专享优惠券',
-    content: '新用户专享优惠券已发放至您的账户，有效期7天',
-    time: '昨天 18:20',
-    date: '昨天',
-    publishTime: '2026-03-11 18:00',
-    read: true
+export const systemNotices = ref<Array<{
+  id: string; // 唯一标识
+  type: string; // 通知类型
+  title: string; // 通知标题
+  content: string; // 通知正文内容
+  time: string; // 通知接收时间
+  date: string; // 通知日期
+  publishTime: string; // 发布时间
+  read: boolean; // 是否已读
+  senderName: string; // 发送者姓名
+  attach?: string; // 附件
+}>>([])
+
+// 格式化日期
+const formatDate = (dateStr: string) => {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+
+  if (date >= today) {
+    return '今天'
+  } else if (date >= yesterday) {
+    return '昨天'
+  } else {
+    return date.toLocaleDateString('zh-CN')
   }
-])
+}
+
+const getSystemNotices = async () => {
+  try {
+    const rawRes = await fetch('/server/api/In-site/message/queryMyMessage', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        pageNum: 1,
+        pageSize: 20,
+        sortItemList: [
+          {
+            isAsc: false,
+            column: "publishTime"
+          }
+        ]
+      })
+    })
+    const rawData = await rawRes.text()
+    const res = JSONbig({ storeAsString: true }).parse(rawData)
+
+    if (res.data.list && Array.isArray(res.data.list)) {
+      systemNotices.value = res.data.list.map(item => ({
+        id: item.messageId.toString(),
+        type: item.messageType || '系统通知',
+        title: item.messageTitle || '',
+        content: item.messageContent || '',
+        time: new Date(item.sendTime).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+        date: formatDate(item.sendTime),
+        publishTime: item.sendTime,
+        read: item.isRead === 1 ,
+        senderName: item.senderName || '',
+        attach: item.attach || ''
+      }))
+
+    } else {
+      systemNotices.value = []
+    }
+  } catch (error) {
+    console.error('获取系统通知失败:', error)
+    systemNotices.value = []
+  }
+}
+getSystemNotices()

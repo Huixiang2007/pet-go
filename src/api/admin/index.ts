@@ -1,5 +1,7 @@
 export * from './user';
 export * from './foster';
+export * from './shop';
+
 export interface ApiResponse<T> {
   code: number;        
   data: T;             

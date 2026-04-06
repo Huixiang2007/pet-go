@@ -81,34 +81,47 @@
           @click="handleSwitchToSystemNotice"
         />
 
-        <!-- 店铺列表项 - 动态渲染 -->
-        <div
-          v-for="shop in shopList"
-          :key="shop.id"
-          class="flex items-center p-4 border-b border-gray-100 cursor-pointer hover:bg-blue-100 transition-colors"
-          :class="{ 'bg-blue-100': activeShopId === shop.id }"
-          @click="handleSwitchShop(shop)"
-        >
-          <img
-            :src="shop.avatar"
-            alt="店铺头像"
-            class="w-12 h-12 rounded-full border-2 object-cover"
-            :class="{
-              'border-blue-500': activeShopId === shop.id,
-              'border-transparent': activeShopId !== shop.id,
-            }"
-          />
-          <div class="ml-3 flex-1 min-w-0">
-            <h1 class="text-base font-bold text-gray-800">{{ shop.name }}</h1>
-            <p class="text-xs text-gray-500 truncate">{{ shop.lastMessage }}</p>
-          </div>
-          <span
-            v-if="shop.unreadCount > 0"
-            class="text-xs text-white bg-blue-500 rounded-full w-5 h-5 flex items-center justify-center"
+        <!-- 店铺列表 -->
+        <div v-for="shop in safeShopList" :key="shop.shopId">
+          <div
+            class="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-blue-100 transition-colors"
+            :class="{ 'bg-blue-100': activeShopId === shop.shopId }"
+            @click="handleSwitchShop(shop)"
           >
-            {{ shop.unreadCount }}
-          </span>
-          <span v-else class="text-xs text-gray-400">{{ shop.lastTime }}</span>
+            <!-- 头像 + 店铺信息 区域 -->
+            <div class="flex items-center gap-3">
+              <img
+                :src="shop.shopAvatar"
+                alt="店铺头像"
+                class="w-12 h-12 rounded-full border-2 object-cover flex-shrink-0"
+                :class="{
+                  'border-blue-500': activeShopId === shop.shopId,
+                  'border-transparent': activeShopId !== shop.shopId,
+                }"
+              />
+              <div class="flex-1 min-w-0">
+                <!-- 店铺名称：超长截断 + 限制行数 -->
+                <h1 class="text-base font-bold text-gray-800 truncate" title="{{ shop.shopName }}">
+                  {{ shop.shopName }}
+                </h1>
+                <!-- 最后一条消息：超长截断 -->
+                <p class="text-xs text-gray-500 truncate">{{ shop.lastMsgContent }}</p>
+              </div>
+            </div>
+
+            <!-- 未读数/时间 区域（ -->
+            <div class="flex flex-col items-end gap-1 ml-2 flex-shrink-0 w-20">
+              <span
+                v-if="shop.unreadCount > 0"
+                class="text-xs text-white bg-blue-500 rounded-full w-5 h-5 flex items-center justify-center self-end"
+              >
+                {{ shop.unreadCount }}
+              </span>
+              <div v-else class="text-xs text-gray-400 truncate text-right pt-8">
+                {{ formatTime(shop.lastMsgTime) }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -116,40 +129,56 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import SystemNoticeItem from './SystemNoticeItem.vue'
-import { shopList } from '../data/shopData'
+import { getShopList } from '../data/chatListData'
 import { ElMessage } from 'element-plus' // 引入提示组件
-
+import formatTime from '@/utils/time'
 // 接收主页面传递的参数
-defineProps<{
+const props = defineProps<{
   latestNotice: { id: string; content: string; time: string }
   unreadCount: number
-  activeShopId: string // 当前选中的店铺ID
+  activeShopId: number
+  allShops: any[]
+  allFosterLists: any[]
+  chatType: string
 }>()
+
+const chatType = computed(() => props.chatType)
 
 // 触发给主页面的事件
 const emit = defineEmits(['switch-to-system-notice', 'switch-shop', 'save-auto-reply'])
 
-// 自动回复设置相关状态
+// 自动回复设置
 const showAutoReplySettings = ref(false)
 const autoReplyContent = ref('')
 
-// 初始化：从本地缓存加载配置
+const safeShopList = computed(() => {
+  if (chatType.value == 'shop') {
+    return Array.isArray(props.allShops) ? props.allShops : []
+  } else {
+    return Array.isArray(props.allFosterLists) ? props.allFosterLists : []
+  }
+})
+
 onMounted(() => {
   const savedContent = localStorage.getItem('auto_reply_welcome')
   if (savedContent) {
     autoReplyContent.value = savedContent
   }
+
+  if (!props.activeShopId && safeShopList.value.length > 0) {
+    handleSwitchShop(safeShopList.value[0])
+  }
 })
 
-// 保存自动回复配置
+// 保存自动回复
 const saveAutoReply = () => {
   if (!autoReplyContent.value.trim()) {
     ElMessage.warning('欢迎语不能为空！')
     return
   }
-  // 通知父组件（可选）
+  // 通知父组件
   emit('save-auto-reply', {
     content: autoReplyContent.value,
   })
@@ -166,3 +195,25 @@ const handleSwitchShop = (shop: any) => {
   emit('switch-shop', shop)
 }
 </script>
+<style scoped>
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rounded-full {
+  min-width: 20px;
+  min-height: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+/* 列表项 hover 效果增强 */
+.cursor-pointer {
+  position: relative;
+}
+.cursor-pointer:hover {
+  background-color: #e0f2fe !important; /* 浅蓝 hover 色 */
+}
+</style>

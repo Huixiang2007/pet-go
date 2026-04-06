@@ -2,7 +2,6 @@
   <NavBar />
   <main class="mx-auto px-4 py-8 bg-white">
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mt-12">
-
       <div class="product-grid grid grid-cols-1 lg:grid-cols-3 gap-8 p-6 md:p-8">
         <div class="lg:col-span-2">
           <div class="flex gap-4">
@@ -11,11 +10,11 @@
               <div
                 v-for="(item, i) in mediaList"
                 :key="i"
-                class="thumb cursor-pointer rounded-md  overflow-hidden relative"
+                class="thumb cursor-pointer rounded-md overflow-hidden relative"
                 :class="activeMediaIndex === i ? 'ring-2 ring-orange-400' : ''"
                 @click="switchMedia(i)"
               >
-                <img :src="item.src" alt="缩略图" class="w-full h-full object-cover" />
+                <img :src="item.thumbSrc" alt="缩略图" class="w-full h-full object-cover" />
                 <div
                   v-if="item.type === 'video'"
                   class="absolute inset-0 bg-black/30 flex items-center justify-center"
@@ -75,23 +74,42 @@
               </button>
               <button
                 class="px-6 py-3 text-gray-500"
-                :class="{ 'text-orange-500 border-b-2 border-orange-500': activeTab === 'review' }"
-                @click="activeTab = 'review'"
+                :class="{
+                  'text-orange-500 border-b-2 border-orange-500': activeTab === 'allReview',
+                }"
+                @click="activeTab = 'allReview'"
               >
-                用户评价
+                全部评价
+              </button>
+              <button
+                class="px-6 py-3 text-gray-500"
+                :class="{
+                  'text-orange-500 border-b-2 border-orange-500': activeTab === 'question',
+                }"
+                @click="activeTab = 'question'"
+              >
+                问大家
               </button>
             </div>
 
             <!-- 商品详情 -->
             <div v-if="activeTab === 'detail'" class="p-6 md:p-8">
-              <h3 class="text-lg font-semibold mb-4">商品详情</h3>
-              <p class="text-sm text-gray-600 mb-6">{{ product.detail }}</p>
-              <img
-                v-for="(img, idx) in product.images?.split(',') || []"
-                :key="idx"
-                :src="img"
-                class="w-full rounded-lg mb-4"
-              />
+              <div
+                v-if="!product.detail || product.detail.trim() === ''"
+                class="text-center py-10 bg-amber-50 rounded-xl mb-6"
+              >
+                <div class="text-amber-500 text-4xl mb-3">🐾</div>
+                <p class="text-amber-700 font-medium mb-2">哎呀！商家偷懒啦～</p>
+                <p class="text-gray-500 text-sm">居然忘了放商品详情，不过放心，好物不会差</p>
+              </div>
+              <p v-else class="text-sm text-gray-600 mb-6">{{ product.detail }}</p>
+
+              <div class="mb-6">
+                <h2 class="text-lg font-bold text-gray-800 mb-2">
+                  {{ product.name }}
+                </h2>
+                <p class="text-sm text-gray-600">{{ product.subTitle || '' }}</p>
+              </div>
             </div>
 
             <!-- 规格参数 -->
@@ -111,8 +129,8 @@
                   <td class="border border-gray-200 p-3">{{ product.productSn || '-' }}</td>
                 </tr>
                 <tr>
-                  <td class="border border-gray-200 p-3">品牌</td>
-                  <td class="border border-gray-200 p-3">{{ product.brandName || '-' }}</td>
+                  <td class="border border-gray-200 p-3">品牌ID</td>
+                  <td class="border border-gray-200 p-3">{{ product.brandId || '-' }}</td>
                 </tr>
                 <tr>
                   <td class="border border-gray-200 p-3">价格</td>
@@ -128,48 +146,57 @@
                   <td class="border border-gray-200 p-3">质保</td>
                   <td class="border border-gray-200 p-3">{{ product.warrantyTip || '-' }}</td>
                 </tr>
+                <tr>
+                  <td class="border border-gray-200 p-3">销量</td>
+                  <td class="border border-gray-200 p-3">{{ product.sales || 0 }} 件</td>
+                </tr>
               </table>
             </div>
 
             <!-- 用户评价 -->
-            <div v-if="activeTab === 'review'" class="p-6 md:p-8">
-              <h2 class="text-lg font-semibold mb-4">用户评价</h2>
-              <p class="text-gray-600 mb-4">共 {{ product.reviewCount || 0 }} 条评价</p>
-              <div class="review-item mb-6 pb-6 border-b border-gray-100">
-                <div class="review-star text-yellow-400 mb-2">
-                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i
-                  ><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                </div>
-                <p><strong>用户：张先生</strong></p>
-                <p class="text-gray-600">
-                  商品质量很好，颜值也高，宠物很喜欢！
-                </p>
-              </div>
-              <div class="review-item">
-                <div class="review-star text-yellow-400 mb-2">
-                  <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i
-                  ><i class="fa fa-star"></i><i class="fa fa-star-half-o"></i>
-                </div>
-                <p><strong>用户：李女士</strong></p>
-                <p class="text-gray-600">
-                  发货很快，包装严实，和描述一致，值得购买~
-                </p>
-              </div>
+            <div v-if="activeTab === 'allReview'" class="p-6 md:p-8">
+              <CommentList
+                :shopId="Number(product.shopId)"
+                :activeTab="activeTab"
+                :productId="product.id"
+              />
+            </div>
+            <!-- 问大家 -->
+            <div v-if="activeTab === 'question'" class="p-6 md:p-8">
+              <QuestionUs
+                :shopId="Number(product.shopId)"
+                :activeTab="activeTab"
+                :productId="product.id"
+              />
             </div>
           </div>
         </div>
-
         <!-- 右侧信息 -->
         <div class="lg:block lg:col-span-1 mt-20 mb-5">
-          <div class="lg:fixed lg:w-[calc(100%-2rem)] max-w-[430px] py-5 px-4 mt-0 lg:mt-[-112px] overflow-auto max-h-[calc(100vh-4rem)]">
+          <div
+            class="lg:fixed lg:w-[calc(100%-2rem)] max-w-[430px] py-5 px-4 mt-0 lg:mt-[-112px] overflow-auto max-h-[calc(100vh-4rem)]"
+          >
             <div>
               <div class="flex items-center justify-between">
-                <div @click="goStore"
-                     class="text-sm text-gray-500 cursor-pointer border-b border-gray-200 pb-2 hover:text-orange-600 whitespace-nowrap overflow-hidden text-ellipsis"
-                >{{ product.shopName }}</div>
+                <div
+                  @click="goStore"
+                  class="text-sm text-gray-500 cursor-pointer border-b border-gray-200 pb-2 hover:text-orange-600 whitespace-nowrap overflow-hidden text-ellipsis"
+                >
+                  {{ product.shopName }}
+                </div>
               </div>
-
-              <h1 class="mt-4 text-2xl font-bold break-words">{{ product.name }}</h1>
+              <div class="flex items-center gap-24">
+                <div>
+                  <h1 class="text-2xl font-bold break-words">{{ product.name }}</h1>
+                </div>
+                <div class="shop-btn flex justify-center md:justify-start gap-4">
+                  <router-link
+                    :to="`/customer-service?id=${product.shopOwnerId}&type=shop`"
+                    class="bg-white text-orange-500 px-6 py-2 rounded-full text-sm border-2 border-orange-500 hover:bg-orange-50 transition-all active:scale-95"
+                    >联系客服</router-link
+                  >
+                </div>
+              </div>
 
               <div class="flex items-center gap-3 mt-3 flex-wrap">
                 <div class="flex items-center text-yellow-400">
@@ -192,10 +219,34 @@
                   ¥{{ product.marketPrice || 0 }}
                 </div>
                 <div class="text-xs py-0.5 rounded bg-orange-50 text-orange-600">
-                  直降{{ (product.marketPrice - product.currentPrice) || 0 }}元
+                  直降{{ (product.marketPrice - product.currentPrice || 0).toFixed(1) }}元
                 </div>
               </div>
-              <div class="mt-2 text-sm text-gray-500">{{ '无可用优惠券' }}</div>
+
+              <!-- 优惠券模块 -->
+              <div class="mt-4">
+                <p class="text-sm font-medium text-gray-700 mb-2">可用优惠券</p>
+                <div v-if="product.couponsList && product.couponsList.length > 0" class="space-y-2">
+                  <div
+                    v-for="(coupon, idx) in product.couponsList"
+                    :key="idx"
+                    class="flex items-center justify-between px-3 py-2 bg-white rounded border border-orange-200"
+                  >
+                    <div class="flex items-center gap-2">
+                      <span class="text-orange-500 font-bold text-lg"
+                        >¥{{ coupon.denomination }}</span
+                      >
+                      <span class="text-xs text-gray-500">满{{ coupon.minAmount }}可用</span>
+                    </div>
+                    <button
+                      class="text-xs text-orange-500 border border-orange-500 px-2 py-1 rounded"
+                    >
+                      立即领取
+                    </button>
+                  </div>
+                </div>
+                <p v-else class="text-sm text-gray-500">无可用优惠券</p>
+              </div>
             </div>
 
             <div v-if="specGroups.length > 0" class="w-full">
@@ -223,7 +274,7 @@
                 <h3 class="text-sm font-medium text-gray-600 mb-2">已选</h3>
                 <div class="text-sm text-gray-500 flex flex-wrap gap-2">
                   <span v-for="(value, key) in selectedOptions" :key="key" class="mr-1"
-                  >{{ key }}: {{ value }}</span
+                    >{{ key }}: {{ value }}</span
                   >
                 </div>
               </div>
@@ -261,7 +312,9 @@
               库存：<span class="text-green-600">{{ selectedSku.stock || 999 }}</span> 件
             </div>
 
-            <div class="flex flex-col sm:flex-row gap-3 pt-4 pr-[4.5rem] border-t border-gray-100 mt-4 ">
+            <div
+              class="flex flex-col sm:flex-row gap-3 pt-4 pr-[4.5rem] border-t border-gray-100 mt-4"
+            >
               <button
                 id="addCart"
                 class="w-full sm:flex-1 py-3 bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600 transition-colors flex items-center justify-center"
@@ -279,7 +332,9 @@
               </button>
             </div>
 
-            <div class="text-sm text-gray-500 pt-4 border-t border-gray-100 flex flex-wrap gap-3 w-full mb-6">
+            <div
+              class="text-sm text-gray-500 pt-4 border-t border-gray-100 flex flex-wrap gap-3 w-full mb-6"
+            >
               <div class="flex items-center gap-2 whitespace-nowrap">
                 <i class="fa fa-check-circle text-orange-500"></i
                 >{{ product.warrantyTip || '正品保障' }}
@@ -295,12 +350,14 @@
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { ElMessage } from 'element-plus' // 修正拼写
+import { ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
-import { addCartApi ,getProductDetail} from "../../../api/pet-shop/product"
-import type {ProductDetail,SkuInfo} from '../../../types/shop'
+import CommentList from './components/CommentList.vue'
+import QuestionUs from './components/QuestionUs.vue'
+import { addCartApi, getProductDetail } from '../../../api/pet-shop/product'
+import type { ProductDetail, SkuInfo } from '../../../types/shop'
 const router = useRouter()
-const shopId= ref('')
+const shopId = ref('')
 
 interface MediaItem {
   type: 'image' | 'video'
@@ -308,7 +365,6 @@ interface MediaItem {
   thumbSrc: string
   format: string
 }
-
 
 interface SpecGroup {
   name: string
@@ -325,25 +381,38 @@ const route = useRoute()
 const id = route.params.id as string
 console.log('产品ID:', id)
 
-
 const product = ref<ProductDetail>({
   id: 0,
+  brandId: 0,
   shopName: '',
+  shopOwnerId: 0,
+
   name: '',
   productScore: 0,
   brandName: '',
+
   reviewCount: 0,
   currentPrice: 0,
   marketPrice: 0,
+
   detail: '',
   images: '',
   mainImage: '',
+
   videoUrl: '',
-  shopId:'',
+  shopId: '',
   productSn: '',
+
   productWeight: 0,
   warrantyTip: '',
   skuList: [],
+  subTitle: '',
+
+  sales: 0,
+  couponsList: [],
+  shopType: '',
+  title: '',
+  typeId: 0,
 })
 
 // 媒体
@@ -358,12 +427,14 @@ const qty = ref<number>(1)
 
 // 计算当前媒体
 const currentMedia = computed<MediaItem>(() => {
-  return mediaList.value[activeMediaIndex.value] || {
-    type: 'image',
-    src: product.value.mainImage || '',
-    thumbSrc: product.value.mainImage || '',
-    format: 'jpg',
-  }
+  return (
+    mediaList.value[activeMediaIndex.value] || {
+      type: 'image',
+      src: product.value.mainImage || '',
+      thumbSrc: product.value.mainImage || '',
+      format: 'jpg',
+    }
+  )
 })
 
 // 是否有视频
@@ -378,18 +449,31 @@ const specGroups = computed<SpecGroup[]>(() => {
 
   if (product.value.skuList?.length) {
     product.value.skuList.forEach((sku: SkuInfo) => {
-      if (!sku.specText) return
-      // 适配接口的specText（单组规格：'111:111'）
-      const specItems = sku.specText.split(';');
-      specItems.forEach(item => {
-      const [name, value] = item.split(':').map(str => str.trim())
-      if (name && value) {
-        if (!specMap.has(name)) {
-          specMap.set(name, new Set())
+      if (!sku.specJson) return
+      // 解析 specJson（接口返回的是 JSON 字符串，如 {"颜色":"红色","版本":"基础款"}）
+      try {
+        const specObj = JSON.parse(sku.specJson)
+        Object.entries(specObj).forEach(([name, value]) => {
+          if (name && value) {
+            if (!specMap.has(name)) {
+              specMap.set(name, new Set())
+            }
+            specMap.get(name)?.add(value as string)
+          }
+        })
+      } catch (e) {
+        console.error('解析 specJson 失败:', e)
+        if (sku.specText) {
+          const parts = sku.specText.split(' - ').map((s) => s.trim())
+          if (parts.length === 2) {
+            const [name, value] = parts
+            if (!specMap.has(name)) {
+              specMap.set(name, new Set())
+            }
+            specMap.get(name)?.add(value)
+          }
         }
-        specMap.get(name)?.add(value)
       }
-    })
     })
   }
 
@@ -415,10 +499,14 @@ const selectedSku = computed<SelectedSku>(() => {
 
 // 判断是否选完规格
 const isSkuSelected = computed(() => {
-  return specGroups.value.length === 0 || Object.keys(selectedOptions.value).length === specGroups.value.length
+  return (
+    specGroups.value.length === 0 ||
+    Object.keys(selectedOptions.value).length === specGroups.value.length
+  )
 })
+
 // 获取产品详情
-const productDetail =async () => {
+const productDetail = async () => {
   try {
     const res = await getProductDetail(id)
     console.log('接口返回数据:', res)
@@ -426,39 +514,59 @@ const productDetail =async () => {
     product.value = productNew
     shopId.value = productNew.shopId
 
-    // 初始化媒体列表（适配接口的图片地址）
+    // 初始化媒体列表：视频优先展示
     const imageList = productNew.images?.split(',') || []
-    const mainImage = productNew.mainImage || imageList[0] || ""
-    mediaList.value = [
-      { type: 'image', src: mainImage, thumbSrc: mainImage, format: 'jpg' },
-    ...imageList.slice(1).map((img: string): MediaItem => ({
-  type: 'image',
-  src: img,
-  thumbSrc: img,
-  format: 'jpg'
-}))
-    ]
+    const mainImage = productNew.mainImage || imageList[0] || ''
+    mediaList.value = []
 
-    // 添加视频
+    // 有视频就先放视频
     if (productNew.videoUrl && productNew.videoUrl !== '暂无商品视频url') {
-      mediaList.value.unshift({
-        type: 'video', src: productNew.videoUrl, thumbSrc: mainImage, format: 'mp4'
+      mediaList.value.push({
+        type: 'video',
+        src: productNew.videoUrl,
+        thumbSrc: mainImage,
+        format: 'mp4',
       })
+      activeMediaIndex.value = 0 // 默认展示视频
     }
+
+    // 再放图片
+    mediaList.value.push({
+      type: 'image',
+      src: mainImage,
+      thumbSrc: mainImage,
+      format: 'jpg',
+    })
+    imageList.slice(1).forEach((img: string) => {
+      mediaList.value.push({
+        type: 'image',
+        src: img,
+        thumbSrc: img,
+        format: 'jpg',
+      })
+    })
 
     // 初始化默认选中第一个SKU
     if (productNew.skuList?.length) {
       selectedSkuInfo.value = productNew.skuList[0]
       // 解析默认SKU的规格
-      if (selectedSkuInfo.value?.specText) {
-        const [name, value] = selectedSkuInfo.value.specText.split(':')
-        if (name && value) {
-          selectedOptions.value[name] = value
+      if (selectedSkuInfo.value?.specJson) {
+        try {
+          const specObj = JSON.parse(selectedSkuInfo.value.specJson)
+          Object.assign(selectedOptions.value, specObj)
+        } catch {
+          // 兼容旧格式
+          if (selectedSkuInfo.value.specText) {
+            const parts = selectedSkuInfo.value.specText.split(' - ').map((s) => s.trim())
+            if (parts.length === 2) {
+              const [name, value] = parts
+              selectedOptions.value[name] = value
+            }
+          }
         }
       }
     }
-    }
-  catch(err) {
+  } catch (err) {
     console.error('产品详情请求失败:', err)
     ElMessage.error('获取商品信息失败')
   }
@@ -467,9 +575,10 @@ const productDetail =async () => {
 const goStore = () => {
   router.push({
     path: '/Store',
-    query: { id: shopId.value }
+    query: { id: shopId.value },
   })
 }
+
 // 规格选择相关函数
 function selectSkuOption(specName: string, option: string) {
   selectedOptions.value[specName] = option
@@ -478,20 +587,31 @@ function selectSkuOption(specName: string, option: string) {
     selectedSkuInfo.value = matchSku
   }
 }
+
 function findMatchingSku(): SkuInfo | null {
   if (!product.value.skuList?.length) return null
-  return product.value.skuList.find((sku: SkuInfo) => {
-    if (!sku.specText) return false
-    // 把SKU的规格文本拆成键值对（比如 { "重量": "2kg", "口味": "鱼肉味" }）
-    const specItems = sku.specText.split(';').reduce((obj, item) => {
-      const [name, value] = item.split(':').map(str => str.trim());
-      if (name && value) obj[name] = value;
-      return obj;
-    }, {} as Record<string, string>);
-    return Object.entries(selectedOptions.value).every(([name, value]) => {
-      return specItems[name] === value;
-    });
-  }) || null;
+  return (
+    product.value.skuList.find((sku: SkuInfo) => {
+      if (!sku.specJson) return false
+      try {
+        const specObj = JSON.parse(sku.specJson)
+        return Object.entries(selectedOptions.value).every(([name, value]) => {
+          return specObj[name] === value
+        })
+      } catch {
+        if (sku.specText) {
+          const parts = sku.specText.split(' - ').map((s) => s.trim())
+          if (parts.length === 2) {
+            const [name, value] = parts
+            return Object.entries(selectedOptions.value).every(
+              ([n, v]) => n === name && v === value,
+            )
+          }
+        }
+        return false
+      }
+    }) || null
+  )
 }
 
 // 媒体相关函数
@@ -499,17 +619,15 @@ function switchMedia(index: number) {
   activeMediaIndex.value = index
   videoPlayer.value?.pause()
 }
-// 播放图片中的视频
 function playVideoFromImage() {
-  const videoIndex = mediaList.value.findIndex(item => item.type === 'video')
+  const videoIndex = mediaList.value.findIndex((item) => item.type === 'video')
   if (videoIndex !== -1) {
     activeMediaIndex.value = videoIndex
     setTimeout(() => videoPlayer.value?.play(), 100)
   }
 }
-// 视频播放结束
 function onVideoEnded() {
-  const firstImageIndex = mediaList.value.findIndex(item => item.type === 'image')
+  const firstImageIndex = mediaList.value.findIndex((item) => item.type === 'image')
   if (firstImageIndex !== -1) {
     activeMediaIndex.value = firstImageIndex
   }
@@ -523,7 +641,7 @@ function decrease() {
   if (qty.value > 1) qty.value--
 }
 
-// 加入购物车（
+// 加入购物车
 const addToCart = async () => {
   if (!product.value.id || !selectedSkuInfo.value?.skuId) {
     ElMessage.warning('缺少产品/SKU信息')
@@ -540,7 +658,7 @@ const addToCart = async () => {
     ElMessage.success('添加购物车成功')
     console.log(res)
   } catch (error) {
-    console.error("购物车添加失败", error)
+    console.error('购物车添加失败', error)
     ElMessage.error('添加购物车失败，请稍后重试')
   }
 }

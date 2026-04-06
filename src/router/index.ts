@@ -20,6 +20,12 @@ const routes: RouteRecordRaw[] = [
     name: 'fosterDetail',
     component: () => import('@/views/fosterCare/FosterDetail.vue'),
   },
+    //促销活动详情
+  {
+    path: '/promotion',
+    name: 'promotionDetail',
+    component: () => import('@/views/petShop/shop/PromotionDetail.vue'),
+  },
   // 寄养预订
   {
     path: '/foster-book/:fosterId/:serviceId',
@@ -293,7 +299,7 @@ const routes: RouteRecordRaw[] = [
       // 数据概览
       {
         path: '', // 空路径 = /admin 默认子路由
-        redirect: '/admin/data', // 等价于 /admin/data
+        redirect: '/admin/user', 
         name: 'homePage',
       },
       {
@@ -325,12 +331,75 @@ const routes: RouteRecordRaw[] = [
         },
       },
       // router/index.ts
-{
-  path: '/foster/detail/:id',
-  name: 'FosterDetail',
-  component: () => import('@/views/admin/components/foster/FosterDetail.vue'),
-  meta: { title: '寄养方详情' }
-},
+      {
+        path: '/foster/detail/:id',
+        name: 'FosterDetail',
+        component: () => import('@/views/admin/components/foster/FosterDetail.vue'),
+        meta: { title: '寄养方详情' },
+      },
+      //电商管理
+      {
+        path: 'shop',
+        name: 'shop',
+        redirect: '/admin/shop/store',
+        meta: { title: '电商管理', icon: 'el-icon-s-platform' },
+        children: [
+          {
+            path: 'store',
+            name: 'createShop',
+            component: () => import('@/views/admin/components/shop/shopStore.vue'),
+            meta: { title: '商铺管理' },
+          },
+          {
+            path: 'product',
+            name: 'shoreProduct',
+            component: () => import('@/views/admin/components/shop/shopProduct.vue'),
+            meta: { title: '商品管理' },
+          },
+          {
+            path: 'sku',
+            name: 'shopSku',
+            component: () => import('@/views/admin/components/shop/shopSku.vue'),
+            meta: { title: 'Sku管理' },
+          },
+          {
+            path: 'detail',
+            name: 'shopDetail',
+            component: () => import('@/views/admin/components/shop/shopDetail.vue'),
+            meta: { title: '商铺详情' },
+          },
+           {
+            path: 'audit',
+            name: 'auditDetail',
+            component: () => import('@/views/admin/components/shop/auditDetail.vue'),
+            meta: { title: '商铺审核详情' },
+          },
+           {
+            path: 'goods',
+            name: 'goodsDetail',
+            component: () => import('@/views/admin/components/shop/productDetail.vue'),
+            meta: { title: '商品详情' },
+          },
+          {
+            path: 'update',
+            name: 'updateDetail',
+            component: () => import('@/views/admin/components/shop/productAuditDetail.vue'),
+            meta: { title: '商品审核详情' },
+          },
+          {
+            path: 'style',
+            name: 'styleDetail',
+            component: () => import('@/views/admin/components/shop/skuDetail.vue'),
+            meta: { title: 'sku详情' },
+          },
+          {
+            path: 'specific',
+            name: 'specficDetail',
+            component: () => import('@/views/admin/components/shop/skuAuditDetail.vue'),
+            meta: { title: 'sku详情' },
+          },
+        ],
+      },
       //活动管理路由
       {
         path: 'active',

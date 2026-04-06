@@ -1,8 +1,6 @@
-<!-- 订单结算主页面 -->
 <template>
   <NavBar />
   <div class="min-h-screen bg-yellow-50">
-    <!-- 步骤条 -->
     <div class="bg-white pt-24 pb-8 border-b border-gray-200">
       <div class="order-container mx-auto px-4">
         <div class="flex items-center justify-between max-w-3xl mx-auto">
@@ -36,7 +34,6 @@
       </div>
     </div>
 
-    <!-- 核心内容区 -->
     <main class="order-container mx-auto px-4 py-8 flex flex-row justify-center">
       <div class="flex flex-col items-between w-[60%]">
         <div class="mr-4">
@@ -45,127 +42,326 @@
             @set-default="setDefaultAddress"
             @jump-to-address="jumpToAddressManage"
           />
-          <!-- 优惠券选择组件 -->
           <CouponSelector :coupons="coupons" @select-coupon="selectCoupon" />
         </div>
-        <!-- 订单摘要组件 -->
-        <OrderSummary @confirm-pay="openPayPopup" />
+
+        <OrderSummary
+          :goods="selectedGoods"
+          :shipping-fee="shippingFee"
+          :discount="selectedDiscount"
+          :total-price="totalPrice"
+          @confirm-pay="confirmOrder"
+          @update:agreementAccepted="agreementAccepted = $event"
+        />
       </div>
+
       <div class="w-[40%]">
-        <GoodsList />
+        <GoodsList
+          :goods="selectedGoods"
+          @update:goods="updateGoods"
+          @update:remark="orderRemark = $event"
+        />
       </div>
     </main>
 
-    <!-- 支付确认弹窗 -->
+    <el-loading v-if="loading" fullscreen text="确认订单中..." />
+    <!-- 支付弹窗 -->
     <PayPopup
-      v-model="showPayDialog"
+      v-model="payDialogVisible"
       :order-no="orderNo"
       :calculate-total-price="totalPrice"
       :user-balance="userBalance"
       @go-to-recharge="handleGoToRecharge"
-      @pay-success="handlePaySuccess"
+      @pay-success="handlePay"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import AddressSelector from './components/order-pay/AddressSelector.vue'
 import CouponSelector from './components/order-pay/CouponSelector.vue'
 import OrderSummary from './components/order-pay/OrderSummary.vue'
 import GoodsList from './components/order-pay/GoodsList.vue'
-import PayPopup from './components/order-pay/PayPopup.vue'
+import { getBalance } from '@/api/foster-care/book'
+
+import { ElMessage, ElLoading } from 'element-plus'
+import {
+  submitOrder,
+  getAddressList,
+  getDefaultAddress,
+  updateDefaultAddress,
+  payOrder,
+  payOrderCart,
+} from '@/api/pet-shop/order'
+import { getProductDetail } from '@/api/pet-shop/product'
+import PayPopup from '@/views/petShop/order/components/order-pay/PayPopup.vue'
+import { getCartItems } from '@/api/pet-shop/order'
 import router from '@/router/index'
-// 弹窗状态
-const showPayDialog = ref(false)
-const orderNo = ref('20250518000123456')
-const totalPrice = ref(179.7)
-const userBalance = ref(200)
+import { useRoute } from 'vue-router'
 
-// 前往充值
-const handleGoToRecharge = () => {
-  alert('跳转至充值页面')
+const route = useRoute()
+const loading = ref(false)
+const orderRemark = ref('')
+// 支付弹窗状态
+const payDialogVisible = ref(false)
+const orderNo = ref('')
+// 订单核心
+const selectedGoods = ref([])
+const addressList = ref([])
+const shippingFee = ref(0)
+const selectedDiscount = ref(0)
+const purchaseType = ref('立即购买')
+
+// 购物车 / 立即购买id
+const type = ref('')
+
+// 加载数据
+onMounted(() => {
+  const productId = route.query.id as string
+  const skuId = route.query.sku as string
+  const qty = route.query.qty as string
+  type.value = route.query.type as string
+
+  if (productId) {
+    purchaseType.value = type.value === 'buyNow' ? '立即购买' : '购物车购买'
+    loadGoods(productId, skuId, qty) // 传参进去
+  } else {
+    purchaseType.value = type.value === 'buyNow' ? '立即购买' : '购物车购买'
+    loadGoodsFromCart()
+  }
+
+  loadAddress()
+  loadDefaultAddress()
+  getUserBalance()
+})
+//立即购买加载商品
+const loadGoods = async (id: string, skuId: string, qty: string) => {
+  try {
+    const res = await getProductDetail(id)
+    if (res) {
+      selectedGoods.value = [
+        {
+          id: res.id,
+          name: res.name || res.title,
+          spec: res.subTitle || '默认规格',
+          price: res.currentPrice,
+          quantity: Number(qty) || 1,
+          image: res.mainImage,
+          skuId: skuId,
+        },
+      ]
+    }
+  } catch (e) {
+    console.error('加载商品失败', e)
+  }
+}
+const pageNum = ref(1)
+const pageSize = ref(10000)
+const selectStatus = ref('1') // 选中状态(1-选中)
+const loadGoodsFromCart = async () => {
+  try {
+    const res = await getCartItems(pageNum.value, pageSize.value, selectStatus.value)
+    console.log('购物车接口返回数据:', res)
+    if (res) {
+      selectedGoods.value = res.map((item) => ({
+        id: item.id,
+        productId: item.productId,
+        name: item.productName,
+        spec: item.skuSpecText,
+        price: item.price,
+        quantity: item.quantity,
+        image: item.mainImage,
+        skuId: item.skuId,
+        stock: item.stock,
+        shopName: item.shopName,
+      }))
+      console.log('处理后购物车商品:', selectedGoods.value)
+    }
+  } catch (e) {
+    console.error('加载购物车商品失败', e)
+    ElMessage.error('加载购物车商品失败')
+  }
+}
+// 地址
+const loadAddress = async () => {
+  try {
+    const res = await getAddressList({})
+    if (res.ok) {
+      addressList.value = res.data.list.map((item: any) => ({
+        id: item.id,
+        name: item.receiverName,
+        phone: item.receiverPhone,
+        address: item.detailAddress,
+        addressDetail: item.detailAddress,
+        isDefault: item.isDefault === '默认地址',
+        province: item.province,
+        city: item.city,
+        district: item.district,
+      }))
+    }
+  } catch (e) {
+    console.error('加载地址失败:', e)
+  }
 }
 
-const handlePaySuccess = () => {
-  alert('支付成功！')
+const loadDefaultAddress = async () => {
+  const res = (await getDefaultAddress()) as any
+  if (res) {
+    addressList.value.forEach((i) => (i.isDefault = i.id === res.id))
+  }
 }
-//地址
-interface Address {
-  id: number
-  name: string
-  phone: string
-  address: string
-  addressDetail?: string
-  isDefault: boolean
-  province?: string
-  city?: string
-  district?: string
-}
-const addressList = ref<Address[]>([
-  {
-    id: 1,
-    name: '张三',
-    phone: '138****6789',
-    address: '北京市朝阳区建国路88号',
-    addressDetail: '现代城5号楼2307室',
-    isDefault: true,
-    province: '北京市',
-    city: '北京市',
-    district: '朝阳区',
-  },
-  {
-    id: 2,
-    name: '李四',
-    phone: '139****5678',
-    address: '上海市浦东新区陆家嘴',
-    addressDetail: '金融中心1号楼808室',
-    isDefault: false,
-    province: '上海市',
-    city: '上海市',
-    district: '浦东新区',
-  },
-])
 
-// 优惠券数据
+const setDefaultAddress = async (id: number) => {
+  addressList.value.forEach((i) => (i.isDefault = i.id === id))
+  await updateDefaultAddress(id + '')
+  ElMessage.success('默认地址已更新')
+}
+
+// 优惠券
 const coupons = ref([
-  {
-    id: 1,
-    discount: '满199减30',
-    validity: '2023-12-31',
-    isSelected: true,
-  },
-  {
-    id: 2,
-    discount: '满99减10',
-    validity: '2023-12-15',
-    isSelected: false,
-  },
+  { id: 1, discount: '满199减30', isSelected: false },
+  { id: 2, discount: '满99减10', isSelected: true },
 ])
-// 设置默认地址
-const setDefaultAddress = (id: number) => {
-  addressList.value.forEach((item) => {
-    item.isDefault = item.id === id
-  })
+
+const selectCoupon = (id: number) => {
+  coupons.value.forEach((c) => (c.isSelected = c.id === id))
+  const c = coupons.value.find((v) => v.id === id)
+  selectedDiscount.value = c?.discount.includes('30') ? 30 : 10
 }
 
-// 跳转至个人中心地址管理页
-const jumpToAddressManage = () => {
-  router.push('/persons')
-  alert('跳转至个人中心-地址管理页')
-}
+// 总价
+const totalPrice = computed(() => {
+  const sum = selectedGoods.value.reduce((s, g) => s + g.price * g.quantity, 0)
+  return Math.max(0, sum + shippingFee.value - selectedDiscount.value)
+})
+const agreementAccepted = ref(false)
+const updateGoods = (val: any) => (selectedGoods.value = val)
+// 确认订单
+const confirmOrder = async () => {
+  const addr = addressList.value.find((a) => a.isDefault)
+  if (!addr) {
+    ElMessage.warning('请选择收货地址')
+    return
+  }
+  if (!agreementAccepted.value) {
+    ElMessage.warning('请同意服务协议')
+    return
+  }
 
-// 选择优惠券
-const selectCoupon = (selectedId: number) => {
-  coupons.value.forEach((coupon) => {
-    coupon.isSelected = coupon.id === selectedId
-  })
-}
+  loading.value = true
+  try {
+    const isBuyNow = !!route.query.id
+    const finalPurchaseType = isBuyNow ? '立即购买' : '购物车购买'
+    const baseParams = {
+      purchaseType: finalPurchaseType,
+      addressId: addr.id + '',
+      couponIds: coupons.value.filter((c) => c.isSelected).map((c) => c.id + ''),
+      payType: '支付宝',
+      orderRemark: orderRemark.value ? orderRemark.value : '',
+    }
 
-// 打开支付弹窗
-const openPayPopup = () => {
-  showPayDialog.value = true
+    let finalParams = {}
+    if (isBuyNow) {
+      const goods = selectedGoods.value[0] // 立即购买只有1个商品
+      finalParams = {
+        ...baseParams,
+        productId: goods.id + '',
+        skuId: goods.skuId,
+        quantity: goods.quantity,
+      }
+    } else {
+      finalParams = {
+        ...baseParams,
+        cartIds: selectedGoods.value.map((g) => g.id + ''), // 购物车ID列表
+      }
+    }
+
+    console.log('最终请求参数：', finalParams)
+    const res = await submitOrder(finalParams)
+    if (res.ok) {
+      ElMessage.success('确认订单成功！订单已生成，待支付')
+      // 支付弹窗
+      payDialogVisible.value = true
+      orderNo.value = res.data.orderNo
+    } else {
+      ElMessage.error(res.msg || '确认订单失败')
+    }
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('确认订单异常')
+  } finally {
+    loading.value = false
+  }
 }
+const handlePay = async () => {
+  const type = route.query.type as string
+
+  if (type === 'buyNow') {
+    if (!orderNo.value) {
+      ElMessage.error('订单号不存在')
+      return
+    }
+
+    try {
+      const res = await payOrder({
+        orderSn: orderNo.value,
+      })
+
+      if (res.ok || res.success) {
+        ElMessage.success('支付成功')
+        payDialogVisible.value = false
+        setTimeout(() => router.push('/order-list'), 1500)
+      } else {
+        ElMessage.error(res.msg || '支付失败')
+      }
+    } catch (e) {
+      console.error('支付异常:', e)
+      ElMessage.error('支付异常')
+    }
+  } else {
+    if (!orderNo.value) {
+      ElMessage.error('订单号不存在')
+      return
+    }
+
+    try {
+      const res = await payOrderCart({
+        orderSn: [orderNo.value],
+      })
+
+      if (res.ok || res.success) {
+        ElMessage.success('支付成功')
+        payDialogVisible.value = false
+        setTimeout(() => router.push('/order-list'), 1500)
+      } else {
+        ElMessage.error(res.msg || '支付失败')
+      }
+    } catch (e) {
+      console.error('支付异常:', e)
+      ElMessage.error('支付异常')
+    }
+  }
+}
+//充值
+const handleGoToRecharge = () => {
+  ElMessage.info('跳转到充值页面')
+  router.push('/recharge')
+}
+//获取余额支付金额
+const userBalance = ref(0)
+const getUserBalance = async () => {
+  try {
+    const res = await getBalance()
+    if (res.code === 0) {
+      userBalance.value = res.data
+    }
+  } catch (error) {
+    console.error('获取余额失败：', error)
+    ElMessage.error('获取账户余额失败，请稍后重试')
+  }
+}
+const jumpToAddressManage = () => router.push('/persons')
 </script>
 
 <style scoped lang="scss">

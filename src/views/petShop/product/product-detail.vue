@@ -323,13 +323,14 @@
               >
                 <i class="fa fa-shopping-cart mr-2"></i> 加入购物车
               </button>
-              <button
+              <router-link
+                :to="`/order?id=${id}&sku=${selectedSkuInfo?.skuId ?? ''}&qty=${qty}&type=buyNow`"
                 id="buyNow"
                 class="w-full sm:flex-1 py-3 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors flex items-center justify-center"
                 :disabled="!isSkuSelected || selectedSku.stock <= 0"
               >
                 <i class="fa fa-bolt mr-2"></i> 立即购买
-              </button>
+              </router-link>
             </div>
 
             <div

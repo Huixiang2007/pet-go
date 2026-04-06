@@ -22,7 +22,7 @@
                 <ul class="space-y-1">
                   <li v-for="(status, index) in statusFilters" :key="index">
                     <button
-                      @click="activeStatus = status.value"
+                      @click="handleStatusChange(status.value)"
                       class="w-full flex items-center px-3 py-2.5 rounded-lg text-left transition-all"
                       :class="
                         activeStatus === status.value && activeTab === 'orders'
@@ -98,9 +98,11 @@
                 >
                   <div class="relative w-full sm:w-72">
                     <input
+                      v-model="searchKey"
                       type="text"
                       placeholder="搜索订单号/商品名称"
                       class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 focus:outline-none transition-all"
+                      @keyup.enter="fetchOrders()"
                     />
                     <i
                       class="fa fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"
@@ -125,12 +127,16 @@
                   to="/petShop"
                   class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg transition-colors"
                 >
-                  class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg
-                  transition-colors" > 去逛逛
+                  去逛逛
                 </router-link>
               </div>
               <div v-else class="space-y-4">
-                <OrderCard v-for="value in filteredOrders" :key="value.id" :order="value" />
+                <OrderCard
+                  v-for="value in orders"
+                  :key="value.id"
+                  :order="value"
+                  @refresh="fetchOrders"
+                />
               </div>
             </div>
 
@@ -146,7 +152,6 @@
               </div>
             </div>
 
-            <!-- 评论管理 -->
             <div class="mt-8 mb-8" v-else-if="activeTab === 'comments'">
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-gray-800">
@@ -154,7 +159,6 @@
                   评论管理
                 </h2>
               </div>
-
               <div class="bg-white rounded-xl shadow-sm p-5">
                 <Comments
                   :page-num="pageNum"
@@ -165,7 +169,6 @@
               </div>
             </div>
 
-            <!-- //寄养的管理 -->
             <div class="mt-8 mb-8" v-else-if="activeTab === 'keep-pet'">
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-gray-800">
@@ -173,7 +176,6 @@
                   寄养管理
                 </h2>
               </div>
-
               <div class="bg-white rounded-xl shadow-sm p-5">
                 <ForserOrderList />
               </div>
@@ -199,127 +201,128 @@
 
 <script setup lang="ts">
 import OrderCard from './components/OrderCard.vue'
-import { type Order } from './components/OrderCard.vue'
+import { type Order } from '@/types/shop'
 import Comments from './components/MyComments.vue'
 import Coupons from './components/MyCoupons.vue'
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { getMyOrders } from '@/api/pet-shop/order'
 
-// 筛选状态
-const activeStatus = ref('all')
+// 状态变量
+const activeStatus = ref<string | number>('all') // 支持 all/数字
 const activeTab = ref('orders')
 const pageNum = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+const searchKey = ref('')
+const orders = ref<Order[]>([])
+const loading = ref(false)
 
-// 分页切换
-const handlePageChange = () => {
-  ElMessage.info('切换页码：' + pageNum.value)
+const statusMap = {
+  all: 0, // 0表示全部
+  pending: 1, // 待付款
+  shipping: 2, // 待发货
+  receiving: 3, // 待收货
+  returning: 4, // 退款/售后
 }
-// 筛选选项数据
+
+// 获取订单列表
+const fetchOrders = async () => {
+  loading.value = true
+  try {
+    const params = {
+      searchCount: true,
+      pageNum: pageNum.value,
+      pageSize: pageSize.value,
+      current: pageNum.value,
+      sortItemList: [{ isAsc: true, column: 'createTime' }],
+      deliverySn: '',
+      productName: searchKey.value,
+      listStatus: activeStatus.value === 'all' ? 0 : statusMap[activeStatus.value],
+    }
+
+    const res = await getMyOrders(params)
+    console.log('订单列表响应:', res)
+    // 检查响应结构
+    if (res && (res.code === 0 || res.ok || res.success)) {
+      // 适配不同的响应结构
+      const data = res.data || res
+      console.log('订单列表数据:', data.list)
+      // 转换数据结构
+      orders.value = (data.list || []).map((item: any) => ({
+        id: item.orderSn || item.id,
+        date: item.createTime || new Date().toISOString(),
+        status: item.orderStatus,
+        statusType: mapOrderStatus(item.orderStatus),
+        product: {
+          name: item.productName,
+          image: item.productMainImg,
+          spec: item.specText,
+        },
+        price: item.payAmount / item.quantity || item.payAmount,
+        quantity: item.quantity,
+        total: item.totalAmount || item.payAmount,
+      }))
+      total.value = data.total || data.list.length
+      console.log('处理后订单数据:', orders.value)
+      console.log('总数量:', total.value)
+    } else {
+      console.log('响应状态异常:', res)
+      ElMessage.error('获取订单失败')
+    }
+  } catch (err) {
+    console.error('获取订单错误:', err)
+    ElMessage.error('获取订单失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+// 订单状态映射
+const mapOrderStatus = (status: string): string => {
+  const statusMap: Record<string, string> = {
+    待付款: 'pending',
+    待发货: 'shipping',
+    待收货: 'receiving',
+    已完成: 'completed',
+    已收货: 'received',
+    退货中: 'returning',
+  }
+  return statusMap[status] || 'pending'
+}
+
+// 分页/筛选变化
+const handlePageChange = () => {
+  fetchOrders()
+}
+
+// 状态筛选（修复版）
+const handleStatusChange = (value: string | number) => {
+  activeStatus.value = value
+  pageNum.value = 1
+  fetchOrders()
+}
+
+// 初始化
+onMounted(() => {
+  fetchOrders()
+})
+
+// 状态选项
 const statusFilters = [
   { label: '全部订单', value: 'all' },
   { label: '待付款', value: 'pending' },
   { label: '待发货', value: 'shipping' },
   { label: '待收货', value: 'receiving' },
-  { label: '已发货', value: 'completed' },
-  { label: '已收货', value: 'received' },
   { label: '退货中', value: 'returning' },
 ]
-const orders = ref<Order[]>([
-  {
-    id: '20240610001',
-    date: '2024-06-10 14:30',
-    status: '待发货',
-    statusType: 'shipping',
-    product: {
-      name: '天然无谷狗粮 1.5kg',
-      image: 'https://picsum.photos/id/237/200/200',
-      spec: '口味：鸡肉味 | 适用年龄：成年犬',
-    },
-    price: 89,
-    quantity: 1,
-    total: 89,
-  },
-
-  {
-    id: '20240610001',
-    date: '2024-06-10 14:30',
-    status: '待发货',
-    statusType: 'pending',
-    product: {
-      name: '天然无谷狗粮 1.5kg',
-      image: 'https://picsum.photos/id/237/200/200',
-      spec: '口味：鸡肉味 | 适用年龄：成年犬',
-    },
-    price: 89,
-    quantity: 1,
-    total: 89,
-  },
-  {
-    id: '20240610002',
-    date: '2024-06-10 14:30',
-    status: '待收货',
-    statusType: 'receiving',
-    product: {
-      name: '天然无谷狗粮 1.5kg',
-      image: 'https://picsum.photos/id/237/200/200',
-      spec: '口味：鸡肉味 | 适用年龄：成年犬',
-    },
-    price: 89,
-    quantity: 1,
-    total: 89,
-  },
-  {
-    id: '20240610003',
-    date: '2024-06-10 14:30',
-    status: '已收货',
-    statusType: 'completed',
-    product: {
-      name: '天然无谷狗粮 1.5kg',
-      image: 'https://picsum.photos/id/237/200/200',
-      spec: '口味：鸡肉味 | 适用年龄：成年犬',
-    },
-    price: 89,
-    quantity: 1,
-    total: 89,
-  },
-  {
-    id: '20240610002',
-    date: '2024-06-10 14:30',
-    status: '待收货',
-    statusType: 'received',
-    product: {
-      name: '天然无谷狗粮 1.5kg',
-      image: 'https://picsum.photos/id/237/200/200',
-      spec: '口味：鸡肉味 | 适用年龄：成年犬',
-    },
-    price: 89,
-    quantity: 1,
-    total: 89,
-  },
-  {
-    id: '20240610004',
-    date: '2024-06-10 14:30',
-    status: '待收货',
-    statusType: 'returning',
-    product: {
-      name: '天然无谷狗粮 1.5kg',
-      image: 'https://picsum.photos/id/237/200/200',
-      spec: '口味：鸡肉味 | 适用年龄：成年犬',
-    },
-    price: 89,
-    quantity: 1,
-    total: 89,
-  },
-])
-const filteredOrders = computed(() => {
-  if (activeStatus.value === 'all') {
-    return orders.value
-  }
-  return orders.value.filter((order) => order.statusType === activeStatus.value)
-})
 </script>
+
+<style scoped>
+.content-auto {
+  content-visibility: auto;
+}
+</style>
 
 <style scoped>
 .content-auto {

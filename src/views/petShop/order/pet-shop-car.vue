@@ -207,13 +207,14 @@
                 </span>
               </div>
             </div>
-            <button
+            <router-link
+              :to="{ path: '/order?type=cart' }"
               class="bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white px-12 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg font-medium flex items-center gap-2"
               :disabled="countTotal === 0"
               :class="{ 'opacity-70 cursor-not-allowed': countTotal === 0 }"
             >
               🛒 去结算
-            </button>
+            </router-link>
           </div>
         </div>
       </div>
@@ -277,7 +278,7 @@
 <script setup lang="ts">
 import type { CartItem } from '../../../types/shop'
 import infiniteScroll from '../shop/components/infiniteScroll.vue'
-import getRecommendApi from '../../../api/pet-shop/product'
+import { getRecommendApi } from '../../../api/pet-shop/product'
 import {
   getCartItems,
   updateCartItemQuantity,
@@ -356,7 +357,7 @@ const Cartlist = async (isLoadMore = false) => {
       loading.value = true
     }
 
-    const res = await getCartItems(CpageNum.value, CpageSize.value)
+    const res = await getCartItems(CpageNum.value, CpageSize.value, '')
     const raw = Array.isArray(res) ? res : []
     console.log('cartlist响应', res)
     const list = raw.map((item) => ({
@@ -366,7 +367,7 @@ const Cartlist = async (isLoadMore = false) => {
       price: Number(item.price) || 0,
       quantity: item.quantity || 1,
       imgUrl: item.mainImage || '/img/宠物1.jpg',
-      selected: item.selected === true,
+      selected: item.selected === '选中',
       status: item.status || '有效',
       invalidReason: item.invalidReason || '已下架',
     }))

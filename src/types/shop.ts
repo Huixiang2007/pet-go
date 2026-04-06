@@ -115,12 +115,31 @@ export interface CartItem {
   skuSpecText?: string;
   mainImage?: string;
   id: number
+  skuId?: number
+  productId?: number
+  stock?: number
+  shopName?: string
   name: string
   price: number
   imgUrl: string
   spec: string
   quantity: number
-  selected: boolean,
+  selected: boolean | string
     status?: string
   invalidReason?: string
+}
+//订单
+export interface Order {
+  id: string
+  date: string
+  status: string
+  statusType: 'pending' | 'shipping' | 'receiving' | 'returning'
+  product: {
+    name: string
+    image: string
+    spec: string
+  }
+  price: number
+  quantity: number
+  total: number
 }

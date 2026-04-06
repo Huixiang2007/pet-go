@@ -8,15 +8,15 @@
       <div class="space-y-3 mb-6">
         <div class="flex justify-between text-sm">
           <span class="text-light">商品总价</span>
-          <span>¥209.70</span>
+          <span>¥{{ totalPrice }}</span>
         </div>
         <div class="flex justify-between text-sm">
           <span class="text-light">运费</span>
-          <span>¥0.00</span>
+          <span>¥{{ props.shippingFee }}</span>
         </div>
         <div class="flex justify-between text-sm">
           <span class="text-light">优惠券折扣</span>
-          <span class="text-green-500">-¥30.00</span>
+          <span class="text-green-500">-¥{{ props.discount }}</span>
         </div>
       </div>
 
@@ -25,7 +25,7 @@
       <!-- 实付款 -->
       <div class="flex justify-between font-semibold text-lg mb-6">
         <span>实付款</span>
-        <span>¥179.70</span>
+        <span>¥{{ actualPrice }}</span>
       </div>
 
       <!-- 支付方式 -->
@@ -37,7 +37,9 @@
         <div class="payment-option balance-payment flex items-center gap-2 py-3">
           <i class="fa fa-money text-[#67c23a]"></i>
           <span>余额支付</span>
-          <span class="payment-tip text-xs text-gray-500 ml-2">将从您的充值余额中扣除 111</span>
+          <span class="payment-tip text-xs text-gray-500 ml-2"
+            >将从您的充值余额中扣除{{ actualPrice }}元</span
+          >
         </div>
         <!-- 确认支付按钮 -->
         <el-button
@@ -104,13 +106,35 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { computed } from 'vue'
 
 const agreementAccepted = ref(false)
 const dialogVisible = ref(false)
 const handleAgreement = () => {
   agreementAccepted.value = !agreementAccepted.value
+  emit('update:agreementAccepted', agreementAccepted.value)
 }
-defineEmits(['confirm-pay'])
+const emit = defineEmits(['confirm-pay', 'update:agreementAccepted'])
+
+const props = defineProps<{
+  goods: Array<{
+    price: number
+    quantity: number
+  }>
+  shippingFee: number
+  discount: number
+}>()
+
+const totalPrice = computed(() => {
+  if (!props.goods || !Array.isArray(props.goods)) {
+    return 0
+  }
+  return props.goods.reduce((sum, item) => sum + item.price * item.quantity, 0)
+})
+
+const actualPrice = computed(() => {
+  return totalPrice.value + (props.shippingFee || 0) - (props.discount || 0)
+})
 </script>
 
 <style scoped lang="scss">

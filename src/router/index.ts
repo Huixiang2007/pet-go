@@ -47,16 +47,6 @@ const routes: RouteRecordRaw[] = [
     name: 'fosterOrder',
     component: () => import('@/views/fosterCare/foster-orders.vue'),
   },
-  // 电商的首页
-  {
-    path: '/shop',
-    name: 'shop',
-    component: () => import('@/views/petShop/shop/pet-shop-view.vue'),
-    meta: {
-      requiresAuth: true,
-      title: '欢迎来到宠物商城',
-    },
-  },
   // 宠物购物车
   {
     path: '/pet-cart',
@@ -193,6 +183,16 @@ const routes: RouteRecordRaw[] = [
       title: 'PetGo销售分析',
     },
   },
+          // 电商的首页
+  {
+    path: '/shop',
+    name: 'shops',
+    component: () => import('@/views/petShop/shop/pet-shop-view.vue'),
+    meta: {
+      requiresAuth: true,
+      title: '欢迎来到宠物商城',
+    },
+  },
   // 秒杀
   {
     path: '/flash-sale',
@@ -290,6 +290,7 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/userCenter/person-center.vue'),
     meta: { title: '个人中心' },
   },
+
   //后台管理
   {
     path: '/admin',

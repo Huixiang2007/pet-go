@@ -5,13 +5,19 @@
       <div class="text-md font-bold">退款/售后管理</div>
       <div class="flex flex-row gap-2">
         <el-select v-model="refundStatusFilter" placeholder="全部状态" clearable size="small">
-          <el-option label="全部状态" value=""></el-option>
-          <el-option label="待处理" value="待处理"></el-option>
-          <el-option label="已同意" value="已同意"></el-option>
-          <el-option label="已拒绝" value="已拒绝"></el-option>
-          <el-option label="已完成" value="已完成"></el-option>
+          <el-option label="全部状态" value="0"></el-option>
+          <el-option label="待商家审核" value="0"></el-option>
+          <el-option label="审核通过" value="1"></el-option>
+          <el-option label="审核拒绝" value="3"></el-option>
+          <el-option label="用户已发货" value="4"></el-option>
+          <el-option label="退款成功" value="5"></el-option>
         </el-select>
-        <el-input placeholder="订单号/退款编号" v-model="refundSearchInput" clearable size="small">
+        <el-select v-model="refundTypeFilter" placeholder="退款类型" clearable size="small">
+          <el-option label="全部类型" value="0"></el-option>
+          <el-option label="仅退款" value="1"></el-option>
+          <el-option label="退货退款" value="2"></el-option>
+        </el-select>
+        <el-input placeholder="订单编号" v-model="refundSearchInput" clearable size="small">
           <template #prefix>
             <i class="fas fa-search text-md text-gray-300"></i>
           </template>
@@ -95,8 +101,19 @@
 
     <!-- 分页 -->
     <div class="px-6 py-3 border-t flex justify-between items-center">
-      <div class="text-sm text-gray-500">共 {{ refundData.length }} 条记录</div>
-      <el-pagination layout="prev, pager, next" :total="refundData.length" :page-size="10" />
+      <div class="text-sm text-gray-500">共 {{ total }} 条记录</div>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="total"
+        :page-size="pageSize"
+        :current-page="pageNum"
+        @current-change="
+          (current) => {
+            pageNum = current
+            loadRefundList()
+          }
+        "
+      />
     </div>
   </div>
 
@@ -149,6 +166,16 @@
       >
         拒绝退款
       </el-button>
+
+      <el-button
+        v-if="currentRefund && currentRefund.status === '已同意'"
+        size="mini"
+        type="text"
+        class="text-purple-600"
+        @click="handleMerchantRefund(currentRefund)"
+      >
+        退款
+      </el-button>
     </template>
   </el-dialog>
 
@@ -183,15 +210,28 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  getRefundList,
+  getRefundDetail,
+  handleRefund,
+  handleRefundMerchant,
+} from '@/api/pet-shop/order'
 
 // 基础数据
 const refundSearchInput = ref('')
-const refundStatusFilter = ref('')
+const refundStatusFilter = ref('0')
+const refundTypeFilter = ref('0')
 const refundDetailVisible = ref(false)
 const rejectRefundVisible = ref(false)
 const currentRefund = ref<any>(null)
+const loading = ref(false)
+
+// 分页数据
+const pageNum = ref(1)
+const pageSize = ref(10)
+const total = ref(0)
 
 // 拒绝退款表单
 const rejectForm = ref({
@@ -210,38 +250,7 @@ interface RefundRow {
   reason?: string
 }
 
-const refundData = ref<RefundRow[]>([
-  {
-    refundId: 'RF2016050401',
-    orderId: '20160504',
-    productName: '进口宠物冻干零食-三文鱼味',
-    refundType: '仅退款',
-    amount: '500',
-    applyTime: '2016-05-03 09:20:15',
-    status: '待处理',
-    reason: '商品与描述不符，要求仅退款',
-  },
-  {
-    refundId: 'RF2016050201',
-    orderId: '20160502',
-    productName: '宠物零食大礼包-鸡肉味',
-    refundType: '退货退款',
-    amount: '500',
-    applyTime: '2016-05-02 11:30:45',
-    status: '已同意',
-    reason: '不想要了，申请退货退款',
-  },
-  {
-    refundId: 'RF2016050101',
-    orderId: '20160501',
-    productName: '宠物主食罐-牛肉味',
-    refundType: '仅退款',
-    amount: '200',
-    applyTime: '2016-05-02 10:15:30',
-    status: '已拒绝',
-    reason: '商品质量问题，要求仅退款',
-  },
-])
+const refundData = ref<RefundRow[]>([])
 
 // 退款状态标签类型
 const getRefundTagType = (status: string) => {
@@ -249,11 +258,11 @@ const getRefundTagType = (status: string) => {
     case '待处理':
       return 'warning'
     case '已同意':
-      return 'success'
+      return 'primary' // 已同意
     case '已拒绝':
-      return 'danger'
-    case '已完成':
-      return 'primary'
+      return 'danger' // 拒绝
+    case '退款成功':
+      return 'success' // 最终成功
     default:
       return ''
   }
@@ -261,23 +270,106 @@ const getRefundTagType = (status: string) => {
 
 // 核心方法
 const searchRefund = () => {
-  console.log('搜索退款:', refundSearchInput.value, refundStatusFilter.value)
+  pageNum.value = 1
+  loadRefundList()
 }
+//退款列表
+const loadRefundList = async () => {
+  loading.value = true
+  try {
+    const params = {
+      searchCount: true,
+      pageNum: pageNum.value,
+      pageSize: pageSize.value,
+      current: pageNum.value,
+      sortItemList: [
+        {
+          isAsc: false,
+          column: 'create_time',
+        },
+      ],
+      refundType: Number(refundTypeFilter.value),
+    }
 
-const openRefundDetail = (row: RefundRow) => {
-  currentRefund.value = row
-  refundDetailVisible.value = true
+    const res = await getRefundList(params)
+    if (res?.ok) {
+      refundData.value = res.data.list || []
+      total.value = res.data.total || 0
+    } else {
+      ElMessage.error(res?.msg || '获取退款列表失败')
+    }
+  } catch (e) {
+    console.error('获取退款列表失败：', e)
+    ElMessage.error('获取退款列表失败，请稍后重试')
+  } finally {
+    loading.value = false
+  }
 }
-
+//详情
+const openRefundDetail = async (row: RefundRow) => {
+  try {
+    const res = await getRefundDetail(row.refundId)
+    if (res?.ok) {
+      currentRefund.value = res.data
+      refundDetailVisible.value = true
+    } else {
+      ElMessage.error(res?.msg || '获取退款详情失败')
+    }
+  } catch (e) {
+    console.error('获取退款详情失败：', e)
+    ElMessage.error('获取退款详情失败，请稍后重试')
+  }
+}
+//模拟商家退款
+const handleMerchantRefund = (row: RefundRow) => {
+  ElMessageBox.confirm('确认执行退款？退款后资金将退回用户账户，无法撤销', '确认退款', {
+    confirmButtonText: '确认退款',
+    cancelButtonText: '取消',
+    type: 'success',
+  }).then(async () => {
+    try {
+      // 调用接口
+      const res = await handleRefundMerchant(row.refundId)
+      if (res?.ok) {
+        refundDetailVisible.value = false
+        ElMessage.success('退款成功！')
+        loadRefundList()
+      } else {
+        ElMessage.error(res?.msg || '退款失败')
+      }
+    } catch (e) {
+      console.error(e)
+      ElMessage.error('退款失败，请检查接口')
+    }
+  })
+}
+//同意退款
 const agreeRefund = (row: RefundRow) => {
   ElMessageBox.confirm('确认同意该退款申请吗？', '提示', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
-  }).then(() => {
-    row.status = '已同意'
-    refundDetailVisible.value = false
-    ElMessage.success('退款申请已同意！')
+  }).then(async () => {
+    try {
+      const params = {
+        refundId: row.refundId,
+        status: 2,
+        shopNote: '',
+        orderSn: row.orderId,
+      }
+      const res = await handleRefund(params)
+      if (res?.ok) {
+        row.status = '已同意'
+        refundDetailVisible.value = false
+        ElMessage.success('退款申请已同意！')
+        loadRefundList()
+      } else {
+        ElMessage.error(res?.msg || '同意退款失败')
+      }
+    } catch (e) {
+      console.error('同意退款失败：', e)
+      ElMessage.error('同意退款失败，请稍后重试')
+    }
   })
 }
 
@@ -286,8 +378,8 @@ const openRejectRefundModal = (row: RefundRow) => {
   rejectForm.value = { reason: '' }
   rejectRefundVisible.value = true
 }
-
-const confirmRejectRefund = () => {
+//拒绝退款
+const confirmRejectRefund = async () => {
   if (!rejectForm.value.reason.trim()) {
     ElMessage.warning('拒绝理由不能为空！')
     return
@@ -297,13 +389,35 @@ const confirmRejectRefund = () => {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
-  }).then(() => {
-    currentRefund.value.status = '已拒绝'
-    rejectRefundVisible.value = false
-    refundDetailVisible.value = false
-    ElMessage.success('退款申请已拒绝！')
+  }).then(async () => {
+    try {
+      const params = {
+        refundId: currentRefund.value.refundId,
+        orderSn: currentRefund.value.orderId,
+        status: 2,
+        shopNote: rejectForm.value.reason,
+      }
+      const res = await handleRefund(params)
+      if (res?.ok) {
+        currentRefund.value.status = '已拒绝'
+        rejectRefundVisible.value = false
+        refundDetailVisible.value = false
+        ElMessage.success('退款申请已拒绝！')
+        loadRefundList()
+      } else {
+        ElMessage.error(res?.msg || '拒绝退款失败')
+      }
+    } catch (e) {
+      console.error('拒绝退款失败：', e)
+      ElMessage.error('拒绝退款失败，请稍后重试')
+    }
   })
 }
+
+// 初始化加载
+onMounted(() => {
+  loadRefundList()
+})
 </script>
 
 <style scoped>

@@ -25,6 +25,7 @@ export interface  ChatRecord {
   time: string
   isImage?: boolean
   imageUrl?: string
+  image?:string
   isWithdrawn?: boolean
   isGoods?: boolean
   isService?: boolean

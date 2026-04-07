@@ -177,7 +177,7 @@
                 </h2>
               </div>
               <div class="bg-white rounded-xl shadow-sm p-5">
-                <ForserOrderList />
+                <FosterOrderList />
               </div>
             </div>
 
@@ -185,8 +185,7 @@
               <el-pagination
                 v-model:current-page="pageNum"
                 v-model:page-size="pageSize"
-                page-sizes="[5, 10, 15, 20]"
-                layout="total, sizes, prev, pager, next, jumper"
+                page-sizes="[5]"
                 :total="total"
                 @size-change="handlePageChange"
                 @current-change="handlePageChange"
@@ -204,6 +203,7 @@ import OrderCard from './components/OrderCard.vue'
 import { type Order } from '@/types/shop'
 import Comments from './components/MyComments.vue'
 import Coupons from './components/MyCoupons.vue'
+import FosterOrderList from '@/views/petShop/order/components/FosterOrderList.vue'
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getMyOrders } from '@/api/pet-shop/order'
@@ -224,8 +224,9 @@ const statusMap = {
   shipping: 2, // 待发货
   receiving: 3, // 待收货
   returning: 4, // 退款/售后
+  reviewing: 5, // 待评价
+  cancelled: 6, // 已取消
 }
-
 // 获取订单列表
 const fetchOrders = async () => {
   loading.value = true
@@ -244,7 +245,7 @@ const fetchOrders = async () => {
     const res = await getMyOrders(params)
     console.log('订单列表响应:', res)
     // 检查响应结构
-    if (res && (res.code === 0 || res.ok || res.success)) {
+    if (res && (res.code === 0 || res.ok)) {
       // 适配不同的响应结构
       const data = res.data || res
       console.log('订单列表数据:', data.list)

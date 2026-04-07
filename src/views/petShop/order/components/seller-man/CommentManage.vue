@@ -261,7 +261,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { getShopCommentList, replyComment } from '@/api/pet-shop/comment'
+import { getProductCommentList, replyComment } from '@/api/pet-shop/comment'
 
 // 分页参数
 const pageNum = ref(1)
@@ -328,7 +328,7 @@ const commentData = ref<CommentRow[]>([])
 const getCommentList = async () => {
   loading.value = true
   try {
-    const res = await getShopCommentList({
+    const res = await getProductCommentList({
       pageNum: pageNum.value,
       pageSize: pageSize.value,
       keyword: queryParams.keyword,

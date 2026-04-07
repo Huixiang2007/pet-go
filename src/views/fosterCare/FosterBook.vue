@@ -94,7 +94,7 @@
 
       <!-- 支付确认弹窗 -->
       <FosterPayConfirm v-if="showPayConfirmDialog" :orderNo=orderNo :calculateTotalPrice=calculateTotalPrice
-        :userBalance=userBalance @go-to-recharge="goToRecharge" v-model=showPayConfirmDialog
+        :userBalance=userBalance :vaccineUrls="bookingForm.vaccineUrls" @go-to-recharge="goToRecharge" v-model=showPayConfirmDialog
         @pay-success="handlePayConfirm" />
     </div>
   </div>

@@ -132,8 +132,12 @@ const handleServiceChange = (ids: number[]) => {
 }
 
 const handleVaccineChange = (files: FileItem[]) => {
+    // 存储文件对象用于上传
     bookingForm.pictureUrlList = files.map(item => item.file as File)
+    // 同时存储 URL 用于预览
+    bookingForm.vaccineUrls = files.map(item => item.url)
     console.log('疫苗文件已存入 bookingForm：', bookingForm.pictureUrlList)
+    console.log('疫苗文件 URL 已存入 bookingForm：', bookingForm.vaccineUrls)
 
 }
 

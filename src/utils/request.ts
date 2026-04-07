@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { Method, AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus' // 需引入Element组件
 const service = axios.create({
-  timeout: 5000,
+  timeout: 60000,
 })
 // 请求拦截器上方新增白名单
 const noTokenApiList = [
@@ -108,7 +108,7 @@ service.interceptors.response.use(
     if (error.response) {
       // 有响应但状态码异常
       console.log('HTTP错误：', error.response)
-      const { status, config} = error.response
+      const { status, config } = error.response
       switch (status) {
         case 400:
           ElMessage.error('请求参数错误（HTTP 400）')
@@ -127,22 +127,22 @@ service.interceptors.response.use(
           ElMessage.error(`请求地址不存在：${config.url}（HTTP 404）`)
           break
         case 500:
-         // 核心修改：判断500错误是否包含“未登录”相关提示
-        // const isLoginError = data?.msg?.includes('未登录') || data?.msg?.includes('登录态') || data?.msg?.includes('token');
-        // if (isLoginError) {
-        //   // 500但属于登录态问题：触发登录跳转
-        //   ElMessageBox.confirm('登录状态异常，请重新登录', '提示', {
-        //     confirmButtonText: '重新登录',
-        //     cancelButtonText: '取消',
-        //     type: 'warning',
-        //   }).then(() => {
-        //     localStorage.removeItem('authToken');
-        //     window.location.href = '/login';
-        //   });
-        // } else {
+          // 核心修改：判断500错误是否包含“未登录”相关提示
+          // const isLoginError = data?.msg?.includes('未登录') || data?.msg?.includes('登录态') || data?.msg?.includes('token');
+          // if (isLoginError) {
+          //   // 500但属于登录态问题：触发登录跳转
+          //   ElMessageBox.confirm('登录状态异常，请重新登录', '提示', {
+          //     confirmButtonText: '重新登录',
+          //     cancelButtonText: '取消',
+          //     type: 'warning',
+          //   }).then(() => {
+          //     localStorage.removeItem('authToken');
+          //     window.location.href = '/login';
+          //   });
+          // } else {
           // 普通500错误：仅提示
-          ElMessage.error('服务器内部错误（HTTP 500）');
-        // }
+          ElMessage.error('服务器内部错误（HTTP 500）')
+          // }
           break
 
         default:
@@ -150,7 +150,7 @@ service.interceptors.response.use(
       }
     } else if (error.message.includes('timeout')) {
       // 超时错误
-      ElMessage.error('请求超时，请稍后重试')
+      ElMessage.error('请求超时啦，请稍后重试')
     } else if (error.message.includes('Network Error')) {
       // 断网等网络连接错误
       ElMessage.error('网络连接失败，请检查网络')

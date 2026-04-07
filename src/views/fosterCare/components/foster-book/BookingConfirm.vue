@@ -38,8 +38,8 @@
                         <span class="value">{{ bookingForm.pictureUrlList.length }} 个文件</span>
                     </div>
                     <div class="vaccineFilesList">
-                        <div v-for="(file, index) in bookingForm.pictureUrlList" :key="index" class="file-item">
-                            <img :src="file.previewUrl" alt="预览图" />
+                        <div v-for="(file, index) in bookingForm.vaccineUrls" :key="index" class="file-item">
+                            <img :src="file" alt="预览图" />
                         </div>
                     </div>
                 </div>

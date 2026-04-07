@@ -15,10 +15,14 @@
       />
 
       <!-- 评价系统组件 -->
+<<<<<<< HEAD
+      <FosterReviewSystem :total-score="fosterHome.totalScore" :service-score="fosterHome.serviceScore" @preview-image="handleImagePreview" />
+=======
       <FosterReviewSystem
         :total-score="fosterHome.totalScore"
         :service-score="fosterHome.serviceScore"
       />
+>>>>>>> 7f99d1688df2e23e815f54fb2c5ed956dde4298b
     </div>
 
     <!-- 图片预览弹窗 -->

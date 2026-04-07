@@ -46,7 +46,7 @@
               </div>
               <div class="metric-item">
                 <div class="metric-label">完成率</div>
-                <div class="metric-value">{{ completionRate }}%</div>
+                <div class="metric-value">{{ completionRate }}</div>
 
               </div>
             </div>
@@ -324,28 +324,53 @@
 <script lang="ts" setup>
 import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus'
-import { getFosterService, getAddService, addFosterService, addAdditionalService, updateFosterService, deleteFosterService } from '@/api/foster-care/manage'
+import { getFosterService, getAddService, addFosterService, addAdditionalService, updateFosterService, deleteFosterService, getFosterOrderData } from '@/api/foster-care/manage'
 
 
 // 经营数据
-const totalIncome = ref(28740)
-const totalOrders = ref(156)
-const completionRate = ref(98)
-
+const totalIncome = ref(0)
+const totalOrders = ref(0)
+const completionRate = ref('0%')
+const incomeData = ref<any[]>([])
 
 // 套餐相关
 const hasPackages = ref(false)
+const provider = localStorage.getItem('fosterProviderIds')
+console.log('provider:', provider)
+// 获取订单数据
+const fetchOrderData = async () => {
 
-// 模拟收入数据
-const incomeData = ref([
-  { label: '周一', value: '¥1200', height: 60, active: false },
-  { label: '周二', value: '¥1800', height: 90, active: false },
-  { label: '周三', value: '¥2100', height: 100, active: true },
-  { label: '周四', value: '¥1600', height: 80, active: false },
-  { label: '周五', value: '¥1900', height: 95, active: false },
-  { label: '周六', value: '¥2400', height: 120, active: false },
-  { label: '周日', value: '¥2000', height: 100, active: false },
-])
+  try {
+    const res = await getFosterOrderData(Number(provider))
+    if (res.code === 0 && res.data) {
+      const data = res.data
+      totalIncome.value = data.totalAmount
+      totalOrders.value = data.totalOrders
+      completionRate.value = data.finished
+
+      // 处理收入数据
+      const incomeList = data.incomeList || []
+      const dateList = data.dateList || []
+      const maxIncome = Math.max(...incomeList, 1)
+
+      incomeData.value = incomeList.map((value: number, index: number) => {
+        const date = dateList[index] || ''
+        const height = (value / maxIncome) * 100
+        return {
+          label: date.substring(5), // 只显示月-日
+          value: `¥${value}`,
+          height: height,
+          active: false
+        }
+      })
+    } else {
+      ElMessage.error(res.msg || '获取订单数据失败')
+    }
+  } catch (error) {
+    console.error('获取订单数据失败:', error)
+    ElMessage.error('网络错误，请稍后重试')
+  }
+}
 
 // 最近活动
 const recentActivities = ref([
@@ -412,8 +437,7 @@ interface PackageItem {
 }
 
 const packages = ref<PackageItem[]>([])
-const provider = localStorage.getItem('fosterProviderIds')
-console.log('provider:', provider)
+
 
 // 获取套餐数据
 const fetchFosterService = async (showLoading: boolean = true) => {
@@ -800,6 +824,8 @@ onMounted(() => {
   console.log('店铺管理页面加载完成')
   // 获取套餐数据
   fetchFosterService()
+  // 获取订单数据
+  fetchOrderData()
 })
 </script>
 

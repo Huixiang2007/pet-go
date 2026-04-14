@@ -251,7 +251,8 @@ const fetchOrders = async () => {
       console.log('订单列表数据:', data.list)
       // 转换数据结构
       orders.value = (data.list || []).map((item: any) => ({
-        id: item.orderSn || item.id,
+        id: item.id, // 使用item.id作为唯一标识
+        orderSn: item.orderSn,
         date: item.createTime || new Date().toISOString(),
         status: item.orderStatus,
         statusType: mapOrderStatus(item.orderStatus),
@@ -287,7 +288,7 @@ const mapOrderStatus = (status: string): string => {
     待收货: 'receiving',
     已完成: 'completed',
     已收货: 'received',
-    退货中: 'returning',
+    退款完成: 'returning',
   }
   return statusMap[status] || 'pending'
 }

@@ -6,12 +6,10 @@
       <div class="flex flex-row gap-2">
         <el-select v-model="orderStatusFilter" placeholder="全部状态" clearable size="small">
           <el-option label="全部状态" value=""></el-option>
-          <el-option label="待付款" value="待付款"></el-option>
           <el-option label="待发货" value="待发货"></el-option>
           <el-option label="待收货" value="待收货"></el-option>
           <el-option label="待评价" value="待评价"></el-option>
-          <el-option label="已完成" value="已完成"></el-option>
-          <el-option label="已取消" value="已取消"></el-option>
+          <el-option label="退款中/售后" value="退款中/售后"></el-option>
         </el-select>
         <el-input
           placeholder="订单号/姓名/手机号"
@@ -26,19 +24,6 @@
         <el-button size="small" @click="searchOrder">搜索</el-button>
         <el-button size="small" type="primary" @click="refreshOrder">刷新</el-button>
       </div>
-    </div>
-
-    <!-- 批量操作 -->
-    <div class="px-8 py-3 flex justify-between items-center">
-      <div class="flex gap-2">
-        <el-button size="mini" type="primary" icon="el-icon-s-tools" @click="batchOperation"
-          >批量操作</el-button
-        >
-        <el-button size="mini" type="success" icon="el-icon-s-check" @click="batchShip"
-          >批量发货</el-button
-        >
-      </div>
-      <div class="text-sm text-gray-500">共 {{ filteredOrderData.length }} 条记录</div>
     </div>
 
     <!-- 订单表格 -->
@@ -56,8 +41,8 @@
       @selection-change="handleOrderSelectionChange"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="id" label="订单号" width="140" />
-      <el-table-column prop="name" label="买家姓名" width="100" />
+      <el-table-column prop="orderSn" label="订单号" width="180" />
+      <el-table-column prop="username" label="买家姓名" width="100" />
       <el-table-column prop="productName" label="商品名称" width="200">
         <template #default="scope">
           <div class="text-ellipsis overflow-hidden" :title="scope.row.productName">
@@ -65,22 +50,29 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="address" label="收货地址" min-width="200">
+      <el-table-column prop="specText" label="商品规格" width="150">
         <template #default="scope">
-          <div class="address-text" :title="scope.row.address">
-            {{ scope.row.address }}
+          <div class="text-ellipsis overflow-hidden" :title="scope.row.specText">
+            {{ scope.row.specText }}
           </div>
         </template>
       </el-table-column>
-      <el-table-column prop="phone" label="联系电话" width="120" />
-      <el-table-column prop="status" label="订单状态" width="100">
+      <el-table-column prop="quantity" label="数量" width="80" />
+      <el-table-column prop="orderStatus" label="订单状态" width="100">
         <template #default="scope">
           <el-tag :type="getStatusTagType(scope.row.orderStatus)" size="small">
             {{ scope.row.orderStatus }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="time" label="下单时间" width="160" />
+      <el-table-column prop="payStatus" label="支付状态" width="100">
+        <template #default="scope">
+          <el-tag :type="scope.row.payStatus === '已支付' ? 'success' : 'warning'" size="small">
+            {{ scope.row.payStatus }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="下单时间" width="160" />
       <el-table-column prop="totalAmount" label="订单金额" width="100">
         <template #default="scope">¥{{ scope.row.totalAmount }}</template>
       </el-table-column>
@@ -92,7 +84,7 @@
             >
 
             <el-button
-              v-if="scope.row.status === '待发货'"
+              v-if="scope.row.orderStatus === '待发货'"
               size="mini"
               type="text"
               class="text-green-600"
@@ -101,7 +93,7 @@
               发货
             </el-button>
             <el-button
-              v-if="scope.row.status === '待付款'"
+              v-if="scope.row.orderStatus === '待付款'"
               size="mini"
               type="text"
               class="text-red-600"
@@ -148,38 +140,71 @@
           <p class="text-sm text-gray-500">订单编号：{{ currentOrder.orderSn }}</p>
           <p class="text-sm text-gray-500">下单时间：{{ currentOrder.createTime }}</p>
           <p class="text-sm text-gray-500">买家姓名：{{ currentOrder.username }}</p>
+          <p class="text-sm text-gray-500">支付方式：{{ currentOrder.payType }}</p>
+          <p class="text-sm text-gray-500">支付状态：{{ currentOrder.payStatus }}</p>
+          <p class="text-sm text-gray-500">支付时间：{{ currentOrder.payTime || '未支付' }}</p>
         </div>
         <div>
           <p class="text-sm text-gray-500">商品名称：{{ currentOrder.productName }}</p>
+          <p class="text-sm text-gray-500">商品规格：{{ currentOrder.specText }}</p>
           <p class="text-sm text-gray-500">订单金额：¥{{ currentOrder.totalAmount }}</p>
-          <p class="text-sm text-gray-500">收货地址：{{ currentOrder.address }}</p>
+          <p class="text-sm text-gray-500">实付金额：¥{{ currentOrder.payAmount }}</p>
+          <p class="text-sm text-gray-500">订单状态：{{ currentOrder.orderStatus }}</p>
         </div>
       </div>
 
       <div class="pt-2 border-t">
         <h4 class="font-medium mb-2">商品信息</h4>
         <el-table
-          :data="[{ name: currentOrder.productName, price: currentOrder.price, num: 1 }]"
+          :data="[
+            {
+              name: currentOrder.productName,
+              price: currentOrder.price,
+              num: currentOrder.quantity,
+            },
+          ]"
           size="mini"
         >
           <el-table-column prop="name" label="商品名称" />
           <el-table-column prop="price" label="单价" />
           <el-table-column prop="num" label="数量" />
           <el-table-column label="小计">
-            <template #default="scope">¥{{ scope.row.price }}</template>
+            <template #default="scope">¥{{ scope.row.price * scope.row.num || '0.00' }}</template>
           </el-table-column>
         </el-table>
       </div>
 
+      <div class="pt-2 border-t">
+        <h4 class="font-medium mb-2">费用明细</h4>
+        <div class="space-y-1 text-sm">
+          <div class="flex justify-between">
+            <span>商品总价</span>
+            <span>¥{{ currentOrder.price * currentOrder.quantity || '0.00' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>运费</span>
+            <span>¥{{ currentOrder.freightAmount || '0.00' }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>优惠</span>
+            <span>-¥{{ currentOrder.discountAmount || '0.00' }}</span>
+          </div>
+          <div class="flex justify-between font-medium mt-2">
+            <span>实付款</span>
+            <span class="text-orange-500">¥{{ currentOrder.payAmount }}</span>
+          </div>
+        </div>
+      </div>
+
       <div class="text-right pt-2">
-        <p class="text-lg font-bold">订单总价：¥{{ currentOrder.totalAmount }}</p>
+        <p class="text-lg font-bold">订单总价：¥{{ currentOrder.totalAmount || '0.00' }}</p>
       </div>
     </div>
 
     <template #footer>
       <el-button @click="orderDetailVisible = false">关闭</el-button>
       <el-button
-        v-if="currentOrder && currentOrder.status === '待发货'"
+        v-if="currentOrder && currentOrder.orderStatus === '待发货'"
         type="primary"
         @click="openShipModal(currentOrder)"
       >
@@ -198,6 +223,7 @@
     <div v-if="currentOrder" class="space-y-4">
       <p class="text-sm">订单编号：{{ currentOrder.orderSn }}</p>
       <p class="text-sm">商品名称：{{ currentOrder.productName }}</p>
+      <p class="text-sm">商品规格：{{ currentOrder.specText }}</p>
 
       <el-form :model="shipForm" label-width="80px">
         <el-form-item label="快递公司" required>
@@ -266,7 +292,7 @@ const batchType = ref('batchShip')
 
 // 分页数据
 const pageNum = ref(1)
-const pageSize = ref(10)
+const pageSize = ref(7)
 const total = ref(0)
 const loading = ref(false)
 
@@ -288,6 +314,7 @@ interface OrderRow {
   totalAmount: number
   payAmount: number
   payType: string
+  price?: number
   payStatus: string
   deliveryCompany: string
   deliverySn: string
@@ -321,8 +348,9 @@ const loadOrderList = async () => {
         },
       ],
       listStatus: getStatusValue(orderStatusFilter.value),
+      orderSn: orderSearchInput.value || undefined,
     }
-
+    console.log('订单列表参数:', params)
     const res = await getShopOrderList(params)
     console.log(res)
     if (res?.ok) {
@@ -337,6 +365,7 @@ const loadOrderList = async () => {
         payAmount: item.payAmount,
         payType: item.payType,
         payStatus: item.payStatus,
+        price: item.price || 0,
         deliveryCompany: item.deliveryCompany,
         deliverySn: item.deliverySn,
         productPic: item.productPic,
@@ -357,7 +386,7 @@ const loadOrderList = async () => {
   }
 }
 
-// 状态=
+// 状态映射
 const getStatusValue = (status: string): number => {
   const statusMap: Record<string, number> = {
     待发货: 1,
@@ -371,18 +400,14 @@ const getStatusValue = (status: string): number => {
 // 订单状态标签类型
 const getStatusTagType = (status: string) => {
   switch (status) {
-    case '待付款':
-      return 'warning'
     case '待发货':
       return 'info'
     case '待收货':
       return 'success'
     case '待评价':
       return 'primary'
-    case '已完成':
-      return 'success'
-    case '已取消':
-      return 'danger'
+    case '退款中/售后':
+      return 'warning'
     default:
       return ''
   }
@@ -419,14 +444,15 @@ const confirmShip = async () => {
   }).then(async () => {
     try {
       const params = {
-        orderSn: currentOrder.value.id,
+        orderSn: currentOrder.value.orderSn,
         deliveryCompany: shipForm.value.express,
-        deliverySn: shipForm.value.expressNo,
-        remark: shipForm.value.remark,
+        shopNote: shipForm.value.remark,
       }
+      console.log('发货参数:', params)
       const res = await shipOrder(params)
-      if (res?.ok) {
-        currentOrder.value.status = '待收货'
+      console.log('发货结果:', res)
+      if (res) {
+        currentOrder.value.orderStatus = '待收货'
         shipModalVisible.value = false
         orderDetailVisible.value = false
         ElMessage.success(`发货成功！运单号：${shipForm.value.expressNo}`)
@@ -453,83 +479,28 @@ const cancelOrder = (row: OrderRow) => {
   })
 }
 
-// 批量操作
-const batchOperation = () => {
-  if (selectedOrders.value.length === 0) {
-    ElMessage.warning('请先选择要操作的订单！')
-    return
-  }
-  batchOperationVisible.value = true
-}
-
-// 批量发货
-const batchShip = () => {
-  if (selectedOrders.value.length === 0) {
-    ElMessage.warning('请先选择要发货的订单！')
-    return
-  }
-  batchType.value = 'batchShip'
-  batchOperationVisible.value = true
-}
-
-// 确认批量操作
-const confirmBatchOperation = () => {
-  let msg = ''
-  switch (batchType.value) {
-    case 'batchShip':
-      msg = '确认批量发货选中的订单吗？'
-      break
-    case 'batchCancel':
-      msg = '确认批量取消选中的订单吗？'
-      break
-    case 'batchExport':
-      msg = '确认导出选中的订单数据吗？'
-      break
-    default:
-      msg = '确认执行批量操作吗？'
-  }
-
-  ElMessageBox.confirm(msg, '批量操作', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(() => {
-    batchOperationVisible.value = false
-    if (batchType.value === 'batchShip') {
-      selectedOrders.value.forEach((order) => {
-        order.status = '待收货'
-      })
-      ElMessage.success(`成功发货 ${selectedOrders.value.length} 个订单！`)
-    } else if (batchType.value === 'batchCancel') {
-      selectedOrders.value.forEach((order) => {
-        order.status = '已取消'
-      })
-      ElMessage.success(`成功取消 ${selectedOrders.value.length} 个订单！`)
-    } else if (batchType.value === 'batchExport') {
-      ElMessage.success(`成功导出 ${selectedOrders.value.length} 个订单数据！`)
-    }
-    selectedOrders.value = []
-  })
-}
-
 // 其他工具方法
 const handleOrderSelectionChange = (val: any[]) => {
   selectedOrders.value = val
 }
+// 搜索订单
 const searchOrder = () => {
   pageNum.value = 1
   loadOrderList()
 }
+// 刷新订单
 const refreshOrder = () => {
   pageNum.value = 1
   loadOrderList()
   ElMessage.success('订单列表已刷新')
 }
+// 改变分页大小
 const handleSizeChange = (val: number) => {
   pageSize.value = val
   pageNum.value = 1
   loadOrderList()
 }
+// 改变当前页
 const handleCurrentChange = (val: number) => {
   pageNum.value = val
   loadOrderList()

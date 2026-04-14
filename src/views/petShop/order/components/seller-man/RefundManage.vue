@@ -39,8 +39,7 @@
         fontWeight: '500',
       }"
     >
-      <el-table-column prop="refundId" label="退款编号" width="160" />
-      <el-table-column prop="orderId" label="关联订单号" width="160" />
+      <el-table-column prop="orderId" label="关联订单号" width="220" />
       <el-table-column prop="productName" label="商品名称" width="230">
         <template #default="scope">
           <div class="text-ellipsis overflow-hidden" :title="scope.row.productName">
@@ -56,13 +55,22 @@
         </template>
       </el-table-column>
       <el-table-column prop="amount" label="退款金额" width="100">
-        <template #default="scope">¥{{ scope.row.amount }}</template>
+        <template #default="scope">¥{{ scope.row.refundAmount }}</template>
       </el-table-column>
-      <el-table-column prop="applyTime" label="申请时间" width="180" />
+      <el-table-column prop="reason" label="申请原因" width="160">
+        <template #default="scope">
+          <div class="text-ellipsis overflow-hidden" :title="scope.row.reason">
+            {{ scope.row.reason }}
+          </div>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="refundTime" label="申请时间" width="180" />
+
       <el-table-column prop="status" label="处理状态" width="100">
         <template #default="scope">
           <el-tag :type="getRefundTagType(scope.row.status)" size="small">
-            {{ scope.row.status }}
+            {{ scope.row.status || '待处理' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -77,7 +85,6 @@
               >查看详情</el-button
             >
             <el-button
-              v-if="scope.row.status === '待处理'"
               size="mini"
               type="text"
               class="text-green-600"
@@ -86,7 +93,6 @@
               同意退款
             </el-button>
             <el-button
-              v-if="scope.row.status === '待处理'"
               size="mini"
               type="text"
               class="text-red-600"
@@ -133,20 +139,37 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <p class="text-sm text-gray-500">退款编号：{{ currentRefund.refundId }}</p>
-          <p class="text-sm text-gray-500">关联订单：{{ currentRefund.orderId }}</p>
+          <p class="text-sm text-gray-500">
+            关联订单：{{ currentRefund.orderSn || currentRefund.orderId }}
+          </p>
           <p class="text-sm text-gray-500">退款类型：{{ currentRefund.refundType }}</p>
-          <p class="text-sm text-gray-500">申请时间：{{ currentRefund.applyTime }}</p>
+          <p class="text-sm text-gray-500">申请时间：{{ currentRefund.refundTime }}</p>
         </div>
         <div>
           <p class="text-sm text-gray-500">商品名称：{{ currentRefund.productName }}</p>
-          <p class="text-sm text-gray-500">退款金额：¥{{ currentRefund.amount }}</p>
+          <p class="text-sm text-gray-500">商品规格：{{ currentRefund.specText || '未填写' }}</p>
+          <p class="text-sm text-gray-500">退款金额：¥{{ currentRefund.refundAmount }}</p>
           <p class="text-sm text-gray-500">退款原因：{{ currentRefund.reason || '未填写' }}</p>
         </div>
+      </div>
+
+      <div v-if="currentRefund.productMainImage" class="pt-2 border-t">
+        <h4 class="font-medium mb-2">商品图片</h4>
+        <img
+          :src="currentRefund.productMainImage"
+          class="w-32 h-32 object-cover rounded"
+          alt="商品图片"
+        />
       </div>
 
       <div v-if="currentRefund.reason" class="pt-2 border-t">
         <h4 class="font-medium mb-2">退款说明</h4>
         <p class="text-sm bg-gray-50 p-2 rounded">{{ currentRefund.reason }}</p>
+      </div>
+
+      <div v-if="currentRefund.shopNote" class="pt-2 border-t">
+        <h4 class="font-medium mb-2">商家备注</h4>
+        <p class="text-sm bg-gray-50 p-2 rounded">{{ currentRefund.shopNote }}</p>
       </div>
     </div>
 
@@ -187,7 +210,7 @@
     :close-on-click-modal="false"
   >
     <div v-if="currentRefund" class="space-y-4">
-      <p class="text-sm">退款编号：{{ currentRefund.refundId }}</p>
+      <p class="text-sm">退款编号：{{ currentRefund.refundSn }}</p>
       <p class="text-sm text-gray-500">请填写拒绝退款的原因（必填）</p>
 
       <el-form :model="rejectForm" label-width="80px">
@@ -217,6 +240,7 @@ import {
   getRefundDetail,
   handleRefund,
   handleRefundMerchant,
+  shopRefundReceive,
 } from '@/api/pet-shop/order'
 
 // 基础数据
@@ -288,10 +312,10 @@ const loadRefundList = async () => {
           column: 'create_time',
         },
       ],
-      refundType: Number(refundTypeFilter.value),
     }
 
     const res = await getRefundList(params)
+    console.log('退款', res)
     if (res?.ok) {
       refundData.value = res.data.list || []
       total.value = res.data.total || 0

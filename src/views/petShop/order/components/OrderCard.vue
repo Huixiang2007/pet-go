@@ -6,7 +6,7 @@
     >
       <div>
         <p class="text-gray-500 text-sm">
-          订单编号：<span class="text-gray-700">{{ order.id }}</span>
+          订单编号：<span class="text-gray-700">{{ order.orderSn }}</span>
         </p>
         <p class="text-gray-400 text-xs mt-1">{{ order.date }}</p>
       </div>
@@ -68,9 +68,8 @@
             立即付款
           </button>
         </template>
-
+        <!-- //代发货状态 -->
         <template v-else-if="order.statusType === 'shipping'">
-          <button class="px-4 py-2 border rounded-lg text-sm">提醒发货</button>
           <button
             class="px-4 py-2 bg-red-500 text-white rounded-lg text-sm"
             @click="openRefundDialog"
@@ -78,10 +77,10 @@
             申请退款
           </button>
         </template>
-
+        <!-- // 待收货状态 -->
         <template v-else-if="order.statusType === 'receiving'">
           <router-link
-            :to="`/package-info/?id=${order.id}`"
+            :to="`/package-info/?id=${order.orderSn}`"
             class="px-4 py-2 border rounded-lg text-sm"
             >查看物流</router-link
           >
@@ -98,18 +97,10 @@
             确认收货
           </button>
         </template>
-
         <template v-else-if="order.statusType === 'returning'">
-          <router-link
-            :to="`/package-info/?id=${order.id}`"
-            class="px-4 py-2 border rounded-lg text-sm"
-            >查看进度</router-link
-          >
-          <router-link
-            to="/customer-service"
-            class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm"
-            >联系客服</router-link
-          >
+          <el-button size="mini" type="primary" @click="handleUserRefundDelivery(order)">
+            确认发货
+          </el-button>
         </template>
       </div>
     </div>
@@ -117,7 +108,7 @@
     <!-- 支付弹窗 -->
     <PayPopup
       v-model="payDialogVisible"
-      :order-no="order.id"
+      :order-no="order.orderSn"
       :calculate-total-price="order.total"
       :user-balance="userBalance"
       @pay-success="handlePaySuccess"
@@ -143,7 +134,7 @@
             <label class="block text-gray-700 text-sm font-medium mb-1">订单编号</label>
             <input
               type="text"
-              :value="order.id"
+              :value="order.orderSn"
               class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed"
               disabled
             />
@@ -237,7 +228,7 @@
               <div class="space-y-4 text-sm">
                 <p>
                   <span class="w-24 inline-block text-gray-500">订单编号</span>
-                  {{ orderDetailData?.orderSn || order.id }}
+                  {{ orderDetailData?.orderSn }}
                 </p>
                 <p>
                   <span class="w-24 inline-block text-gray-500">创建时间</span>
@@ -317,8 +308,15 @@
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { cancelOrder, orderDetail, payOrder, applyRefund, confirmOrder } from '@/api/pet-shop/order'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import {
+  cancelOrder,
+  confirmOrder,
+  orderDetail,
+  userRefundDelivery,
+  payOrder,
+  applyRefund,
+} from '@/api/pet-shop/order'
 import PayPopup from './order-pay/PayPopup.vue'
 import { getBalance } from '@/api/foster-care/book'
 
@@ -326,6 +324,7 @@ const emit = defineEmits(['refresh'])
 
 export interface Order {
   id: string
+  orderSn: string
   date: string
   status: string
   statusType:
@@ -353,7 +352,7 @@ const openPayDialog = () => {
 
 const handlePaySuccess = async () => {
   try {
-    const res = await payOrder({ orderSn: props.order.id })
+    const res = await payOrder({ orderSn: props.order.orderSn })
     if (res?.success) {
       ElMessage.success('支付成功')
       emit('refresh')
@@ -380,11 +379,33 @@ const getUserBalance = async () => {
 onMounted(() => {
   getUserBalance()
 })
+//用户确认发货
+const handleUserRefundDelivery = (order: Order) => {
+  ElMessageBox.confirm('确认已经将商品寄回给商家吗？', '确认发货', {
+    confirmButtonText: '确认发货',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      const res = await userRefundDelivery(props.order.id)
+      console.log('确认发货', order.id)
+      if (res?.ok) {
+        ElMessage.success('确认发货成功！')
+        emit('refresh')
+      } else {
+        ElMessage.error(res?.msg || '确认发货失败')
+      }
+    } catch (e) {
+      console.error('确认发货失败：', e)
+      ElMessage.error('确认发货失败，请稍后重试')
+    }
+  })
+}
 
 // 取消订单
 const handleCancelOrder = async () => {
   try {
-    const res = await cancelOrder({ orderSn: props.order.id })
+    const res = await cancelOrder({ orderSn: props.order.orderSn })
     if (res?.success) {
       ElMessage.success('取消成功')
       emit('refresh')
@@ -422,7 +443,7 @@ const submitRefund = async () => {
 
   try {
     const refundData = {
-      orderSn: props.order.id,
+      orderSn: props.order.orderSn,
       refundType: refundForm.value.type,
       refundAmount: refundForm.value.amount,
       reason: refundForm.value.reason,
@@ -451,7 +472,7 @@ const loadingDetail = ref(false)
 const openDetailDialog = async () => {
   loadingDetail.value = true
   try {
-    const res = await orderDetail(props.order.id)
+    const res = await orderDetail(props.order.orderSn)
     if (res?.ok === true) {
       orderDetailData.value = res.data
       detailVisible.value = true
@@ -467,7 +488,7 @@ const openDetailDialog = async () => {
 // 确认收货
 const handleConfirmReceive = async () => {
   try {
-    const res = await confirmOrder(props.order.id)
+    const res = await confirmOrder(props.order.orderSn)
     if (res?.ok) {
       ElMessage.success('确认收货成功')
       emit('refresh')

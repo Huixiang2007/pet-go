@@ -88,8 +88,8 @@ export const payOrder = async (param: any): Promise<any> => {
 }
 
 // 支付订单（购物车）
-export const payOrderCart = async (param: any): Promise<any> => {
-  const response = await request('/server/api/shop/order/pay-order', 'POST', param)
+export const payOrderCart = async (param: string[]): Promise<any> => {
+  const response = await request('/server/api/shop/order/pay-order-cart', 'POST', param)
   return response
 }
 
@@ -148,14 +148,14 @@ export const confirmOrder = async (orderSn: string): Promise<any> => {
 //查讯退款申请详情
 export const getRefundDetail = async (refundId: string): Promise<any> => {
   const response = await request('/server/api/shop/order/refund-detail', 'POST', {
-    refundId
+    refundid: refundId  // 修改参数名为refundid
   })
   return response
-  }
+}
 //退款处理（商户端）
 export const handleRefundMerchant = async (refundId: string): Promise<any> => {
   const response = await request('/server/api/shop/order/handle-refund-merchant', 'POST', {
-    refundId
+    refundid: refundId  // 修改参数名为refundid
   })
   return response
 }
@@ -167,7 +167,7 @@ export const getRefundList = async (param: any): Promise<any> => {
 }
 //商家发活
 export const shipOrder = async (param: any): Promise<any> => {
-  const response = await request('/server/api/shop/order/ship-order', 'POST', param)
+  const response = await request('/server/api/shop/order/ship-order', 'POST',param)
   return response
 }
 //模拟商家收货

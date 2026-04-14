@@ -11,6 +11,9 @@
                 <div class="section-title">
                     <i class="iconfont text-lg text-[#409eff]">&#xe90d;</i>
                     <strong class="ml-2 text-lg">选择寄养宠物</strong>
+                    <el-button v-if="myPets.length === 0" type="primary" @click="onAddPet"
+                        class="ml-5 mb-1">添加宠物</el-button>
+
                 </div>
                 <el-select v-model="bookingForm.petName" placeholder="选择宠物" @change="onPetChange">
                     <el-option v-for="item in myPets" :key="item.id" :label="item.name" :value="item.name" />
@@ -106,12 +109,16 @@
 import { computed, } from 'vue'
 import { Service, ChatDotRound, Document } from '@element-plus/icons-vue'
 import FileUpload from '@/components/common/FileUpload.vue'
+import { useRouter } from 'vue-router'
+
+
 // import { ElMessage } from 'element-plus'
 
 import { useBookingForm } from '@/composables/foster/use-booking-form'
 import { usePriceCalculator } from '@/composables/foster/use-price-cal'
 import { useBookingPackageStore, useBookingFormStore } from '@/stores/booking'
 import type { FileItem } from '@/types/upload'
+const router = useRouter()
 
 const bookingStore = useBookingPackageStore()
 const bookingFormStore = useBookingFormStore()
@@ -140,7 +147,10 @@ const handleVaccineChange = (files: FileItem[]) => {
     console.log('疫苗文件 URL 已存入 bookingForm：', bookingForm.vaccineUrls)
 
 }
+const onAddPet = () => {
+    router.push('/add-pet');
 
+}
 
 </script>
 <style scoped lang="scss">

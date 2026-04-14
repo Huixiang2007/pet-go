@@ -36,6 +36,7 @@ export interface FosterServiceItem {
   title: string
   basePrice: number
   description: string
+  available: number
   petTypes: string
   serviceType: number
   additionalServices: AdditionalServiceItem[]

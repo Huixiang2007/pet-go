@@ -50,13 +50,13 @@ const navItems = ref<NavItem[]>([
     unicode: '\ue736',
     path: '/shop',
   },
-  {
-    text: '宠行天下',
-    color: 'text-[rgb(22,209,22)]',
-    bgColor: 'rgb(223,254,223)',
-    unicode: '\ue602',
-    path: '/travel',
-  },
+  // {
+  //   text: '宠行天下',
+  //   color: 'text-[rgb(22,209,22)]',
+  //   bgColor: 'rgb(223,254,223)',
+  //   unicode: '\ue602',
+  //   path: '/travel',
+  // },
   {
     text: '我的宠物',
     color: '#f9526f',
@@ -78,13 +78,13 @@ const navItems = ref<NavItem[]>([
     unicode: '\ue655',
     path: '/pet-cart',
   },
-  {
-    text: '旅游足迹',
-    color: 'text-[rgb(255,105,180)]',
-    bgColor: 'rgb(255,192,203)',
-    unicode: '\ue60a',
-    path: '/travel-history',
-  },
+  // {
+  //   text: '旅游足迹',
+  //   color: 'text-[rgb(255,105,180)]',
+  //   bgColor: 'rgb(255,192,203)',
+  //   unicode: '\ue60a',
+  //   path: '/travel-history',
+  // },
   {
     text: '我的消息',
     color: 'text-[rgb(156,156,224)]',

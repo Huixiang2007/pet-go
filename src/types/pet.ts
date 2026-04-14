@@ -52,3 +52,8 @@ export interface Pet {
   healthRecords?: HealthRecords
   growthRecords?: GrowthRecords[]
 }
+export interface MyPets {
+  id: number
+  name: string
+  type: string
+}

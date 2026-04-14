@@ -94,8 +94,8 @@
 
       <!-- 支付确认弹窗 -->
       <FosterPayConfirm v-if="showPayConfirmDialog" :orderNo=orderNo :calculateTotalPrice=calculateTotalPrice
-        :userBalance=userBalance :vaccineUrls="bookingForm.vaccineUrls" @go-to-recharge="goToRecharge" v-model=showPayConfirmDialog
-        @pay-success="handlePayConfirm" />
+        :userBalance=userBalance :vaccineUrls="bookingForm.vaccineUrls" @go-to-recharge="goToRecharge"
+        v-model=showPayConfirmDialog @pay-success="handlePayConfirm" />
     </div>
   </div>
 </template>
@@ -262,8 +262,8 @@ const confirmPayment = async () => {
 
   try {
     const res = await payFosterOrder({
-      orderNo: orderNo.value,
-      couponId: null
+      orderNo: orderNo.value
+
     })
     if (res.code === 0) {
       currentStep.value = 5 // 进入支付成功页面

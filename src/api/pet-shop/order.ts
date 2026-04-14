@@ -128,3 +128,64 @@ export const getAddressList = async (param: any): Promise<any> => {
     })
     return response
   }
+
+
+  //申请退款
+  export const applyRefund = async (param: any): Promise<any> => {
+    const response = await request('/server/api/shop/order/refund-apply', 'POST', param)
+    return response
+  }
+//确认收货
+export const confirmOrder = async (orderSn: string): Promise<any> => {
+  const response = await request(`/server/api/shop/order/confirm/${orderSn}`, 'POST')
+  return response
+  }
+  //处理退款申请
+  export const handleRefund = async (param: any): Promise<any> => {
+    const response = await request('/server/api/shop/order/handle-refund', 'POST', param)
+    return response
+  }
+//查讯退款申请详情
+export const getRefundDetail = async (refundId: string): Promise<any> => {
+  const response = await request('/server/api/shop/order/refund-detail', 'POST', {
+    refundId
+  })
+  return response
+  }
+//退款处理（商户端）
+export const handleRefundMerchant = async (refundId: string): Promise<any> => {
+  const response = await request('/server/api/shop/order/handle-refund-merchant', 'POST', {
+    refundId
+  })
+  return response
+}
+//退款申请列表
+
+export const getRefundList = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/order/refund-list', 'POST', param)
+  return response
+}
+//商家发活
+export const shipOrder = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/order/ship-order', 'POST', param)
+  return response
+}
+//模拟商家收货
+export const shopRefundReceive = async (refundId: string): Promise<any> => {
+  const response = await request('/server/api/shop/order/shop-refund-receive', 'POST', {
+    refundId
+  })
+  return response
+}
+//用户发货
+export const userRefundDelivery = async (refunId: string): Promise<any> => {
+  const response = await request('/server/api/shop/order/user-refund-delivery', 'POST', {
+    refunId
+  })
+  return response
+}
+//商家查看订单列表
+export const getShopOrderList = async (param: any): Promise<any> => {
+  const response = await request('/server/api/shop/order/shop-order-list', 'POST', param)
+  return response
+}

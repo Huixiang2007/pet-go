@@ -224,7 +224,16 @@ const loadChatRecords = async (userId: number, isLoadMore = false) => {
             isService: false,
           }
         }
-
+        if (item.msgType === 'image') {
+          return {
+            ...base,
+            content: '',
+            isImage: true,
+            imageUrl: item.image || '',
+            isGoods: false,
+            isService: false,
+          }
+        }
         if (item.msgType === 'product') {
           return {
             ...base,
@@ -317,6 +326,10 @@ const sendMessage = (record: any) => {
     newRecord.content = record.content || ''
     newRecord.isImage = !!record.isImage
     newRecord.imageUrl = record.imageUrl || ''
+  } else if (newRecord.msgType === 'image') {
+    newRecord.content = ''
+    newRecord.isImage = true
+    newRecord.imageUrl = record.imageUrl || record.image || ''
   } else if (newRecord.msgType === 'product') {
     newRecord.isGoods = true
     newRecord.goodsInfo = {
@@ -365,6 +378,15 @@ const handleSSEMessage = (data: any) => {
         ...base,
         content: data.content || '',
         isImage: !!data.image,
+        imageUrl: data.image || '',
+        isGoods: false,
+        isService: false,
+      }
+    } else if (data.msgType === 'image') {
+      record = {
+        ...base,
+        content: '',
+        isImage: true,
         imageUrl: data.image || '',
         isGoods: false,
         isService: false,

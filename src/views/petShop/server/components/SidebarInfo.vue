@@ -35,7 +35,7 @@
       </router-link>
       <router-link
         v-else
-        :to="{ path: '/foster-detail', query: { id: props.activeShop?.shopId } }"
+        :to="{ path: `/foster-detail/${props.activeShop?.fosterProviderId}` }"
         class="mt-4 w-full bg-blue-500 text-white text-sm py-2.5 rounded-lg hover:bg-blue-600 transition-colors shadow-sm flex items-center justify-center gap-2"
       >
         <i class="fa fa-home"></i> 查看寄养机构

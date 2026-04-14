@@ -165,8 +165,8 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               <option value="">请选择退款类型</option>
-              <option value="full">全额退款</option>
-              <option value="partial">部分退款</option>
+              <option value="1">仅退款</option>
+              <option value="2">退货退款</option>
             </select>
           </div>
 
@@ -191,11 +191,11 @@
               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
             >
               <option value="">请选择退款原因</option>
-              <option value="no_delivery">长时间未发货</option>
-              <option value="wrong_product">商品错发/漏发</option>
-              <option value="quality_issue">商品质量问题</option>
-              <option value="no_need">不需要了/拍错了</option>
-              <option value="other">其他原因</option>
+              <option value="长时间未发货">长时间未发货</option>
+              <option value="商品错发/漏发">商品错发/漏发</option>
+              <option value="商品质量问题">商品质量问题</option>
+              <option value="不需要了/拍错了">不需要了/拍错了</option>
+              <option value="其他原因">其他原因</option>
             </select>
           </div>
 
@@ -228,33 +228,83 @@
           <el-skeleton :loading="loadingDetail" animated>
             <template #template>
               <div class="space-y-4">
-                <div class="flex">
-                  <div class="w-24 skeleton-block"></div>
-                  <div class="flex-1 skeleton-block"></div>
-                  <div class="w-24 skeleton-block"></div>
-                  <div class="flex-1 skeleton-block"></div>
-                </div>
+                <div class="h-4 skeleton-block"></div>
+                <div class="h-4 skeleton-block"></div>
+                <div class="h-4 skeleton-block"></div>
               </div>
             </template>
             <template #default>
-              <div class="space-y-4">
+              <div class="space-y-4 text-sm">
                 <p>
-                  <span class="w-24 inline-block text-gray-500">订单号</span
-                  >{{ orderDetailData?.orderSn || order.id }}
+                  <span class="w-24 inline-block text-gray-500">订单编号</span>
+                  {{ orderDetailData?.orderSn || order.id }}
                 </p>
                 <p>
-                  <span class="w-24 inline-block text-gray-500">创建时间</span
-                  >{{ orderDetailData?.createTime || order.date }}
+                  <span class="w-24 inline-block text-gray-500">创建时间</span>
+                  {{ orderDetailData?.createTime }}
                 </p>
                 <p>
-                  <span class="w-24 inline-block text-gray-500">订单状态</span
-                  >{{ orderDetailData?.orderStatus || order.status }}
+                  <span class="w-24 inline-block text-gray-500">订单状态</span>
+                  {{ orderDetailData?.orderStatus }}
                 </p>
                 <p>
-                  <span class="w-24 inline-block text-gray-500">实付款</span
-                  ><span class="text-orange-500 font-bold"
-                    >¥{{ orderDetailData?.payAmount || order.total }}</span
-                  >
+                  <span class="w-24 inline-block text-gray-500">评价状态</span>
+                  {{ orderDetailData?.commentStatus || '暂无' }}
+                </p>
+
+                <div class="border-t pt-3"></div>
+
+                <p>
+                  <span class="w-24 inline-block text-gray-500">商品名称</span>
+                  {{ orderDetailData?.productName }}
+                </p>
+                <p>
+                  <span class="w-24 inline-block text-gray-500">商品规格</span>
+                  {{ orderDetailData?.specText || '无规格' }}
+                </p>
+                <p>
+                  <span class="w-24 inline-block text-gray-500">购买数量</span>
+                  {{ orderDetailData?.quantity || order.quantity }} 件
+                </p>
+
+                <div class="border-t pt-3"></div>
+
+                <p>
+                  <span class="w-24 inline-block text-gray-500">商品单价</span>
+                  ¥{{ orderDetailData?.price || order.price }}
+                </p>
+                <p>
+                  <span class="w-24 inline-block text-gray-500">优惠金额</span>
+                  ¥{{ orderDetailData?.discountAmount || 0 }}
+                </p>
+                <p>
+                  <span class="w-24 inline-block text-gray-500">运费</span>
+                  ¥{{ orderDetailData?.freightAmount || 0 }}
+                </p>
+
+                <div class="border-t pt-3"></div>
+
+                <p>
+                  <span class="w-24 inline-block text-gray-500">支付方式</span>
+                  {{ orderDetailData?.payType }}
+                </p>
+                <p>
+                  <span class="w-24 inline-block text-gray-500">支付状态</span>
+                  {{ orderDetailData?.payStatus }}
+                </p>
+                <p>
+                  <span class="w-24 inline-block text-gray-500">支付时间</span>
+                  {{ orderDetailData?.payTime || '未支付' }}
+                </p>
+
+                <p>
+                  <span class="w-24 inline-block text-gray-500">店铺名称</span>
+                  {{ orderDetailData?.shopName }}
+                </p>
+
+                <p v-if="orderDetailData?.receiveTime">
+                  <span class="w-24 inline-block text-gray-500">确认收货时间</span>
+                  {{ orderDetailData.receiveTime }}
                 </p>
               </div>
             </template>
@@ -268,7 +318,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { cancelOrder, orderDetail, payOrder } from '@/api/pet-shop/order'
+import { cancelOrder, orderDetail, payOrder, applyRefund, confirmOrder } from '@/api/pet-shop/order'
 import PayPopup from './order-pay/PayPopup.vue'
 import { getBalance } from '@/api/foster-care/book'
 
@@ -278,7 +328,15 @@ export interface Order {
   id: string
   date: string
   status: string
-  statusType: 'pending' | 'shipping' | 'receiving' | 'completed' | 'received' | 'returning'
+  statusType:
+    | 'pending'
+    | 'shipping'
+    | 'receiving'
+    | 'completed'
+    | 'received'
+    | 'returning'
+    | 'reviewing'
+    | 'cancelled'
   product: { name: string; image: string; spec: string }
   price: number
   quantity: number
@@ -361,9 +419,28 @@ const submitRefund = async () => {
     ElMessage.warning('请填写完整的退款信息')
     return
   }
-  ElMessage.success('退款申请已提交')
-  refundVisible.value = false
-  emit('refresh')
+
+  try {
+    const refundData = {
+      orderSn: props.order.id,
+      refundType: refundForm.value.type,
+      refundAmount: refundForm.value.amount,
+      reason: refundForm.value.reason,
+      images: '',
+    }
+
+    const res = await applyRefund(refundData)
+    if (res?.ok) {
+      ElMessage.success('退款申请已提交')
+      refundVisible.value = false
+      emit('refresh')
+    } else {
+      ElMessage.error(res?.msg || '退款申请失败')
+    }
+  } catch (e) {
+    console.error('退款申请失败：', e)
+    ElMessage.error('退款申请失败，请稍后重试')
+  }
 }
 
 //  订单详情
@@ -375,7 +452,7 @@ const openDetailDialog = async () => {
   loadingDetail.value = true
   try {
     const res = await orderDetail(props.order.id)
-    if (res?.success) {
+    if (res?.ok === true) {
       orderDetailData.value = res.data
       detailVisible.value = true
     }
@@ -388,9 +465,19 @@ const openDetailDialog = async () => {
 }
 
 // 确认收货
-const handleConfirmReceive = () => {
-  ElMessage.success('确认收货成功')
-  emit('refresh')
+const handleConfirmReceive = async () => {
+  try {
+    const res = await confirmOrder(props.order.id)
+    if (res?.ok) {
+      ElMessage.success('确认收货成功')
+      emit('refresh')
+    } else {
+      ElMessage.error(res?.msg || '确认收货失败')
+    }
+  } catch (e) {
+    console.error('确认收货失败：', e)
+    ElMessage.error('确认收货失败，请稍后重试')
+  }
 }
 
 const getStatusClass = computed(() => (type: Order['statusType']) => {
@@ -401,6 +488,8 @@ const getStatusClass = computed(() => (type: Order['statusType']) => {
     completed: 'bg-green-50 text-green-700',
     received: 'bg-gray-50 text-gray-700',
     returning: 'bg-red-50 text-red-700',
+    reviewing: 'bg-orange-50 text-orange-700',
+    cancelled: 'bg-gray-50 text-gray-700',
   }
   return map[type] || ''
 })

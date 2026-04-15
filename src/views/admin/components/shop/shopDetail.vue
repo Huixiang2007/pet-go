@@ -20,13 +20,8 @@
       </div>
 
       <!-- 详细信息网格 -->
-      <el-descriptions
-        :column="2"
-        border
-        label-style="color:#956b3e; font-weight:500;"
-        content-style="color:#6b5b45;"
-        class="info-desc"
-      >
+      <el-descriptions :column="2" border label-style="color:#956b3e; font-weight:500;" content-style="color:#6b5b45;"
+        class="info-desc">
         <el-descriptions-item label="联系人">{{ shopData.contactName }}</el-descriptions-item>
         <el-descriptions-item label="联系电话">{{ shopData.contactPhone }}</el-descriptions-item>
         <el-descriptions-item label="邮箱">{{ shopData.contactEmail }}</el-descriptions-item>
@@ -81,7 +76,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getShopDetail } from '@/api/admin/shop'
 import type { StoreInfo } from '@/api/admin/shop'
-
+import { ElMessage } from 'element-plus'
 const route = useRoute()
 const router = useRouter()
 
@@ -91,12 +86,12 @@ const shopData = ref<StoreInfo>({} as StoreInfo)
 // 获取商铺id
 async function loadShopDetail() {
   const shopId = route.query.id as string
-  
+
   if (!shopId) {
     ElMessage.error('未找到商铺 ID')
     return
   }
-  
+
   try {
     const res = await getShopDetail(shopId)
     shopData.value = res.data
@@ -130,7 +125,6 @@ const goBack = () => {
 </script>
 
 <style scoped lang="scss">
-
 .shop-audit-detail-container {
   padding: 20px;
   background: #faf6f0;

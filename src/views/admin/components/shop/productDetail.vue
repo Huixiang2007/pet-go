@@ -3,7 +3,9 @@
     <!-- 顶部返回 + 标题 -->
     <div class="detail-header-bar">
       <el-button type="default" @click="goBack" round>
-        <el-icon><ArrowLeft /></el-icon>
+        <el-icon>
+          <ArrowLeft />
+        </el-icon>
         返回列表
       </el-button>
       <h2>商品详情</h2>
@@ -14,21 +16,10 @@
       <!-- 商品头部：主图 + 基础信息 -->
       <div class="product-header">
         <div class="product-image-group">
-          <el-image
-            :src="productData.mainImage"
-            class="main-image"
-            preview-teleported
-            fit="cover"
-          />
+          <el-image :src="productData.mainImage" class="main-image" preview-teleported fit="cover" />
           <div class="sub-images" v-if="productData.images">
-            <el-image
-              v-for="(img, idx) in productData.images.split(',')"
-              :key="idx"
-              :src="img"
-              class="sub-image"
-              preview-teleported
-              fit="cover"
-            />
+            <el-image v-for="(img, idx) in productData.images.split(',')" :key="idx" :src="img" class="sub-image"
+              preview-teleported fit="cover" />
           </div>
         </div>
         <div class="product-base-info">
@@ -59,14 +50,9 @@
       </div>
 
       <!-- 商品详细信息 -->
-      <el-descriptions
-        :column="2"
-        border
-        label-style="color:#956b3e; font-weight:500;"
-        content-style="color:#6b5b45;"
-        class="info-desc"
-      >
-       
+      <el-descriptions :column="2" border label-style="color:#956b3e; font-weight:500;" content-style="color:#6b5b45;"
+        class="info-desc">
+
         <el-descriptions-item label="商品编号">{{ productData.productSn }}</el-descriptions-item>
         <el-descriptions-item label="品牌ID">{{ productData.brandId }}</el-descriptions-item>
         <el-descriptions-item label="类别ID">{{ productData.typeId }}</el-descriptions-item>
@@ -95,7 +81,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { ProductInfo } from '@/api/admin/shop'
-
+import { ElMessage } from 'element-plus'
 import { getProductDetail } from '@/api/admin/shop'
 
 // 路由
@@ -103,7 +89,7 @@ const router = useRouter()
 const route = useRoute()
 
 // 商品数据（1:1 对应你给的接口字段）
-const productData = ref<ProductInfo>({} as StoreInfo)
+const productData = ref<ProductInfo>()
 
 // 获取商品详情
 async function loadProductDetail() {
@@ -115,7 +101,7 @@ async function loadProductDetail() {
 
   try {
     const res = await getProductDetail(productId)
-    if (res.data && res.ok) {
+    if (res.data && res.code == 0) {
       productData.value = res.data
       console.log('商品详情', productData.value)
     } else {
@@ -275,7 +261,8 @@ onMounted(() => {
         border-radius: 6px;
       }
 
-      .stock-info, .sales-info {
+      .stock-info,
+      .sales-info {
         color: #6b5b45;
         font-size: 14px;
       }

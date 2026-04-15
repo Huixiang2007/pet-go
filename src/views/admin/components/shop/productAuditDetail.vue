@@ -3,7 +3,9 @@
     <!-- 顶部返回 + 标题 -->
     <div class="detail-header-bar">
       <el-button type="default" @click="goBack" round>
-        <el-icon><ArrowLeft /></el-icon>
+        <el-icon>
+          <ArrowLeft />
+        </el-icon>
         返回列表
       </el-button>
       <h2>商品审批详情</h2>
@@ -11,34 +13,23 @@
 
     <!-- 主体卡片 -->
     <el-card class="main-card" shadow="hover">
-  
-     
+
+
       <!-- 商品头部：主图 + 基础信息 -->
       <div class="product-header">
         <div class="product-image-group">
-          <el-image
-            :src="auditData.mainImage"
-            class="main-image"
-            preview-teleported
-            fit="cover"
-          />
+          <el-image :src="auditData.mainImage" class="main-image" preview-teleported fit="cover" />
           <div class="sub-images" v-if="auditData.images">
-            <el-image
-              v-for="(img, idx) in auditData.images.split(',')"
-              :key="idx"
-              :src="img"
-              class="sub-image"
-              preview-teleported
-              fit="cover"
-            />
+            <el-image v-for="(img, idx) in auditData.images.split(',')" :key="idx" :src="img" class="sub-image"
+              preview-teleported fit="cover" />
           </div>
         </div>
         <div class="product-base-info">
           <h1 class="product-title">{{ auditData.title }}</h1>
-        
-  <div class="tag-group">
-        
-            <el-tag class="product-subtitle">{{ auditData.subTitle || '暂无副标题'}}</el-tag>
+
+          <div class="tag-group">
+
+            <el-tag class="product-subtitle">{{ auditData.subTitle || '暂无副标题' }}</el-tag>
 
 
             <el-tag :type="getAuditStatusTagType(auditData.auditResult)" class="audit-status-tag">
@@ -67,21 +58,16 @@
       </div>
 
       <!-- 商品详细信息 -->
-      <el-descriptions
-        :column="2"
-        border
-        label-style="color:#956b3e; font-weight:500;"
-        content-style="color:#6b5b45;"
-        class="info-desc"
-      >
-        
+      <el-descriptions :column="2" border label-style="color:#956b3e; font-weight:500;" content-style="color:#6b5b45;"
+        class="info-desc">
+
         <el-descriptions-item label="商品编号">{{ auditData.productSn }}</el-descriptions-item>
-       
-        <el-descriptions-item label="父级分类ID">{{ auditData.typeParent || '-'}}</el-descriptions-item>
-        <el-descriptions-item label="子级分类ID">{{ auditData.typeChild || '-'}}</el-descriptions-item>
+
+        <el-descriptions-item label="父级分类ID">{{ auditData.typeParent || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="子级分类ID">{{ auditData.typeChild || '-' }}</el-descriptions-item>
         <el-descriptions-item label="质保信息">{{ auditData.warrantyTip || '无' }}</el-descriptions-item>
         <el-descriptions-item label="审批人ID">{{ auditData.auditorId || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="审批类型">{{ auditData.auditType  }}</el-descriptions-item>
+        <el-descriptions-item label="审批类型">{{ auditData.auditType }}</el-descriptions-item>
         <el-descriptions-item label="审批时间">{{ auditData.auditTime || '-' }}</el-descriptions-item>
         <el-descriptions-item label="视频URL" :span="2">
           <el-link :href="auditData.videoUrl" target="_blank" v-if="auditData.videoUrl">
@@ -97,26 +83,24 @@
       <!-- 审批理由区域（动态控制：待审核可输入，已审核只读） -->
       <div class="audit-reason-section">
         <h3 class="section-title">📝 审批意见</h3>
-        <el-input
-          v-model="auditReason"
-          type="textarea"
-          rows="4"
-          :disabled="auditData.auditResult !== '待审核'"
-          placeholder="请输入审批理由"
-          class="reason-input"
-        />
+        <el-input v-model="auditReason" type="textarea" rows="4" :disabled="auditData.auditResult !== '待审核'"
+          placeholder="请输入审批理由" class="reason-input" />
       </div>
     </el-card>
 
     <div class="audit-btn-group" v-if="auditData.auditResult === '待审核'">
 
       <el-button type="danger" size="default" round @click="handleReject">
-        <el-icon><Close /> </el-icon>
-          &nbsp;驳回申请
+        <el-icon>
+          <Close />
+        </el-icon>
+        &nbsp;驳回申请
       </el-button>
       <el-button type="success" size="default" round @click="handlePass">
-        <el-icon><Check /> </el-icon>
-         &nbsp;审核通过
+        <el-icon>
+          <Check />
+        </el-icon>
+        &nbsp;审核通过
       </el-button>
     </div>
   </div>
@@ -126,7 +110,8 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { ProductAudit } from '@/api/admin/shop'
-import { getProductAuditDetail ,updateProductAudit,addProductAudit } from '@/api/admin/shop' 
+import { getProductAuditDetail, updateProductAudit, addProductAudit } from '@/api/admin/shop'
+import { ElMessage } from 'element-plus'
 
 // 路由
 const router = useRouter()
@@ -147,7 +132,7 @@ async function loadAuditDetail() {
 
   try {
     const res = await getProductAuditDetail(auditId)
-    if (res.data && res.ok) {
+    if (res.data && res.code == 0) {
       auditData.value = res.data
       auditReason.value = res.data.auditReason || ''
     } else {
@@ -165,22 +150,22 @@ const goBack = () => {
 }
 
 // 审核通过
-const handlePass = async() => {
+const handlePass = async () => {
   if (!auditReason.value) {
     ElMessage.warning("请输入审批理由")
     return
   }
-  try{
-    const params={
-      auditContentId: auditData.value.productId,
-      auditRecordId:auditData.value.id,
-      auditResult: '审核通过', 
+  try {
+    const params = {
+      auditContentId: Number(auditData.value.productId),
+      auditRecordId: Number(auditData.value.id),
+      auditResult: '审核通过',
       auditReason: auditReason.value,
     }
     let res
-    if(auditData.value.auditType === '添加审核'){
+    if (auditData.value.auditType === '添加审核') {
       res = await addProductAudit(params)
-    }else{
+    } else {
       res = await updateProductAudit(params)
     }
     if (res.ok) {
@@ -189,10 +174,10 @@ const handlePass = async() => {
     } else {
       ElMessage.error(res.msg || '审核失败')
     }
-  }catch(err){
+  } catch (err) {
     console.error('审核失败', err)
   }
-  
+
 }
 
 // 驳回申请
@@ -204,8 +189,8 @@ const handleReject = async () => {
 
   try {
     const params = {
-      auditContentId: auditData.value.productId,
-      auditRecordId: auditData.value.id,
+      auditContentId: Number(auditData.value.productId),
+      auditRecordId: Number(auditData.value.id),
       auditResult: '审核不通过',
       auditReason: auditReason.value
     }
@@ -361,7 +346,7 @@ onMounted(() => {
     }
 
     .product-subtitle {
-      margin: 0 10px 0 0 ;
+      margin: 0 10px 0 0;
       color: #9e7d66;
       font-size: 12px;
     }
@@ -407,7 +392,8 @@ onMounted(() => {
       align-items: center;
       gap: 16px;
 
-      .stock-info, .weight-info {
+      .stock-info,
+      .weight-info {
         color: #6b5b45;
         font-size: 14px;
       }
@@ -450,9 +436,9 @@ onMounted(() => {
 
 /* 审批按钮组 */
 .audit-btn-group {
-      display: flex;
-    justify-content: space-around;
-    gap: 36px;
-    margin-top: 10px;
+  display: flex;
+  justify-content: space-around;
+  gap: 36px;
+  margin-top: 10px;
 }
 </style>

@@ -52,18 +52,16 @@ export const useUpload = (options: {
     const urls: string[] = []
     for (const file of files) {
       const url = await uploadFile(file)
-      if (url) {
-        urls.push(url)
-        // 记录上传成功的文件
-        fileList.value.push({
-          name: file.name,
-          url,
-          file: file,
-          size: file.size,
-          type: file.type,
-          isImage: file.type.startsWith('image/'),
-        })
-      }
+      urls.push(url)
+      // 记录上传成功的文件
+      fileList.value.push({
+        name: file.name,
+        url,
+        file: file,
+        size: file.size,
+        type: file.type,
+        isImage: file.type.startsWith('image/'),
+      })
     }
     return urls
   }

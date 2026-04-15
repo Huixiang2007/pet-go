@@ -44,8 +44,8 @@
                         </div>
 
                         <router-link :to="`/customer-service?id=${fosterHome.userId}&type=foster`"
-                            class="cute-btn bg-white text-blue-500 border border-blue-300 w-full mt-4">
-                            <i class="el-icon-chat-dot-round mr-1"></i>在线咨询
+                            class="inline-block w-full py-3 px-4 rounded-lg bg-blue-500 text-white font-medium transition-all duration-300 hover:bg-blue-600 hover:shadow-lg flex items-center justify-center">
+                            <i class="el-icon-chat-dot-round mr-2"></i>点击咨询
                         </router-link>
                     </div>
                 </div>

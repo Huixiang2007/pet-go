@@ -44,7 +44,7 @@
                         </div>
 
                         <router-link :to="`/customer-service?id=${fosterHome.userId}&type=foster`"
-                            class="inline-block w-full py-3 px-4 rounded-lg bg-blue-500 text-white font-medium transition-all duration-300 hover:bg-blue-600 hover:shadow-lg flex items-center justify-center">
+                            class="w-full py-3 px-4 rounded-lg bg-blue-500 text-white font-medium transition-all duration-300 hover:bg-blue-600 hover:shadow-lg flex items-center justify-center">
                             <i class="el-icon-chat-dot-round mr-2"></i>点击咨询
                         </router-link>
                     </div>

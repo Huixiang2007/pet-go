@@ -147,18 +147,10 @@ export const confirmOrder = async (orderSn: string): Promise<any> => {
   }
 //查讯退款申请详情
 export const getRefundDetail = async (refundId: string): Promise<any> => {
-  const response = await request('/server/api/shop/order/refund-detail', 'POST', {
-    refundid: refundId  // 修改参数名为refundid
-  })
+  const response = await request('/server/api/shop/order/refund-detail?refundId=' + refundId, 'POST')
   return response
 }
-//退款处理（商户端）
-export const handleRefundMerchant = async (refundId: string): Promise<any> => {
-  const response = await request('/server/api/shop/order/handle-refund-merchant', 'POST', {
-    refundid: refundId  // 修改参数名为refundid
-  })
-  return response
-}
+
 //退款申请列表
 
 export const getRefundList = async (param: any): Promise<any> => {

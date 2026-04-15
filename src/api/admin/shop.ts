@@ -166,20 +166,27 @@ export interface UpdateProductParams {
 }
 
 // 分页返回数据类型（对应接口里的 data 字段）
-export type ShopPageResult = PageResult<StoreInfo>
-export type ShopAuditResult = PageResult<StoreAudit>
-export type ProductPageResult = PageResult<ProductInfo>
-export type ProductAuditResult = PageResult<ProductAudit>
-export type SkuPageResult = PageResult<SkuInfo>
-export type SkuAuditResult = PageResult<SkuAudit>
+// export type ShopPageResult = PageResult<StoreInfo>
+// export type ShopAuditResult = PageResult<StoreAudit>
+// export type ProductPageResult = PageResult<ProductInfo>
+// export type ProductAuditResult = PageResult<ProductAudit>
+// export type SkuPageResult = PageResult<SkuInfo>
+// export type SkuAuditResult = PageResult<SkuAudit>
 
 // 完整接口返回类型
-export type ShopListResponse = ApiResponse<ShopPageResult>
-export type ShopAuditResponse = ApiResponse<ShopAuditResult>
-export type ProductListResponse = ApiResponse<ProductPageResult>
-export type ProductAuditResponse = ApiResponse<ProductAuditResult>
-export type SkuListResponse = ApiResponse<SkuPageResult>
-export type SkuAuditResponse = ApiResponse<SkuAuditResult>
+// export type ShopListResponse = ApiResponse<ShopPageResult>
+// export type ShopAuditResponse = ApiResponse<ShopAuditResult>
+// export type ProductListResponse = ApiResponse<ProductPageResult>
+// export type ProductAuditResponse = ApiResponse<ProductAuditResult>
+// export type SkuListResponse = ApiResponse<SkuPageResult>
+// export type SkuAuditResponse = ApiResponse<SkuAuditResult>
+// 分页接口返回类型（正确写法！）
+export type ShopListResponse = ApiResponse<PageResult<StoreInfo>>
+export type ShopAuditResponse = ApiResponse<PageResult<StoreAudit>>
+export type ProductListResponse = ApiResponse<PageResult<ProductInfo>>
+export type ProductAuditResponse = ApiResponse<PageResult<ProductAudit>>
+export type SkuListResponse = ApiResponse<PageResult<SkuInfo>>
+export type SkuAuditResponse = ApiResponse<PageResult<SkuAudit>>
 //获取所有商铺列表
 export const getShopPageList = (params: PageParams) => {
   return request<ShopListResponse>('/server/api/shop-admin/shop/page-shop-list', 'POST', params)

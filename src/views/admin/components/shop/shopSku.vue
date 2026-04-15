@@ -44,7 +44,7 @@
               class="pagination-wrapper"
               v-model:current-page="pageParams.pageNum"
               v-model:page-size="pageParams.pageSize"
-              :total="total"
+              :total="totalNum"
               :page-sizes="[10, 20, 30, 50]"
               layout="total, sizes, prev, pager, next, jumper"
               @size-change="handleSizeChange"
@@ -132,7 +132,7 @@ const pageParams = ref<PageParams>({
 })
 
 // 总条数
-const total = ref(0)
+const totalNum = ref(0)
 const updateList = ref([])
 
 const auditPageParams = ref<PageParams>({
@@ -144,8 +144,9 @@ const auditTotal = ref(0)
 async function loadSkuList() {
   try {
     const res = await getSkuList(pageParams.value)
-    addList.value = res.data.list || []
-    total.value = res.data.total || 0
+    const { list, total } = res.data as any; 
+    addList.value = list || []
+    totalNum.value = total || 0
   } catch (err) {
     console.error('获取商铺列表失败', err)
   }
@@ -154,8 +155,9 @@ async function loadSkuList() {
 async function auditSkuList() {
   try {
     const res = await getSkuAuditList(pageParams.value)
-    updateList.value = res.data.list
-    auditTotal.value = res.data.total
+    const { list, total } = res.data as any; 
+    updateList.value = list
+    auditTotal.value = total
   } catch (error) {
     console.log(error)
   }

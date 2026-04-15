@@ -103,6 +103,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import type {SkuAudit} from '@/api/admin/shop'
 import { getSkuAuditDetail,addSkuAudit,updateSkuAudit } from '@/api/admin/shop'
 const router = useRouter()
@@ -117,13 +118,15 @@ const auditReason = ref("")
 async function loadDetail() {
   const id = route.query.id as string
 
-  // const res = await getSkuAuditDetail(id)
-  // auditData.value = res.data
+
     try {
     const res = await getSkuAuditDetail(id)
-    if (res.data && res.ok) {
-      auditData.value = res.data
-      auditReason.value = res.data.auditReason || ''
+    const data = res.data as any; 
+
+
+    if (data) {
+      auditData.value = data
+      auditReason.value = data.auditReason || ''
     } else {
       ElMessage.error(res.msg || '获取sku审批详情失败')
     }
@@ -146,8 +149,8 @@ const handleReject = async() => {
   }
   try {
     const params = {
-      auditContentId: auditData.value.skuId,
-      auditRecordId: auditData.value.id,
+      auditContentId: +auditData.value.skuId,
+      auditRecordId: +auditData.value.id,
       auditResult: '审核不通过',
       auditReason: auditReason.value
     }
@@ -182,8 +185,8 @@ const handlePass = async() => {
   }
   try{
     const params={
-      auditContentId: auditData.value.skuId,
-      auditRecordId:auditData.value.id,
+      auditContentId: +auditData.value.skuId,
+      auditRecordId:+auditData.value.id,
       auditResult: '审核通过', 
       auditReason: auditReason.value,
     }

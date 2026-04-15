@@ -22,7 +22,8 @@ const emit = defineEmits<{ (e: 'click'): void }>()
 const hasDragged = ref(false)
 const handleClick = () => {
     console.log(isDragging.value, hasDragged.value, props.preventClickOnDrag)
-    if (hasDragged.value || !props.preventClickOnDrag) {
+    // 只有在没有拖拽过的情况下才触发点击事件
+    if (!hasDragged.value) {
         emit('click')
     }
 }
@@ -40,7 +41,7 @@ const initPosition = () => {
 const handleDragStart = (e) => {
     console.log("开始拖拽")
     isDragging.value = true;
-    hasDragged.value = false;
+
     dragOffset.value = {
         x: e.offsetX,
         y: e.offsetY,
@@ -64,9 +65,10 @@ const handleDrag = (e) => {
 //拖拽结束
 const handleDragEnd = () => {
     isDragging.value = false;
-
-
-
+    // 延迟重置 hasDragged，确保 click 事件能够正确判断
+    setTimeout(() => {
+        hasDragged.value = false;
+    }, 0);
 }
 onMounted(() => {
     initPosition()

@@ -3,7 +3,9 @@
     <!-- 顶部返回 + 标题 -->
     <div class="detail-header-bar">
       <el-button type="default" @click="goBack" round>
-        <el-icon><ArrowLeft /></el-icon>
+        <el-icon>
+          <ArrowLeft />
+        </el-icon>
         返回列表
       </el-button>
       <h2>商品详情</h2>
@@ -14,77 +16,61 @@
       <!-- 商品头部：主图 + 基础信息 -->
       <div class="product-header">
         <div class="product-image-group">
-          <el-image
-            :src="productData.mainImage"
-            class="main-image"
-            preview-teleported
-            fit="cover"
-          />
-          <div class="sub-images" v-if="productData.images">
-            <el-image
-              v-for="(img, idx) in productData.images.split(',')"
-              :key="idx"
-              :src="img"
-              class="sub-image"
-              preview-teleported
-              fit="cover"
-            />
+          <el-image :src="productData?.mainImage" class="main-image" preview-teleported fit="cover" />
+          <div class="sub-images" v-if="productData?.images">
+            <el-image v-for="(img, idx) in productData?.images.split(',')" :key="idx" :src="img" class="sub-image"
+              preview-teleported fit="cover" />
           </div>
         </div>
         <div class="product-base-info">
-          <h1 class="product-title">{{ productData.title }}</h1>
-          <p class="product-subtitle">{{ productData.subTitle || '暂无副标题' }}</p>
+          <h1 class="product-title">{{ productData?.title }}</h1>
+          <p class="product-subtitle">{{ productData?.subTitle || '暂无副标题' }}</p>
           <div class="price-group">
             <div class="price-item">
               <span class="price-label">销售价</span>
-              <span class="price-value">¥{{ productData.currentPrice }}</span>
+              <span class="price-value">¥{{ productData?.currentPrice }}</span>
             </div>
             <div class="price-item">
               <span class="price-label">市场价</span>
-              <span class="price-value market">¥{{ productData.marketPrice }}</span>
+              <span class="price-value market">¥{{ productData?.marketPrice }}</span>
             </div>
             <div class="price-item">
               <span class="price-label">成本价</span>
-              <span class="price-value cost">¥{{ productData.costPrice }}</span>
+              <span class="price-value cost">¥{{ productData?.costPrice }}</span>
             </div>
           </div>
           <div class="status-group">
-            <el-tag :type="getStatusTagType(productData.status)" class="status-tag">
-              {{ productData.status }}
+            <el-tag :type="getStatusTagType(productData?.status)" class="status-tag">
+              {{ productData?.status }}
             </el-tag>
-            <span class="stock-info">库存：{{ productData.stock }} 件</span>
-            <span class="sales-info">销量：{{ productData.sales }} 件</span>
+            <span class="stock-info">库存：{{ productData?.stock }} 件</span>
+            <span class="sales-info">销量：{{ productData?.sales }} 件</span>
           </div>
         </div>
       </div>
 
       <!-- 商品详细信息 -->
-      <el-descriptions
-        :column="2"
-        border
-        label-style="color:#956b3e; font-weight:500;"
-        content-style="color:#6b5b45;"
-        class="info-desc"
-      >
-       
-        <el-descriptions-item label="商品编号">{{ productData.productSn }}</el-descriptions-item>
-        <el-descriptions-item label="品牌ID">{{ productData.brandId }}</el-descriptions-item>
-        <el-descriptions-item label="类别ID">{{ productData.typeId }}</el-descriptions-item>
-        <el-descriptions-item label="商品重量">{{ productData.productWeight }}g</el-descriptions-item>
-        <el-descriptions-item label="商品评分">{{ productData.productScore }} 分</el-descriptions-item>
-        <el-descriptions-item label="累计评价">{{ productData.reviewCount }} 条</el-descriptions-item>
-        <el-descriptions-item label="质保提示">{{ productData.warrantyTip || '无' }}</el-descriptions-item>
-        <el-descriptions-item label="上架时间">{{ productData.publishTime || '-' }}</el-descriptions-item>
-        <el-descriptions-item label="创建时间">{{ productData.createTime }}</el-descriptions-item>
-        <el-descriptions-item label="更新时间">{{ productData.updateTime }}</el-descriptions-item>
+      <el-descriptions :column="2" border label-style="color:#956b3e; font-weight:500;" content-style="color:#6b5b45;"
+        class="info-desc">
+
+        <el-descriptions-item label="商品编号">{{ productData?.productSn }}</el-descriptions-item>
+        <el-descriptions-item label="品牌ID">{{ productData?.brandId }}</el-descriptions-item>
+        <el-descriptions-item label="类别ID">{{ productData?.typeId }}</el-descriptions-item>
+        <el-descriptions-item label="商品重量">{{ productData?.productWeight|| '-- ' }}g</el-descriptions-item>
+        <el-descriptions-item label="商品评分">{{ productData?.productScore }} 分</el-descriptions-item>
+        <el-descriptions-item label="累计评价">{{ productData?.reviewCount }} 条</el-descriptions-item>
+        <el-descriptions-item label="质保提示">{{ productData?.warrantyTip || '无' }}</el-descriptions-item>
+        <el-descriptions-item label="上架时间">{{ productData?.publishTime || '--' }}</el-descriptions-item>
+        <el-descriptions-item label="创建时间">{{ productData?.createTime }}</el-descriptions-item>
+        <el-descriptions-item label="更新时间">{{ productData?.updateTime }}</el-descriptions-item>
         <el-descriptions-item label="视频URL" :span="2">
-          <el-link :href="productData.videoUrl" target="_blank" v-if="productData.videoUrl">
-            {{ productData.videoUrl }}
+          <el-link :href="productData?.videoUrl" target="_blank" v-if="productData?.videoUrl">
+            {{ productData?.videoUrl }}
           </el-link>
           <span v-else>无视频</span>
         </el-descriptions-item>
         <el-descriptions-item label="商品详情" :span="2">
-          <div class="detail-content">{{ productData.detail || '暂无详情' }}</div>
+          <div class="detail-content">{{ productData?.detail || '暂无详情' }}</div>
         </el-descriptions-item>
       </el-descriptions>
     </el-card>
@@ -95,7 +81,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { ProductInfo } from '@/api/admin/shop'
-
+import { ElMessage } from 'element-plus'
 import { getProductDetail } from '@/api/admin/shop'
 
 // 路由
@@ -103,7 +89,7 @@ const router = useRouter()
 const route = useRoute()
 
 // 商品数据（1:1 对应你给的接口字段）
-const productData = ref<ProductInfo>({} as StoreInfo)
+const productData = ref<ProductInfo>()
 
 // 获取商品详情
 async function loadProductDetail() {
@@ -115,7 +101,7 @@ async function loadProductDetail() {
 
   try {
     const res = await getProductDetail(productId)
-    if (res.data && res.ok) {
+    if (res.data && res.code == 0) {
       productData.value = res.data
       console.log('商品详情', productData.value)
     } else {
@@ -275,7 +261,8 @@ onMounted(() => {
         border-radius: 6px;
       }
 
-      .stock-info, .sales-info {
+      .stock-info,
+      .sales-info {
         color: #6b5b45;
         font-size: 14px;
       }

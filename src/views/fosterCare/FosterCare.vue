@@ -453,7 +453,21 @@ const initMap = () => {
 
         // 初始化地理编码器
         // geocoder = new AMap.Geocoder({ city: "全国" });
-
+        // const infoWindow = new AMap.InfoWindow({
+        //     //创建信息窗体
+        //     isCustom: true, //使用自定义窗体
+        //     content: "<div>HELLO,AMAP!</div>", //信息窗体的内容可以是任意html片段
+        //     offset: new AMap.Pixel(16, -45),
+        // });
+        // const onMarkerClick = function (e) {
+        //     infoWindow.open(map, e.target.getPosition()); //打开信息窗体
+        //     //e.target就是被点击的Marker
+        // };
+        // const marker = new AMap.Marker({
+        //     position: [116.481181, 39.989792],
+        // });
+        // map.add(marker);
+        // marker.on("click", onMarkerClick); //绑定click事件
         // 地图加载完成后，直接定位到用户当前位置
         locateUserPosition();
 

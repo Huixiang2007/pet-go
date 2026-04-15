@@ -41,8 +41,6 @@ export const useBookingFormStore = defineStore('bookingForm', () => {
     bookingForm.additionalServiceId = []
     bookingForm.specialRequirements = ''
     bookingForm.emergencyPhone = ''
-    bookingForm.pictureUrlList = []
-    bookingForm.vaccineUrls = []
   }
 
   // 更新附加服务

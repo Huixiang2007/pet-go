@@ -2,7 +2,9 @@
   <div class="notice-publish-container">
     <!-- 页面头部 -->
     <div class="page-header">
-      <el-icon class="header-icon"><Bell /></el-icon>
+      <el-icon class="header-icon">
+        <Bell />
+      </el-icon>
       <h2>系统管理 - 通知发布</h2>
     </div>
 
@@ -12,34 +14,23 @@
         <!-- 发布新通知标签页 -->
         <el-tab-pane label="发布新通知" name="publish">
           <div class="tab-content">
-            <el-form
-              :model="noticeForm"
-              label-width="100px"
-              class="notice-form"
-            >
+            <el-form :model="noticeForm" label-width="100px" class="notice-form">
               <!-- 通知基本信息 -->
               <div class="form-section">
                 <h3 class="section-title">
-                  <el-icon class="section-icon"><EditPen /></el-icon> 通知基本信息
+                  <el-icon class="section-icon">
+                    <EditPen />
+                  </el-icon> 通知基本信息
                 </h3>
               </div>
 
               <el-form-item label="通知标题" prop="title">
-                <el-input
-                  v-model="noticeForm.title"
-                  placeholder="输入通知标题（如：国庆寄养活动延期通知）"
-                  maxlength="30"
-                  show-word-limit
-                  class="form-input"
-                />
+                <el-input v-model="noticeForm.title" placeholder="输入通知标题（如：国庆寄养活动延期通知）" maxlength="30" show-word-limit
+                  class="form-input" />
               </el-form-item>
 
               <el-form-item label="通知类型" prop="type">
-                <el-select
-                  v-model="noticeForm.type"
-                  placeholder="选择通知类型"
-                  class="form-select"
-                >
+                <el-select v-model="noticeForm.type" placeholder="选择通知类型" class="form-select">
                   <el-option label="系统通知" value="系统通知" />
                   <el-option label="活动通知" value="活动通知" />
                   <el-option label="个人通知" value="个人通知" />
@@ -47,7 +38,7 @@
                 </el-select>
               </el-form-item>
 
-               <!-- 发布范围：全体 / 个人 -->
+              <!-- 发布范围：全体 / 个人 -->
               <el-form-item label="发布范围" prop="range">
                 <el-radio-group v-model="noticeForm.range" class="range-group">
                   <el-radio label="全体用户" border class="range-radio" />
@@ -55,15 +46,10 @@
                 </el-radio-group>
 
                 <!-- 选择个人时显示用户ID输入框 -->
-                <el-input
-                  v-if="noticeForm.range === '个人用户'"
-                  v-model="noticeForm.userId"
-                  placeholder="请输入接收用户ID（数字）"
-                  style="width: 200px; margin-left: 10px; position: absolute; left:253px;"
-                  type="number"
-                />
+                <el-input v-if="noticeForm.range === '个人用户'" v-model="noticeForm.userId" placeholder="请输入接收用户ID（数字）"
+                  style="width: 200px; margin-left: 10px; position: absolute; left:253px;" type="number" />
               </el-form-item>
-<!-- 
+              <!-- 
               <el-form-item label="发布时间" prop="publishTime">
                 <el-radio-group v-model="noticeForm.timeType" class="time-group">
                   <el-radio label="立即发布" border class="time-radio" />
@@ -81,18 +67,15 @@
               <!-- 通知内容编辑 -->
               <div class="form-section">
                 <h3 class="section-title">
-                  <el-icon class="section-icon"><Document /></el-icon> 通知内容编辑
+                  <el-icon class="section-icon">
+                    <Document />
+                  </el-icon> 通知内容编辑
                 </h3>
               </div>
 
               <el-form-item label="通知内容" prop="content">
-                <el-input
-                  v-model="noticeForm.content"
-                  type="textarea"
-                  :rows="8"
-                  placeholder="输入通知详细内容（支持换行，可填写活动规则/系统变更/温馨提示等）"
-                  class="form-textarea"
-                />
+                <el-input v-model="noticeForm.content" type="textarea" :rows="8"
+                  placeholder="输入通知详细内容（支持换行，可填写活动规则/系统变更/温馨提示等）" class="form-textarea" />
               </el-form-item>
 
               <!-- <el-form-item label="弹窗提醒">
@@ -109,16 +92,15 @@
               <!-- 通知预览 -->
               <div class="form-section">
                 <h3 class="section-title">
-                  <el-icon class="section-icon"><View /></el-icon> 通知预览
+                  <el-icon class="section-icon">
+                    <View />
+                  </el-icon> 通知预览
                 </h3>
               </div>
 
               <el-card class="preview-card" shadow="hover">
                 <div class="preview-header">
-                  <el-tag
-                    :type="getTagType()"
-                    class="preview-tag"
-                  >
+                  <el-tag :type="getTagType()" class="preview-tag">
                     {{ noticeForm.type || '【请选择通知类型】' }}
                   </el-tag>
                   <h4 class="preview-title">{{ noticeForm.title || '【请输入通知标题】' }}</h4>
@@ -139,10 +121,14 @@
               <!-- 提交按钮组 -->
               <el-form-item class="form-btn-group">
                 <el-button type="primary" class="publish-btn" @click="handlePublish">
-                  <el-icon><UploadFilled /></el-icon> 确认发布
+                  <el-icon>
+                    <UploadFilled />
+                  </el-icon> 确认发布
                 </el-button>
                 <el-button type="default" class="save-btn" @click="resetForm">
-                  <el-icon><Refresh /></el-icon> 重置表单
+                  <el-icon>
+                    <Refresh />
+                  </el-icon> 重置表单
                 </el-button>
               </el-form-item>
             </el-form>
@@ -152,13 +138,8 @@
     </el-card>
 
     <!-- 发布确认弹窗 -->
-    <el-dialog
-      v-model="publishDialogVisible"
-      title="确认发布通知"
-      width="500px"
-      class="publish-dialog"
-      :close-on-click-modal="false"
-    >
+    <el-dialog v-model="publishDialogVisible" title="确认发布通知" width="500px" class="publish-dialog"
+      :close-on-click-modal="false">
       <div class="dialog-content">
         <p class="dialog-tip">你即将发布以下通知，确认发布后将推送至对应用户群体：</p>
         <div class="dialog-preview">
@@ -180,7 +161,7 @@
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Bell, EditPen, Document, View, UploadFilled, Refresh } from '@element-plus/icons-vue'
-import { NewsInfo } from '@/api/admin/news'
+import type { NewsInfo } from '@/api/admin/news'
 import { sendBroadcastMessage, sendPrivateMessage } from '@/api/admin/news'
 
 // 标签页状态
@@ -194,7 +175,8 @@ const noticeForm = reactive({
   timeType: '立即发布',
   publishTime: '' as Date | string,
   content: '',
-  isPopup: false
+  isPopup: false,
+  userId: 0
 })
 
 // 发布确认弹窗
@@ -242,26 +224,26 @@ const confirmPublish = async () => {
       attachment: '',
       dataId: ''
     }
-if (noticeForm.range === '个人用户') {
-   params.receiverId = Number(noticeForm.userId)
-  const res= await sendPrivateMessage(params)
-   if(res.code === 0){
-    ElMessage.success('公告发布成功，已推送给个人用户！')
-    publishDialogVisible.value = false
-    resetForm()
-   }
-     
+    if (noticeForm.range === '个人用户') {
+      params.receiverId = Number(noticeForm.userId)
+      const res = await sendPrivateMessage(params)
+      if (res.code === 0) {
+        ElMessage.success('公告发布成功，已推送给个人用户！')
+        publishDialogVisible.value = false
+        resetForm()
+      }
+
     }
- 
- else{
-   const res=await sendBroadcastMessage(params)
-    if(res.code === 0){
-      ElMessage.success('公告发布成功，已推送给全体用户！')
-      publishDialogVisible.value = false
-      resetForm()
+
+    else {
+      const res = await sendBroadcastMessage(params)
+      if (res.code === 0) {
+        ElMessage.success('公告发布成功，已推送给全体用户！')
+        publishDialogVisible.value = false
+        resetForm()
+      }
+
     }
-    
- }
   } catch (err) {
     ElMessage.error('发布失败：' + err)
   }
@@ -344,12 +326,14 @@ const resetForm = () => {
 
 // 发布表单样式
 .notice-form {
+
   .form-input,
   .form-select,
   .form-textarea,
   .time-picker {
     border-radius: 8px;
     border-color: #e8d6c4;
+
     &:focus-within {
       border-color: #e8a87c;
       box-shadow: 0 0 0 2px rgba(232, 168, 124, 0.1);
@@ -357,13 +341,15 @@ const resetForm = () => {
   }
 
   // 单选组样式
-  .range-group, .time-group {
+  .range-group,
+  .time-group {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     width: 100%;
 
-    .range-radio, .time-radio {
+    .range-radio,
+    .time-radio {
       border-radius: 8px;
       border-color: #e8d6c4;
       background-color: #fff9f2;
@@ -432,7 +418,8 @@ const resetForm = () => {
       padding: 8px 20px;
     }
 
-    .save-btn, .reset-btn {
+    .save-btn,
+    .reset-btn {
       border-radius: 8px;
       border-color: #e8d6c4;
       color: #6b5b45;
@@ -462,7 +449,9 @@ const resetForm = () => {
         color: #3e2723;
       }
 
-      .dialog-type, .dialog-range, .dialog-time {
+      .dialog-type,
+      .dialog-range,
+      .dialog-time {
         font-size: 14px;
         color: #6b5b45;
         margin: 5px 0;
@@ -483,7 +472,8 @@ const resetForm = () => {
     padding: 10px;
   }
 
-  .range-group, .time-group {
+  .range-group,
+  .time-group {
     flex-direction: column;
   }
 

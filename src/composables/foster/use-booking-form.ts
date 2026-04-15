@@ -1,18 +1,19 @@
 import { ref, computed, onMounted } from 'vue'
 import { getMyPets } from '@/api/foster-care'
 import { useBookingFormStore } from '@/stores/booking'
+import type { MyPets } from '@/types/pet'
 export const useBookingForm = () => {
   const userId = localStorage.getItem('userId')
   const bookingFormStore = useBookingFormStore()
   const bookingForm = bookingFormStore.bookingForm
   //   bookingFormStore.resetBookingForm(serviceId)
   //宠物数据
-  const myPets = ref([])
+  const myPets = ref<Array<{ id: number; name: string; type: string }>>([])
   const getPets = async () => {
     const res = await getMyPets(Number(userId))
     console.log('获取宠物数据成功', res)
     if (res.code === 0) {
-      myPets.value = res.data.map((pet) => ({
+      myPets.value = res.data.map((pet: any) => ({
         id: pet.id,
         name: pet.name,
         type: pet.type,

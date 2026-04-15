@@ -45,7 +45,7 @@
               class="pagination-wrapper"
               v-model:current-page="pageParams.pageNum"
               v-model:page-size="pageParams.pageSize"
-              :total="total"
+              :total="totalNum"
               :page-sizes="[10, 20, 30, 50]"
               layout="total, sizes, prev, pager, next, jumper"
               @size-change="handleSizeChange"
@@ -81,7 +81,7 @@
                 <el-button size="small" type="primary" @click="goToUpdateDetail(scope.row.id)"
                   >查看</el-button
                 >
-                <el-button
+                <!-- <el-button
                   v-if="scope.row.auditStatus === 'pending'"
                   size="small"
                   type="success"
@@ -96,7 +96,7 @@
                   @click="handleAudit(scope.row.applyId, 'reject')"
                 >
                   驳回
-                </el-button>
+                </el-button> -->
               </template>
             </el-table-column>
           </el-table>
@@ -120,6 +120,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getShopPageList, getShopAuditList } from '@/api/admin/shop'
+import {  ElMessage } from 'element-plus'
 import { useRouter } from 'vue-router'
 import type { PageParams } from '@/api/admin'
 const activeTab = ref('add')
@@ -143,7 +144,7 @@ const pageParams = ref<PageParams>({
 })
 
 // 总条数
-const total = ref(0)
+const totalNum = ref(0)
 
 // 更新商铺审核相关数据
 const updateList = ref([])
@@ -157,8 +158,10 @@ const auditTotal = ref(0)
 async function loadShopList() {
   try {
     const res = await getShopPageList(pageParams.value)
-    addList.value = res.data.list || []
-    total.value = res.data.total || 0
+    const { list, total } = res.data as any; 
+    
+    addList.value = list || []
+    totalNum.value = total || 0
   } catch (err) {
     console.error('获取商铺列表失败', err)
   }
@@ -168,8 +171,9 @@ async function loadShopList() {
 async function loadAuditList() {
   try {
     const res = await getShopAuditList(auditPageParams.value)
-    updateList.value = res.data.list || []
-    auditTotal.value = res.data.total || 0
+    const { list, total } = res.data as any;
+    updateList.value = list || []
+    auditTotal.value = total || 0
 
     // 处理状态文本映射
     updateList.value.forEach((item: any) => {

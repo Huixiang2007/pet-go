@@ -25,7 +25,7 @@
         <DraggableContainer v-else-if="!isFullscreen" @click.stop :initialPosition="dialogPosition"
             :preventClickOnDrag="false" :container-style="{ width: '600px', height: '720px' }" class="chat-dialog">
             <!-- 小屏对话框 -->
-            <div>
+            <div class="small-chat-wrapper">
                 <!-- 对话框头部 -->
                 <div class="chat-header">
                     <div class="chat-header-left">
@@ -60,7 +60,7 @@
                 </div>
 
                 <!-- 聊天内容区 -->
-                <div class="chat-content">
+                <div class="chat-content" ref="chatContent">
                     <!-- AI 欢迎消息 -->
                     <div class="message-list" ref="messageList">
                         <div v-for="message in Messages" :key="message.id" class="message"
@@ -70,29 +70,30 @@
                             </div>
                         </div>
                     </div>
-
-
-
                 </div>
 
-                <!-- 常见问题快捷按钮 -->
-                <div class="quick-questions">
-                    <button class="quick-question-btn" @click="sendQuickQuestion('寄养价格')">寄养价格</button>
-                    <button class="quick-question-btn" @click="sendQuickQuestion('宠物饮食要求')">宠物饮食要求</button>
-                    <button class="quick-question-btn" @click="sendQuickQuestion('退订规则')">退订规则</button>
-                    <button class="quick-question-btn" @click="sendQuickQuestion('寄养环境')">寄养环境</button>
-                    <button class="quick-question-btn" @click="sendQuickQuestion('宠物安全')">宠物安全</button>
-                </div>
+                <!-- 底部固定区域 -->
+                <div class="chat-bottom-area">
+                    <!-- 常见问题快捷按钮 -->
+                    <div class="quick-questions">
+                        <button class="quick-question-btn" @click="sendQuickQuestion('项目的简单介绍')">项目的简单介绍</button>
+                        <button class="quick-question-btn" @click="sendQuickQuestion('寄样预定流程')">寄样预定流程</button>
+                        <button class="quick-question-btn" @click="sendQuickQuestion('宠物寄样注意事项')">宠物寄样注意事项</button>
+                        <button class="quick-question-btn"
+                            @click="sendQuickQuestion('PetGo宠物信息管理')">PetGo宠物信息管理</button>
+                    </div>
 
-                <!-- 输入区域 -->
-                <div class="chat-input-area">
-                    <input type="text" class="chat-input" placeholder="输入你的问题..." v-model="messageInput"
-                        @keyup.enter="sendMessage" />
-                    <button class="send-button" @click="sendMessage" :disabled="!messageInput.trim()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
-                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                        </svg>
-                    </button>
+                    <!-- 输入区域 -->
+                    <div class="chat-input-area">
+                        <input type="text" class="chat-input" placeholder="输入你的问题..." v-model="messageInput"
+                            @keyup.enter="sendMessage" />
+                        <button class="send-button" @click="sendMessage" :disabled="!messageInput.trim()">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                class="w-5 h-5">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -248,34 +249,28 @@
                                 </template>
                             </div>
                         </div>
-
-
-
-                        <!-- 模拟正在输入状态 -->
-
                     </div>
 
                     <!-- 快捷问题区 -->
                     <div class="fullscreen-quick-questions">
                         <p class="quick-title">你可以问我：</p>
                         <div class="quick-buttons">
-                            <button class="quick-btn" @click="sendQuickQuestion('寄养价格是多少？')">
-                                <span class="btn-icon">💰</span>
+                            <button class="quick-btn" @click="sendQuickQuestion('项目的简单介绍')">
+                                <span class="btn-icon">�</span>
                                 <span>项目的简单介绍</span>
                             </button>
-                            <button class="quick-btn" @click="sendQuickQuestion('宠物饮食有什么要求？')">
-                                <span class="btn-icon">🍖</span>
-                                <span>宠物寄养注意事项</span>
-                            </button>
-                            <button class="quick-btn" @click="sendQuickQuestion('退订规则是什么？')">
-                                <span class="btn-icon">📝</span>
-                                <span>PetGo宠物信息管理</span>
-                            </button>
-                            <button class="quick-btn" @click="sendQuickQuestion('寄养环境怎么样？')">
-                                <span class="btn-icon">🏠</span>
+                            <button class="quick-btn" @click="sendQuickQuestion('寄样预定流程')">
+                                <span class="btn-icon">📅</span>
                                 <span>寄样预定流程</span>
                             </button>
-
+                            <button class="quick-btn" @click="sendQuickQuestion('宠物寄样注意事项')">
+                                <span class="btn-icon">⚠️</span>
+                                <span>宠物寄样注意事项</span>
+                            </button>
+                            <button class="quick-btn" @click="sendQuickQuestion('PetGo宠物信息管理')">
+                                <span class="btn-icon">🐾</span>
+                                <span>PetGo宠物信息管理</span>
+                            </button>
                         </div>
                     </div>
 
@@ -308,7 +303,6 @@ import { getAiChat } from '@/api/ai/ai'
 const isOpen = ref(false)
 const isFullscreen = ref(false)
 const showTooltip = ref(false)
-const messageInput = ref('')
 const isSidebarOpen = ref(true)
 interface Message {
     id: string
@@ -316,9 +310,7 @@ interface Message {
     sender: string
     isTyping: boolean
 }
-const Messages = ref<Message[]>([])
-const messageList = ref<HTMLElement | null>(null)
-// const chatContainer = ref<HTMLElement | null>(null)
+
 // 拖动功能
 const buttonPosition = ref({
     x: window.innerWidth - 90,
@@ -344,33 +336,41 @@ onMounted(() => {
     console.log(window.innerWidth)
     initPosition()
 })
-// 打开聊天
-const openChat = () => {
-    isOpen.value = true
+const Messages = ref<Message[]>([])
+const messageList = ref<HTMLElement | null>(null)
+const chatContent = ref<HTMLElement | null>(null)
+const messageInput = ref('')
+//当前会话的id
+const currentMemoryId = ref('')
+//生成uuid
+const generateUUID = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
 
+    });
 }
-
-// 关闭聊天
-const closeChat = () => {
-    isOpen.value = false
-    isFullscreen.value = false
-    isSidebarOpen.value = true
-}
-
-// 切换全屏
-const toggleFullscreen = () => {
-    isFullscreen.value = !isFullscreen.value
-}
-
-// 切换侧边栏 
-const toggleSidebar = () => {
-    isSidebarOpen.value = !isSidebarOpen.value
-}
-
 // 创建新对话
 const createNewChat = () => {
-    console.log('创建新对话')
+    const newMemoryId = generateUUID();
+    currentMemoryId.value = newMemoryId;
+    Messages.value = [];
+    // console.log('创建新对话')
+    //添加欢迎消息
+    addWelcomeMessage();
     // 这里可以添加创建新对话的逻辑
+}
+// 添加欢迎消息
+const addWelcomeMessage = () => {
+    const welcomeMessage = {
+        id: generateUUID(),
+        content: '你好！我是PetGo AI寄养顾问，有什么可以帮助你的吗？',
+        sender: 'ai',
+        isTyping: false
+    };
+    Messages.value.push(welcomeMessage);
+
 }
 
 // 发送消息
@@ -383,7 +383,7 @@ const sendMessage = async () => {
 
         // 添加用户消息
         const userMessage: Message = {
-            id: Date.now().toString(),
+            id: generateUUID(),
             content: userInput,
             sender: 'user',
             isTyping: false
@@ -394,7 +394,7 @@ const sendMessage = async () => {
         messageInput.value = ''
 
         // 添加 AI 消息占位
-        const aiMessageId = Date.now().toString();
+        const aiMessageId = generateUUID();
         const aiMessage = ref({
             id: aiMessageId,
             content: '',
@@ -402,18 +402,13 @@ const sendMessage = async () => {
             isTyping: true
         })
         Messages.value.push(aiMessage.value);
-        // 标记 AI 正在输入
-        aiMessage.value.isTyping = true
 
         // 滚动到底部
         scrollToBottom()
 
-        const memoryId = Date.now().toString()
-
-
         try {
             console.log('开始请求 AI 聊天接口...')
-            const res = await getAiChat(memoryId, userInput)
+            const res = await getAiChat(currentMemoryId.value, userInput)
             console.log('API 响应:', res)
             console.log('响应数据类型:', typeof res.body)
 
@@ -470,16 +465,49 @@ const sendMessage = async () => {
         }
     }
 }
+// 打开聊天
+const openChat = () => {
+    isOpen.value = true
+
+}
+
+// 关闭聊天
+const closeChat = () => {
+    isOpen.value = false
+    isFullscreen.value = false
+    isSidebarOpen.value = true
+}
+
+// 切换全屏
+const toggleFullscreen = () => {
+    isFullscreen.value = !isFullscreen.value
+}
+
+// 切换侧边栏 
+const toggleSidebar = () => {
+    isSidebarOpen.value = !isSidebarOpen.value
+}
+
 
 // 滚动到底部
 const scrollToBottom = async () => {
     await nextTick()
-    if (messageList.value) {
-        messageList.value.scrollTop = messageList.value.scrollHeight
+    // 小屏模式：滚动 chatContent
+    if (chatContent.value) {
+        chatContent.value.scrollTop = chatContent.value.scrollHeight
+    }
+    // 全屏模式：滚动 messageList（全屏模式下 messageList 是可滚动的）
+    if (messageList.value && isFullscreen.value) {
+        const fullscreenContent = messageList.value.closest('.fullscreen-chat-content')
+        if (fullscreenContent) {
+            fullscreenContent.scrollTop = fullscreenContent.scrollHeight
+        }
     }
 }
 
-
+onMounted(() => {
+    createNewChat();
+});
 
 // 发送快捷问题
 const sendQuickQuestion = (question: string) => {
@@ -589,6 +617,21 @@ const sendQuickQuestion = (question: string) => {
         bottom: 20px;
         right: 5vw;
     }
+
+    /* 小屏对话框包装器 */
+    .small-chat-wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        width: 100%;
+    }
+
+    /* 底部固定区域 */
+    .chat-bottom-area {
+        flex-shrink: 0;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+    }
 }
 
 /* 对话框头部 */
@@ -657,16 +700,22 @@ const sendQuickQuestion = (question: string) => {
 /* 聊天内容区 */
 .chat-content {
     flex: 1;
-    padding: 20px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 16px;
     background: #f8fafc;
+    min-height: 0;
+
+    .message-list {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
 
     .message {
         max-width: 85%;
-        margin-bottom: 43px;
+        margin-bottom: 16px;
 
         &.ai-message {
             align-self: flex-start;
@@ -680,6 +729,7 @@ const sendQuickQuestion = (question: string) => {
 
         &.user-message {
             align-self: flex-end;
+            max-width: 100%;
 
             .message-bubble {
                 background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
@@ -724,19 +774,19 @@ const sendQuickQuestion = (question: string) => {
 
 /* 常见问题快捷按钮 */
 .quick-questions {
-    padding: 16px 20px;
+    padding: 12px 20px;
     background: white;
-    border-top: 1px solid #e2e8f0;
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
+    border-bottom: 1px solid #e2e8f0;
 
     .quick-question-btn {
         background: #f1f5f9;
         border: 1px solid #e2e8f0;
         border-radius: 20px;
-        padding: 8px 16px;
-        font-size: 13px;
+        padding: 6px 14px;
+        font-size: 12px;
         color: #475569;
         cursor: pointer;
         transition: all 0.2s ease;
@@ -754,9 +804,8 @@ const sendQuickQuestion = (question: string) => {
 .chat-input-area {
     display: flex;
     gap: 12px;
-    padding: 16px 20px;
+    padding: 12px 20px;
     background: white;
-    border-top: 1px solid #e2e8f0;
 
     .chat-input {
         flex: 1;
@@ -1209,6 +1258,7 @@ const sendQuickQuestion = (question: string) => {
                 &.user-message {
                     align-self: flex-end;
                     flex-direction: row-reverse;
+                    max-width: 100%;
 
                     .message-bubble {
                         background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);

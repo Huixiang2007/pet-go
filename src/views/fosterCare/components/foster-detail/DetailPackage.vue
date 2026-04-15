@@ -24,7 +24,7 @@
                                 {{ packageItem.basePrice }}<span class="text-base font-normal">元/天</span>
                             </div>
                             <div class="text-sm" :class="maxPets > 0 ? 'text-green-500' : 'text-red-500'">
-                                {{ maxPets > 0 ? `剩余${maxPets}个名额` : '已满' }}
+                                {{ packageItem.available > 0 ? `剩余${packageItem.available}个名额` : '已满' }}
                             </div>
                         </div>
                     </div>

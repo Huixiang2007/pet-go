@@ -8,21 +8,11 @@
       <FosterHomeBasicInfo :fosterHome="fosterHome" @preview-image="handleImagePreview" />
 
       <!-- 套餐展示组件 -->
-      <FosterServicePackage
-        :provider-id="fosterHomeId"
-        :max-pets="fosterHome.maxPets"
-        @select-package="handleSelectPackage"
-      />
+      <FosterServicePackage :provider-id="fosterHomeId" :max-pets="fosterHome.maxPets"
+        @select-package="handleSelectPackage" />
 
       <!-- 评价系统组件 -->
-<<<<<<< HEAD
-      <FosterReviewSystem :total-score="fosterHome.totalScore" :service-score="fosterHome.serviceScore" @preview-image="handleImagePreview" />
-=======
-      <FosterReviewSystem
-        :total-score="fosterHome.totalScore"
-        :service-score="fosterHome.serviceScore"
-      />
->>>>>>> 7f99d1688df2e23e815f54fb2c5ed956dde4298b
+      <FosterReviewSystem :total-score="fosterHome.totalScore" :service-score="fosterHome.serviceScore" />
     </div>
 
     <!-- 图片预览弹窗 -->

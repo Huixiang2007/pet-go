@@ -1,5 +1,5 @@
 <template>
-  <LoadingComponent v-if="isLoading" />
+  <LoadingComponent v-if="props.loading" />
   <form class="layui-form profile-form" @submit.prevent="handleSubmit" v-else>
     <!--审核失败提示 -->
     <div v-if="showRejectedNotice" class="rejected-notice">
@@ -331,8 +331,7 @@ import { ref, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 import LoadingComponent from '@/components/common/LoadingStatus.vue'
 
-// 核心修改1：初始化isLoading为false（父组件控制加载状态，子组件无需加载）
-const isLoading = ref(false)
+
 const wasRejected = ref(false)
 
 // 接收父组件的状态和信息
@@ -345,6 +344,11 @@ const props = defineProps({
   info: { type: Object, required: true },
   isRejected: {
     // 修复：required 改为 false，default 生效
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+   loading: {
     type: Boolean,
     required: false,
     default: false,

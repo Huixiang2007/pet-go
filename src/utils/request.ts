@@ -24,7 +24,7 @@ service.interceptors.request.use(
       if (config.headers) {
         delete config.headers.Authorization
       }
-      console.log('白名单接口，跳过 Token 添加')
+      // console.log('白名单接口，跳过 Token 添加')
     } else {
       console.log('token不存在')
     }

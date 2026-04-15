@@ -1,5 +1,5 @@
 <template>
-    <div class="ai-chat-container">
+    <div class="ai-chat-container" v-if="isLoggedIn">
         <!-- 悬浮按钮 -->
         <DraggableContainer v-if="!isOpen" @click="openChat" @mouseenter="showTooltip = true"
             @mouseleave="showTooltip = false" :initialPosition="buttonPosition" :preventClickOnDrag="true"
@@ -304,6 +304,7 @@ const isOpen = ref(false)
 const isFullscreen = ref(false)
 const showTooltip = ref(false)
 const isSidebarOpen = ref(true)
+const isLoggedIn = ref(false)
 interface Message {
     id: string
     content: string
@@ -335,7 +336,19 @@ const initPosition = () => {
 onMounted(() => {
     console.log(window.innerWidth)
     initPosition()
+
+    // 检查登录状态
+    checkLoginStatus()
+
+    // 监听存储变化，以便在登录/登出时更新状态
+    window.addEventListener('storage', checkLoginStatus)
 })
+
+// 检查登录状态
+const checkLoginStatus = () => {
+    isLoggedIn.value = !!localStorage.getItem('authToken')
+    console.log('登录状态:', isLoggedIn.value)
+}
 const Messages = ref<Message[]>([])
 const messageList = ref<HTMLElement | null>(null)
 const chatContent = ref<HTMLElement | null>(null)

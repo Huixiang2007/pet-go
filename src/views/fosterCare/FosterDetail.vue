@@ -16,7 +16,7 @@
     </div>
 
     <!-- 图片预览弹窗 -->
-    <el-dialog v-model="showImageDialog" width="80%" top="5vh">
+    <el-dialog v-model="showImageDialog" width="50%" top="5vh">
       <img :src="previewImage" class="w-full h-auto rounded-lg" />
     </el-dialog>
   </div>

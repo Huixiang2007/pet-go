@@ -91,6 +91,7 @@ const props = defineProps<{
     totalScore: number
     serviceScore: number
 }>()
+console.log(props)
 
 // 定义事件
 const emit = defineEmits<{

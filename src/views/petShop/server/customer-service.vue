@@ -71,6 +71,7 @@
             @load-more="handleLoadMore"
           />
           <MessageInput
+            :key="`${chatType}_${activeShop.userId}`"
             v-model="message"
             :chat-type="chatType"
             :target-user-id="activeShop.userId"
@@ -84,7 +85,7 @@
         v-if="!isSystemNotice && activeShop.shopId"
         :active-shop="activeShop"
         :chat-type="chatType"
-        @send="() => loadChatRecords(activeShop.userId)"
+        @send="() => loadChatRecords(activeShop.userId, chatType)"
       />
     </div>
   </div>
@@ -186,7 +187,8 @@ const loadChatRecords = async (userId: number, isLoadMore = false) => {
 
   try {
     loading.value = true
-    let res
+    let res: any
+    console.log('加载聊天类型:', chatType.value)
     if (chatType.value === 'shop') {
       res = await getChatRecords(userId, pageNum.value, pageSize)
       console.log('电商聊天记录:', res)
@@ -194,7 +196,6 @@ const loadChatRecords = async (userId: number, isLoadMore = false) => {
       res = await getFosterChatRecords(userId, pageNum.value, pageSize)
       console.log('寄养聊天记录:', res)
     }
-
     const currentUserId = +(localStorage.getItem('userId') || 0)
     const key = `${chatType.value}_${userId}`
     const list = res.records || []
@@ -303,6 +304,7 @@ const handleLoadMore = () => {
 // 发送消息
 const sendMessage = (record: any) => {
   let uid = activeShop.value.userId
+  console.log('发送消息:', uid)
   if (!uid) {
     uid = extractNumberFromStr(route.query.id as string)
   }
@@ -478,17 +480,18 @@ const addFosterToList = (newFoster: any) => {
 }
 
 // 正则提取数字ID
-const extractNumberFromStr = (str: string): number => {
-  const match = str.match(/^\d+/)
-  return match ? Number(match[0]) : NaN
+const extractNumberFromStr = (str) => {
+  if (!str) return null // 添加空值检查
+  const match = str.match(/\d+/)
+  return match ? parseInt(match[0]) : null
 }
-// 切换店铺/寄养
 onMounted(async () => {
   if (!route.query.type) {
     router.replace({ query: { ...route.query, type: 'shop' } })
     return
   }
 
+  // 先加载对应类型的店铺列表
   if (chatType.value === 'shop') {
     await shopList()
     allShops.value = [...getShopList]
@@ -501,20 +504,82 @@ onMounted(async () => {
       shopAvatar: item.fosterProviderAvatar,
     }))
   }
-  // 切换店铺/寄养后默认选中第一个店铺
-  const currentList = chatType.value === 'shop' ? allShops.value : allFosterLists.value
-  if (currentList.length > 0) {
-    activeShop.value = currentList[0]
-  }
 
-  isSystemNotice.value = false
+  // 处理URL传入的userId
   const urlUserId = extractNumberFromStr(route.query.id as string)
+  const currentList = chatType.value === 'shop' ? allShops.value : allFosterLists.value
+
   if (urlUserId) {
     const targetId = Number(urlUserId)
-    const currentList = chatType.value === 'shop' ? allShops.value : allFosterLists.value
     const targetItem = currentList.find((s: any) => s.userId === targetId)
 
     if (!targetItem) {
+      // 列表里没有，就去接口查
+      try {
+        let info = null
+        if (chatType.value === 'shop') {
+          info = await getShopBaseInfoByUserId(targetId)
+          addShopToList(info)
+          if (info) {
+            activeShop.value = info // 这里必须赋值
+            loadChatRecords(info.userId)
+          }
+        } else {
+          info = await getFosterBaseInfoByUserId(targetId)
+          const fosterItem = addFosterToList(info)
+          if (fosterItem) {
+            activeShop.value = fosterItem // 这里必须赋值
+            loadChatRecords(fosterItem.userId)
+          }
+        }
+      } catch (e) {
+        console.error('获取店铺/寄养信息失败', e)
+        // 查不到的话，兜底用列表第一个
+        if (currentList.length > 0) {
+          activeShop.value = currentList[0]
+          loadChatRecords(currentList[0].userId)
+        }
+      }
+    } else {
+      activeShop.value = targetItem
+      loadChatRecords(targetItem.userId)
+    }
+  } else {
+    // 没有URL参数，用列表第一个
+    if (currentList.length > 0) {
+      activeShop.value = currentList[0]
+      loadChatRecords(currentList[0].userId)
+    }
+  }
+
+  isSystemNotice.value = false
+
+  // SSE
+  const userId = Number(localStorage.getItem('userId'))
+  if (!userId || isNaN(userId)) return
+  sseInstance = createSSE(userId)
+  sseInstance.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data)
+      handleSSEMessage(data)
+    } catch (error) {
+      console.error('解析SSE失败', error)
+    }
+  }
+})
+console.log('切换店铺/寄养:', route.query.id)
+watch(
+  () => route.query.id,
+  async (newUserId) => {
+    if (!newUserId) return
+    const targetId = extractNumberFromStr(newUserId as string)
+    const currentList = chatType.value === 'shop' ? allShops.value : allFosterLists.value
+    const targetItem = currentList.find((s: any) => s.userId === targetId)
+
+    if (targetItem) {
+      activeShop.value = targetItem
+      loadChatRecords(targetItem.userId)
+    } else {
       try {
         let info = null
         if (chatType.value === 'shop') {
@@ -535,41 +600,9 @@ onMounted(async () => {
       } catch (e) {
         console.error('获取店铺/寄养信息失败', e)
       }
-    } else {
-      activeShop.value = targetItem
-      loadChatRecords(targetItem.userId)
-    }
-  } else {
-    if (activeShop.value.userId) loadChatRecords(activeShop.value.userId)
-  }
-
-  // SSE
-  const userId = Number(localStorage.getItem('userId'))
-  if (!userId || isNaN(userId)) return
-  sseInstance = createSSE(userId)
-  sseInstance.onmessage = (event) => {
-    try {
-      const data = JSON.parse(event.data)
-      handleSSEMessage(data)
-    } catch (error) {
-      console.error('解析SSE失败', error)
-    }
-  }
-})
-
-watch(
-  () => route.query.id,
-  async (newUserId) => {
-    if (!newUserId) return
-    const targetId = extractNumberFromStr(newUserId as string)
-    const currentList = chatType.value === 'shop' ? allShops.value : allFosterLists.value
-    const targetItem = currentList.find((s: any) => s.userId === targetId)
-
-    if (targetItem) {
-      activeShop.value = targetItem
-      loadChatRecords(targetItem.userId)
     }
   },
+  { immediate: true },
 )
 
 // 滚动到底部

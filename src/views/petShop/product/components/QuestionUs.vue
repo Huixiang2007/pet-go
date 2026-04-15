@@ -13,7 +13,7 @@
         :key="item.id"
         class="qa-item border-b border-gray-100 pb-4 last:border-b-0"
       >
-        <!-- 提问部分（新增回复按钮！） -->
+        <!-- 提问部分 -->
         <div class="question flex gap-3">
           <div
             class="question-tag w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold"
@@ -435,10 +435,10 @@ const handleLike = async (answerId: string | number, isLiked: boolean) => {
   try {
     if (isLiked) {
       console.log('取消点赞', answerId)
-      await cancelLikeComment(String(answerId), 2)
+      await cancelLikeComment(String(answerId), 3)
     } else {
       console.log('点赞', answerId)
-      await likeComment(String(answerId), 2)
+      await likeComment(String(answerId), 3)
     }
     loadQaList(true)
   } catch (e) {

@@ -73,15 +73,14 @@ watch(
   { immediate: true },
 )
 
-// 监听 userId 变化
 watch(
   () => props.targetUserId,
   (id) => {
-    console.log('当前聊天目标userId：', id)
+    console.log('MessageInput 最新 targetUserId:', id)
+    // 这里可以重置输入框状态、清除选中状态等
   },
   { immediate: true },
 )
-
 const autoResizeTextarea = () => {
   if (!textareaRef.value) return
   textareaRef.value.style.height = '60px'
@@ -123,11 +122,19 @@ const removeImage = () => {
   selectedImage.value = null
   imagePreviewUrl.value = ''
 }
-
+const extractNumberFromStr = (str: any) => {
+  if (!str) return null
+  const match = str.toString().match(/\d+/)
+  return match ? parseInt(match[0]) : null
+}
 // 发送消息
 const handleSend = async () => {
-  const receiverId = props.targetUserId
-  console.log('当前聊天目标userId：', receiverId)
+  let receiverId = props.targetUserId
+  if (!receiverId || receiverId === 0) {
+    receiverId = extractNumberFromStr(props.urlId as string) || 0
+  }
+
+  console.log('MessageInput最终receiverId：', receiverId)
   if (!receiverId || receiverId === 0) {
     ElMessage.warning('未选择聊天对象')
     return

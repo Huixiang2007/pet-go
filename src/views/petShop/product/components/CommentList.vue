@@ -27,7 +27,7 @@
 
           <!--  晒图/视频） -->
           <div
-            v-if="comment.imageUrls || comment.videoUrl"
+            v-if="comment.imageUrls || comment.videoUrls"
             class="flex gap-2 mb-4 overflow-x-auto pb-2"
           >
             <img
@@ -42,23 +42,6 @@
               controls
               playsinline
             ></video>
-          </div>
-
-          <div class="flex items-center gap-3 bg-gray-50 p-3 rounded-lg mb-3">
-            <img
-              :src="itemInfo.mainImage"
-              :alt="itemInfo.title"
-              class="w-20 h-20 rounded object-cover"
-            />
-            <div class="flex-1">
-              <div class="text-sm text-gray-800 line-clamp-2">
-                {{ itemInfo.title }}
-              </div>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-red-500 font-bold text-lg">¥{{ itemInfo.currentPrice }}</span>
-                <span class="text-gray-400 text-xs">已抢{{ itemInfo.sales }}件</span>
-              </div>
-            </div>
           </div>
 
           <!--点赞/回复/展开 -->

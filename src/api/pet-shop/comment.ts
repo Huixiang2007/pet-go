@@ -77,7 +77,7 @@ export const getProductCommentList = async (params: any) => {
   return res.data;
   }
   //点赞
-  export async function likeComment(dataId: string | number, likeType: 2 | 1) {
+  export async function likeComment(dataId: string | number, likeType: 2 | 1|3) {
   const res = await request(
     `/server/api/shop/product/comment/user-like-comment/${dataId}?likeType=${likeType}`,
     'POST'
@@ -85,7 +85,7 @@ export const getProductCommentList = async (params: any) => {
   return res.data;
 }
 //取消点赞
-export async function cancelLikeComment(dataId: string | number, likeType:  1|2) {
+export async function cancelLikeComment(dataId: string | number, likeType:  1|2|3) {
   const res = await request(
     `/server/api/shop/product/comment/user-cancel-like-comment/${dataId}?likeType=${likeType}`,
     'POST'

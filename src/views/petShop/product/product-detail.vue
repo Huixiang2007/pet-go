@@ -187,7 +187,7 @@
               </div>
               <div class="flex items-center gap-24">
                 <div>
-                  <h1 class="text-2xl font-bold break-words">{{ product.name }}</h1>
+                  <h1 class="text-2xl font-bold break-words">{{ product.title }}</h1>
                 </div>
                 <div class="shop-btn flex justify-center md:justify-start gap-4">
                   <router-link
@@ -414,6 +414,7 @@ const product = ref<ProductDetail>({
   shopType: '',
   title: '',
   typeId: 0,
+  imageUrls: [], // <-- add this line to satisfy ProductDetail type
 })
 
 // 媒体
@@ -676,7 +677,7 @@ onMounted(() => {
 
 <style scoped>
 .product-grid {
-  grid-template-columns: 1fr 1fr 300px;
+  grid-template-columns: 1fr 1fr 380px;
 }
 
 :deep(.lg\:sticky) {

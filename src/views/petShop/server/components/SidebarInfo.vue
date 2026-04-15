@@ -169,13 +169,13 @@
 
 <script lang="ts" setup>
 import { ref, watch, computed } from 'vue'
+import { ElMessage } from 'element-plus'
 import {
   getShopGoods,
   sendShopMessage,
   getFosterGoods,
   sendFosterGoodsMessage,
 } from '@/api/message/chat'
-import { ElementPlus } from '@element-plus/icons-vue'
 
 const props = defineProps<{
   activeShop: any
@@ -227,7 +227,7 @@ const getGoods = async () => {
 
 // 发送商品/寄养服务到聊天
 const sendGoods = async (itemId: number) => {
-  if (!props.activeShop?.userId) {
+  if (!props.activeShop.userId) {
     console.warn('接收者ID无效，无法发送')
     return
   }
@@ -237,12 +237,12 @@ const sendGoods = async (itemId: number) => {
       const res = await sendShopMessage(props.activeShop.userId, itemId)
       console.log('发送商品成功:', res)
       emit('send')
-      ElementPlus.sucesesss('发送成功')
+      ElMessage.success('发送成功')
     } else {
       const res = await sendFosterGoodsMessage(props.activeShop.userId, itemId)
       console.log('发送寄养服务成功:', res)
       emit('send')
-      ElementPlus.sucesesss('发送成功')
+      ElMessage.success('发送成功')
     }
   } catch (err) {
     console.error('发送失败', err)

@@ -131,7 +131,6 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from 'vue'
 import SystemNoticeItem from './SystemNoticeItem.vue'
-import { getShopList } from '../data/chatListData'
 import { ElMessage } from 'element-plus' // 引入提示组件
 import formatTime from '@/utils/time'
 // 接收主页面传递的参数

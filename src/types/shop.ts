@@ -80,6 +80,7 @@ export interface ProductDetail {
     brandName: string
   images: string | null
   mainImage: string
+  imageUrls: string[]
   marketPrice: number
   name: string
   productScore: number

@@ -115,7 +115,7 @@ const handlePayConfirm = async () => {
     const res = await new Promise((resolve) => setTimeout(resolve, 1000))
     console.log(res)
     emit('pay-success')
-    closeDialog() // 支付成功后关闭弹窗
+    closeDialog()
   } catch (error) {
     console.error('支付失败：', error)
   } finally {

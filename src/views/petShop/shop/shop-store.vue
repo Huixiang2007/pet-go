@@ -120,26 +120,23 @@
             >
               <div class="relative w-full h-48 sm:h-56 overflow-hidden">
                 <img
-                  :src="product.image"
-                  :alt="product.name"
+                  :src="product.productMainImage"
+                  :alt="product.productName"
                   class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                 />
                 <span
-                  v-if="product.isNew"
-                  class="absolute top-3 left-3 bg-orange-500 text-white text-xs px-2 py-1 rounded-full"
-                  >新品</span
+                  v-if="product.status === '上架'"
+                  class="absolute top-3 left-3 bg-green-500 text-white text-xs px-2 py-1 rounded-full"
+                  >上架</span
                 >
               </div>
               <div class="p-4">
-                <h3 class="font-medium text-gray-800 line-clamp-1">{{ product.name }}</h3>
-                <p class="text-gray-500 text-xs mt-1 line-clamp-1">{{ product.spec }}</p>
-                <div class="mt-2 flex items-center gap-1">
-                  <div class="rating-star text-amber-400 text-xs">
-                    <i v-for="star in product.rating" :key="star" class="fa fa-star"></i>
-                  </div>
-                  <span class="text-xs text-gray-500">{{ product.rating }}分</span>
-                </div>
+                <h3 class="font-medium text-gray-800 line-clamp-1">{{ product.productName }}</h3>
+                <p class="text-gray-500 text-xs mt-1 line-clamp-1">
+                  {{ product.brandName }} | {{ product.productType }}
+                </p>
                 <p class="text-xs text-gray-400 mt-1">销量：{{ product.sales }}+</p>
+                <p class="text-xs text-gray-400 mt-1">库存：{{ product.stockStatus }}</p>
                 <div class="mt-3 flex justify-between items-center">
                   <span class="text-orange-600 font-bold text-lg">¥{{ product.price }}</span>
                   <button
@@ -162,6 +159,8 @@
 import { ref, onMounted } from 'vue'
 import InfiniteScroll from './components/infiniteScroll.vue'
 import { useRoute } from 'vue-router'
+import { getProductList } from '@/api/pet-shop/product'
+import { ElMessage } from 'element-plus'
 import axios from 'axios'
 const router = useRoute()
 const shopid = router.query.id
@@ -169,15 +168,16 @@ const shopid = router.query.id
 // 定义商品数据
 interface Product {
   id: string | number
-  name: string
+  productName: string
   price: number
-  spec: string
-  image: string
-  category: string
-  rating: number
-  sales: string
-  isNew?: boolean
-  description?: string
+  productMainImage: string
+  productType: string
+  sales: number
+  status: string
+  stock: number
+  stockStatus: string
+  productSn: string
+  brandName: string
 }
 interface shop {
   shopName: string
@@ -214,44 +214,38 @@ const getstore = () => {
     })
 }
 const products = ref<Product[]>([])
-const page = ref(1)
+const currentPage = ref(1)
 const pageSize = ref(12) //每页有10挑
 const isLoading = ref(false) //是否正在加载数据
 const hasmore = ref(true) //是否还有更多数据\
 const token = localStorage.getItem('authToken')
 console.log('token:', token)
-const getProducts = () => {
-  if (!isLoading.value && hasmore.value) {
-    isLoading.value = true
-    axios
-      .request({
-        url: '/server/api/shop/shops/list',
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        data: {
-          pageNum: 1,
-          pageSize: 10,
-        },
-      })
-      .then((response: any) => {
-        isLoading.value = false
-        console.log('商品信息', response.data)
-        const newProducts = response.data.data.list
-        products.value = [...products.value, ...newProducts]
-        if (newProducts.length < pageSize.value) {
-          hasmore.value = false
-          console.log('没有更多数据了')
-        } else {
-          page.value++
-        }
-      })
-      .catch((error) => {
-        isLoading.value = false
-        console.error('获取商品数据失败:', error.response.data)
-        console.error('获取商品数据失败:', error)
-      })
+const getProducts = async () => {
+  try {
+    const requestParams = {
+      pageSize: pageSize.value,
+      pageNum: currentPage.value,
+    }
+
+    const res = await getProductList(requestParams)
+    console.log(res)
+    if (res) {
+      const productList = res.list as unknown as Product[]
+      hasmore.value = productList.length === pageSize.value
+      isLoading.value = false
+      // 追加数据而不是覆盖
+      if (currentPage.value === 1) {
+        products.value = productList
+      } else {
+        products.value = [...products.value, ...productList]
+      }
+      currentPage.value++
+    } else {
+      ElMessage.error('获取商品列表失败！')
+    }
+  } catch (err: any) {
+    console.log(err)
+    ElMessage.error('获取商品列表失败！')
   }
 }
 

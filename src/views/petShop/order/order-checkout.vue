@@ -37,11 +37,8 @@
     <main class="order-container mx-auto px-4 py-8 flex flex-row justify-center">
       <div class="flex flex-col items-between w-[60%]">
         <div class="mr-4">
-          <AddressSelector
-            :address-list="addressList"
-            @set-default="setDefaultAddress"
-            @jump-to-address="jumpToAddressManage"
-          />
+          :address-list="addressList" @set-default="setDefaultAddress"
+          @jump-to-address="jumpToAddressManage" />
           <CouponSelector :coupons="coupons" @select-coupon="selectCoupon" />
         </div>
 
@@ -220,8 +217,8 @@ const setDefaultAddress = async (id: number) => {
 
 // 优惠券
 const coupons = ref([
-  { id: 1, discount: '满199减30', isSelected: false },
-  { id: 2, discount: '满99减10', isSelected: true },
+  { id: 1, discount: '满199减30', isSelected: false, validity: '2024-12-31' },
+  { id: 2, discount: '满99减10', isSelected: true, validity: '2024-12-31' },
 ])
 
 const selectCoupon = (id: number) => {
@@ -238,6 +235,7 @@ const totalPrice = computed(() => {
 const agreementAccepted = ref(false)
 const updateGoods = (val: any) => (selectedGoods.value = val)
 // 确认订单
+let orderNos: string[] = []
 const confirmOrder = async () => {
   const addr = addressList.value.find((a) => a.isDefault)
   if (!addr) {
@@ -276,14 +274,22 @@ const confirmOrder = async () => {
         cartIds: selectedGoods.value.map((g) => g.id + ''), // 购物车ID列表
       }
     }
-
     console.log('最终请求参数：', finalParams)
     const res = await submitOrder(finalParams)
+    console.log('确认订单响应：', res)
     if (res.ok) {
       ElMessage.success('确认订单成功！订单已生成，待支付')
-      // 支付弹窗
       payDialogVisible.value = true
-      orderNo.value = res.data.orderNo
+      const orderNoMatch = res.data.match(/\[([^\]]+)\]/)
+      if (!orderNoMatch || !orderNoMatch[1]) {
+        ElMessage.error('订单创建成功，但订单号提取失败')
+        return
+      }
+
+      const orderNoStr = orderNoMatch[1]
+      orderNos = orderNoStr.split(',').map((item) => item.trim())
+
+      console.log('订单号：', orderNos)
     } else {
       ElMessage.error(res.msg || '确认订单失败')
     }
@@ -298,17 +304,17 @@ const handlePay = async () => {
   const type = route.query.type as string
 
   if (type === 'buyNow') {
-    if (!orderNo.value) {
+    if (!orderNos.length) {
       ElMessage.error('订单号不存在')
       return
     }
 
     try {
       const res = await payOrder({
-        orderSn: orderNo.value,
+        orderSn: orderNos[0],
       })
 
-      if (res.ok || res.success) {
+      if (res.ok) {
         ElMessage.success('支付成功')
         payDialogVisible.value = false
         setTimeout(() => router.push('/order-list'), 1500)
@@ -320,17 +326,15 @@ const handlePay = async () => {
       ElMessage.error('支付异常')
     }
   } else {
-    if (!orderNo.value) {
+    if (!orderNos.length) {
       ElMessage.error('订单号不存在')
       return
     }
 
     try {
-      const res = await payOrderCart({
-        orderSn: [orderNo.value],
-      })
+      const res = await payOrderCart(orderNos)
 
-      if (res.ok || res.success) {
+      if (res.ok) {
         ElMessage.success('支付成功')
         payDialogVisible.value = false
         setTimeout(() => router.push('/order-list'), 1500)

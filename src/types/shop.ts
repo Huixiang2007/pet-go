@@ -131,6 +131,7 @@ export interface CartItem {
 //订单
 export interface Order {
   id: string
+  orderSn: string
   date: string
   status: string
   statusType: 'pending' | 'shipping' | 'receiving' | 'returning'

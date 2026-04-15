@@ -12,22 +12,32 @@
 
         <div class="flex flex-col lg:flex-row gap-6">
           <aside class="lg:w-64 shrink-0">
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md">
+            <div
+              class="bg-white rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md"
+            >
               <div class="p-5" @click="activeTab = 'orders'">
                 <h3 class="text-lg font-semibold text-gray-800 pb-3 border-b border-gray-100 mb-4">
                   订单状态
                 </h3>
                 <ul class="space-y-1">
                   <li v-for="(status, index) in statusFilters" :key="index">
-                    <button @click="handleStatusChange(status.value)"
-                      class="w-full flex items-center px-3 py-2.5 rounded-lg text-left transition-all" :class="activeStatus === status.value && activeTab === 'orders'
-                        ? 'bg-orange-50 text-orange-600 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50'
-                        ">
-                      <span class="w-2.5 h-2.5 rounded-full mr-3" :class="activeStatus === status.value && activeTab === 'orders'
-                        ? 'bg-orange-500'
-                        : 'bg-gray-300'
-                        "></span>
+                    <button
+                      @click="handleStatusChange(status.value)"
+                      class="w-full flex items-center px-3 py-2.5 rounded-lg text-left transition-all"
+                      :class="
+                        activeStatus === status.value && activeTab === 'orders'
+                          ? 'bg-orange-50 text-orange-600 font-medium'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      "
+                    >
+                      <span
+                        class="w-2.5 h-2.5 rounded-full mr-3"
+                        :class="
+                          activeStatus === status.value && activeTab === 'orders'
+                            ? 'bg-orange-500'
+                            : 'bg-gray-300'
+                        "
+                      ></span>
                       {{ status.label }}
                     </button>
                   </li>
@@ -36,28 +46,40 @@
 
               <div class="border-t border-gray-100">
                 <nav class="p-2">
-                  <button @click="activeTab = 'keep-pet'"
-                    class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1" :class="activeTab === 'keep-pet'
-                      ? 'bg-orange-50 text-orange-600 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50'
-                      ">
+                  <button
+                    @click="activeTab = 'keep-pet'"
+                    class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1"
+                    :class="
+                      activeTab === 'keep-pet'
+                        ? 'bg-orange-50 text-orange-600 font-medium'
+                        : 'text-gray-600 hover:bg-gray-50'
+                    "
+                  >
                     <i class="fa fa-comment w-5 text-center mr-3"></i>
                     寄养订单
                   </button>
 
-                  <button @click="activeTab = 'coupons'"
-                    class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1" :class="activeTab === 'coupons'
-                      ? 'bg-orange-50 text-orange-600 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50'
-                      ">
+                  <button
+                    @click="activeTab = 'coupons'"
+                    class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1"
+                    :class="
+                      activeTab === 'coupons'
+                        ? 'bg-orange-50 text-orange-600 font-medium'
+                        : 'text-gray-600 hover:bg-gray-50'
+                    "
+                  >
                     <i class="fa fa-ticket w-5 text-center mr-3"></i>
                     我的优惠券
                   </button>
-                  <button @click="activeTab = 'comments'"
-                    class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1" :class="activeTab === 'comments'
-                      ? 'bg-orange-50 text-orange-600 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50'
-                      ">
+                  <button
+                    @click="activeTab = 'comments'"
+                    class="w-full flex items-center px-3 py-2.5 rounded-lg transition-all mb-1"
+                    :class="
+                      activeTab === 'comments'
+                        ? 'bg-orange-50 text-orange-600 font-medium'
+                        : 'text-gray-600 hover:bg-gray-50'
+                    "
+                  >
                     <i class="fa fa-comment w-5 text-center mr-3"></i>
                     评论管理
                   </button>
@@ -68,32 +90,53 @@
 
           <main class="flex-1">
             <div v-if="activeTab === 'orders'">
-              <div class="bg-white rounded-xl shadow-sm p-4 md:p-5 mb-6 transition-all hover:shadow-md">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div
+                class="bg-white rounded-xl shadow-sm p-4 md:p-5 mb-6 transition-all hover:shadow-md"
+              >
+                <div
+                  class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+                >
                   <div class="relative w-full sm:w-72">
-                    <input v-model="searchKey" type="text" placeholder="搜索订单号/商品名称"
+                    <input
+                      v-model="searchKey"
+                      type="text"
+                      placeholder="搜索订单号/商品名称"
                       class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 focus:outline-none transition-all"
-                      @keyup.enter="fetchOrders()" />
-                    <i class="fa fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                      @keyup.enter="fetchOrders()"
+                    />
+                    <i
+                      class="fa fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+                    ></i>
                   </div>
                 </div>
               </div>
 
               <div v-if="orders.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
                 <div class="w-32 h-32 mx-auto mb-4 opacity-30">
-                  <img src="https://picsum.photos/id/225/200/200" alt="暂无订单" class="w-full h-full object-contain" />
+                  <img
+                    src="https://picsum.photos/id/225/200/200"
+                    alt="暂无订单"
+                    class="w-full h-full object-contain"
+                  />
                 </div>
                 <h3 class="text-lg font-medium text-gray-800 mb-2">暂无相关订单</h3>
                 <p class="text-gray-500 mb-6 max-w-md mx-auto">
                   您还没有相关订单，快去挑选心仪的商品吧～
                 </p>
-                <router-link to="/petShop"
-                  class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg transition-colors">
+                <router-link
+                  to="/petShop"
+                  class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg transition-colors"
+                >
                   去逛逛
                 </router-link>
               </div>
               <div v-else class="space-y-4">
-                <OrderCard v-for="value in orders" :key="value.id" :order="value" @refresh="fetchOrders" />
+                <OrderCard
+                  v-for="value in orders"
+                  :key="value.id"
+                  :order="value"
+                  @refresh="fetchOrders"
+                />
               </div>
             </div>
 
@@ -117,8 +160,12 @@
                 </h2>
               </div>
               <div class="bg-white rounded-xl shadow-sm p-5">
-                <Comments :page-num="pageNum" :page-size="pageSize" @page-change="handlePageChange"
-                  @update:total="total = $event" />
+                <Comments
+                  :page-num="pageNum"
+                  :page-size="pageSize"
+                  @page-change="handlePageChange"
+                  @update:total="total = $event"
+                />
               </div>
             </div>
 
@@ -135,8 +182,14 @@
             </div>
 
             <div class="mt-6 flex justify-center">
-              <el-pagination v-model:current-page="pageNum" v-model:page-size="pageSize" page-sizes="[5]" :total="total"
-                @size-change="handlePageChange" @current-change="handlePageChange" />
+              <el-pagination
+                v-model:current-page="pageNum"
+                v-model:page-size="pageSize"
+                page-sizes="[5]"
+                :total="total"
+                @size-change="handlePageChange"
+                @current-change="handlePageChange"
+              />
             </div>
           </main>
         </div>
@@ -198,7 +251,8 @@ const fetchOrders = async () => {
       console.log('订单列表数据:', data.list)
       // 转换数据结构
       orders.value = (data.list || []).map((item: any) => ({
-        id: item.orderSn || item.id,
+        id: item.id,
+        orderSn: item.orderSn || '', // 确保orderSn属性存在且为字符串
         date: item.createTime || new Date().toISOString(),
         status: item.orderStatus,
         statusType: mapOrderStatus(item.orderStatus),
@@ -207,7 +261,7 @@ const fetchOrders = async () => {
           image: item.productMainImg,
           spec: item.specText,
         },
-        price: item.payAmount / item.quantity || item.payAmount,
+        price: item.payAmount && item.quantity ? item.payAmount / item.quantity : item.payAmount,
         quantity: item.quantity,
         total: item.totalAmount || item.payAmount,
       }))
@@ -234,7 +288,7 @@ const mapOrderStatus = (status: string): string => {
     待收货: 'receiving',
     已完成: 'completed',
     已收货: 'received',
-    退货中: 'returning',
+    退款完成: 'returning',
   }
   return statusMap[status] || 'pending'
 }

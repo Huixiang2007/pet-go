@@ -509,6 +509,7 @@ const isSkuSelected = computed(() => {
 // 获取产品详情
 const productDetail = async () => {
   try {
+    console.log('获取产品详情')
     const res = await getProductDetail(id)
     console.log('接口返回数据:', res)
     const productNew = res

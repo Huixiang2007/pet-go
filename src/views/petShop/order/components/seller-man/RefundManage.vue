@@ -39,8 +39,7 @@
         fontWeight: '500',
       }"
     >
-      <el-table-column prop="refundId" label="退款编号" width="160" />
-      <el-table-column prop="orderId" label="关联订单号" width="160" />
+      <el-table-column prop="orderId" label="关联订单号" width="220" />
       <el-table-column prop="productName" label="商品名称" width="230">
         <template #default="scope">
           <div class="text-ellipsis overflow-hidden" :title="scope.row.productName">
@@ -56,13 +55,22 @@
         </template>
       </el-table-column>
       <el-table-column prop="amount" label="退款金额" width="100">
-        <template #default="scope">¥{{ scope.row.amount }}</template>
+        <template #default="scope">¥{{ scope.row.refundAmount }}</template>
       </el-table-column>
-      <el-table-column prop="applyTime" label="申请时间" width="180" />
+      <el-table-column prop="reason" label="申请原因" width="160">
+        <template #default="scope">
+          <div class="text-ellipsis overflow-hidden" :title="scope.row.reason">
+            {{ scope.row.reason }}
+          </div>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="refundTime" label="申请时间" width="180" />
+
       <el-table-column prop="status" label="处理状态" width="100">
         <template #default="scope">
-          <el-tag :type="getRefundTagType(scope.row.status)" size="small">
-            {{ scope.row.status }}
+          <el-tag :type="getRefundTagType(scope.row.refundStatus)" size="small">
+            {{ scope.row.refundStatus || '待处理' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -77,7 +85,6 @@
               >查看详情</el-button
             >
             <el-button
-              v-if="scope.row.status === '待处理'"
               size="mini"
               type="text"
               class="text-green-600"
@@ -86,7 +93,6 @@
               同意退款
             </el-button>
             <el-button
-              v-if="scope.row.status === '待处理'"
               size="mini"
               type="text"
               class="text-red-600"
@@ -127,54 +133,79 @@
     <div v-if="currentRefund" class="space-y-4">
       <div class="flex justify-between items-center pb-2 border-b">
         <div class="font-bold">退款信息</div>
-        <el-tag :type="getRefundTagType(currentRefund.status)">{{ currentRefund.status }}</el-tag>
+        <el-tag :type="getRefundTagType(currentRefund.refundStatus)">{{
+          currentRefund.refundStatus
+        }}</el-tag>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <p class="text-sm text-gray-500">退款编号：{{ currentRefund.refundId }}</p>
+          <p class="text-sm text-gray-500">退款编号：{{ currentRefund.orderSn }}</p>
           <p class="text-sm text-gray-500">关联订单：{{ currentRefund.orderId }}</p>
           <p class="text-sm text-gray-500">退款类型：{{ currentRefund.refundType }}</p>
-          <p class="text-sm text-gray-500">申请时间：{{ currentRefund.applyTime }}</p>
+          <p class="text-sm text-gray-500">申请时间：{{ currentRefund.refundTime }}</p>
         </div>
         <div>
           <p class="text-sm text-gray-500">商品名称：{{ currentRefund.productName }}</p>
-          <p class="text-sm text-gray-500">退款金额：¥{{ currentRefund.amount }}</p>
+          <p class="text-sm text-gray-500">商品规格：{{ currentRefund.specText || '未填写' }}</p>
+          <p class="text-sm text-gray-500">退款金额：¥{{ currentRefund.refundAmount }}</p>
           <p class="text-sm text-gray-500">退款原因：{{ currentRefund.reason || '未填写' }}</p>
         </div>
+      </div>
+
+      <div v-if="currentRefund.productMainImage" class="pt-2 border-t">
+        <h4 class="font-medium mb-2">商品图片</h4>
+        <img
+          :src="currentRefund.productMainImage"
+          class="w-32 h-32 object-cover rounded"
+          alt="商品图片"
+        />
       </div>
 
       <div v-if="currentRefund.reason" class="pt-2 border-t">
         <h4 class="font-medium mb-2">退款说明</h4>
         <p class="text-sm bg-gray-50 p-2 rounded">{{ currentRefund.reason }}</p>
       </div>
+
+      <div v-if="currentRefund.shopNote" class="pt-2 border-t">
+        <h4 class="font-medium mb-2">商家备注</h4>
+        <p class="text-sm bg-gray-50 p-2 rounded">{{ currentRefund.shopNote }}</p>
+      </div>
     </div>
 
     <template #footer>
       <el-button @click="refundDetailVisible = false">关闭</el-button>
       <el-button
-        v-if="currentRefund && currentRefund.status === '待处理'"
+        v-if="currentRefund && currentRefund.refundStatus === '待商家审核'"
         type="primary"
         @click="agreeRefund(currentRefund)"
       >
         同意退款
       </el-button>
       <el-button
-        v-if="currentRefund && currentRefund.status === '待处理'"
+        v-if="currentRefund && currentRefund.refundStatus === '待商家审核'"
         type="danger"
         @click="openRejectRefundModal(currentRefund)"
       >
         拒绝退款
       </el-button>
-
       <el-button
-        v-if="currentRefund && currentRefund.status === '已同意'"
+        v-if="currentRefund && currentRefund.refundStatus === '审核同意'"
         size="mini"
         type="text"
         class="text-purple-600"
         @click="handleMerchantRefund(currentRefund)"
       >
         退款
+      </el-button>
+      <el-button
+        v-if="currentRefund && currentRefund.refundStatus === '用户已发货'"
+        size="mini"
+        type="text"
+        class="text-green-600"
+        @click="handleShopReceive(currentRefund)"
+      >
+        确认收货
       </el-button>
     </template>
   </el-dialog>
@@ -187,7 +218,7 @@
     :close-on-click-modal="false"
   >
     <div v-if="currentRefund" class="space-y-4">
-      <p class="text-sm">退款编号：{{ currentRefund.refundId }}</p>
+      <p class="text-sm">退款编号：{{ currentRefund.refundSn }}</p>
       <p class="text-sm text-gray-500">请填写拒绝退款的原因（必填）</p>
 
       <el-form :model="rejectForm" label-width="80px">
@@ -216,7 +247,7 @@ import {
   getRefundList,
   getRefundDetail,
   handleRefund,
-  handleRefundMerchant,
+  shopRefundReceive,
 } from '@/api/pet-shop/order'
 
 // 基础数据
@@ -240,13 +271,16 @@ const rejectForm = ref({
 
 // 退款数据
 interface RefundRow {
+  id?: string
+  orderSn: string
+  productMainImage?: string
   refundId: string
   orderId: string
   productName: string
   refundType: string
   amount: string
   applyTime: string
-  status: string
+  refundStatus: string
   reason?: string
 }
 
@@ -255,12 +289,16 @@ const refundData = ref<RefundRow[]>([])
 // 退款状态标签类型
 const getRefundTagType = (status: string) => {
   switch (status) {
-    case '待处理':
+    case '待商家审核':
       return 'warning'
-    case '已同意':
+    case '审核同意':
       return 'primary' // 已同意
-    case '已拒绝':
+    case '审核拒绝':
       return 'danger' // 拒绝
+    case '用户已发货':
+      return 'warning'
+    case '商家已收货':
+      return 'warning'
     case '退款成功':
       return 'success' // 最终成功
     default:
@@ -288,12 +326,22 @@ const loadRefundList = async () => {
           column: 'create_time',
         },
       ],
-      refundType: Number(refundTypeFilter.value),
     }
 
     const res = await getRefundList(params)
+    console.log('退款', res)
     if (res?.ok) {
-      refundData.value = res.data.list || []
+      refundData.value = (res.data.list || []).map((item: any) => ({
+        ...item,
+        refundId: item.refundId || item.id,
+        orderId: item.orderSn || item.orderId,
+        productName: item.productName,
+        refundType: item.refundType,
+        amount: item.refundAmount,
+        applyTime: item.refundTime,
+        status: item.status,
+        reason: item.reason,
+      }))
       total.value = res.data.total || 0
     } else {
       ElMessage.error(res?.msg || '获取退款列表失败')
@@ -308,7 +356,9 @@ const loadRefundList = async () => {
 //详情
 const openRefundDetail = async (row: RefundRow) => {
   try {
-    const res = await getRefundDetail(row.refundId)
+    const refundId = row.refundId
+    console.log('openRefundDetail called with refundId:', refundId)
+    const res = await getRefundDetail(refundId)
     if (res?.ok) {
       currentRefund.value = res.data
       refundDetailVisible.value = true
@@ -329,7 +379,11 @@ const handleMerchantRefund = (row: RefundRow) => {
   }).then(async () => {
     try {
       // 调用接口
-      const res = await handleRefundMerchant(row.refundId)
+      const res = await handleRefund({
+        id: row.id,
+        orderSn: row.orderSn,
+        status: 1,
+      })
       if (res?.ok) {
         refundDetailVisible.value = false
         ElMessage.success('退款成功！')
@@ -343,6 +397,29 @@ const handleMerchantRefund = (row: RefundRow) => {
     }
   })
 }
+
+// 商家确认收货
+const handleShopReceive = (row: RefundRow) => {
+  ElMessageBox.confirm('确认已收到用户退回的商品吗？', '确认收货', {
+    confirmButtonText: '确认收货',
+    cancelButtonText: '取消',
+    type: 'warning',
+  }).then(async () => {
+    try {
+      const res = await shopRefundReceive(row.refundId)
+      if (res?.ok) {
+        ElMessage.success('收货成功！')
+        loadRefundList()
+        refundDetailVisible.value = false
+      } else {
+        ElMessage.error(res?.msg || '收货失败')
+      }
+    } catch (e) {
+      console.error('收货失败：', e)
+      ElMessage.error('收货失败，请稍后重试')
+    }
+  })
+}
 //同意退款
 const agreeRefund = (row: RefundRow) => {
   ElMessageBox.confirm('确认同意该退款申请吗？', '提示', {
@@ -352,14 +429,13 @@ const agreeRefund = (row: RefundRow) => {
   }).then(async () => {
     try {
       const params = {
-        refundId: row.refundId,
+        id: row.id,
+        orderSn: row.orderSn,
         status: 2,
-        shopNote: '',
-        orderSn: row.orderId,
+        shopNote: row.reason || '',
       }
       const res = await handleRefund(params)
       if (res?.ok) {
-        row.status = '已同意'
         refundDetailVisible.value = false
         ElMessage.success('退款申请已同意！')
         loadRefundList()

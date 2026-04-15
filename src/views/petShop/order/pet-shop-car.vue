@@ -393,7 +393,7 @@ const Cartlist = async (isLoadMore = false) => {
 // 获取推荐商品
 const recommendProduct = async () => {
   try {
-    const response = await getRecommendApi({ pageNum: 1, pageSize: 10 })
+    const response = await getRecommendApi(1, 10)
     console.log('推荐商品响应:', response)
     let newProducts: any[] = []
     if (response && response.data && response.data.data && response.data.data.list) {

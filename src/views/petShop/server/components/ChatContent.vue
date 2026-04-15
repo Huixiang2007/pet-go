@@ -147,11 +147,7 @@
               v-else-if="(record.msgType === 'service' || record.isService) && record.serviceInfo"
               class="overflow-hidden bg-white rounded-xl shadow-sm w-[200px] border border-gray-100"
             >
-              <img
-                :src="record.serviceInfo.mainImage"
-                class="w-full h-[120px] object-cover"
-                @error="(e) => (e.target.src = 'https://picsum.photos/id/237/200/120')"
-              />
+              <img :src="record.serviceInfo.mainImage" class="w-full h-[120px] object-cover" />
 
               <div class="p-2">
                 <div class="text-sm font-medium text-gray-800 line-clamp-2">

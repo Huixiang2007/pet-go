@@ -37,11 +37,8 @@
     <main class="order-container mx-auto px-4 py-8 flex flex-row justify-center">
       <div class="flex flex-col items-between w-[60%]">
         <div class="mr-4">
-          <AddressSelector
-            :address-list="addressList"
-            @set-default="setDefaultAddress"
-            @jump-to-address="jumpToAddressManage"
-          />
+          :address-list="addressList" @set-default="setDefaultAddress"
+          @jump-to-address="jumpToAddressManage" />
           <CouponSelector :coupons="coupons" @select-coupon="selectCoupon" />
         </div>
 
@@ -220,8 +217,8 @@ const setDefaultAddress = async (id: number) => {
 
 // 优惠券
 const coupons = ref([
-  { id: 1, discount: '满199减30', isSelected: false },
-  { id: 2, discount: '满99减10', isSelected: true },
+  { id: 1, discount: '满199减30', isSelected: false, validity: '2024-12-31' },
+  { id: 2, discount: '满99减10', isSelected: true, validity: '2024-12-31' },
 ])
 
 const selectCoupon = (id: number) => {

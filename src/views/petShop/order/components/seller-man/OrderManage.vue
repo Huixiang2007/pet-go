@@ -250,30 +250,6 @@
       <el-button type="primary" @click="confirmShip">确认发货</el-button>
     </template>
   </el-dialog>
-
-  <!-- 批量操作弹窗 -->
-  <el-dialog
-    v-model="batchOperationVisible"
-    title="批量操作"
-    width="400px"
-    :close-on-click-modal="false"
-  >
-    <div class="space-y-4">
-      <p class="text-sm">已选择 {{ selectedOrders.length }} 个订单</p>
-      <p class="text-sm text-gray-500">请选择要执行的操作：</p>
-
-      <el-radio-group v-model="batchType">
-        <el-radio label="batchShip">批量发货</el-radio>
-        <el-radio label="batchCancel">批量取消</el-radio>
-        <el-radio label="batchExport">导出订单</el-radio>
-      </el-radio-group>
-    </div>
-
-    <template #footer>
-      <el-button @click="batchOperationVisible = false">取消</el-button>
-      <el-button type="primary" @click="confirmBatchOperation">确认执行</el-button>
-    </template>
-  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -286,9 +262,7 @@ const orderStatusFilter = ref('')
 const selectedOrders = ref<any[]>([])
 const orderDetailVisible = ref(false)
 const shipModalVisible = ref(false)
-const batchOperationVisible = ref(false)
 const currentOrder = ref<any>(null)
-const batchType = ref('batchShip')
 
 // 分页数据
 const pageNum = ref(1)

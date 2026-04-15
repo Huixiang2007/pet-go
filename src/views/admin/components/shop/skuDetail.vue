@@ -75,7 +75,7 @@
 <script setup lang="ts">
 import { ref,  onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-
+import { ElMessage } from 'element-plus'
 import { getSkuDetail } from '@/api/admin/shop' 
 
 // 路由
@@ -114,8 +114,9 @@ async function loadSkuDetail() {
 
   try {
     const res = await getSkuDetail(skuId)
-    if (res.data && res.ok) {
-      skuData.value = res.data
+    const data=res.data as any
+    if (data ) {
+      skuData.value = data
     } else {
       ElMessage.error(res.msg || '获取SKU详情失败')
     }

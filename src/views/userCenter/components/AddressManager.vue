@@ -151,7 +151,7 @@ interface Address {
   city: string
   district: string
   detailAddress: string
-  isDefault: '默认地址' | '普通地址'
+  isDefault: string
   street: string
 }
 
@@ -224,7 +224,7 @@ const getAddressList = async () => {
     })
     if (response.code === 0) {
       if (response.msg === '操作成功') {
-        addressList.value = response.data.list || []
+        addressList.value = response.data.list as any|| []
         pagination.value.total = response.data.total || 0
         pagination.value.pages = response.data.pages || 1
         if (pagination.value.currentPage === 1 && addressList.value.length === 0) {
@@ -291,7 +291,7 @@ const handleEdit = async (address: Address) => {
         city: detail.city,
         district: detail.district,
         detailAddress: detail.detailAddress,
-        isDefault: detail.isDefault,
+        isDefault:detail.isDefault as "默认地址" | "普通地址",
         street: detail.street || '无',
       }
       selectedAddress.value.province = detail.province
@@ -341,12 +341,12 @@ const handleSave = async () => {
       city: cityName,
       district: districtName,
       detailAddress: addressForm.value.detailAddress,
-      isDefault: isDefaultSwitch.value ? '默认地址' : '普通地址',
+      isDefault: isDefaultSwitch.value ? '默认地址' as const: '普通地址'as const,
       street: addressForm.value.street || '无',
     }
     console.log('发送的地址数据:', addressData)
     let response: any
-    console.log(addressData.id)
+    
 
     if (editingAddressId.value) {
       // 编辑地址

@@ -66,6 +66,7 @@
             @submit="submitRealName"
             :isRejected="isRealNameRejected"
             @refresh="getUserInfomation"
+             :loading="isFetching"
           />
           <ChangePassword
             v-if="currentTab === 2"
@@ -329,7 +330,7 @@ const getUserMoney = async () => {
     const response = await getMoney()
     if (response.code === 0) {
     
-      userBalance.value = response.data
+      userBalance.value = response.data as unknown as number
     }
   } catch (error) {
     console.error('获取余额失败:', error)

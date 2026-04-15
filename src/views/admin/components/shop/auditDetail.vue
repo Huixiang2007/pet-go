@@ -14,13 +14,13 @@
     <el-card class="main-card" shadow="hover">
       <!-- 商铺基础信息 -->
       <div class="shop-base-section">
-        <el-avatar :src="auditData.shopAvatar" class="shop-avatar" />
+        <el-avatar :src="auditData?.shopAvatar" class="shop-avatar" />
         <div class="shop-base-info">
-          <h1 class="shop-name">{{ auditData.shopName }}</h1>
+          <h1 class="shop-name">{{ auditData?.shopName }}</h1>
           <div class="tag-group">
-            <el-tag class="tag-type">{{ auditData.shopType }}</el-tag>
-            <el-tag :type="getAuditStatusTagType(auditData.auditResult)" class="audit-status-tag">
-              {{ auditData.auditResult || '待审核' }}
+            <el-tag class="tag-type">{{ auditData?.shopType }}</el-tag>
+            <el-tag :type="getAuditStatusTagType(auditData?.auditResult)" class="audit-status-tag">
+              {{ auditData?.auditResult || '待审核' }}
             </el-tag>
           </div>
         </div>
@@ -28,29 +28,29 @@
 
       <el-descriptions :column="2" border label-style="color:#956b3e; font-weight:500;" content-style="color:#6b5b45;"
         class="info-desc">
-        <el-descriptions-item label="店铺类型">{{ auditData.shopType }}</el-descriptions-item>
-        <el-descriptions-item label="用户ID">{{ auditData.userId }}</el-descriptions-item>
-        <el-descriptions-item label="审批类型">{{ auditData.auditType }}</el-descriptions-item>
+        <el-descriptions-item label="店铺类型">{{ auditData?.shopType }}</el-descriptions-item>
+        <el-descriptions-item label="用户ID">{{ auditData?.userId }}</el-descriptions-item>
+        <el-descriptions-item label="审批类型">{{ auditData?.auditType }}</el-descriptions-item>
         <el-descriptions-item label="审批人ID">{{
-          auditData.auditorId || '-'
+          auditData?.auditorId || '-'
         }}</el-descriptions-item>
         <el-descriptions-item label="审批人姓名">{{
-          auditData.auditorName || '-'
+          auditData?.auditorName || '-'
         }}</el-descriptions-item>
         <el-descriptions-item label="审批时间">{{
-          auditData.auditTime || '-'
+          auditData?.auditTime || '-'
         }}</el-descriptions-item>
-        <el-descriptions-item label="联系人">{{ auditData.contactName }}</el-descriptions-item>
-        <el-descriptions-item label="联系电话">{{ auditData.contactPhone }}</el-descriptions-item>
-        <el-descriptions-item label="邮箱">{{ auditData.contactEmail }}</el-descriptions-item>
+        <el-descriptions-item label="联系人">{{ auditData?.contactName }}</el-descriptions-item>
+        <el-descriptions-item label="联系电话">{{ auditData?.contactPhone }}</el-descriptions-item>
+        <el-descriptions-item label="邮箱">{{ auditData?.contactEmail }}</el-descriptions-item>
         <el-descriptions-item label="所在地区">
-          {{ auditData.province }} {{ auditData.city }} {{ auditData.district }}
+          {{ auditData?.province }} {{ auditData?.city }} {{ auditData?.district }}
         </el-descriptions-item>
         <el-descriptions-item label="详细地址" :span="2">
-          {{ auditData.address }}
+          {{ auditData?.address }}
         </el-descriptions-item>
         <el-descriptions-item label="商铺简介" :span="2">
-          {{ auditData.description }}
+          {{ auditData?.description }}
         </el-descriptions-item>
       </el-descriptions>
 
@@ -58,17 +58,17 @@
       <div class="cert-section">
         <h3 class="section-title">📄 资质证件审核</h3>
         <div class="cert-images">
-          <div class="cert-item" v-if="auditData.shopType === '2' || auditData.shopType === '企业店'">
+          <div class="cert-item" v-if="auditData?.shopType === '2' || auditData?.shopType === '企业店'">
             <p>营业执照</p>
-            <el-image :src="auditData.businessLicense" class="cert-img" preview-teleported fit="cover" />
+            <el-image :src="auditData?.businessLicense" class="cert-img" preview-teleported fit="cover" />
           </div>
           <div class="cert-item">
             <p>身份证正面</p>
-            <el-image :src="auditData.idCardFront" class="cert-img" preview-teleported fit="cover" />
+            <el-image :src="auditData?.idCardFront" class="cert-img" preview-teleported fit="cover" />
           </div>
           <div class="cert-item">
             <p>身份证反面</p>
-            <el-image :src="auditData.idCardBack" class="cert-img" preview-teleported fit="cover" />
+            <el-image :src="auditData?.idCardBack" class="cert-img" preview-teleported fit="cover" />
           </div>
         </div>
       </div>
@@ -76,13 +76,13 @@
       <!-- 审批理由区域 -->
       <div class="audit-reason-section">
         <h3 class="section-title">📝 审批意见</h3>
-        <el-input v-model="auditReason" type="textarea" rows="4" :disabled="auditData.auditResult !== '待审核'"
+        <el-input v-model="auditReason" type="textarea" rows="4" :disabled="auditData?.auditResult !== '待审核'"
           placeholder="请输入审批理由" class="reason-input" />
       </div>
     </el-card>
 
     <!-- 底部审批按钮-->
-    <div class="audit-btn-group" v-if="auditData.auditResult === '待审核'">
+    <div class="audit-btn-group" v-if="auditData?.auditResult === '待审核'">
       <el-button type="danger" size="default" round @click="handleReject">
         <el-icon>
           <Close />

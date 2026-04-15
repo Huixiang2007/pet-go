@@ -55,7 +55,7 @@
             class="pagination-wrapper"
             v-model:current-page="pageParams.pageNum"
             v-model:page-size="pageParams.pageSize"
-            :total="total"
+            :total="totalNum"
             :page-sizes="[10, 20, 30, 50]"
             layout="total, sizes, prev, pager, next, jumper"
             @size-change="handleSizeChange"
@@ -113,9 +113,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { getProductList,deleteProduct,getProductAuditList } from '@/api/admin/shop'
+import type { ProductInfo, ProductAudit} from '@/api/admin/shop'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import type { PageParams } from '@/api/admin'
 import { useRouter } from 'vue-router'
-const addList = ref([])
+const addList =ref<ProductInfo[]>([])
 const activeTab = ref('add')
 const router = useRouter()
 // 分页参数
@@ -123,7 +125,7 @@ const pageParams = ref<PageParams>({
   pageNum: 1,
   pageSize: 10,
 })
-const updateList = ref([])
+const updateList = ref<ProductAudit[]>([])
 
 const auditPageParams = ref<PageParams>({
   pageNum: 1,
@@ -132,14 +134,17 @@ const auditPageParams = ref<PageParams>({
 const auditTotal = ref(0)
 
 // 总条数
-const total = ref(0)
+const totalNum = ref(0)
 //获取商品列表
 async function loadProductList() {
   try {
     const res = await getProductList(pageParams.value)
 
-    addList.value = res.data.list
-    total.value = res.data.total
+    
+     const { list, total } = res.data as any;
+
+    addList.value = list;
+    totalNum.value = total;
   } catch (error) {
     console.log(error)
   }
@@ -148,10 +153,10 @@ async function loadProductList() {
 //获取商品审批列表
 async function auditProductList() {
   try {
-    const res = await getProductAuditList(pageParams.value)
-
-    updateList.value = res.data.list
-    auditTotal.value = res.data.total
+    const res = await getProductAuditList(auditPageParams.value)
+    const { list, total } = res.data as any; 
+    updateList.value = list
+    auditTotal.value = total
   } catch (error) {
     console.log(error)
   }

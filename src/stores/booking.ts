@@ -31,6 +31,7 @@ export const useBookingFormStore = defineStore('bookingForm', () => {
     emergencyPhone: '',
     userNotes: '',
     pictureUrlList: [] as File[],
+    vaccineUrls: [] as string[],
   })
   // 重置表单
   const resetBookingForm = (serviceId: number) => {

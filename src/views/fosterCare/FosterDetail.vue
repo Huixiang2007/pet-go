@@ -15,10 +15,9 @@
       <FosterReviewSystem :total-score="fosterHome.totalScore" :service-score="fosterHome.serviceScore" />
     </div>
 
-    <!-- 图片预览弹窗 -->
-    <el-dialog v-model="showImageDialog" width="50%" top="5vh">
-      <img :src="previewImage" class="w-full h-auto rounded-lg" />
-    </el-dialog>
+    <!-- 图片预览组件 -->
+    <el-image-viewer v-if="showImageDialog" :url-list="srcList as string[]" :initial-index="currentImageIndex"
+      @close="showImageDialog = false" />
   </div>
 </template>
 
@@ -73,6 +72,8 @@ const fosterHome = reactive<FosterHomeDetail>({
 // 图片预览状态
 const showImageDialog = ref(false)
 const previewImage = ref('')
+const srcList = ref<string[] | string>()
+const currentImageIndex = ref(0)
 
 // 获取寄养家庭详情
 const getFosterHomeDetail = async (id: number) => {
@@ -92,8 +93,25 @@ const getFosterHomeDetail = async (id: number) => {
 
 // 图片预览处理
 const handleImagePreview = (image: string) => {
+  console.log('点击图片:', image);
   previewImage.value = image
+
+  // 确保 srcList 是数组
+  if (fosterHome.environmentPhotos && Array.isArray(fosterHome.environmentPhotos)) {
+    srcList.value = fosterHome.environmentPhotos
+    // 获取当前图片在列表中的索引
+    currentImageIndex.value = srcList.value.indexOf(image) || 0
+    console.log('当前索引:', currentImageIndex.value)
+  } else {
+    srcList.value = []
+    currentImageIndex.value = 0
+  }
+
+  console.log('图片列表:', srcList.value)
+
+  // 显示预览对话框
   showImageDialog.value = true
+  console.log('显示预览对话框:', showImageDialog.value)
 }
 
 // 选择套餐处理
@@ -117,6 +135,19 @@ onMounted(async () => {
 <style scoped lang="scss">
 #app {
   border-top: 1px solid transparent;
+}
+
+.demo-image__error .image-slot {
+  font-size: 30px;
+}
+
+.demo-image__error .image-slot .el-icon {
+  font-size: 30px;
+}
+
+.demo-image__error .el-image {
+  width: 100%;
+  height: 200px;
 }
 
 .cute-card {

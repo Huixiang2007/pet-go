@@ -1,7 +1,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { getMyPets } from '@/api/foster-care'
 import { useBookingFormStore } from '@/stores/booking'
-import type { MyPets } from '@/types/pet'
+// import type { MyPets } from '@/types/pet'
 export const useBookingForm = () => {
   const userId = localStorage.getItem('userId')
   const bookingFormStore = useBookingFormStore()

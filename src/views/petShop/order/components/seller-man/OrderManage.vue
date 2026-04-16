@@ -11,12 +11,7 @@
           <el-option label="待评价" value="待评价"></el-option>
           <el-option label="退款中/售后" value="退款中/售后"></el-option>
         </el-select>
-        <el-input
-          placeholder="订单号/姓名/手机号"
-          v-model="orderSearchInput"
-          clearable
-          size="small"
-        >
+        <el-input placeholder="订单号/姓名/手机号" v-model="orderSearchInput" clearable size="small">
           <template #prefix>
             <i class="fas fa-search text-md text-gray-300"></i>
           </template>
@@ -27,19 +22,17 @@
     </div>
 
     <!-- 订单表格 -->
-    <el-table
-      :data="filteredOrderData"
-      style="width: 100%"
-      stripe
-      :loading="loading"
-      :cell-style="{ padding: '12px 0' }"
-      :header-cell-style="{
+    <div v-if="!loading && orderData.length === 0" class="flex flex-col items-center justify-center py-16">
+      <i class="fas fa-box-open text-5xl text-gray-300 mb-4"></i>
+      <p class="text-gray-500 text-lg">暂无订单</p>
+      <p class="text-gray-400 text-sm mt-2">您还没有任何订单数据</p>
+    </div>
+    <el-table v-else :data="filteredOrderData" style="width: 100%" stripe :loading="loading"
+      :cell-style="{ padding: '12px 0' }" :header-cell-style="{
         background: '#fafafa',
         color: '#606266',
         fontWeight: '500',
-      }"
-      @selection-change="handleOrderSelectionChange"
-    >
+      }" @selection-change="handleOrderSelectionChange">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="orderSn" label="订单号" width="180" />
       <el-table-column prop="username" label="买家姓名" width="100" />
@@ -79,26 +72,14 @@
       <el-table-column label="操作" width="200">
         <template #default="scope">
           <div class="flex gap-2">
-            <el-button size="mini" type="text" class="text-blue-600" @click="viewOrder(scope.row)"
-              >查看</el-button
-            >
+            <el-button size="mini" type="text" class="text-blue-600" @click="viewOrder(scope.row)">查看</el-button>
 
-            <el-button
-              v-if="scope.row.orderStatus === '待发货'"
-              size="mini"
-              type="text"
-              class="text-green-600"
-              @click="openShipModal(scope.row)"
-            >
+            <el-button v-if="scope.row.orderStatus === '待发货'" size="mini" type="text" class="text-green-600"
+              @click="openShipModal(scope.row)">
               发货
             </el-button>
-            <el-button
-              v-if="scope.row.orderStatus === '待付款'"
-              size="mini"
-              type="text"
-              class="text-red-600"
-              @click="cancelOrder(scope.row)"
-            >
+            <el-button v-if="scope.row.orderStatus === '待付款'" size="mini" type="text" class="text-red-600"
+              @click="cancelOrder(scope.row)">
               取消
             </el-button>
           </div>
@@ -107,32 +88,21 @@
     </el-table>
 
     <!-- 分页 -->
-    <div class="px-6 py-3 border-t flex justify-between items-center">
+    <div v-if="orderData.length > 0" class="px-6 py-3 border-t flex justify-between items-center">
       <div class="text-sm text-gray-500">共 {{ total }} 条记录</div>
-      <el-pagination
-        layout="prev, pager, next, jumper"
-        :total="total"
-        :page-size="pageSize"
-        :current-page="pageNum"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-      />
+      <el-pagination layout="prev, pager, next, jumper" :total="total" :page-size="pageSize" :current-page="pageNum"
+        @size-change="handleSizeChange" @current-change="handleCurrentChange" />
     </div>
   </div>
 
   <!-- 订单详情弹窗 -->
-  <el-dialog
-    v-model="orderDetailVisible"
-    title="订单详情"
-    width="800px"
-    :close-on-click-modal="false"
-  >
+  <el-dialog v-model="orderDetailVisible" title="订单详情" width="800px" :close-on-click-modal="false">
     <div v-if="currentOrder" class="space-y-4">
       <div class="flex justify-between items-center pb-2 border-b">
         <div class="font-bold">订单信息</div>
         <el-tag :type="getStatusTagType(currentOrder.orderStatus)">{{
           currentOrder.orderStatus
-        }}</el-tag>
+          }}</el-tag>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -155,16 +125,13 @@
 
       <div class="pt-2 border-t">
         <h4 class="font-medium mb-2">商品信息</h4>
-        <el-table
-          :data="[
-            {
-              name: currentOrder.productName,
-              price: currentOrder.price,
-              num: currentOrder.quantity,
-            },
-          ]"
-          size="mini"
-        >
+        <el-table :data="[
+          {
+            name: currentOrder.productName,
+            price: currentOrder.price,
+            num: currentOrder.quantity,
+          },
+        ]" size="mini">
           <el-table-column prop="name" label="商品名称" />
           <el-table-column prop="price" label="单价" />
           <el-table-column prop="num" label="数量" />
@@ -203,23 +170,15 @@
 
     <template #footer>
       <el-button @click="orderDetailVisible = false">关闭</el-button>
-      <el-button
-        v-if="currentOrder && currentOrder.orderStatus === '待发货'"
-        type="primary"
-        @click="openShipModal(currentOrder)"
-      >
+      <el-button v-if="currentOrder && currentOrder.orderStatus === '待发货'" type="primary"
+        @click="openShipModal(currentOrder)">
         发货
       </el-button>
     </template>
   </el-dialog>
 
   <!-- 发货弹窗 -->
-  <el-dialog
-    v-model="shipModalVisible"
-    title="发货操作"
-    width="500px"
-    :close-on-click-modal="false"
-  >
+  <el-dialog v-model="shipModalVisible" title="发货操作" width="500px" :close-on-click-modal="false">
     <div v-if="currentOrder" class="space-y-4">
       <p class="text-sm">订单编号：{{ currentOrder.orderSn }}</p>
       <p class="text-sm">商品名称：{{ currentOrder.productName }}</p>
@@ -500,6 +459,7 @@ onMounted(() => {
 :deep(.el-input__inner) {
   border-radius: 4px;
 }
+
 :deep(.el-button) {
   border-radius: 4px;
 }
@@ -518,13 +478,16 @@ onMounted(() => {
 .grid {
   display: grid;
 }
+
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
 .gap-4 {
   gap: 1rem;
 }
-.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+
+.space-y-4> :not([hidden])~ :not([hidden]) {
   margin-top: 1rem;
 }
 </style>

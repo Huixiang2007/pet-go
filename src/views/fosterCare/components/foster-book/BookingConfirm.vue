@@ -38,7 +38,7 @@
                         <span class="value">{{ bookingForm.pictureUrlList.length }} 个文件</span>
                     </div>
                     <div class="vaccineFilesList">
-                        <div v-for="(file, index) in bookingForm.vaccineUrls" :key="index" class="file-item">
+                        <div v-for="(file, index) in bookingForm.pictureUrlList" :key="index" class="file-item">
                             <img :src="file" alt="预览图" />
                         </div>
                     </div>
@@ -61,8 +61,7 @@
                         <div v-for="id in bookingForm.additionalServiceId" :key="id" class="additional-service-item">
                             <span class="service-name">{{bookingForm.additionalServices.find(s => s.id ===
                                 id).title}}</span>
-                            <span class="service-price">¥{{bookingForm.additionalServices.find(s => s.id ===
-                                id).price}}</span>
+
                         </div>
                     </div>
                     <div class="info-item mt-2">

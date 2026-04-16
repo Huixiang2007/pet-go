@@ -2,13 +2,8 @@
   <div class="header">
     <!-- 左侧：移动端菜单按钮 -->
     <div class="header-left">
-      <el-button
-        icon="Menu"
-        class="mobile-menu-btn"
-        @click="sidebarOpened = !sidebarOpened"
-        circle
-        v-show="isMobile"
-      ></el-button>
+      <el-button icon="Menu" class="mobile-menu-btn" @click="sidebarOpened = !sidebarOpened" circle
+        v-show="isMobile"></el-button>
     </div>
 
     <!-- 中间：全局搜索框 -->
@@ -24,13 +19,13 @@
         <template #append>
           <el-button icon="Search" type="primary" size="small" @click="handleSearch"></el-button>
         </template>
-      </el-input>
-    </div> -->
+</el-input>
+</div> -->
 
     <!-- 右侧：功能入口区 -->
     <div class="header-right">
-    
-     
+
+
 
       <!-- 消息通知（简化 dropdown 插槽写法） -->
       <!-- <el-dropdown trigger="click" class="notification-dropdown">
@@ -80,16 +75,12 @@
         </template>
       </el-dropdown> -->
 
-    <!--退出登录 -->
-   
-        <el-button
-          icon="SwitchButton"
-          class="header-btn"
-          @click="LoginOut"
-        >退出登录
-        </el-button>
-    
-     
+      <!--退出登录 -->
+
+      <el-button icon="SwitchButton" class="header-btn" @click="LoginOut">退出登录
+      </el-button>
+
+
     </div>
   </div>
 </template>
@@ -97,7 +88,7 @@
 <!-- 注意：如果使用的是 Element Plus（Vue 3），需要确保图标已导入，可在 script 中添加： -->
 <script setup lang="ts">
 import { ref } from 'vue'
-import  request  from '@/utils/request'
+import request from '@/utils/request'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
@@ -123,6 +114,7 @@ const LoginOut = async (): Promise<void> => {
       if (response.code === 0) {
         localStorage.removeItem('authToken');
         localStorage.removeItem('userId');
+        localStorage.removeItem('userLocation');
         window.layui.layer.close(index);
         router.push('/login'); // 直接用 router 实例，无需 window.router
         window.layui.layer.msg('退出登录成功', { icon: 1, time: 1500 });
@@ -162,6 +154,7 @@ export default {
 .mobile-menu-btn {
   background-color: transparent;
   color: #333;
+
   &:hover {
     background-color: #f5f7fa;
   }
@@ -189,6 +182,7 @@ export default {
 .header-btn {
   background-color: transparent;
   color: #666;
+
   &:hover {
     background-color: #f5f7fa;
     color: #409eff;
@@ -251,6 +245,7 @@ export default {
   display: flex;
   align-items: flex-start;
   gap: 12px;
+
   &:hover {
     background-color: #f5f7fa;
   }
@@ -287,6 +282,7 @@ export default {
 .mark-read-btn {
   color: #409eff;
   background-color: transparent;
+
   &:hover {
     background-color: transparent;
     color: #2563eb;

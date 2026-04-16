@@ -102,7 +102,7 @@
         <div class="font-bold">订单信息</div>
         <el-tag :type="getStatusTagType(currentOrder.orderStatus)">{{
           currentOrder.orderStatus
-          }}</el-tag>
+        }}</el-tag>
       </div>
 
       <div class="grid grid-cols-2 gap-4">
@@ -466,7 +466,7 @@ onMounted(() => {
 
 :deep(.address-text) {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  /* -webkit-line-clamp: 2; */
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;

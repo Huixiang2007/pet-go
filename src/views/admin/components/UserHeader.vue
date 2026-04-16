@@ -269,7 +269,7 @@ export default {
   color: #666;
   margin-bottom: 4px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  // -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

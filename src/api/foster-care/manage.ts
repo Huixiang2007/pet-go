@@ -9,8 +9,12 @@ export const addFosterService = (data: any): Promise<ApiResponse<any>> => {
   return request('/server/api/user/fosterServices/addFosterServices', 'POST', data)
 }
 //删除服务套餐
-export const deleteFosterService = (id: number): Promise<ApiResponse<any>> => {
-  return request('/server/api/user/fosterServices/deleteFosterServices', 'DELETE', { id })
+export const deleteFosterService = (params: { id: number }): Promise<ApiResponse<any>> => {
+  return request(
+    `/server/api/user/fosterServices/deleteFosterServices?id=${params.id}`,
+    'POST',
+    params,
+  )
 }
 //更新服务套餐
 export const updateFosterService = (id: number, data: any): Promise<ApiResponse<any>> => {
@@ -28,6 +32,9 @@ export const getAddService = (serviceId: number): Promise<ApiResponse<any>> => {
 }
 
 //获取寄养人订单数据
-export const getFosterOrderData = (providerId: number): Promise<ApiResponse<any>> => {
-  return request('/server/api/user/foster-orders/orderTrend', 'POST', { providerId })
+export const getFosterOrderData = (params: { providerId: number }): Promise<ApiResponse<any>> => {
+  return request(
+    `/server/api/user/foster-orders/orderTrend?providerId=${params.providerId}`,
+    'POST',
+  )
 }

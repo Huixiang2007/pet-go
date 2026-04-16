@@ -5,27 +5,21 @@
       <div class="order-container mx-auto px-4">
         <div class="flex items-center justify-between max-w-3xl mx-auto">
           <div class="flex flex-col items-center">
-            <div
-              class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2"
-            >
+            <div class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2">
               <i class="fa fa-shopping-cart"></i>
             </div>
             <span class="text-sm font-medium text-[#333333]">购物车</span>
           </div>
           <div class="flex-1 h-1 mx-2 bg-[#f3ce48]"></div>
           <div class="flex flex-col items-center">
-            <div
-              class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2"
-            >
+            <div class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2">
               <i class="fa fa-map-marker"></i>
             </div>
             <span class="text-sm font-medium text-[#333333]">确认订单</span>
           </div>
           <div class="flex-1 h-1 mx-2 bg-gray-200"></div>
           <div class="flex flex-col items-center">
-            <div
-              class="w-10 h-10 rounded-full bg-gray-200 text-white flex items-center justify-center mb-2"
-            >
+            <div class="w-10 h-10 rounded-full bg-gray-200 text-white flex items-center justify-center mb-2">
               <i class="fa fa-credit-card"></i>
             </div>
             <span class="text-sm font-medium text-[#333333]">支付</span>
@@ -42,41 +36,26 @@
           <CouponSelector :coupons="coupons" @select-coupon="selectCoupon" />
         </div>
 
-        <OrderSummary
-          :goods="selectedGoods"
-          :shipping-fee="shippingFee"
-          :discount="selectedDiscount"
-          :total-price="totalPrice"
-          @confirm-pay="confirmOrder"
-          @update:agreementAccepted="agreementAccepted = $event"
-        />
+        <OrderSummary :goods="selectedGoods" :shipping-fee="shippingFee" :discount="selectedDiscount"
+          :total-price="totalPrice" @confirm-pay="confirmOrder"
+          @update:agreementAccepted="agreementAccepted = $event" />
       </div>
 
       <div class="w-[40%]">
-        <GoodsList
-          :goods="selectedGoods"
-          @update:goods="updateGoods"
-          @update:remark="orderRemark = $event"
-        />
+        <GoodsList :goods="selectedGoods" @update:goods="updateGoods" @update:remark="orderRemark = $event" />
       </div>
     </main>
 
     <el-loading v-if="loading" fullscreen text="确认订单中..." />
     <!-- 支付弹窗 -->
-    <PayPopup
-      v-model="payDialogVisible"
-      :order-no="orderNo"
-      :calculate-total-price="totalPrice"
-      :user-balance="userBalance"
-      @go-to-recharge="handleGoToRecharge"
-      @pay-success="handlePay"
-    />
+    <PayPopup v-model="payDialogVisible" :order-no="orderNo" :calculate-total-price="totalPrice"
+      :user-balance="userBalance" @go-to-recharge="handleGoToRecharge" @pay-success="handlePay" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import AddressSelector from './components/order-pay/AddressSelector.vue'
+// import AddressSelector from './components/order-pay/AddressSelector.vue'
 import CouponSelector from './components/order-pay/CouponSelector.vue'
 import OrderSummary from './components/order-pay/OrderSummary.vue'
 import GoodsList from './components/order-pay/GoodsList.vue'
@@ -87,7 +66,7 @@ import {
   submitOrder,
   getAddressList,
   getDefaultAddress,
-  updateDefaultAddress,
+  // updateDefaultAddress,
   payOrder,
   payOrderCart,
 } from '@/api/pet-shop/order'
@@ -209,11 +188,11 @@ const loadDefaultAddress = async () => {
   }
 }
 
-const setDefaultAddress = async (id: number) => {
-  addressList.value.forEach((i) => (i.isDefault = i.id === id))
-  await updateDefaultAddress(id + '')
-  ElMessage.success('默认地址已更新')
-}
+// const setDefaultAddress = async (id: number) => {
+//   addressList.value.forEach((i) => (i.isDefault = i.id === id))
+//   await updateDefaultAddress(id + '')
+//   ElMessage.success('默认地址已更新')
+// }
 
 // 优惠券
 const coupons = ref([
@@ -365,7 +344,7 @@ const getUserBalance = async () => {
     ElMessage.error('获取账户余额失败，请稍后重试')
   }
 }
-const jumpToAddressManage = () => router.push('/persons')
+// const jumpToAddressManage = () => router.push('/persons')
 </script>
 
 <style scoped lang="scss">

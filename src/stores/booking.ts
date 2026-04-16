@@ -30,8 +30,8 @@ export const useBookingFormStore = defineStore('bookingForm', () => {
     specialRequirements: '',
     emergencyPhone: '',
     userNotes: '',
-    pictureUrlList: [] as File[],
-    vaccineUrls: [] as string[],
+    pictureUrlList: [] as string[], // 用于预览的URL列表
+    vaccineFiles: [] as File[], // 用于提交的文件列表
   })
   // 重置表单
   const resetBookingForm = (serviceId: number) => {
@@ -41,6 +41,8 @@ export const useBookingFormStore = defineStore('bookingForm', () => {
     bookingForm.additionalServiceId = []
     bookingForm.specialRequirements = ''
     bookingForm.emergencyPhone = ''
+    bookingForm.pictureUrlList = []
+    bookingForm.vaccineFiles = []
   }
 
   // 更新附加服务

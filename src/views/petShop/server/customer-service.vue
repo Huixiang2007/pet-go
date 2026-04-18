@@ -4,6 +4,7 @@
       class="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[85vh] flex flex-row overflow-hidden"
     >
       <ChatList
+        :is-system-notice="isSystemNotice"
         :chat-type="chatType"
         :latest-notice="latestSystemNotice"
         :unread-count="unreadNoticeCount"
@@ -53,13 +54,15 @@
             </button>
           </div>
         </div>
-
         <template v-if="isSystemNotice">
           <SystemNoticeChat
             :notices="systemNotices"
+            :loading-more="loadingSystemNotices"
+            :has-more="hasMoreSystemNotices"
             @markRead="handleMarkNoticeRead"
             @delete="handleDelete"
             @batchDelete="handleBatchDelete"
+            @loadMore="handleLoadMoreSystemNotices"
           />
         </template>
         <template v-else>
@@ -85,7 +88,7 @@
         v-if="!isSystemNotice && activeShop.shopId"
         :active-shop="activeShop"
         :chat-type="chatType"
-        @send="() => loadChatRecords(activeShop.userId, chatType)"
+        @send="() => loadChatRecords(activeShop.userId)"
       />
     </div>
   </div>
@@ -99,7 +102,12 @@ import ChatContent from './components/ChatContent.vue'
 import SystemNoticeChat from './components/SystemNoticeChat.vue'
 import SidebarInfo from './components/SidebarInfo.vue'
 import MessageInput from './components/MessageInput.vue'
-import { systemNotices } from './data/noticeData'
+import {
+  systemNotices,
+  loadingSystemNotices,
+  hasMoreSystemNotices,
+  getSystemNotices,
+} from './data/noticeData'
 import type { ChatRecord } from '@/types/chat'
 import {
   defaultActiveShop,
@@ -176,6 +184,13 @@ watch(
   },
   { immediate: true },
 )
+
+// 加载更多系统通知
+const handleLoadMoreSystemNotices = () => {
+  if (!loadingSystemNotices.value && hasMoreSystemNotices.value) {
+    getSystemNotices(true)
+  }
+}
 
 // 加载聊天记录
 const loadChatRecords = async (userId: number, isLoadMore = false) => {
@@ -567,7 +582,6 @@ onMounted(async () => {
     }
   }
 })
-console.log('切换店铺/寄养:', route.query.id)
 watch(
   () => route.query.id,
   async (newUserId) => {
@@ -653,6 +667,7 @@ onUnmounted(() => {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #3b82f6;
   border-radius: 3px;

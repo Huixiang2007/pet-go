@@ -12,24 +12,25 @@
                                 <div class="flex justify-between">
                                     <h3 class="font-semibold text-gray-700 mb-2">你的位置</h3>
                                     <button class="text-xs text-blue-500" @click="goToPerson">
-                                        去修改
+                                        定位不准确？去修改
                                     </button>
                                 </div>
 
-                                <!-- <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm text-gray-600 truncate" :title="userHomeAddress">
-                                        {{ userHomeAddress || '加载中...' }}
-                                    </span>
-                                    
-                                </div> -->
                                 <div v-if="locationError" class="text-xs text-red-500 bg-red-50 p-2 rounded mt-1">
                                     ⚠️ {{ locationError }}
                                 </div>
                                 <div v-else-if="currentLocation.address"
                                     class="text-sm text-green-600 bg-green-50 p-2 rounded mt-2">
-                                    <i class="iconfont mr-1 ">&#xe603;</i>
-                                    <span class="">已定位: {{ userHomeAddress }}</span>
-
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <i class="iconfont mr-1">&#xe603;</i>
+                                            <span>已定位: {{ userHomeAddress }}</span>
+                                        </div>
+                                        <button class="text-xs text-blue-500 hover:text-blue-600 ml-2 whitespace-nowrap"
+                                            @click="showAddressSelector = true">
+                                            重新选择
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -142,7 +143,8 @@
                                     gap: 16px;
                                     margin-bottom: 16px;
                                     ">
-                                    <li v-for="foster in fosterHomes" :key="foster.id" @click="focusOnMarker(foster)"
+                                    <li v-for="foster in fosterHomes" :key="foster.id"
+                                        @click="focusOnMarker(foster.lng, foster.lat)"
                                         class="list-item border border-blue-100 rounded-xl p-4 hover:shadow-md transition-all duration-300 bg-blue-50/30 hover:bg-blue-50/50 cursor-pointer">
                                         <div style="
                                           border: 1px solid #e0f0ff;
@@ -243,6 +245,29 @@
             </div>
         </div>
     </div>
+
+    <!-- 地址选择器对话框 -->
+    <el-dialog v-model="showAddressSelector" title="您的默认地址不精确，请选择正确的地址" width="500px"
+        custom-class="address-selector-dialog" @close="handleDialogClose">
+        <div class="address-selector">
+            <div v-for="(item, index) in addressResults" :key="index" class="address-item"
+                :class="{ 'is-selected': selectedAddress === item }" @click="selectedAddress = item">
+                <div class="address-content">
+                    <span class="address-text">{{ item.formattedAddress }}</span>
+                    <el-icon v-if="selectedAddress === item">
+                        <Check class="check-icon" />
+                    </el-icon>
+                    <!-- <i v-if="selectedAddress === item" class="iconfont check-icon">&#xe60b;</i> -->
+                </div>
+            </div>
+        </div>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="handleDialogClose">取消</el-button>
+                <el-button type="primary" @click="selectAddress(selectedAddress)">确定</el-button>
+            </span>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup lang="ts">
@@ -253,6 +278,7 @@ import AMapLoader from "@amap/amap-jsapi-loader";
 import NavBar from '@/components/common/NavBar.vue';
 import { useRouter } from 'vue-router'
 import request from '@/utils/request';
+
 declare global {
     interface Window {
         _AMapSecurityConfig: {
@@ -277,13 +303,18 @@ const mapLoadError = ref('')
 // 用户家庭住址相关
 const userHomeAddress = ref('')
 const locationError = ref('')
-
+const mapInitialized = ref(false)
+const isConfirming = ref(false);//判断是通过确定还是取消来关闭对话框的
 // 当前定位信息（经纬度+地址）
 const currentLocation = reactive({
     lat: 0 as number,
     lng: 0 as number,
     address: '' as string
 })
+// 地址选择器相关
+const addressResults = ref<any[]>([])
+const showAddressSelector = ref(false)
+const selectedAddress = ref<any>(null)
 //分页相关
 const currentPage = ref(1)
 const total = ref(0)
@@ -342,250 +373,22 @@ interface FosterHome {
 
 
 // 获取用户家庭住址
-// const getUserHomeAddress = async () => {
-//     const loading = ElLoading.service({ text: '获取家庭住址中...' })
-//     try {
-//         const response = await request(
-//             '/server/api/user/getDefaultUserAddress',
-//             'GET'
-//         );
-//         if (response.code === 0) {
-//             console.log('获取用户地址响应:', response.data.detailAddress);
-//             userHomeAddress.value = response.data.detailAddress;
-
-//             // 获取地址后解析经纬度
-//             await parseAddressToLatLng(userHomeAddress.value);
-//         } else {
-//             locationError.value = '未获取到您的家庭住址，请先完善个人信息';
-//             return;
-//         }
-//     } catch (err) {
-//         console.error('获取家庭住址失败:', err);
-//         locationError.value = '获取地址失败，请刷新重试';
-//     } finally {
-//         loading.close();
-//     }
-// }
-// interface GeocodeResult {
-//     geocodes: {
-//         location: {
-//             lat: number;
-//             lng: number;
-//         };
-//         formattedAddress: string;
-//     }[];
-//     info: string;
-// }
-// 地址转经纬度
-// const parseAddressToLatLng = async (address: string) => {
-//     if (!geocoder) {
-//         locationError.value = '地图服务未就绪，请稍等';
-//         return;
-//     }
-
-//     return new Promise((resolve) => {
-//         geocoder.getLocation(address, (status: string, result: GeocodeResult) => {
-//             if (status === 'complete' && result.geocodes != undefined && result.geocodes.length > 0) {
-//                 const { location, formattedAddress } = result.geocodes[0]!;
-//                 if (location && !isNaN(location.lat) && !isNaN(location.lng)) {
-//                     currentLocation.lat = location.lat;
-//                     currentLocation.lng = location.lng;
-//                     currentLocation.address = formattedAddress;
-//                     locationError.value = '';
-//                     console.log(requestParams.value);
-//                     // 更新地图中心
-//                     if (map) {
-//                         map.setCenter([currentLocation.lng, currentLocation.lat]);
-//                         map.setZoom(15);
-//                     }
-
-//                     // 初始化请求数据
-//                     nextTick(() => {
-//                         load();
-//                     });
-//                     resolve(true);
-//                 } else {
-//                     locationError.value = '地址解析失败，无法获取有效位置';
-//                     resolve(false);
-//                 }
-//             } else {
-//                 locationError.value = `地址解析失败: ${result.info || '未知错误'}`;
-//                 resolve(false);
-//             }
-//         });
-//     });
-// }
-
-
-
-// 初始化地图
-
-const initMap = () => {
-    if (!mapContainer.value) {
-        mapLoadError.value = '地图容器未找到';
-        return;
-    }
-
-    mapLoadError.value = '';
-    const loading = ElLoading.service({ text: '加载地图中...' });
-
-    window._AMapSecurityConfig = {
-        securityJsCode: "76efd4e49a820ee84255d33dffeb374f",
-    };
-
-    AMapLoader.load({
-        key: "f9a61d8c1043186ca29b9675925160ff",
-        version: "2.0",
-        plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder"],
-    }).then((AMap: any
-    ) => {
-        AMapInstance = AMap;
-
-        map = new AMap.Map("custom-map-container", {
-            viewMode: "3D",
-            zoom: 12,
-            center: [113.9274, 35.2869]
-        });
-
-        // 添加地图控件
-        map.addControl(new AMap.ToolBar());
-        map.addControl(new AMap.Scale());
-
-        // 初始化地理编码器
-        // geocoder = new AMap.Geocoder({ city: "全国" });
-        // const infoWindow = new AMap.InfoWindow({
-        //     //创建信息窗体
-        //     isCustom: true, //使用自定义窗体
-        //     content: "<div>HELLO,AMAP!</div>", //信息窗体的内容可以是任意html片段
-        //     offset: new AMap.Pixel(16, -45),
-        // });
-        // const onMarkerClick = function (e) {
-        //     infoWindow.open(map, e.target.getPosition()); //打开信息窗体
-        //     //e.target就是被点击的Marker
-        // };
-        // const marker = new AMap.Marker({
-        //     position: [116.481181, 39.989792],
-        // });
-        // map.add(marker);
-        // marker.on("click", onMarkerClick); //绑定click事件
-        // 地图加载完成后，直接定位到用户当前位置
-        locateUserPosition();
-
-        // ElMessage.success('地图加载成功');
-        loading.close();
-    }).catch((err) => {
-        console.error('地图加载失败:', err);
-        mapLoadError.value = `地图加载失败: ${err.message || '请检查API密钥'}`;
-        loading.close();
-    });
-}
-
-// 定位用户当前位置
-const locateUserPosition = () => {
-    if (!navigator.geolocation) {
-        ElMessage.error('您的浏览器不支持地理定位');
-        // 如果不支持地理定位，尝试使用用户默认地址
-        // getUserHomeAddress();
-        return;
-    }
-
-    ElMessage.info('正在获取您的位置...');
-
-    navigator.geolocation.getCurrentPosition(
-        // 成功回调
-        async (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-
-            currentLocation.lat = lat;
-            currentLocation.lng = lng;
-
-            // 使用高德逆地理编码获取地址
-            try {
-                const geocoder = new AMapInstance.Geocoder();
-                geocoder.getAddress([lng, lat], (status: string, result: any) => {
-                    if (status === 'complete' && result.regeocode) {
-                        currentLocation.address = result.regeocode.formattedAddress;
-                        userHomeAddress.value = result.regeocode.formattedAddress;
-                    } else {
-                        currentLocation.address = '位置获取成功';
-                        userHomeAddress.value = '位置获取成功';
-                    }
-
-                    // 移动地图中心到当前位置，设置合适的缩放级别
-                    map.setCenter([lng, lat]);
-                    map.setZoom(15); // 显示当前位置所在的区域
-
-                    // 初始化请求数据
-                    nextTick(() => {
-                        load();
-                    });
-
-                    ElMessage.success('位置获取成功');
-                });
-            } catch (error) {
-                console.error('逆地理编码失败:', error);
-                currentLocation.address = '位置获取成功';
-                userHomeAddress.value = '位置获取成功';
-
-                // 移动地图中心到当前位置
-                map.setCenter([lng, lat]);
-                map.setZoom(15);
-
-                // 初始化请求数据
-                nextTick(() => {
-                    load();
-                });
-
-                ElMessage.success('位置获取成功');
-            }
-        },
-        // 失败回调
-        (error) => {
-            console.error('定位失败:', error);
-            let errorMsg = '位置获取失败';
-
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    errorMsg = '用户拒绝提供位置信息';
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    errorMsg = '位置信息不可用';
-                    break;
-                case error.TIMEOUT:
-                    errorMsg = '获取位置信息超时';
-                    break;
-            }
-
-            ElMessage.error(errorMsg);
-
-            // 定位失败时，尝试使用用户默认地址
-            // getUserHomeAddress();
-        },
-        // 选项
-        {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 60000,
-        },
-    );
-}
-
-// 获取用户家庭住址（保留原代码，作为备选方案）
-/*
 const getUserHomeAddress = async () => {
     const loading = ElLoading.service({ text: '获取家庭住址中...' })
     try {
         const response = await request(
-            '/server/api/user/getDefaultUserAddress',
-            'GET'
+            '/server/api/shop/user-address-manage/get-default-address',
+            'POST'
         );
         if (response.code === 0) {
             console.log('获取用户地址响应:', response.data.detailAddress);
             userHomeAddress.value = response.data.detailAddress;
-
+            console.log(userHomeAddress.value)
             // 获取地址后解析经纬度
-            await parseAddressToLatLng(userHomeAddress.value);
+            if (mapInitialized.value) {
+                await parseAddressToLatLng(userHomeAddress.value);
+
+            }
         } else {
             locationError.value = '未获取到您的家庭住址，请先完善个人信息';
             return;
@@ -597,66 +400,347 @@ const getUserHomeAddress = async () => {
         loading.close();
     }
 }
-*/
+interface GeocodeResult {
+    geocodes: {
+        location: {
+            lat: number;
+            lng: number;
+        };
+        formattedAddress: string;
+    }[];
+    info: string;
+}
+// 选择地址
+const selectAddress = (address: any) => {
+    isConfirming.value = true;
 
-// 地址转经纬度（保留原代码，作为备选方案）
-/*
-const parseAddressToLatLng = async (address: string) => {
-    if (!geocoder) {
-        locationError.value = '地图服务未就绪，请稍等';
+    if (address.location && !isNaN(address.location.lat) && !isNaN(address.location.lng)) {
+        currentLocation.lat = address.location.lat;
+        currentLocation.lng = address.location.lng;
+        currentLocation.address = address.formattedAddress;
+        userHomeAddress.value = address.formattedAddress;
+        locationError.value = '';
+
+        // 存储选择的地址到localStorage
+        localStorage.setItem('userLocation', JSON.stringify({
+            lat: currentLocation.lat,
+            lng: currentLocation.lng,
+            address: currentLocation.address
+        }));
+
+        // 重置分页状态，确保重新加载数据
+        currentPage.value = 1;
+        hasMore.value = true;
+        fosterHomes.value = [];
+        // 更新地图中心
+        if (map) {
+            map.setCenter([currentLocation.lng, currentLocation.lat], true);
+            map.setZoom(15, true);
+        }
+
+        // 初始化请求数据
+        nextTick(() => {
+            load();
+        });
+    }
+    showAddressSelector.value = false;
+    setTimeout(() => {
+        isConfirming.value = false;
+    }, 0);
+}
+
+// 处理对话框关闭
+const handleDialogClose = () => {
+    // 如果用户没有选择地址，默认选择第一个地址
+    console.log(selectedAddress.value)
+    if (isConfirming.value) {
         return;
     }
+    if (addressResults.value.length > 0) {
+        console.log("关闭对话框")
 
-    return new Promise((resolve) => {
+        selectAddress(addressResults.value[0]);
+    }
+    showAddressSelector.value = false;
+}
+
+// 地址转经纬度
+const parseAddressToLatLng = async (address: string) => {
+    if (!AMapInstance || !mapInitialized.value) {
+        console.warn('地图未初始化，等待初始化完成后再解析地址');
+        locationError.value = '地图未初始化，无法解析地址';
+        return;
+    }
+    AMapInstance.plugin("AMap.Geocoder", function () {
+        console.log('开始解析地址:', address)
+
+        const geocoder = new AMapInstance.Geocoder();
+
         geocoder.getLocation(address, (status: string, result: GeocodeResult) => {
             if (status === 'complete' && result.geocodes != undefined && result.geocodes.length > 0) {
-                const { location, formattedAddress } = result.geocodes[0]!;
-                if (location && !isNaN(location.lat) && !isNaN(location.lng)) {
-                    currentLocation.lat = location.lat;
-                    currentLocation.lng = location.lng;
-                    currentLocation.address = formattedAddress;
-                    locationError.value = '';
-                    console.log(requestParams.value);
-                    // 更新地图中心
-                    if (map) {
-                        map.setCenter([currentLocation.lng, currentLocation.lat]);
-                        map.setZoom(15);
+                console.log(result)
+                if (result.geocodes.length === 1) {
+                    // 只有一个结果，直接使用
+                    const { location, formattedAddress } = result.geocodes[0]!;
+                    if (location && !isNaN(location.lat) && !isNaN(location.lng)) {
+                        currentLocation.lat = location.lat;
+                        currentLocation.lng = location.lng;
+                        currentLocation.address = formattedAddress;
+                        userHomeAddress.value = formattedAddress;
+                        locationError.value = '';
+
+                        // 存储地址信息到localStorage
+                        localStorage.setItem('userLocation', JSON.stringify({
+                            lat: currentLocation.lat,
+                            lng: currentLocation.lng,
+                            address: currentLocation.address
+                        }));
+
+                        console.log(requestParams.value);
+                        // 更新地图中心
+                        if (map) {
+                            console.log("设置地图中心")
+                            map.setCenter([currentLocation.lng, currentLocation.lat], true);
+                            map.setZoom(15, true);
+                        }
+
+                        // 初始化请求数据
+                        nextTick(() => {
+                            load();
+                        });
+
+                    } else {
+                        locationError.value = '地址解析失败，无法获取有效位置';
                     }
+                } else {
+                    // 多个结果，显示选择器
+                    addressResults.value = result.geocodes;
+                    selectedAddress.value = result.geocodes[0]; // 默认选择第一个地址
+                    showAddressSelector.value = true;
+                }
+            } else {
+                locationError.value = `地址解析失败: ${result.info || '未知错误'}`;
+
+            }
+        });
+    });
+}
+
+
+
+    // 初始化地图
+
+    const initMap = () => {
+        if (!mapContainer.value) {
+            mapLoadError.value = '地图容器未找到';
+            return;
+        }
+
+        mapLoadError.value = '';
+        const loading = ElLoading.service({ text: '加载地图中...' });
+
+        window._AMapSecurityConfig = {
+            securityJsCode: "76efd4e49a820ee84255d33dffeb374f",
+        };
+
+        AMapLoader.load({
+            key: "f9a61d8c1043186ca29b9675925160ff",
+            version: "2.0",
+            plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder"],
+        }).then((AMap: any
+        ) => {
+            AMapInstance = AMap;
+            mapInitialized.value = true;
+            map = new AMap.Map("custom-map-container", {
+                viewMode: "3D",
+                zoom: 12,
+                center: [113.9274, 35.2869]
+            });
+
+            // 添加地图控件
+            map.addControl(new AMap.ToolBar());
+            map.addControl(new AMap.Scale());
+
+            // 初始化地理编码器
+            // geocoder = new AMap.Geocoder({ city: "全国" });
+            const infoWindow = new AMap.InfoWindow({
+                //创建信息窗体
+                isCustom: true, //使用自定义窗体
+                content: "<div>HELLO,AMAP!</div>", //信息窗体的内容可以是任意html片段
+                offset: new AMap.Pixel(16, -45),
+            });
+            const onMarkerClick = function (e) {
+                infoWindow.open(map, e.target.getPosition()); //打开信息窗体
+                //e.target就是被点击的Marker
+            };
+            const marker = new AMap.Marker({
+                position: [116.481181, 39.989792],
+            });
+            map.add(marker);
+            marker.on("click", onMarkerClick); //绑定click事件
+            // 地图加载完成后，直接定位到用户当前位置
+            locateUserPosition();
+
+            // ElMessage.success('地图加载成功');
+            loading.close();
+        }).catch((err) => {
+            console.error('地图加载失败:', err);
+            mapLoadError.value = `地图加载失败: ${err.message || '请检查API密钥'}`;
+            loading.close();
+        });
+    }
+
+    // 定位用户当前位置
+    const locateUserPosition = () => {
+        // 检查localStorage中是否有存储的位置信息
+        const storedLocation = localStorage.getItem('userLocation');
+        if (storedLocation) {
+            try {
+                const location = JSON.parse(storedLocation);
+                currentLocation.lat = location.lat;
+                currentLocation.lng = location.lng;
+                currentLocation.address = location.address;
+                userHomeAddress.value = location.address;
+
+                // 移动地图中心到存储的位置
+                if (map) {
+                    map.setCenter([location.lng, location.lat], true);
+                    map.setZoom(15, true);
+                }
+
+                // 初始化请求数据
+                nextTick(() => {
+                    load();
+                });
+
+                console.log('使用存储的位置信息');
+                return;
+            } catch (error) {
+                console.error('解析存储的位置信息失败:', error);
+                // 解析失败，继续执行定位
+            }
+        }
+
+        if (!navigator.geolocation) {
+            ElMessage.error('您的浏览器不支持地理定位');
+            // 如果不支持地理定位，尝试使用用户默认地址
+            getUserHomeAddress();
+            return;
+        }
+
+        ElMessage.info('正在获取您的位置...');
+
+        navigator.geolocation.getCurrentPosition(
+            // 成功回调
+            async (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                currentLocation.lat = lat;
+                currentLocation.lng = lng;
+
+                // 使用高德逆地理编码获取地址
+                try {
+                    const geocoder = new AMapInstance.Geocoder();
+                    geocoder.getAddress([lng, lat], (status: string, result: any) => {
+                        if (status === 'complete' && result.regeocode) {
+                            currentLocation.address = result.regeocode.formattedAddress;
+                            userHomeAddress.value = result.regeocode.formattedAddress;
+                        } else {
+                            currentLocation.address = '位置获取成功';
+                            userHomeAddress.value = '位置获取成功';
+                        }
+
+                        // 存储位置信息到localStorage
+                        localStorage.setItem('userLocation', JSON.stringify({
+                            lat: currentLocation.lat,
+                            lng: currentLocation.lng,
+                            address: currentLocation.address
+                        }));
+
+                        // 移动地图中心到当前位置，设置合适的缩放级别
+                        map.setCenter([lng, lat], true);
+                        map.setZoom(15, true); // 显示当前位置所在的区域
+
+                        // 初始化请求数据
+                        nextTick(() => {
+                            load();
+                        });
+
+                        ElMessage.success('位置获取成功');
+                    });
+                } catch (error) {
+                    console.error('逆地理编码失败:', error);
+                    currentLocation.address = '位置获取成功';
+                    userHomeAddress.value = '位置获取成功';
+
+                    // 存储位置信息到localStorage
+                    localStorage.setItem('userLocation', JSON.stringify({
+                        lat: currentLocation.lat,
+                        lng: currentLocation.lng,
+                        address: currentLocation.address
+                    }));
+
+                    // 移动地图中心到当前位置
+                    map.setCenter([lng, lat], true);
+                    map.setZoom(15, true);
 
                     // 初始化请求数据
                     nextTick(() => {
                         load();
                     });
-                    resolve(true);
-                } else {
-                    locationError.value = '地址解析失败，无法获取有效位置';
-                    resolve(false);
+
+                    ElMessage.success('位置获取成功');
                 }
-            } else {
-                locationError.value = `地址解析失败: ${result.info || '未知错误'}`;
-                resolve(false);
-            }
-        });
-    });
-}
-*/
+            },
+            // 失败回调
+            (error) => {
+                // console.error('定位失败:', error);
+                let errorMsg = '位置获取失败';
 
-// 更新地图标记
-const updateMapMarkers = () => {
-    if (!map) return;
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMsg = '请前往设置中允许请求位置信息';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMsg = '位置信息不可用';
+                        break;
+                    case error.TIMEOUT:
+                        errorMsg = '获取位置信息超时';
+                        break;
+                }
 
-    // 清除现有标记
-    markers.forEach((marker: any
+                ElMessage.error(errorMsg);
 
-    ) => marker.remove && marker.remove());
-    markers = [];
+                // 定位失败时，尝试使用用户默认地址
+                getUserHomeAddress();
+            },
+            // 选项
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 60000,
+            },
+        );
+    }
 
-    // 添加用户位置标记
-    if (currentLocation.lat && currentLocation.lng && !isNaN(currentLocation.lat) && !isNaN(currentLocation.lng)) {
-        console.log('添加用户位置标记:', currentLocation);
-        const userMarker = new AMapInstance.Marker({
-            position: [currentLocation.lng, currentLocation.lat],
-            content: `
+
+    // 更新地图标记
+    const updateMapMarkers = () => {
+        if (!map) return;
+
+        // 清除现有标记
+        markers.forEach((marker: any
+
+        ) => marker.remove && marker.remove());
+        markers = [];
+
+        // 添加用户位置标记
+        if (currentLocation.lat && currentLocation.lng && !isNaN(currentLocation.lat) && !isNaN(currentLocation.lng)) {
+            console.log('添加用户位置标记:', currentLocation);
+            const userMarker = new AMapInstance.Marker({
+                position: [currentLocation.lng, currentLocation.lat],
+                content: `
                 <div style="
                     background: #FF6B6B;
                     border: 2px solid white;
@@ -671,23 +755,24 @@ const updateMapMarkers = () => {
                     <span style="color:white;font-size:12px;">📍</span>
                 </div>
             `,
-            offset: new AMapInstance.Pixel(-12, -12)
-        });
-        markers.push(userMarker);
-        map.add(userMarker);
-    }
-
-    // 添加寄养家庭标记
-    fosterHomes.value.forEach(foster => {
-        if (!foster.lng || !foster.lat || isNaN(foster.lng) || isNaN(foster.lat)) {
-            console.warn(`寄养家庭 ${foster.name} 经纬度无效，跳过标记`);
-            return;
+                offset: new AMapInstance.Pixel(-12, -12)
+            });
+            userMarker.on('click', () => focusOnMarker(currentLocation.lng, currentLocation.lat));
+            markers.push(userMarker);
+            map.add(userMarker);
         }
 
+        // 添加寄养家庭标记
+        fosterHomes.value.forEach(foster => {
+            if (!foster.lng || !foster.lat || isNaN(foster.lng) || isNaN(foster.lat)) {
+                console.warn(`寄养家庭 ${foster.name} 经纬度无效，跳过标记`);
+                return;
+            }
 
-        const marker = new AMapInstance.Marker({
-            position: [foster.lng, foster.lat],
-            content: `
+
+            const marker = new AMapInstance.Marker({
+                position: [foster.lng, foster.lat],
+                content: `
                 <div style="
                     background-color:#ff6b8c;
                     border: 2px solid white;
@@ -700,184 +785,184 @@ const updateMapMarkers = () => {
                     ${foster.name}
                 </div>
             `,
-            offset: new AMapInstance.Pixel(-50, -30)
-        });
-        marker.on('click', () => focusOnMarker(foster));
-        markers.push(marker);
-        map.add(marker);
-    });
-    fitMapToMarkers();
-}
-
-const fitMapToMarkers = () => {
-    if (!map || markers.length === 0) return;
-
-    // 收集所有标记的经纬度
-    const bounds = new AMapInstance.Bounds();
-    markers.forEach((marker: any
-
-    ) => {
-        bounds.extend(marker.getPosition());
-    });
-
-    // 适配范围（添加padding避免标记贴边）
-    map.setBounds(bounds, false, [20, 20, 20, 20]);
-};
-// 聚焦到寄养家庭
-const focusOnMarker = (foster: FosterHome) => {
-
-    if (map && foster.lng && foster.lat && !isNaN(foster.lng) && !isNaN(foster.lat)) {
-        map.setCenter([foster.lng, foster.lat]);
-        map.setZoom(16);
-    }
-    scrollToTop();
-}
-
-// 请求寄养列表
-const load = async () => {
-    console.log('准备请求数据');
-    if (currentLocation.lat === 0 && currentLocation.lng === 0) {
-        ElMessage.warning('请先完成定位后再操作');
-        return;
-    }
-    if (loading.value || !hasMore.value) return;
-    loading.value = true;
-    console.log('requestParams:', requestParams.value)
-
-    try {
-
-        const response = await request(
-            '/server/api/foster/provider/listByPage',
-            'POST',
-            requestParams.value,
-        );
-        console.log('查询结果:', response);
-        if (response.code === 0) {
-            let newList = response.data.list || [];
-            newList = newList.filter((item: FosterHome) => {
-                return item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1];
+                offset: new AMapInstance.Pixel(-50, -30)
             });
-            newList = sortFosterHomes(newList);
-            if (currentPage.value === 1) {
-                console.log("是第一页")
-                fosterHomes.value = newList
-            } else {
-                fosterHomes.value = [...fosterHomes.value, ...newList]
-            }
-            total.value = response.data.total;
+            marker.on('click', () => focusOnMarker(foster.lng, foster.lat));
+            markers.push(marker);
+            map.add(marker);
+        });
+        fitMapToMarkers();
+    }
 
-            // 判断是否还有更多数据
-            hasMore.value = fosterHomes.value.length < response.data.total;
-            if (hasMore.value) {
-                currentPage.value++;
+    const fitMapToMarkers = () => {
+        if (!map || markers.length === 0) return;
 
-            } else {
-                // ElMessage.info('已加载全部数据');
-            }
+        // 收集所有标记的经纬度
+        const bounds = new AMapInstance.Bounds();
+        markers.forEach((marker: any
 
-            // 更新地图标记
-            updateMapMarkers();
-        } else {
-            ElMessage.error(response.msg || '获取数据失败');
+        ) => {
+            bounds.extend(marker.getPosition());
+        });
+
+        // 适配范围（添加padding避免标记贴边）
+        map.setBounds(bounds, false, [20, 20, 20, 20]);
+    };
+    //聚焦地址
+    const focusOnMarker = (lng, lat) => {
+
+        if (map && lng && lat && !isNaN(lng) && !isNaN(lat)) {
+            map.setCenter([lng, lat]);
+            map.setZoom(16);
         }
-    } catch (error) {
-        console.error('请求失败:', error);
-        ElMessage.error('获取寄养列表失败，请稍后重试');
-    } finally {
-        loading.value = false;
+        scrollToTop();
     }
-}
+    // 请求寄养列表
+    const load = async () => {
+        console.log('准备请求数据');
+        if (currentLocation.lat === 0 && currentLocation.lng === 0) {
+            ElMessage.warning('请先完成定位后再操作');
+            return;
+        }
+        if (loading.value || !hasMore.value) return;
+        loading.value = true;
+        console.log('requestParams:', requestParams.value)
 
+        try {
 
+            const response = await request(
+                '/server/api/foster/provider/listByPage',
+                'POST',
+                requestParams.value,
+            );
+            console.log('查询结果:', response);
+            if (response.code === 0) {
+                let newList = response.data.list || [];
+                newList = newList.filter((item: FosterHome) => {
+                    return item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1];
+                });
+                newList = sortFosterHomes(newList);
+                if (currentPage.value === 1) {
+                    console.log("是第一页")
+                    fosterHomes.value = newList
+                } else {
+                    fosterHomes.value = [...fosterHomes.value, ...newList]
+                }
+                total.value = response.data.total;
 
-// 搜索处理
-const handleSearch = () => {
-    currentPage.value = 1; // 重置为第一页
-    hasMore.value = true;
-    load();
-}
+                // 判断是否还有更多数据
+                hasMore.value = fosterHomes.value.length < response.data.total;
+                if (hasMore.value) {
+                    currentPage.value++;
 
-// 筛选条件变化
-const handleFilterChange = () => {
-    currentPage.value = 1;
-    hasMore.value = true;
-    load();
-}
+                } else {
+                    // ElMessage.info('已加载全部数据');
+                }
 
-// 半径变化（防抖处理）
-const handleRadiusInput = () => {
-
-    handleRadiusConfirm(); // 防抖后执行请求
-
-};
-const handleRadiusConfirm = () => {
-    currentPage.value = 1;
-    hasMore.value = true;
-    load();
-};
-// 排序变化
-const handleSortChange = () => {
-    currentPage.value = 1;
-    hasMore.value = true;
-    load();
-}
-
-// 排序处理函数（根据选中的排序类型排序）
-const sortFosterHomes = (list: FosterHome[]) => {
-    const sortedList = [...list]; // 深拷贝避免修改原数组
-    switch (sortOption.value) {
-        case 'rating': // 评分最高（降序）
-            sortedList.sort((a, b) => b.rating - a.rating);
-            break;
-        case 'price': // 价格最低（升序）
-            sortedList.sort((a, b) => a.price - b.price);
-            break;
-        case 'comprehensive': // 综合排序（默认按id/距离）
-        default:
-            sortedList.sort((a, b) => a.id - b.id); // 或按距离排序：a.distance - b.distance
-            break;
+                // 更新地图标记
+                updateMapMarkers();
+            } else {
+                ElMessage.error(response.msg || '获取数据失败');
+            }
+        } catch (error) {
+            console.error('请求失败:', error);
+            ElMessage.error('获取寄养列表失败，请稍后重试');
+        } finally {
+            loading.value = false;
+        }
     }
-    return sortedList;
-};
 
-// 重置筛选
-const resetFilters = () => {
-    searchKeyword.value = ''
-    filters.fosterTypes = ["个人"]
-    filters.petTypes = []
-    filters.priceRange = [0, 200]
-    filters.radius = '5'
-    sortOption.value = 'comprehensive'
-    // 重置分页状态
-    currentPage.value = 1
-    hasMore.value = true
-    load()
-}
-const scrollToTop = () => {
-    if (scrollContainer.value) {
-        scrollContainer.value.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        })
-    } else {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        })
+
+
+    // 搜索处理
+    const handleSearch = () => {
+        currentPage.value = 1; // 重置为第一页
+        hasMore.value = true;
+        load();
     }
-}
-// 查看详情
 
-const viewDetails = (foster: FosterHome) => {
-    router.push({ name: 'fosterDetail', params: { id: foster.id } });
-}
+    // 筛选条件变化
+    const handleFilterChange = () => {
+        currentPage.value = 1;
+        hasMore.value = true;
+        load();
+    }
 
-// 组件挂载时初始化地图
-onMounted(() => {
-    nextTick(() => {
-        initMap();
+    // 半径变化（防抖处理）
+    const handleRadiusInput = () => {
+
+        handleRadiusConfirm(); // 防抖后执行请求
+
+    };
+    const handleRadiusConfirm = () => {
+        currentPage.value = 1;
+        hasMore.value = true;
+        load();
+    };
+    // 排序变化
+    const handleSortChange = () => {
+        currentPage.value = 1;
+        hasMore.value = true;
+        load();
+    }
+
+    // 排序处理函数（根据选中的排序类型排序）
+    const sortFosterHomes = (list: FosterHome[]) => {
+        const sortedList = [...list]; // 深拷贝避免修改原数组
+        switch (sortOption.value) {
+            case 'rating': // 评分最高（降序）
+                sortedList.sort((a, b) => b.rating - a.rating);
+                break;
+            case 'price': // 价格最低（升序）
+                sortedList.sort((a, b) => a.price - b.price);
+                break;
+            case 'comprehensive': // 综合排序（默认按id/距离）
+            default:
+                sortedList.sort((a, b) => a.id - b.id); // 或按距离排序：a.distance - b.distance
+                break;
+        }
+        return sortedList;
+    };
+
+    // 重置筛选
+    const resetFilters = () => {
+        searchKeyword.value = ''
+        filters.fosterTypes = ["个人"]
+        filters.petTypes = []
+        filters.priceRange = [0, 200]
+        filters.radius = '5'
+        sortOption.value = 'comprehensive'
+        // 重置分页状态
+        currentPage.value = 1
+        hasMore.value = true
+        load()
+    }
+    const scrollToTop = () => {
+        if (scrollContainer.value) {
+            scrollContainer.value.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            })
+        } else {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            })
+        }
+    }
+    // 查看详情
+
+    const viewDetails = (foster: FosterHome) => {
+        router.push({ name: 'fosterDetail', params: { id: foster.id } });
+    }
+
+    // 组件挂载时初始化地图
+    onMounted(() => {
+        nextTick(() => {
+            initMap();
+            // parseAddressToLatLng("河南省郑州市中原区正商花语里");
+        });
     });
-});
 
 
 </script>
@@ -1020,6 +1105,138 @@ onMounted(() => {
         :deep(.el-infinite-scroll) {
             overflow: visible;
         }
+
+        /* 地址选择器样式 */
+
     }
+
+
+}
+
+.address-selector-dialog {
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+}
+
+.address-selector {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 12px 8px;
+}
+
+.address-item {
+    padding: 16px 18px;
+    margin: 8px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: #fafafa;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #4A90E2, #6BC4FF);
+        transform: scaleY(0);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &:hover {
+        background-color: #f0f7ff;
+        transform: translateX(6px) scale(1.01);
+        box-shadow: 0 4px 16px rgba(74, 144, 226, 0.15);
+        border-color: rgba(74, 144, 226, 0.2);
+
+        &::before {
+            transform: scaleY(1);
+        }
+    }
+
+    &:active {
+        transform: translateX(4px) scale(0.99);
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.1);
+    }
+
+    &.is-selected {
+        background: linear-gradient(135deg, rgba(74, 144, 226, 0.12), rgba(107, 196, 255, 0.08));
+        border-color: #4A90E2;
+        box-shadow: 0 4px 20px rgba(74, 144, 226, 0.2);
+        transform: translateX(6px);
+
+        &::before {
+            transform: scaleY(1);
+        }
+    }
+}
+
+.address-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.address-text {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.5;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    transition: color 0.3s ease;
+}
+
+.address-item:hover .address-text {
+    color: #4A90E2;
+}
+
+.address-item.is-selected .address-text {
+    color: #4A90E2;
+    font-weight: 600;
+}
+
+.check-icon {
+    font-size: 20px;
+    color: #4A90E2;
+    flex-shrink: 0;
+    animation: checkIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 2px 4px rgba(74, 144, 226, 0.3));
+}
+
+@keyframes checkIn {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2) rotate(0deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* 对话框标题样式 */
+/* 对话框标题样式 */
+:deep(.el-dialog .el-dialog__header .el-dialog__title) {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
 }
 </style>

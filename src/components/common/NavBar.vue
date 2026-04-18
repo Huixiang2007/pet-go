@@ -26,7 +26,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '@/utils/request'
-import { ElMessage } from 'element-plus'
+// import { ElMessage } from 'element-plus'
 interface NavItem {
   text: string
   color: string
@@ -59,7 +59,7 @@ const navItems = ref<NavItem[]>([
   // },
   {
     text: '我的宠物',
-    color: '#f9526f',
+    color: 'rgb(255 35 145)',
     bgColor: 'pink',
     unicode: '\ue6d7',
     path: '/my-pets',
@@ -73,7 +73,7 @@ const navItems = ref<NavItem[]>([
   },
   {
     text: '购物车',
-    color: 'text-[rgb(100,149,237)]',
+    color: 'text-[rgb(156,156,224)]',
     bgColor: 'rgb(202,234,244)',
     unicode: '\ue655',
     path: '/pet-cart',
@@ -119,7 +119,8 @@ const checkFosterStatus = async () => {
     }
 
   } catch (err) {
-    ElMessage.error(err)
+    // ElMessage.error(err)
+    console.log(err)
 
   }
 }
@@ -177,7 +178,7 @@ onMounted(() => {
 }
 
 .item.active:nth-child(3) {
-  color: rgb(22 209 22) !important;
+  color: rgb(255 35 145) !important;
 }
 
 .item.active:nth-child(4) {
@@ -194,7 +195,7 @@ onMounted(() => {
 }
 
 .item.active:nth-child(5) {
-  color: rgb(229 163 37) !important;
+  color: rgb(65 65 255) !important;
 }
 
 .item.active:nth-child(5)~.active-circle {
@@ -210,13 +211,14 @@ onMounted(() => {
 }
 
 .item.active:nth-child(7) {
-  color: rgb(255 35 145) !important;
+  color: rgb(65 65 255) !important;
 }
 
 .item.active:nth-child(7)~.active-circle {
   left: 738px !important;
 }
 
+/* 
 .item.active:nth-child(8) {
   color: rgb(65 65 255) !important;
 }
@@ -231,7 +233,7 @@ onMounted(() => {
 
 .item.active:nth-child(9)~.active-circle {
   left: 977px !important;
-}
+} */
 
 /* 果冻动画（和原始一致） */
 @keyframes jello {

@@ -94,7 +94,7 @@
 
       <!-- 支付确认弹窗 -->
       <FosterPayConfirm v-if="showPayConfirmDialog" :orderNo=orderNo :calculateTotalPrice=calculateTotalPrice
-        :userBalance=userBalance :vaccineUrls="bookingForm.vaccineUrls" @go-to-recharge="goToRecharge"
+        :userBalance=userBalance :vaccineUrls="bookingForm.pictureUrlList" @go-to-recharge="goToRecharge"
         v-model=showPayConfirmDialog @pay-success="handlePayConfirm" />
     </div>
   </div>
@@ -135,6 +135,7 @@ const bookingStore = useBookingPackageStore()
 const selectedPackage = computed(() => bookingStore.selectedPackage)
 const bookingFormStore = useBookingFormStore()
 const bookingForm = bookingFormStore.bookingForm
+console.log(bookingForm)
 // 初始化检查
 if (!selectedPackage.value) {
   ElMessage.error('请先选择套餐！')
@@ -209,7 +210,7 @@ const confirmBooking = async () => {
     formData.append('specialRequirements', bookingForm.specialRequirements || '')
     formData.append('emergencyPhone', bookingForm.emergencyPhone)
     formData.append('userNotes', '')
-    bookingForm.pictureUrlList.forEach((file: File) => {
+    bookingForm.vaccineFiles.forEach((file: File) => {
       formData.append('pictureUrlList', file)
     })
 
@@ -262,7 +263,7 @@ const confirmPayment = async () => {
 
   try {
     const res = await payFosterOrder({
-      orderNo: orderNo.value
+      orderNo: Number(orderNo.value)
 
     })
     if (res.code === 0) {

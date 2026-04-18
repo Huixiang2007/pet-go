@@ -404,11 +404,12 @@ const loadCommentList = async () => {
   loading.value = true
   try {
     const params = {
-      pageNum: props.pageNum, // 用父页面的
+      pageNum: props.pageNum,
       pageSize: props.pageSize,
       commentStatus: currentStatus.value,
     }
     const res = await getMyViewCommentList(params)
+    console.log('评论列表', res)
     emit('update:total', res.total || 0)
     commentList.value = res.list || []
   } finally {

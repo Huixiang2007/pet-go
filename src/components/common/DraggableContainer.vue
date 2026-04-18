@@ -21,9 +21,9 @@ const emit = defineEmits<{ (e: 'click'): void }>()
 //判断是否是图拽事件，防止拖拽时触发点击事件
 const hasDragged = ref(false)
 const handleClick = () => {
-    console.log(isDragging.value, hasDragged.value, props.preventClickOnDrag)
+    console.log('点击事件触发:', !hasDragged.value)
     // 只有在没有拖拽过的情况下才触发点击事件
-    if (!hasDragged.value) {
+    if (!hasDragged.value || !props.preventClickOnDrag) {
         emit('click')
     }
 }
@@ -39,21 +39,21 @@ const initPosition = () => {
 }
 //开始拖拽
 const handleDragStart = (e) => {
-    console.log("开始拖拽")
+
     isDragging.value = true;
+
 
     dragOffset.value = {
         x: e.offsetX,
         y: e.offsetY,
     }
-
 }
 //正在拖拽，同步元素的位置
 const handleDrag = (e) => {
     if (isDragging.value) {
         console.log("正在拖拽")
-
         hasDragged.value = true;
+
         console.log(parseInt(props.containerStyle.width))
         position.value = {
             x: Math.min(Math.max(0, e.clientX - dragOffset.value.x), window.innerWidth - parseInt(props.containerStyle.width)),
@@ -65,10 +65,8 @@ const handleDrag = (e) => {
 //拖拽结束
 const handleDragEnd = () => {
     isDragging.value = false;
-    // 延迟重置 hasDragged，确保 click 事件能够正确判断
-    setTimeout(() => {
-        hasDragged.value = false;
-    }, 0);
+    // 直接重置 hasDragged，确保点击事件能够正确判断
+    hasDragged.value = false;
 }
 onMounted(() => {
     initPosition()

@@ -71,8 +71,13 @@ export interface ProductDetail {
   id: number | string
   brandId: string | number
   couponsList: Array<{
-    denomination: number
-    minAmount: number
+    id:string | number
+    denomination?: number
+    minAmount?: number
+    couponType?: string
+    couponName?: string
+    discountType?: string
+    discount?: number
   }>
   shopOwnerId: number
   currentPrice: number

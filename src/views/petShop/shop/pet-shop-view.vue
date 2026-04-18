@@ -132,90 +132,57 @@
             </a>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6" v-if="shopCoupons.length > 0">
             <div
-              class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20"
+              v-for="coupon in shopCoupons"
+              :key="coupon.id"
+              class="bg-white rounded-xl p-4 shadow-sm relative overflow-hidden"
             >
-              <div
-                class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"
-              ></div>
-              <div class="absolute top-3 right-3 text-amber-300">
-                <i class="fa fa-paw text-2xl"></i>
+              <div class="mb-3">
+                <h4 class="text-base font-semibold text-gray-800 mb-1">{{ coupon.couponName }}</h4>
+                <p class="text-xs text-gray-400 mb-1">
+                  适用：{{ coupon.usedToShopName || '全平台' }} /
+                  {{ coupon.usedToProductTypeName || '全品类' }}
+                </p>
+                <p class="text-xs text-gray-400">
+                  已领：{{ coupon.receiveCount || 0 }} / 上限：{{ coupon.perLimit || 0 }}
+                </p>
               </div>
-              <div class="flex items-end mb-3">
-                <span class="text-4xl font-bold text-amber-600">¥50</span>
-                <span class="text-gray-500 ml-2 mb-1">满500可用</span>
-              </div>
-              <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
-              <button
-                class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm"
-              >
-                立即领取
-              </button>
-            </div>
 
-            <div
-              class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20"
-            >
-              <div
-                class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"
-              ></div>
-              <div class="absolute top-3 right-3 text-amber-300">
-                <i class="fa fa-paw text-2xl"></i>
-              </div>
-              <div class="flex items-end mb-3">
-                <span class="text-4xl font-bold text-amber-600">¥30</span>
-                <span class="text-gray-500 ml-2 mb-1">满300可用</span>
-              </div>
-              <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
               <button
-                class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm"
+                :disabled="!canReceive(coupon)"
+                :class="[
+                  canReceive(coupon)
+                    ? 'bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-500 hover:to-yellow-500'
+                    : 'bg-gray-300 cursor-not-allowed',
+                ]"
+                class="w-full text-white text-sm py-2 rounded-lg transition-all"
+                @click="receiveCouponHandler(coupon.id)"
               >
-                立即领取
-              </button>
-            </div>
-
-            <div
-              class="coupon bg-white rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden border border-amber-200/20"
-            >
-              <div
-                class="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-amber-400 to-yellow-300"
-              ></div>
-              <div class="absolute top-3 right-3 text-amber-300">
-                <i class="fa fa-paw text-2xl"></i>
-              </div>
-              <div class="flex items-end mb-3">
-                <span class="text-4xl font-bold text-amber-600">¥10</span>
-                <span class="text-gray-500 ml-2 mb-1">无门槛</span>
-              </div>
-              <p class="text-xs text-gray-400 mb-4">有效期至 2023-12-31</p>
-              <button
-                class="w-full bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white py-2 rounded-full text-sm transition-colors shadow-sm"
-              >
-                立即领取
+                {{ getReceiveButtonText(coupon) }}
               </button>
             </div>
           </div>
 
-          <div
-            class="flex flex-col md:flex-row items-center justify-between py-4 px-6 bg-white/80 rounded-2xl mt-6 border border-amber-200/20 backdrop-blur-sm"
-          >
-            <div class="flex items-center mb-3 md:mb-0">
-              <div
-                class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-3"
-              >
-                <i class="fas fa-paw text-amber-700"></i>
-              </div>
-              <div class="text-amber-700 text-sm">不错过每一次优惠</div>
+          <div v-else class="no-coupons">暂无优惠券</div>
+        </div>
+
+        <div
+          class="flex flex-col md:flex-row items-center justify-between py-4 px-6 bg-white/80 rounded-2xl mt-6 border border-amber-200/20 backdrop-blur-sm"
+        >
+          <div class="flex items-center mb-3 md:mb-0">
+            <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-3">
+              <i class="fas fa-paw text-amber-700"></i>
             </div>
-            <div class="flex gap-3">
-              <button
-                class="bg-amber-100 text-amber-700 text-sm px-4 py-2 rounded-full transition-all duration-300 hover:bg-amber-200 hover:scale-105"
-                @click="popupVisible = true"
-              >
-                查看规则
-              </button>
-            </div>
+            <div class="text-amber-700 text-sm">不错过每一次优惠</div>
+          </div>
+          <div class="flex gap-3">
+            <button
+              class="bg-amber-100 text-amber-700 text-sm px-4 py-2 rounded-full transition-all duration-300 hover:bg-amber-200 hover:scale-105"
+              @click="popupVisible = true"
+            >
+              查看规则
+            </button>
           </div>
         </div>
 
@@ -282,36 +249,13 @@
         </div>
       </div>
     </div>
-
-    <div
-      v-if="popupVisible"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 backdrop-blur-sm"
-    >
-      <div
-        class="bg-white rounded-3xl w-full sm:w-3/4 lg:w-1/2 max-h-[80vh] overflow-auto p-6 shadow-xl border border-amber-200/30 transform scale-95 hover:scale-100 transition-all duration-300"
-      >
-        <div class="flex justify-between items-center mb-4 pb-2 border-b border-amber-100">
-          <h2 class="text-xl font-bold text-amber-800 flex items-center">
-            <i class="fa fa-paw text-amber-500 mr-2"></i>优惠规则
-          </h2>
-          <button
-            class="text-gray-500 hover:text-amber-600 transition-colors"
-            @click="popupVisible = false"
-          >
-            <i class="fa fa-times text-xl"></i>
-          </button>
-        </div>
-        <div class="popup-details text-gray-600">
-          <p class="mb-2">每天不定时发放优惠券，注意查收哦～</p>
-          <p class="text-amber-600 text-sm">✨ 新用户首次领取额外赠送5元无门槛券</p>
-        </div>
-      </div>
-    </div>
   </InfiniteScroll>
 </template>
 
 <script setup lang="ts">
 import InfiniteScroll from './components/infiniteScroll.vue'
+import { receiveCoupon, getReceiveCouponList } from '../../../api/pet-shop/coupos'
+import { ElMessage } from 'element-plus'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
@@ -347,6 +291,20 @@ const page = ref(1)
 const pageSize = ref(12) //每页有10挑
 const isLoading = ref(false) //是否正在加载数据
 const hasmore = ref(true) //是否还有更多数据
+
+const shopCoupons = ref([])
+
+const canReceive = (coupon: any) => {
+  const limitNotReached = (coupon.receiveCount || 0) < (coupon.perLimit || 0)
+  return limitNotReached
+}
+
+// 按钮
+const getReceiveButtonText = (coupon: any) => {
+  if ((coupon.receiveCount || 0) >= (coupon.perLimit || 0)) return '已达领取上限'
+  return '立即领取'
+}
+
 const getProducts = () => {
   if (!isLoading.value && hasmore.value) {
     isLoading.value = true
@@ -379,6 +337,39 @@ const getProducts = () => {
       })
   }
 }
+//优惠卷
+const loadShopCoupons = async () => {
+  try {
+    const params = {
+      pageNum: page.value,
+      pageSize: 3,
+    }
+    const res = await getReceiveCouponList(params)
+    console.log('加载店铺优惠券成功:', res)
+    if (res.ok) {
+      shopCoupons.value = res.data.list || []
+    }
+  } catch (error) {
+    console.error('加载店铺优惠券失败:', error)
+  }
+}
+
+const receiveCouponHandler = async (couponId) => {
+  try {
+    const res = await receiveCoupon(couponId)
+    if (res.ok) {
+      ElMessage.success('优惠券领取成功！')
+    }
+  } catch (error) {
+    console.error('领取优惠券失败:', error)
+    ElMessage.error('领取优惠券失败')
+  }
+}
+
+onMounted(() => {
+  loadShopCoupons()
+})
+
 const productsDeatil = (id: string) => {
   router.push({
     path: `/product-detail/${id}`,

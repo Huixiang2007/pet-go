@@ -12,175 +12,195 @@
             <div class="text-lg font-bold text-gray-800">用户管理</div>
             <div class="flex flex-row gap-3">
               <el-input
-                placeholder="请输入用户名/电话"
-                v-model="input"
+                placeholder="请输入用户名搜索"
+                v-model="searchKeyword"
                 clearable
-                style="width: 200px"
+                style="width: 220px"
+                @keyup.enter="handleSearch"
               >
                 <template #prefix>
                   <i class="fas fa-search text-md text-gray-300"></i>
                 </template>
               </el-input>
-              <el-button size="default" type="primary">搜索</el-button>
+              <el-button size="default" type="primary" @click="handleSearch">搜索</el-button>
             </div>
           </div>
+
           <el-table
             :data="tableData"
             style="width: 100%"
             stripe
+            v-loading="loading"
             :cell-style="{ padding: '14px 0', borderRight: '1px solid #f0f0f0' }"
             :header-cell-style="{
               background: '#f5f5f5',
               color: '#606266',
               fontWeight: '500',
-              borderBottom: '1px solid #e0e0e0',
             }"
           >
-            <el-table-column prop="id" label="用户id" />
-            <el-table-column prop="name" label="姓名" />
-            <el-table-column prop="phone" label="电话" />
-            <el-table-column prop="count" label="下单次数" />
-
-            <el-table-column prop="status" label="订单状态">
-              <template #default="scope">
-                <el-tag :type="getStatusTagType(scope.row.status)" size="small">
-                  {{ scope.row.status }}
+            <el-table-column prop="userId" label="用户ID" width="100" />
+            <el-table-column prop="username" label="用户名" min-width="120" />
+            <el-table-column label="累计订单数" width="120">
+              <template #default="{ row }">
+                {{ row.totalOrders || 0 }}
+              </template>
+            </el-table-column>
+            <el-table-column label="累计消费" width="150">
+              <template #default="{ row }"> ¥{{ row.totalAmount?.toFixed(2) || '0.00' }} </template>
+            </el-table-column>
+            <el-table-column label="最近下单时间" min-width="190">
+              <template #default="{ row }">
+                {{ formatDate(new Date(row.lastOrderTime)) || '暂无订单' }}
+              </template>
+            </el-table-column>
+            <el-table-column label="最近订单状态" width="150">
+              <template #default="{ row }">
+                <el-tag :type="getStatusType(row.lastOrderStatus)" size="small">
+                  {{ getStatusText(row.lastOrderStatus) }}
                 </el-tag>
               </template>
             </el-table-column>
-            <el-table-column label="操作">
-              <template #default>
-                <div class="flex gap-3">
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors"
-                    >查看</el-button
-                  >
-                  <el-button
-                    size="mini"
-                    type="text"
-                    class="text-orange-500 hover:text-orange-700 hover:bg-orange-50 transition-colors"
-                    >拉黑</el-button
-                  >
-                </div>
+
+            <el-table-column label="操作" width="140">
+              <template #default="{ row }">
+                <el-button type="primary" size="small" @click="openOrderDialog(row)">
+                  查看订单
+                </el-button>
               </template>
             </el-table-column>
 
             <template #empty>
-              <div class="py-10 flex flex-col items-center justify-center text-gray-400">
+              <div class="py-12 flex flex-col items-center justify-center text-gray-400">
                 <i class="fas fa-user-slash text-4xl mb-3"></i>
                 <div class="text-lg">暂无用户数据</div>
-                <div class="text-sm mt-1">请检查搜索条件或等待数据同步</div>
               </div>
             </template>
           </el-table>
 
           <div class="px-4 py-3 border-t border-gray-200 flex justify-between items-center mt-3">
-            <div class="text-sm text-gray-500">共 {{ tableData.length }} 条记录</div>
-            <!-- 动态显示实际数据量 -->
+            <div class="text-sm text-gray-500">共 {{ total }} 条记录</div>
             <el-pagination
               layout="prev, pager, next"
-              :total="120"
-              :page-size="10"
-              :pager-count="5"
-              style="margin: 0"
+              :total="total"
+              :page-size="pageSize"
+              :current-page="pageNum"
+              @current-change="handlePageChange"
             />
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 订单记录弹窗 -->
+    <el-dialog v-model="orderDialogVisible" title="用户订单记录" width="85%" append-to-body>
+      <el-table :data="currentUserOrders" stripe v-loading="orderLoading" empty-text="暂无订单记录">
+        <el-table-column label="订单编号" prop="orderSn" min-width="200" />
+        <el-table-column label="商品名称" prop="productName" min-width="180" />
+        <el-table-column label="商品规格" prop="specText" min-width="150" />
+        <el-table-column label="购买数量" prop="quantity" width="100" />
+        <el-table-column label="实付金额" width="120">
+          <template #default="{ row }"> ¥{{ row.payAmount?.toFixed(2) || 0 }} </template>
+        </el-table-column>
+        <el-table-column label="订单状态" prop="orderStatus" width="120" />
+        <el-table-column label="支付状态" prop="payStatus" width="120" />
+        <el-table-column label="支付方式" prop="payType" width="120" />
+        <el-table-column label="下单时间" prop="createTime" min-width="190" />
+      </el-table>
+
+      <template #footer>
+        <div class="flex justify-end">
+          <el-button @click="orderDialogVisible = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { queryCustomerList } from '@/api/pet-shop/count'
+import { ElMessage } from 'element-plus'
 
-const input = ref('')
+const searchKeyword = ref('')
+const loading = ref(false)
+const tableData = ref([])
+const total = ref(0)
+const pageNum = ref(1)
+const pageSize = ref(10)
 
-interface TableRow {
-  id: string
-  name: string
-  phone: string
-  status: string
-  count: string
-  operation: string
-}
+// 订单弹窗
+const orderDialogVisible = ref(false)
+const currentUserOrders = ref([])
+const orderLoading = ref(false)
 
-const getStatusTagType = (status: string) => {
-  switch (status) {
-    case '正常':
-      return 'warning'
-    case '已拉黑':
-      return 'danger'
-    case '待收货':
-      return 'info'
-    default:
-      return ''
+// 加载用户列表
+const loadCustomerList = async () => {
+  try {
+    loading.value = true
+    const params = {
+      pageNum: pageNum.value,
+      pageSize: pageSize.value,
+      username: searchKeyword.value || '',
+      sortList: [{ isAsc: false, column: 'totalOrders' }],
+    }
+    const res = await queryCustomerList(params)
+    if (res) {
+      tableData.value = res.list || []
+      total.value = res.total || 0
+    }
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('加载失败')
+  } finally {
+    loading.value = false
   }
 }
+const formatDate = (date) => {
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const day = date.getDate()
+  const hour = date.getHours()
+  const minute = date.getMinutes()
+  const second = date.getSeconds()
+  return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day} ${hour < 10 ? '0' + hour : hour}:${minute < 10 ? '0' + minute : minute}:${second < 10 ? '0' + second : second}`
+}
 
-const tableData: TableRow[] = [
-  {
-    id: '20160502',
-    name: '王小虎',
-    phone: '18888888888',
-    status: '正常',
-    count: '5',
-    operation: '查看详情',
-  },
-  {
-    id: '20160502',
-    name: '王小虎',
-    phone: '18888888888',
-    status: '正常',
-    count: '5',
-    operation: '查看详情',
-  },
-  {
-    id: '20160501',
-    name: '王小虎',
-    phone: '18888888888',
-    status: '待收货',
-    count: '5',
-    operation: '查看详情',
-  },
-  {
-    id: '20160502',
-    name: '王小虎',
-    phone: '18888888888',
-    status: '正常',
-    count: '5',
-    operation: '查看详情',
-  },
-]
+// 搜索
+const handleSearch = () => {
+  pageNum.value = 1
+  loadCustomerList()
+}
+
+// 分页
+const handlePageChange = (page) => {
+  pageNum.value = page
+  loadCustomerList()
+}
+
+// 打开订单弹窗
+const openOrderDialog = (row) => {
+  currentUserOrders.value = row.orders || []
+  orderDialogVisible.value = true
+}
+
+// 订单状态映射
+const getStatusText = (status) => {
+  const map = { 0: '待付款', 1: '待发货', 2: '已发货', 3: '已完成', 4: '已取消' }
+  return map[status] || '无'
+}
+
+const getStatusType = (status) => {
+  const map = { 0: 'warning', 1: 'primary', 2: 'info', 3: 'success', 4: 'danger' }
+  return map[status] || 'info'
+}
+
+onMounted(() => {
+  loadCustomerList()
+})
 </script>
 
 <style scoped>
-:deep(.el-tag--warning) {
-  background-color: #fff7e6;
-  color: #fa8c16;
-  border-color: #ffd591;
-}
-:deep(.el-tag--info) {
-  background-color: #e6f7ff;
-  color: #1890ff;
-  border-color: #91d5ff;
-}
-:deep(.el-tag--danger) {
-  background-color: #fff2f0;
-  color: #f5222d;
-  border-color: #ffccc7;
-}
-
 :deep(.el-table__row--striped td) {
   background-color: #fafafa !important;
-}
-
-:deep(.el-pagination) {
-  margin-top: 0;
-}
-:deep(.el-pager li) {
-  margin: 0 2px;
 }
 </style>

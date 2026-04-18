@@ -93,31 +93,31 @@
               <div
                 class="bg-white rounded-xl shadow-sm p-4 md:p-5 mb-6 transition-all hover:shadow-md"
               >
-                <div
-                  class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-                >
-                  <div class="relative w-full sm:w-72">
+                <div class="flex w-full sm:w-80 gap-2">
+                  <div class="relative flex-1">
                     <input
                       v-model="searchKey"
                       type="text"
                       placeholder="搜索订单号/商品名称"
                       class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-orange-300 focus:ring-2 focus:ring-orange-100 focus:outline-none transition-all"
-                      @keyup.enter="fetchOrders()"
+                      @keyup.enter="handleSearch"
                     />
                     <i
                       class="fa fa-search absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400"
                     ></i>
                   </div>
+                  <button
+                    @click="handleSearch"
+                    class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-lg transition-colors whitespace-nowrap"
+                  >
+                    <i class="fa fa-search mr-1"></i> 搜索
+                  </button>
                 </div>
               </div>
 
               <div v-if="orders.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
-                <div class="w-32 h-32 mx-auto mb-4 opacity-30">
-                  <img
-                    src="https://picsum.photos/id/225/200/200"
-                    alt="暂无订单"
-                    class="w-full h-full object-contain"
-                  />
+                <div class="w-32 h-32 mx-auto mb-4 opacity-30 flex items-center justify-center">
+                  <i class="fas fa-clipboard-list text-6xl text-gray-300"></i>
                 </div>
                 <h3 class="text-lg font-medium text-gray-800 mb-2">暂无相关订单</h3>
                 <p class="text-gray-500 mb-6 max-w-md mx-auto">
@@ -140,7 +140,7 @@
               </div>
             </div>
 
-            <div class="mt-8 mb-8" v-else-if="activeTab === 'coupons'">
+            <div class="mb-8" v-else-if="activeTab === 'coupons'">
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-gray-800">
                   <i class="fa fa-ticket text-[#FF7043] mr-2"></i>
@@ -152,7 +152,7 @@
               </div>
             </div>
 
-            <div class="mt-8 mb-8" v-else-if="activeTab === 'comments'">
+            <div class="mb-8" v-else-if="activeTab === 'comments'">
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-gray-800">
                   <i class="fa fa-comment text-[#FF7043] mr-2"></i>
@@ -169,7 +169,7 @@
               </div>
             </div>
 
-            <div class="mt-8 mb-8" v-else-if="activeTab === 'keep-pet'">
+            <div class="mb-8" v-else-if="activeTab === 'keep-pet'">
               <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-gray-800">
                   <i class="fa fa-comment text-[#FF7043] mr-2"></i>
@@ -237,19 +237,17 @@ const fetchOrders = async () => {
       pageSize: pageSize.value,
       current: pageNum.value,
       sortItemList: [{ isAsc: true, column: 'createTime' }],
-      deliverySn: '',
-      productName: searchKey.value,
+
+      productName: searchKey.value || '',
       listStatus: activeStatus.value === 'all' ? 0 : statusMap[activeStatus.value],
     }
 
     const res = await getMyOrders(params)
     console.log('订单列表响应:', res)
-    // 检查响应结构
     if (res && (res.code === 0 || res.ok)) {
-      // 适配不同的响应结构
       const data = res.data || res
       console.log('订单列表数据:', data.list)
-      // 转换数据结构
+
       orders.value = (data.list || []).map((item: any) => ({
         id: item.id,
         orderSn: item.orderSn || '', // 确保orderSn属性存在且为字符串
@@ -297,7 +295,12 @@ const mapOrderStatus = (status: string): string => {
 const handlePageChange = () => {
   fetchOrders()
 }
-
+// 搜索
+const handleSearch = () => {
+  pageNum.value = 1
+  fetchOrders()
+  searchKey.value = ''
+}
 // 状态筛选（修复版）
 const handleStatusChange = (value: string | number) => {
   activeStatus.value = value

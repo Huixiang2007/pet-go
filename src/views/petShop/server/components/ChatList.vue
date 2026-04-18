@@ -76,6 +76,7 @@
     <div class="flex-1 overflow-y-auto bg-white">
       <div class="flex flex-col">
         <SystemNoticeItem
+          :is-active="isSystemNotice"
           :latest-notice="latestNotice"
           :unread-count="unreadCount"
           @click="handleSwitchToSystemNotice"
@@ -84,8 +85,12 @@
         <!-- 店铺列表 -->
         <div v-for="shop in safeShopList" :key="shop.shopId">
           <div
-            class="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer hover:bg-blue-100 transition-colors"
-            :class="{ 'bg-blue-100': activeShopId === shop.shopId }"
+            class="flex items-center justify-between p-4 border-b border-gray-100 cursor-pointer transition-colors"
+            :class="{
+              'hover:bg-blue-50': !isSystemNotice && activeShopId !== shop.shopId,
+              'bg-blue-50 border-blue-200 shadow-sm':
+                !isSystemNotice && activeShopId === shop.shopId,
+            }"
             @click="handleSwitchShop(shop)"
           >
             <!-- 头像 + 店铺信息 区域 -->
@@ -95,8 +100,9 @@
                 alt="店铺头像"
                 class="w-12 h-12 rounded-full border-2 object-cover flex-shrink-0"
                 :class="{
-                  'border-blue-500': activeShopId === shop.shopId,
-                  'border-transparent': activeShopId !== shop.shopId,
+                  'border-blue-400 ring-2 ring-blue-200':
+                    !isSystemNotice && activeShopId === shop.shopId,
+                  'border-transparent': isSystemNotice || activeShopId !== shop.shopId,
                 }"
               />
               <div class="flex-1 min-w-0">
@@ -141,6 +147,7 @@ const props = defineProps<{
   allShops: any[]
   allFosterLists: any[]
   chatType: string
+  isSystemNotice: boolean
 }>()
 
 const chatType = computed(() => props.chatType)
@@ -208,7 +215,6 @@ const handleSwitchShop = (shop: any) => {
   justify-content: center;
   align-items: center;
 }
-/* 列表项 hover 效果增强 */
 .cursor-pointer {
   position: relative;
 }

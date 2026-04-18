@@ -1,5 +1,13 @@
 <template>
-  <div class="flex-1 p-4 overflow-y-auto space-y-6">
+  <div class="flex-1 p-4 overflow-y-auto space-y-6" ref="messageContainer" @scroll="handleScroll">
+    <!-- 加载更多指示器 -->
+    <div v-if="props.loadingMore" class="py-4 text-center">
+      <i class="fas fa-spinner fa-spin mr-2"></i>
+      <span>加载更多通知...</span>
+    </div>
+    <div v-else-if="props.hasMore === false" class="py-4 text-center text-gray-400 text-sm">
+      没有更多通知了
+    </div>
     <div v-if="deleteMode" class="flex justify-between items-center mb-4">
       <div class="flex gap-3">
         <button
@@ -206,7 +214,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, ref, nextTick, watch, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import {
   markRead as apiMarkRead,
@@ -228,6 +236,8 @@ const props = defineProps<{
     read: boolean
     senderName?: string
   }>
+  loadingMore?: boolean
+  hasMore?: boolean
 }>()
 
 const selectedIds = ref<string[]>([])
@@ -238,6 +248,8 @@ const deleteType = ref<'single' | 'batch'>('single')
 const pendingDeleteId = ref('')
 const deleteMode = ref(false)
 const isLoading = ref(false)
+const messageContainer = ref<HTMLElement | null>(null)
+const observer = ref<IntersectionObserver | null>(null)
 
 // 日期分组
 const noticeGroups = computed(() => {
@@ -246,8 +258,86 @@ const noticeGroups = computed(() => {
     if (!groups[item.date]) groups[item.date] = []
     groups[item.date].push(item)
   })
-  return groups
+  // 按日期正序排列，最早的日期在前
+  const sortedGroups: Record<string, any[]> = {}
+  Object.keys(groups)
+    .sort((a, b) => {
+      // 假设日期格式为 '2024-01-01' 这样的字符串，可以直接比较
+      return new Date(a).getTime() - new Date(b).getTime()
+    })
+    .forEach((key) => {
+      sortedGroups[key] = groups[key]
+    })
+  return sortedGroups
 })
+
+// 滚动到底部
+const scrollToBottom = () => {
+  nextTick(() => {
+    if (messageContainer.value) {
+      messageContainer.value.scrollTop = messageContainer.value.scrollHeight
+    }
+  })
+}
+
+const handleScroll = () => {
+  const el = messageContainer.value
+  if (!el) return
+  if (el.scrollTop <= 50) {
+    // 距离顶部50px就触发
+    if (props.hasMore && !props.loadingMore) {
+      loadMore()
+    }
+  }
+}
+// 加载更多
+const loadMore = () => {
+  if (!props.loadingMore && props.hasMore) {
+    console.log('=== 触发向上加载更多 ===')
+    emit('loadMore')
+  }
+}
+
+// 初始化无限滚动（向上加载）
+const initInfiniteScroll = () => {
+  if (!messageContainer.value) return
+
+  const options = {
+    root: messageContainer.value,
+    rootMargin: '100px 0px 0px 0px', // 👈 关键！向上加载必须用这个
+    threshold: 0,
+  }
+
+  observer.value = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting && props.hasMore && !props.loadingMore) {
+        loadMore()
+      }
+    })
+  }, options)
+
+  // 创建目标节点
+  const target = document.createElement('div')
+  target.className = 'scroll-top-observer'
+  target.style.height = '1px'
+  target.style.width = '100%'
+
+  messageContainer.value.prepend(target)
+  observer.value.observe(target)
+}
+// 清理观察器
+const cleanupObserver = () => {
+  if (observer.value) {
+    observer.value.disconnect()
+    observer.value = null
+  }
+
+  // 移除观察目标元素
+  const target = document.querySelector('.infinite-scroll-target')
+  if (target && messageContainer.value) {
+    messageContainer.value.removeChild(target)
+  }
+}
 
 // 全选
 const selectAll = computed({
@@ -266,6 +356,7 @@ const emit = defineEmits<{
   delete: [id: string]
   batchDelete: [ids: string[]]
   viewDetail: [id: string]
+  loadMore: []
 }>()
 
 // 取消删除模式
@@ -390,6 +481,16 @@ const confirmDeleteAction = async () => {
     isLoading.value = false
   }
 }
+onMounted(() => {
+  scrollToBottom()
+  nextTick(() => {
+    initInfiniteScroll()
+  })
+})
+
+onUnmounted(() => {
+  cleanupObserver()
+})
 </script>
 
 <style scoped>

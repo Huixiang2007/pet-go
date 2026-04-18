@@ -118,7 +118,6 @@
             </template>
           </el-table>
 
-          <!-- 分页 -->
           <div class="px-4 py-3 border-t border-gray-200 flex justify-between items-center mt-3">
             <div class="text-sm text-gray-500">共 {{ total }} 张优惠券</div>
             <el-pagination
@@ -140,7 +139,6 @@
       </div>
     </div>
   </div>
-  <!-- 优惠券详情弹窗 -->
   <el-dialog
     v-model="couponDetailVisible"
     title="优惠券详情"
@@ -153,12 +151,10 @@
           <p class="text-sm text-gray-500">优惠券名称：{{ currentCoupon.name }}</p>
           <p class="text-sm text-gray-500">优惠券编号：{{ currentCoupon.couponSn || '未知' }}</p>
           <p class="text-sm text-gray-500">
-            优惠券类型：{{ currentCoupon.discountType || '未知' }}
+            优惠券类型：{{ currentCoupon.discountType === 1 ? '满减券' : '折扣券' }}
           </p>
-          <p class="text-sm text-gray-500">
-            折扣/金额：{{ currentCoupon.discount || currentCoupon.value || '未知' }}
-          </p>
-          <p class="text-sm text-gray-500">使用条件：{{ currentCoupon.minAmount || '无' }}</p>
+          <p class="text-sm text-gray-500">折扣/金额：{{ currentCoupon.discount }}</p>
+          <p class="text-sm text-gray-500">使用条件：{{ currentCoupon.minAmount || '无门槛' }}</p>
           <p class="text-sm text-gray-500">每人限领：{{ currentCoupon.perLimit || '无限制' }}</p>
         </div>
         <div>
@@ -189,39 +185,34 @@
     </template>
   </el-dialog>
 
-  <!-- 发放优惠卷弹窗 -->
   <el-dialog
     v-model="couponDialogVisible"
     title="发放优惠券"
-    width="500px"
+    width="600px"
     :close-on-click-modal="false"
   >
-    <el-form :model="couponForm" :rules="couponRules" ref="couponFormRef" label-width="100px">
-      <el-form-item label="优惠券编号" prop="id">
-        <el-input v-model="couponForm.id" />
+    <el-form :model="couponForm" :rules="couponRules" ref="couponFormRef" label-width="120px">
+      <el-form-item label="优惠券名称" prop="couponName">
+        <el-input v-model="couponForm.couponName" placeholder="请输入优惠券名称" />
       </el-form-item>
-      <el-form-item label="优惠券名称" prop="name">
-        <el-input v-model="couponForm.name" />
-      </el-form-item>
-      <el-form-item label="优惠券类型" prop="type">
-        <el-radio-group v-model="couponForm.type" size="small">
-          <el-radio label="满减券">满减券</el-radio>
-          <el-radio label="折扣券">折扣券</el-radio>
+      <el-form-item label="优惠券类型" prop="discountType">
+        <el-radio-group v-model="couponForm.discountType" size="small">
+          <el-radio :label="1">满减券</el-radio>
+          <el-radio :label="2">折扣券</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item v-if="couponForm.type === '满减券'" label="优惠金额" prop="value">
+      <el-form-item v-if="couponForm.discountType === 1" label="满减金额" prop="discount">
         <el-input
-          v-model.number="couponForm.value"
+          v-model.number="couponForm.discount"
           type="number"
           min="0.01"
           step="0.01"
-          placeholder="请输入优惠金额"
-          prefix-icon="el-icon-monitor"
+          placeholder="请输入满减金额"
         />
       </el-form-item>
-      <el-form-item v-else-if="couponForm.type === '折扣券'" label="折扣值" prop="value">
+      <el-form-item v-else-if="couponForm.discountType === 2" label="折扣比例" prop="discount">
         <el-input
-          v-model.number="couponForm.value"
+          v-model.number="couponForm.discount"
           type="number"
           min="0.1"
           max="9.9"
@@ -230,10 +221,10 @@
         />
         <div class="text-sm text-gray-500 mt-1">输入格式:8.5表示85折</div>
       </el-form-item>
-      <el-form-item label="使用门槛" prop="min">
+      <el-form-item label="使用门槛" prop="minAmount">
         <div class="flex items-center">
           <el-input
-            v-model.number="couponForm.min"
+            v-model.number="couponForm.minAmount"
             type="number"
             min="0"
             step="1"
@@ -243,31 +234,67 @@
           <el-checkbox v-model="couponForm.isFree" class="ml-4">无门槛</el-checkbox>
         </div>
       </el-form-item>
-      <el-form-item label="发行量" prop="total">
+      <el-form-item label="用户限领数量" prop="perLimit">
         <el-input
-          v-model.number="couponForm.total"
+          v-model.number="couponForm.perLimit"
+          type="number"
+          min="0"
+          placeholder="0表示不限领"
+        />
+      </el-form-item>
+      <el-form-item label="发行量" prop="totalCount">
+        <el-input
+          v-model.number="couponForm.totalCount"
           type="number"
           min="1"
           placeholder="请输入发行量"
         />
       </el-form-item>
-      <el-form-item label="有效期" prop="validPeriod">
-        <el-select v-model="couponForm.validPeriod" placeholder="请选择有效期">
+      <el-form-item label="优惠券描述" prop="description">
+        <el-input
+          v-model="couponForm.description"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入优惠券描述"
+        />
+      </el-form-item>
+
+      <el-form-item label="生效天数" prop="validDays">
+        <el-select v-model="couponForm.validDays" placeholder="请选择生效天数">
           <el-option label="7天" :value="7" />
           <el-option label="30天" :value="30" />
           <el-option label="90天" :value="90" />
-          <el-option label="自定义" :value="'custom'" />
         </el-select>
       </el-form-item>
-      <el-form-item label="自定义时间">
+      <el-form-item label="有效期时间" prop="timeRange">
         <el-date-picker
-          v-model="couponForm.customDateRange"
+          v-model="couponForm.timeRange"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          value-format="YYYY-MM-DD HH:mm:ss"
           style="width: 100%"
         />
+      </el-form-item>
+      <el-form-item label="适用商品类型" prop="usedToProductType">
+        <el-select v-model="couponForm.usedToProductType" placeholder="请选择适用商品类型">
+          <el-option label="全部商品" :value="0" />
+          <el-option-group
+            v-for="category in categories"
+            :key="category.id"
+            :label="category.name"
+            style="font-weight: 600"
+          >
+            <el-option
+              v-for="child in category.children"
+              :key="child.id"
+              :label="child.name"
+              :value="Number(child.id)"
+              style="font-weight: 600"
+            />
+          </el-option-group>
+        </el-select>
       </el-form-item>
     </el-form>
 
@@ -280,48 +307,45 @@
   <el-dialog
     v-model="editCouponDialogVisible"
     title="编辑优惠券"
-    width="500px"
+    width="600px"
     :close-on-click-modal="false"
   >
-    <el-form :model="editForm" :rules="editRules" ref="editFormRef" label-width="100px">
+    <el-form :model="editForm" :rules="editRules" ref="editFormRef" label-width="120px">
       <el-form-item label="优惠券编号" prop="id">
         <el-input v-model="editForm.id" disabled />
       </el-form-item>
-      <!-- 其他表单项保持不变，但都使用editForm -->
-      <el-form-item label="优惠券名称" prop="name">
-        <el-input v-model="editForm.name" />
+      <el-form-item label="优惠券名称" prop="couponName">
+        <el-input v-model="editForm.couponName" placeholder="请输入优惠券名称" />
       </el-form-item>
-      <el-form-item label="优惠券类型" prop="type">
-        <el-radio-group v-model="editForm.type" size="small">
-          <el-radio label="满减券">满减券</el-radio>
-          <el-radio label="折扣券">折扣券</el-radio>
+      <el-form-item label="优惠券类型" prop="discountType">
+        <el-radio-group v-model="editForm.discountType" size="small">
+          <el-radio :label="1">满减券</el-radio>
+          <el-radio :label="2">折扣券</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item v-if="editForm.type === '满减券'" label="优惠金额" prop="value">
+      <el-form-item v-if="editForm.discountType === 1" label="满减金额" prop="discount">
         <el-input
-          v-model.number="editForm.value"
+          v-model.number="editForm.discount"
           type="number"
           min="0.01"
           step="0.01"
-          placeholder="请输入优惠金额"
-          prefix-icon="el-icon-monitor"
+          placeholder="请输入满减金额"
         />
       </el-form-item>
-      <el-form-item v-else-if="editForm.type === '折扣券'" label="折扣值" prop="value">
+      <el-form-item v-else-if="editForm.discountType === 2" label="折扣比例" prop="discount">
         <el-input
-          v-model.number="editForm.value"
+          v-model.number="editForm.discount"
           type="number"
           min="0.1"
           max="9.9"
           step="0.1"
           placeholder="请输入折扣值（如8.5表示85折）"
         />
-        <div class="text-sm text-gray-500 mt-1">输入格式:8.5表示85折</div>
       </el-form-item>
-      <el-form-item label="使用门槛" prop="min">
+      <el-form-item label="使用门槛" prop="minAmount">
         <div class="flex items-center">
           <el-input
-            v-model.number="editForm.min"
+            v-model.number="editForm.minAmount"
             type="number"
             min="0"
             step="1"
@@ -331,31 +355,68 @@
           <el-checkbox v-model="editForm.isFree" class="ml-4">无门槛</el-checkbox>
         </div>
       </el-form-item>
-      <el-form-item label="发行量" prop="total">
+      <el-form-item label="用户限领数量" prop="perLimit">
         <el-input
-          v-model.number="editForm.total"
+          v-model.number="editForm.perLimit"
+          type="number"
+          min="0"
+          placeholder="0表示不限领"
+        />
+      </el-form-item>
+      <el-form-item label="发行量" prop="totalCount">
+        <el-input
+          v-model.number="editForm.totalCount"
           type="number"
           min="1"
           placeholder="请输入发行量"
         />
       </el-form-item>
-      <el-form-item label="有效期" prop="validPeriod">
-        <el-select v-model="editForm.validPeriod" placeholder="请选择有效期">
+      <el-form-item label="优惠券描述" prop="description">
+        <el-input
+          v-model="editForm.description"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入优惠券描述"
+        />
+      </el-form-item>
+
+      <el-form-item label="生效天数" prop="validDays">
+        <el-select v-model="editForm.validDays" placeholder="请选择生效天数">
+          <el-option label="3天" :value="3" />
           <el-option label="7天" :value="7" />
           <el-option label="30天" :value="30" />
           <el-option label="90天" :value="90" />
-          <el-option label="自定义" :value="'custom'" />
         </el-select>
       </el-form-item>
-      <el-form-item label="自定义时间">
+      <el-form-item label="有效期时间" prop="timeRange">
         <el-date-picker
-          v-model="editForm.customDateRange"
+          v-model="editForm.timeRange"
           type="daterange"
           range-separator="至"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
+          value-format="YYYY-MM-DD HH:mm:ss"
           style="width: 100%"
         />
+      </el-form-item>
+      <el-form-item label="适用商品类型" prop="usedToProductType">
+        <el-select v-model="editForm.usedToProductType" placeholder="请选择适用商品类型">
+          <el-option label="全部商品" :value="0" />
+          <el-option-group
+            v-for="category in categories"
+            :key="category.id"
+            :label="category.name"
+            style="font-weight: 600"
+          >
+            <el-option
+              v-for="child in category.children"
+              :key="child.id"
+              :label="child.name"
+              :value="Number(child.id)"
+              style="font-weight: 600"
+            />
+          </el-option-group>
+        </el-select>
       </el-form-item>
     </el-form>
 
@@ -367,7 +428,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   getShopCouponList,
@@ -375,41 +436,60 @@ import {
   updateShopCoupon,
   deleteShopCoupon,
   updateCouponStatus,
+  getProductCategoryList,
 } from '@/api/pet-shop/coupos'
 
 // 搜索输入
 const searchInput = ref('')
-
-// 分页数据
+const categories = ref([])
 const pageNum = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const loading = ref(false)
 
-// 优惠券类型
 interface Coupon {
   id: string
-  name: string
-  value: string
-  condition: string
-  total: string
-  used: string
+  name?: string
+  couponName?: string
+  discountType: number
+  discount: number
+  minAmount: number
+  perLimit: number
+  totalCount: number
+  usedCount: number
+  receiveCount: number
+  description: string
   startTime: string
   endTime: string
+  validDays: number
   status: string
+  usedToProductType: number
+  usedToProductTypeName: string
+  couponSn?: string
+  createTime?: string
+  updateTime?: string
 }
 
 const couponList = ref<Coupon[]>([])
-
-// 优惠券详情弹窗
 const couponDetailVisible = ref(false)
 const currentCoupon = ref<any>(null)
 
-// 打开优惠券详情
+// 加载商品分类
+const loadCategories = async () => {
+  try {
+    const res = await getProductCategoryList()
+    if (res.ok) categories.value = res.data
+  } catch (error) {
+    console.error('加载商品分类失败:', error)
+  }
+}
+
+// 打开详情
 const openCouponDetail = (coupon: Coupon) => {
   currentCoupon.value = coupon
   couponDetailVisible.value = true
 }
+
 // 加载优惠券列表
 const loadCouponList = async () => {
   loading.value = true
@@ -434,7 +514,7 @@ const loadCouponList = async () => {
       couponList.value = (res.data.list || []).map((item: any) => ({
         id: item.id,
         name: item.couponName,
-        value: item.discountType === 1 ? item.discountValue : item.minAmount,
+        value: item.discountType === 1 ? item.discount : item.discount,
         condition: item.minAmount || '',
         total: item.totalCount || '0',
         used: item.usedCount || '0',
@@ -442,16 +522,17 @@ const loadCouponList = async () => {
         endTime: item.endTime,
         status: item.status,
         couponSn: item.couponSn,
-        discountType: item.discountType === 1 ? '满减' : '折扣',
+        discountType: item.discountType,
         discount: item.discount,
+        minAmount: item.minAmount,
         perLimit: item.perLimit,
-        receiveCount: item.receiveCount,
+        totalCount: item.totalCount,
         description: item.description,
+        validDays: item.validDays,
         usedToProductType: item.usedToProductType,
         usedToProductTypeName: item.usedToProductTypeName,
-        usedToShop: item.usedToShop,
-        usedToShopName: item.usedToShopName,
-        validDays: item.validDays,
+        receiveCount: item.receiveCount,
+        usedCount: item.usedCount,
         createTime: item.createTime,
         updateTime: item.updateTime,
       }))
@@ -467,225 +548,237 @@ const loadCouponList = async () => {
   }
 }
 
-// 搜索优惠券
 const searchCoupon = () => {
   pageNum.value = 1
   loadCouponList()
 }
 
-// 优惠券弹窗
+//  新增优惠券
 const couponDialogVisible = ref(false)
 const couponFormRef = ref()
-
-// 优惠券表单数据
 const couponForm = ref({
-  id: '',
-  name: '',
-  type: '满减券',
-  value: 0,
-  min: 0,
+  couponName: '',
+  discountType: 1,
+  discount: 0,
+  minAmount: 0,
   isFree: false,
-  total: 1,
-  validPeriod: 30,
-  customDateRange: null,
+  perLimit: 0,
+  totalCount: 1,
+  description: '',
+  validDays: 30,
+  timeRange: [],
+  usedToProductType: 0,
 })
 
-const couponRules = ref({
-  name: [{ required: true, message: '请输入优惠券名称', trigger: 'blur' }],
-  total: [
-    { required: true, message: '请输入发行量', trigger: 'blur' },
-    { type: 'number', min: 1, message: '发行量必须大于0', trigger: 'blur' },
-  ],
-  value: [
+// 无门槛自动设0
+watch(
+  () => couponForm.value.isFree,
+  (val) => {
+    if (val) couponForm.value.minAmount = 0
+  },
+)
+
+// 表单校验（修复完成）
+const couponRules = {
+  couponName: [{ required: true, message: '请输入优惠券名称', trigger: 'blur' }],
+  discountType: [{ required: true, message: '请选择优惠券类型', trigger: 'change' }],
+  discount: [
     { required: true, message: '请输入优惠金额或折扣值', trigger: 'blur' },
-    { type: 'number', min: 0.01, message: '优惠金额必须大于0', trigger: 'blur' },
+    { type: 'number', min: 0.01, message: '必须大于0', trigger: 'blur' },
   ],
-})
+  totalCount: [{ required: true, message: '请输入发行量', trigger: 'blur' }],
+  validDays: [{ required: true, message: '请选择生效天数', trigger: 'change' }],
+  timeRange: [
+    { required: true, message: '请选择有效期', trigger: 'change' },
+    {
+      validator: (rule, value, callback) => {
+        if (!value || value.length < 2) return callback()
+        const start = new Date(value[0])
+        const end = new Date(value[1])
+        if (end <= start) callback(new Error('结束时间必须大于开始时间'))
+        else callback()
+      },
+      trigger: 'change',
+    },
+  ],
+}
 
-const openCouponDialog = (coupon?: Coupon) => {
-  if (coupon) {
-    couponForm.value = {
-      id: coupon.id,
-      name: coupon.name,
-      type: coupon.condition ? '满减券' : '折扣券',
-      value: parseFloat(coupon.value),
-      min: coupon.condition ? parseFloat(coupon.condition) : 0,
-      isFree: !coupon.condition,
-      total: parseInt(coupon.total),
-      validPeriod: 30,
-      customDateRange: null,
-    }
-  } else {
-    resetCouponForm()
+const openCouponDialog = () => {
+  couponForm.value = {
+    couponName: '',
+    discountType: 1,
+    discount: 0,
+    minAmount: 0,
+    isFree: false,
+    perLimit: 0,
+    totalCount: 1,
+    description: '',
+    validDays: 30,
+    timeRange: [],
+    usedToProductType: 0,
   }
   couponDialogVisible.value = true
 }
 
-// 重置
-const resetCouponForm = () => {
-  if (couponFormRef.value) {
-    couponFormRef.value.resetFields()
-  }
-  couponForm.value = {
-    id: '',
-    name: '',
-    type: '满减券',
-    value: 0,
-    min: 0,
-    isFree: false,
-    total: 1,
-    validPeriod: 30,
-    customDateRange: null,
-  }
-}
-
-// 提交
-// 提交
+// 提交新增
 const submitCoupon = async () => {
-  if (couponFormRef.value) {
-    couponFormRef.value.validate(async (valid: boolean) => {
-      if (valid) {
-        try {
-          const now = new Date()
-          const endDate = new Date(Date.now() + couponForm.value.validPeriod * 24 * 60 * 60 * 1000)
+  await couponFormRef.value.validate()
+  const f = couponForm.value
+  const startTime = f.timeRange[0].replace('T', ' ')
+  const endTime = f.timeRange[1].replace('T', ' ')
 
-          const params = {
-            couponName: couponForm.value.name,
-            discountType: couponForm.value.type === '满减券' ? 1 : 0, // 修正：折扣券使用0
-            discount: couponForm.value.value, // 添加discount参数
-            discountValue: couponForm.value.type === '折扣券' ? couponForm.value.value : 0,
-            minAmount: couponForm.value.isFree ? 0 : couponForm.value.min,
-            totalCount: couponForm.value.total,
-            description: '',
-            startTime: formatDateTimeForBackend(now),
-            endTime: formatDateTimeForBackend(endDate),
-            usedToProductType: 0,
-          }
-          const res = await createShopCoupon(params)
-          if (res?.ok) {
-            ElMessage.success('优惠券发放成功')
-            couponDialogVisible.value = false
-            resetCouponForm()
-            loadCouponList()
-          } else {
-            ElMessage.error(res?.msg || '优惠券发放失败')
-          }
-        } catch (e) {
-          console.error('优惠券发放失败：', e)
-          ElMessage.error('优惠券发放失败，请稍后重试')
-        }
-      }
-    })
+  const params = {
+    couponName: f.couponName,
+    discountType: f.discountType,
+    discount: f.discount,
+    minAmount: f.isFree ? 0 : f.minAmount,
+    perLimit: f.perLimit,
+    totalCount: f.totalCount,
+    description: f.description,
+    startTime: startTime,
+    endTime: endTime,
+    validDays: f.validDays,
+    usedToProductType: f.usedToProductType,
+  }
+
+  const res = await createShopCoupon(params)
+  if (res?.ok) {
+    ElMessage.success('发放成功')
+    couponDialogVisible.value = false
+    loadCouponList()
   }
 }
 
-//编辑
+// 编辑优惠券
+
+let originalForm: Coupon = {
+  id: '',
+  couponName: '',
+  discountType: 1,
+  discount: 0,
+  minAmount: 0,
+  perLimit: 0,
+  totalCount: 1,
+  description: '',
+  validDays: 30,
+  startTime: '',
+  endTime: '',
+  usedToProductType: 0,
+  usedCount: 0,
+  receiveCount: 0,
+  status: '',
+  usedToProductTypeName: '',
+}
+
 const editCouponDialogVisible = ref(false)
+const editFormRef = ref()
 const editForm = ref({
   id: '',
-  name: '',
-  type: '满减券',
-  value: 0,
-  min: 0,
+  couponName: '',
+  discountType: 1,
+  discount: 0,
+  minAmount: 0,
   isFree: false,
-  total: 1,
-  validPeriod: 30,
-  customDateRange: null,
-})
-const editRules = ref({
-  name: [{ required: true, message: '请输入优惠券名称', trigger: 'blur' }],
-  total: [
-    { required: true, message: '请输入发行量', trigger: 'blur' },
-    { type: 'number', min: 1, message: '发行量必须大于0', trigger: 'blur' },
-  ],
-  value: [
-    { required: true, message: '请输入优惠金额或折扣值', trigger: 'blur' },
-    { type: 'number', min: 0.01, message: '优惠金额必须大于0', trigger: 'blur' },
-  ],
+  perLimit: 0,
+  totalCount: 1,
+  description: '',
+  validDays: 30,
+  timeRange: [],
+  usedToProductType: 0,
 })
 
+const editRules = {
+  couponName: [{ required: true, message: '请输入优惠券名称', trigger: 'blur' }],
+  discountType: [{ required: true, message: '请选择折扣类型', trigger: 'change' }],
+  discount: [{ required: true, message: '请输入折扣金额或比例', trigger: 'blur' }],
+  timeRange: [{ required: true, message: '请选择有效期', trigger: 'change' }],
+  validDays: [{ required: true, message: '请输入生效天数', trigger: 'blur' }],
+  totalCount: [{ required: true, message: '请输入发行总数量', trigger: 'blur' }],
+}
+
 // 打开编辑弹窗
-const openEditCouponDialog = (coupon: Coupon) => {
+const openEditCouponDialog = (row: any) => {
+  originalForm = {
+    id: row.id,
+    couponName: row.couponName || row.name, // 兼容不同字段名
+    discountType: row.discountType,
+    discount: row.discount,
+    minAmount: row.minAmount,
+    perLimit: row.perLimit,
+    totalCount: row.totalCount,
+    description: row.description,
+    validDays: row.validDays,
+    startTime: row.startTime,
+    endTime: row.endTime,
+    usedToProductType: row.usedToProductType,
+    usedCount: row.usedCount || 0,
+    receiveCount: row.receiveCount || 0,
+    status: row.status || '',
+    usedToProductTypeName: row.usedToProductTypeName || '',
+  }
+
   editForm.value = {
-    id: coupon.id,
-    name: coupon.name,
-    type: coupon.condition ? '满减券' : '折扣券',
-    value: parseFloat(coupon.value),
-    min: coupon.condition ? parseFloat(coupon.condition) : 0,
-    isFree: !coupon.condition,
-    total: parseInt(coupon.total),
-    validPeriod: 30,
-    customDateRange: null,
+    id: row.id,
+    couponName: row.couponName || row.name,
+    discountType: row.discountType,
+    discount: row.discount,
+    minAmount: row.minAmount,
+    isFree: !row.minAmount,
+    perLimit: row.perLimit,
+    totalCount: row.totalCount,
+    description: row.description,
+    validDays: row.validDays,
+    timeRange: [row.startTime, row.endTime],
+    usedToProductType: row.usedToProductType,
   }
   editCouponDialogVisible.value = true
 }
 
-// 提交编辑
+// 提交编辑（只传修改字段）
 const submitEditCoupon = async () => {
-  if (editForm.value.id) {
-    try {
-      const now = new Date()
-      const endDate = new Date(Date.now() + editForm.value.validPeriod * 24 * 60 * 60 * 1000)
+  await editFormRef.value.validate()
+  const f = editForm.value
 
-      const params = {
-        id: editForm.value.id,
-        couponName: editForm.value.name,
-        discountType: editForm.value.type === '满减券' ? 1 : 0, // 修正：折扣券使用0
-        discount: editForm.value.value, // 添加discount参数
-        discountValue: editForm.value.type === '折扣券' ? editForm.value.value : 0,
-        minAmount: editForm.value.isFree ? 0 : editForm.value.min,
-        totalCount: editForm.value.total,
-        description: '',
-        startTime: formatDateTimeForBackend(now),
-        endTime: formatDateTimeForBackend(endDate),
-        usedToProductType: 0,
-      }
+  // 更可靠的时间格式处理
+  const startTime = f.timeRange?.[0] ? f.timeRange[0].replace('T', ' ') : ''
+  const endTime = f.timeRange?.[1] ? f.timeRange[1].replace('T', ' ') : ''
 
-      const res = await updateShopCoupon(params)
-      if (res?.ok) {
-        ElMessage.success('优惠券更新成功')
-        editCouponDialogVisible.value = false
-        loadCouponList()
-      } else {
-        ElMessage.error(res?.msg || '优惠券更新失败')
-      }
-    } catch (e) {
-      console.error('优惠券更新失败：', e)
-      ElMessage.error('优惠券更新失败，请稍后重试')
+  const params: any = { id: f.id }
+
+  if (f.couponName !== originalForm.couponName) params.couponName = f.couponName
+  if (f.discountType !== originalForm.discountType) params.discountType = f.discountType
+  if (f.discount !== originalForm.discount) params.discount = f.discount
+  if (f.minAmount !== originalForm.minAmount) params.minAmount = f.isFree ? 0 : f.minAmount
+  if (f.perLimit !== originalForm.perLimit) params.perLimit = f.perLimit
+  if (f.totalCount !== originalForm.totalCount) params.totalCount = f.totalCount
+  if (f.description !== originalForm.description) params.description = f.description
+  if (f.timeRange[0] !== originalForm.startTime) params.startTime = startTime
+  if (f.timeRange[1] !== originalForm.endTime) params.endTime = endTime
+  if (f.validDays !== originalForm.validDays) params.validDays = f.validDays
+  if (f.usedToProductType !== originalForm.usedToProductType)
+    params.usedToProductType = f.usedToProductType
+
+  try {
+    const res = await updateShopCoupon(params)
+    if (res?.ok) {
+      ElMessage.success('修改成功')
+      editCouponDialogVisible.value = false
+      loadCouponList()
     }
+  } catch (error) {
+    console.error('修改优惠券失败:', error)
+    ElMessage.error('修改优惠券失败')
   }
 }
 
-const formatDateTimeForBackend = (date: Date) => {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  const h = String(date.getHours()).padStart(2, '0')
-  const m = String(date.getMinutes()).padStart(2, '0')
-  const s = String(date.getSeconds()).padStart(2, '0')
-  return `${year}-${month}-${day} ${h}:${m}:${s}`
-}
-
-// 删除优惠券
-const deleteCoupon = (coupon: Coupon) => {
-  ElMessageBox.confirm('确认删除该优惠券吗？', '提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning',
-  }).then(async () => {
-    try {
-      const res = await deleteShopCoupon(coupon.id)
-      if (res?.ok) {
-        ElMessage.success('优惠券删除成功')
-        loadCouponList()
-      } else {
-        ElMessage.error(res?.msg || '优惠券删除失败')
-      }
-    } catch (e) {
-      console.error('优惠券删除失败：', e)
-      ElMessage.error('优惠券删除失败，请稍后重试')
-    }
-  })
+//  删除
+const deleteCoupon = async (row: any) => {
+  await ElMessageBox.confirm('确定删除？')
+  const res = await deleteShopCoupon(row.id)
+  if (res.ok) {
+    ElMessage.success('删除成功')
+    loadCouponList()
+  }
 }
 
 // 启用/禁用优惠券
@@ -707,6 +800,7 @@ const toggleCouponStatus = async (coupon: Coupon, status: number) => {
 // 初始化加载
 onMounted(() => {
   loadCouponList()
+  loadCategories()
 })
 </script>
 

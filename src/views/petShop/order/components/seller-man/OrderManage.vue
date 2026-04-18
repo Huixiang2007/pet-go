@@ -228,10 +228,12 @@
       <el-form :model="shipForm" label-width="80px">
         <el-form-item label="快递公司" required>
           <el-select v-model="shipForm.express" placeholder="请选择快递公司">
-            <el-option label="顺丰速运" value="顺丰速运"></el-option>
-            <el-option label="圆通快递" value="圆通快递"></el-option>
-            <el-option label="中通快递" value="中通快递"></el-option>
-            <el-option label="韵达快递" value="韵达快递"></el-option>
+            <el-option label="SF" value="顺丰速运"></el-option>
+            <el-option label="YTO" value="圆通快递"></el-option>
+            <el-option label="ZTO" value="中通快递"></el-option>
+            <el-option label="YD" value="韵达快递"></el-option>
+            <el-option label="EMS" value="邮政快递"></el-option>
+            <el-option label="HTKY" value="申通快递"></el-option>
           </el-select>
         </el-form-item>
 

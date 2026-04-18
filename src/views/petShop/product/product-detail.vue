@@ -233,13 +233,24 @@
                     class="flex items-center justify-between px-3 py-2 bg-white rounded border border-orange-200"
                   >
                     <div class="flex items-center gap-2">
-                      <span class="text-orange-500 font-bold text-lg"
-                        >¥{{ coupon.denomination }}</span
-                      >
-                      <span class="text-xs text-gray-500">满{{ coupon.minAmount }}可用</span>
+                      <div class="coupon-item bg-white rounded-lg p-3 shadow-sm mb-2">
+                        <div class="flex items-center justify-between mb-1.5">
+                          <span class="text-orange-500 font-bold text-lg"
+                            >¥{{ coupon.discount }}</span
+                          >
+                          <span class="text-gray-800 text-sm font-medium">{{
+                            coupon.couponName
+                          }}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                          <span class="text-xs text-gray-500">{{ coupon.discountType }}</span>
+                          <span class="text-xs text-gray-500">满{{ coupon.minAmount }}可用</span>
+                        </div>
+                      </div>
                     </div>
                     <button
                       class="text-xs text-orange-500 border border-orange-500 px-2 py-1 rounded"
+                      @click="handleClaimCoupon(coupon.couponId)"
                     >
                       立即领取
                     </button>
@@ -356,6 +367,7 @@ import { useRouter } from 'vue-router'
 import CommentList from './components/CommentList.vue'
 import QuestionUs from './components/QuestionUs.vue'
 import { addCartApi, getProductDetail } from '../../../api/pet-shop/product'
+import { receiveCoupon } from '../../../api/pet-shop/coupos'
 import type { ProductDetail, SkuInfo } from '../../../types/shop'
 const router = useRouter()
 const shopId = ref('')
@@ -414,7 +426,7 @@ const product = ref<ProductDetail>({
   shopType: '',
   title: '',
   typeId: 0,
-  imageUrls: [], // <-- add this line to satisfy ProductDetail type
+  imageUrls: [],
 })
 
 // 媒体
@@ -663,6 +675,19 @@ const addToCart = async () => {
   } catch (error) {
     console.error('购物车添加失败', error)
     ElMessage.error('添加购物车失败，请稍后重试')
+  }
+}
+//优惠卷
+const handleClaimCoupon = async (couponId) => {
+  try {
+    console.log('领取优惠券:', couponId)
+    const res = await receiveCoupon(couponId)
+    if (res.ok) {
+      ElMessage.success('优惠券领取成功！')
+    }
+  } catch (error) {
+    console.error('领取优惠券失败:', error)
+    ElMessage.error('领取优惠券失败')
   }
 }
 

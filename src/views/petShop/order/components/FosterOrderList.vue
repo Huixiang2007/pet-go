@@ -1,6 +1,23 @@
 <template>
     <div id="app" class="order-page">
-        <div class="order-list space-y-4">
+        <!-- 空订单状态 -->
+        <div v-if="!loading && orderList.length === 0"
+            class="empty-order flex flex-col items-center justify-center py-16 bg-white rounded-xl shadow-sm">
+            <div class=" h-32 mx-auto mb-4 opacity-30">
+                <i class="fas fa-clipboard-list text-8xl text-gray-300"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-800 mb-2">暂无相关订单</h3>
+            <p class="text-gray-500 mb-6 max-w-md mx-auto text-center">
+                您还没有相关订单，快去预约心仪的寄养服务吧～
+            </p>
+            <router-link to="/foster-care"
+                class="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg transition-colors">
+                去预约寄养
+            </router-link>
+        </div>
+
+        <!-- 订单列表 -->
+        <div v-else class="order-list space-y-4">
             <div v-for="order in orderList" :key="order.orderNo"
                 class="order-card bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
 
@@ -12,7 +29,7 @@
                             <p class="text-gray-500 text-sm">
                                 订单编号：<span class="text-gray-700">{{ order.orderNo }}</span>
                             </p>
-                            <p class="text-gray-400 text-xs mt-1">{{ order.createTime }}</p>
+                            <p class="text-gray-400 text-xs mt-1">{{ extractDate(order.createTime) }}</p>
                         </div>
                         <span class="px-3 py-1 rounded-full text-xs font-medium"
                             :class="getStatusTagClass(order.orderStatusDesc)">
@@ -164,7 +181,8 @@
                                     </div>
                                     <div class="detail-item">
                                         <span class="text-gray-500 text-sm">附加服务费用：</span>
-                                        <span class="ml-2">¥ {{ additionalAmount }}</span>
+                                        <span class="ml-2">¥ {{ getTotalPrice(order.additionalServices)
+                                        }}</span>
                                     </div>
                                     <div class="detail-item font-bold text-orange-600">
                                         <span class="text-gray-500 text-sm">总计：</span>
@@ -224,7 +242,7 @@ const activeDetailOrderNo = ref(0)
 const orderList = ref<FosterOrderList[]>([])
 const loading = ref(false)
 const vaccineList = ref([])
-const additionalAmount = ref(0)
+// const additionalAmount = ref(0)
 // 获取订单列表
 const fetchOrderList = async () => {
     loading.value = true
@@ -234,19 +252,24 @@ const fetchOrderList = async () => {
             pageSize: 10,
 
         })
-        if (res.code === 0) {
-            orderList.value = res.data.list.map(order => ({
-                ...order,
+        if (res.code == 0) {
+            if (res.data.list.length == 0) {
+                // ElMessage.warning('暂无订单')
+                return
+            }
+            // 先获取订单列表
+            const orders = res.data.list
+            console.log('原始订单列表：', orders)
 
-            }))
-            console.log(orderList.value)
+            // 复制订单列表，避免直接修改原始数据
+            orderList.value = [...orders]
+
             await Promise.all(
                 orderList.value.map(async (order) => {
                     try {
-
                         const detailRes = await getFosterOrderDetail(order.orderNo)
-                        if (detailRes.code === 0) {
-
+                        if (detailRes.code == 0) {
+                            // 合并详情数据
                             Object.assign(order, detailRes.data)
                         }
                     } catch (error) {
@@ -255,7 +278,8 @@ const fetchOrderList = async () => {
                     }
                 })
             )
-            additionalAmount.value = res.data.additionalService.reduce((total: number, item: any) => total + item.price, 0)
+
+            console.log('修改后订单列表：', orderList.value)
         } else {
             ElMessage.error(res.msg || '获取订单列表失败')
         }
@@ -287,7 +311,17 @@ const getStatusTagClass = (status: string) => {
         default: return 'bg-green-100 text-green-600';
     }
 }
-
+//计算附加服务总价
+const getTotalPrice = (additionalServices: Array<any> | null | undefined[]) => {
+    // 添加空值检查，确保 additionalServices 存在且是数组
+    if (!additionalServices || !Array.isArray(additionalServices)) {
+        return 0;
+    }
+    return additionalServices.reduce((total, item) => {
+        const price = Number(item.price);
+        return total + (isNaN(price) ? 0 : price);
+    }, 0);
+};
 // 申请退款
 const handleRefund = async (order: FosterOrderList) => {
     try {
@@ -325,10 +359,10 @@ onMounted(() => {
 <style scoped lang="scss">
 .order-page {
     padding: 16px;
-    background-color: #f9fafb;
-    min-height: 100vh;
-    width: 60%;
-    margin: 30px auto;
+    // background-color: #f9fafb;
+    // min-height: 100vh;
+    width: 100%;
+    // margin: 30px auto;
 }
 
 .order-card {

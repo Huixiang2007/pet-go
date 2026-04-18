@@ -55,11 +55,15 @@
             <div class="chart-area">
               <div class="chart-header">
                 <span>近7天收入趋势</span>
-
               </div>
               <div class="chart-container">
                 <!-- 这里可以放置图表组件，暂时用模拟数据展示 -->
-                <div class="simple-chart">
+                <div v-if="incomeData.length === 0" class="empty-chart">
+                  <i class="fas fa-chart-line text-4xl text-gray-300 mb-3"></i>
+                  <p class="text-gray-500 text-sm">暂无收入数据</p>
+                  <p class="text-gray-400 text-xs mt-1">开始接单后即可查看收入趋势</p>
+                </div>
+                <div v-else class="simple-chart">
                   <div class="chart-bars">
                     <div v-for="(item, index) in incomeData" :key="index" class="chart-bar">
                       <div class="bar-value">{{ item.value }}</div>
@@ -119,13 +123,19 @@
           </template>
 
           <!-- 套餐列表 -->
-          <div class="packages-grid">
+          <div v-if="packages.length === 0" class="flex flex-col items-center justify-center py-16">
+            <i class="fas fa-box-open text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500 text-lg">暂无服务套餐</p>
+            <p class="text-gray-400 text-sm mt-2">您还没有创建任何服务套餐</p>
+            <el-button type="primary" class="mt-4" @click="showAddPackageDialog">
+              <i class="el-icon-circle-plus"></i>立即创建
+            </el-button>
+          </div>
+          <div v-else class="packages-grid">
             <el-card v-for="pkg in packages" :key="pkg.id" class="package-card" shadow="hover">
               <!-- 套餐状态标签 -->
-              <div class="package-status">
-                <div :class="{ 'status-active': pkg.status === 'active' }">
-                  {{ pkg.status === 'active' ? '上架中' : '已下架' }}
-                </div>
+              <!-- <div class="package-status">
+                
                 <div class="package-actions">
                   <el-dropdown trigger="click">
                     <span class="el-dropdown-link">
@@ -136,7 +146,7 @@
 
                   </el-dropdown>
                 </div>
-              </div>
+              </div> -->
 
               <div class="package-header">
                 <div class="package-title-section">
@@ -231,7 +241,8 @@
             </el-form-item>
 
             <el-form-item label="基础价格" prop="basePrice">
-              <el-input v-model="packageForm.basePrice" placeholder="请输入基础价格：元/天" maxlength="10" show-word-limit />
+              <el-input v-model="packageForm.basePrice" type="number" placeholder="请输入基础价格：元/天" maxlength="10"
+                show-word-limit @input="handleBasePriceInput" />
             </el-form-item>
 
             <el-form-item label="宠物数量" prop="maxPets">
@@ -341,7 +352,7 @@ console.log('provider:', provider)
 const fetchOrderData = async () => {
 
   try {
-    const res = await getFosterOrderData(Number(provider))
+    const res = await getFosterOrderData({ providerId: Number(provider) })
     if (res.code === 0 && res.data) {
       const data = res.data
       totalIncome.value = data.totalAmount
@@ -433,7 +444,7 @@ interface PackageItem {
   basePrice: number
   quota: number
   soldCount: number
-  status: 'active' | 'inactive'
+
 }
 
 const packages = ref<PackageItem[]>([])
@@ -628,7 +639,7 @@ const deletePackage = (id: number) => {
   })
     .then(() => {
       // 调用删除接口
-      deleteFosterService(id).then(res => {
+      deleteFosterService({ id }).then(res => {
         if (res.code === 0) {
           packages.value = packages.value.filter((pkg) => pkg.id !== id)
           ElMessage.success('套餐删除成功')
@@ -648,8 +659,8 @@ const deletePackage = (id: number) => {
 const resetPackageForm = () => {
   packageForm.title = ''
   packageForm.description = ''
-  packageForm.basePrice = 120
-  packageForm.quota = 5
+  packageForm.basePrice = 0
+  packageForm.quota = 0
   packageForm.petTypes = []
   packageForm.features = [
     { title: '', price: 0 }
@@ -673,10 +684,18 @@ const removeFeature = (index: number) => {
 const savePackage = async () => {
   console.log("点击添加套餐")
   if (!packageFormRef.value) return
-
+  const features = packageForm.features.filter((f) => f.title.trim())
+  console.log(features)
+  if (features.length == 0) {
+    ElMessage.error('请添加附加服务')
+    return;
+  }
   try {
     await packageFormRef.value.validate()
     saving.value = true
+
+    // 将basePrice转换为数字类型
+    const basePriceNum = Number(packageForm.basePrice)
 
     if (isEditing.value) {
       // 编辑操作：调用更新接口
@@ -684,7 +703,7 @@ const savePackage = async () => {
         title: packageForm.title,
         description: packageForm.description,
         serviceType: 1,
-        basePrice: packageForm.basePrice,
+        basePrice: basePriceNum,
         petTypes: packageForm.petTypes.join(','),
         maxPets: packageForm.maxPets,
         maxWeight: packageForm.maxWeight
@@ -700,7 +719,7 @@ const savePackage = async () => {
             ...packages.value[index],
             title: packageForm.title,
             description: packageForm.description,
-            basePrice: packageForm.basePrice,
+            basePrice: basePriceNum,
             petTypes: packageForm.petTypes,
             quota: packageForm.maxPets,
           }
@@ -718,7 +737,7 @@ const savePackage = async () => {
       const serviceData = {
         title: packageForm.title,
         description: packageForm.description,
-        basePrice: packageForm.basePrice,
+        basePrice: basePriceNum,
         petTypes: packageForm.petTypes.join(','),
         maxPets: packageForm.maxPets,
         maxWeight: packageForm.maxWeight,
@@ -730,18 +749,17 @@ const savePackage = async () => {
         const serviceId = serviceRes.data.serviceId
 
         // 处理附加服务
-        const features = packageForm.features.filter((f) => f.title.trim())
-        if (features.length > 0) {
-          // 为每个附加服务调用接口
-          for (const feature of features) {
-            const additionalServiceData = {
-              serviceId: serviceId,
-              title: feature.title,
-              price: feature.price
-            }
-            await addAdditionalService(additionalServiceData)
+
+        // 为每个附加服务调用接口
+        for (const feature of features) {
+          const additionalServiceData = {
+            serviceId: serviceId,
+            title: feature.title,
+            price: feature.price
           }
+          await addAdditionalService(additionalServiceData)
         }
+
 
         // 添加到本地数据
         const newPackage: PackageItem = {
@@ -753,7 +771,7 @@ const savePackage = async () => {
           basePrice: packageForm.basePrice,
           quota: packageForm.maxPets,
           soldCount: 0,
-          status: 'active',
+
 
         }
         packages.value.push(newPackage)
@@ -808,6 +826,12 @@ const saveShopInfo = async () => {
 }
 
 
+
+// 处理基础价格输入，确保转换为数字类型
+const handleBasePriceInput = () => {
+  // 确保basePrice是数字类型
+  packageForm.basePrice = Number(packageForm.basePrice) || 0
+}
 
 // 工具函数
 const formatNumber = (num: number) => {
@@ -1013,6 +1037,15 @@ onMounted(() => {
 
       .chart-container {
         height: 200px;
+
+        .empty-chart {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          color: #a99eff;
+        }
 
         .simple-chart {
           height: 100%;

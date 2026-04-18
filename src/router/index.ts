@@ -20,7 +20,7 @@ const routes: RouteRecordRaw[] = [
     name: 'fosterDetail',
     component: () => import('@/views/fosterCare/FosterDetail.vue'),
   },
-    //促销活动详情
+  //促销活动详情
   {
     path: '/promotion',
     name: 'promotionDetail',
@@ -183,7 +183,7 @@ const routes: RouteRecordRaw[] = [
       title: 'PetGo销售分析',
     },
   },
-          // 电商的首页
+  // 电商的首页
   {
     path: '/shop',
     name: 'shops',
@@ -300,7 +300,7 @@ const routes: RouteRecordRaw[] = [
       // 数据概览
       {
         path: '', // 空路径 = /admin 默认子路由
-        redirect: '/admin/user', 
+        redirect: '/admin/user',
         name: 'homePage',
       },
       {
@@ -369,13 +369,13 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/admin/components/shop/shopDetail.vue'),
             meta: { title: '商铺详情' },
           },
-           {
+          {
             path: 'audit',
             name: 'auditDetail',
             component: () => import('@/views/admin/components/shop/auditDetail.vue'),
             meta: { title: '商铺审核详情' },
           },
-           {
+          {
             path: 'goods',
             name: 'goodsDetail',
             component: () => import('@/views/admin/components/shop/productDetail.vue'),
@@ -464,8 +464,12 @@ const routes: RouteRecordRaw[] = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_AURL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+  scrollBehavior() {
+    // 始终滚动到顶部
+    return { top: 0 }
+  },
 })
 /**
  * 路由导航守卫
@@ -474,6 +478,18 @@ router.beforeEach((to, from, next) => {
   const requiresAuth = to.meta.requiresAuth ?? false
   const isLogin = !!localStorage.getItem('authToken')
   const isAdminRoute = to.path.startsWith('/admin')
+
+  // 如果已登录且访问登录页面，重定向到首页
+  if (isLogin && to.path === '/login') {
+    const userRole = localStorage.getItem('userRole')
+    if (userRole === '管理员') {
+      next('/admin')
+    } else {
+      next('/foster-care')
+    }
+    return
+  }
+
   if (requiresAuth && !isLogin) {
     ElMessage.warning('请先登录后再访问')
     // 跳转到登录页，并记录当前页面路径（登录后可返回）
@@ -501,9 +517,6 @@ router.beforeEach((to, from, next) => {
   }
   if (to.meta.title) {
     document.title = to.meta.title as string
-  }
-  if (to.path === '/login') {
-    return true
   }
 
   // 已登录 → 允许访问

@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import AddressSelector from './components/order-pay/AddressSelector.vue'
+// import AddressSelector from './components/order-pay/AddressSelector.vue'
 import CouponSelector from './components/order-pay/CouponSelector.vue'
 import OrderSummary from './components/order-pay/OrderSummary.vue'
 import GoodsList from './components/order-pay/GoodsList.vue'
@@ -98,7 +98,7 @@ import {
   submitOrder,
   getAddressList,
   getDefaultAddress,
-  updateDefaultAddress,
+  // updateDefaultAddress,
   payOrder,
   payOrderCart,
 } from '@/api/pet-shop/order'
@@ -215,11 +215,24 @@ const loadAddress = async () => {
     console.error('加载地址失败:', e)
   }
 }
+const jumpToAddressManage = () => {
+  router.push('/persons')
+}
 // 默认地址
 const loadDefaultAddress = async () => {
   const res = (await getDefaultAddress()) as any
   if (res) {
     addressList.value.forEach((i) => (i.isDefault = i.id === res.id))
+  }
+}
+const updateDefaultAddress = async (id: string) => {
+  try {
+    const res = await updateDefaultAddress(id)
+    console.log('更新默认地址成功:', res)
+    ElMessage.success('默认地址已更新')
+  } catch (e) {
+    console.error('更新默认地址失败:', e)
+    ElMessage.error('更新默认地址失败')
   }
 }
 //修改默认地址
@@ -422,7 +435,7 @@ const getUserBalance = async () => {
     ElMessage.error('获取账户余额失败，请稍后重试')
   }
 }
-const jumpToAddressManage = () => router.push('/persons')
+// const jumpToAddressManage = () => router.push('/persons')
 </script>
 
 <style scoped lang="scss">

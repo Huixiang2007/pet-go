@@ -132,8 +132,10 @@ const handleServiceChange = (ids: number[]) => {
 }
 
 const handleVaccineChange = (files: FileItem[]) => {
-    bookingForm.pictureUrlList = files.map(item => item.file as File)
+    bookingForm.pictureUrlList = files.map(item => item.url as string)
+    bookingForm.vaccineFiles = files.map(item => item.file as File)
     console.log('疫苗文件已存入 bookingForm：', bookingForm.pictureUrlList)
+    console.log('疫苗文件对象已存入 bookingForm：', bookingForm.vaccineFiles)
 
 }
 

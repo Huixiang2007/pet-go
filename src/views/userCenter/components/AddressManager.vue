@@ -1,11 +1,7 @@
 <template>
   <LoadingComponent v-if="loading" />
   <div v-else class="address-manager">
-    <button
-      class="layui-btn btn-save"
-      @click="handleAdd"
-      v-if="showAddressForm || addressList.length > 0"
-    >
+    <button class="layui-btn btn-save" @click="handleAdd" v-if="showAddressForm || addressList.length > 0">
       <i class="layui-icon layui-icon-add-circle"></i> 添加新地址
     </button>
 
@@ -15,25 +11,15 @@
         <div class="layui-form-item">
           <label class="layui-form-label">收件人</label>
           <div class="layui-input-block">
-            <input
-              type="text"
-              v-model="addressForm.receiverName"
-              placeholder="请输入收件人姓名"
-              class="layui-input"
-            />
+            <input type="text" v-model="addressForm.receiverName" placeholder="请输入收件人姓名" class="layui-input" />
           </div>
         </div>
 
         <div class="layui-form-item">
           <label class="layui-form-label">联系电话</label>
           <div class="layui-input-block">
-            <input
-              type="text"
-              v-model="addressForm.receiverPhone"
-              lay-verify="phone"
-              placeholder="请输入联系电话"
-              class="layui-input"
-            />
+            <input type="text" v-model="addressForm.receiverPhone" lay-verify="phone" placeholder="请输入联系电话"
+              class="layui-input" />
           </div>
         </div>
 
@@ -42,25 +28,16 @@
         <div class="layui-form-item">
           <label class="layui-form-label">详细地址</label>
           <div class="layui-input-block">
-            <textarea
-              v-model="addressForm.detailAddress"
-              placeholder="请输入详细地址"
-              class="layui-textarea"
-              rows="3"
-            ></textarea>
+            <textarea v-model="addressForm.detailAddress" placeholder="请输入详细地址" class="layui-textarea"
+              rows="3"></textarea>
           </div>
         </div>
 
         <div class="layui-form-item">
           <label class="layui-form-label">默认地址</label>
           <div class="layui-input-block">
-            <el-switch
-              style="height: 39px; line-height: 21px"
-              v-model="isDefaultSwitch"
-              active-text="是"
-              inactive-text="否"
-              active-color="#fd9860"
-            />
+            <el-switch style="height: 39px; line-height: 21px" v-model="isDefaultSwitch" active-text="是"
+              inactive-text="否" active-color="#fd9860" />
           </div>
         </div>
 
@@ -89,26 +66,16 @@
           <button class="layui-btn btn-delete layui-btn-sm" @click="handleDelete(address.id)">
             删除
           </button>
-          <button
-            class="layui-btn layui-btn-primary layui-btn-sm"
-            @click="handleSetDefault(address.id)"
-            v-if="address.isDefault == '普通地址'"
-          >
+          <button class="layui-btn layui-btn-primary layui-btn-sm" @click="handleSetDefault(address.id)"
+            v-if="address.isDefault == '普通地址'">
             设为默认
           </button>
         </div>
       </div>
       <div class="pagination-container">
-        <el-pagination
-          @current-change="handlePageChange"
-          @size-change="handleSizeChange"
-          :page-sizes="[3, 5, 8, 10]"
-          :current-page="pagination.currentPage"
-          :page-size="pagination.pageSize"
-          :total="pagination.total"
-          layout="sizes,prev, pager, next, jumper, ->, total"
-          background
-        />
+        <el-pagination @current-change="handlePageChange" @size-change="handleSizeChange" :page-sizes="[3, 5, 8, 10]"
+          :current-page="pagination.currentPage" :page-size="pagination.pageSize" :total="pagination.total"
+          layout="sizes,prev, pager, next, jumper, ->, total" background />
       </div>
     </div>
     <!-- 空状态 -->
@@ -224,7 +191,7 @@ const getAddressList = async () => {
     })
     if (response.code === 0) {
       if (response.msg === '操作成功') {
-        addressList.value = response.data.list as any|| []
+        addressList.value = response.data.list as any || []
         pagination.value.total = response.data.total || 0
         pagination.value.pages = response.data.pages || 1
         if (pagination.value.currentPage === 1 && addressList.value.length === 0) {
@@ -232,12 +199,12 @@ const getAddressList = async () => {
         }
       }
       if (response.msg === '用户暂无地址！') {
-        ElMessage.warning('您还没有添加收货地址！')
+        // ElMessage.warning('您还没有添加收货地址！')
       }
     }
   } catch (error) {
     console.log(error)
-    ElMessage.error('获取地址失败！')
+    // ElMessage.error('获取地址失败！')
   } finally {
     // 无论成功失败，结束加载时隐藏加载状态
     loading.value = false
@@ -291,7 +258,7 @@ const handleEdit = async (address: Address) => {
         city: detail.city,
         district: detail.district,
         detailAddress: detail.detailAddress,
-        isDefault:detail.isDefault as "默认地址" | "普通地址",
+        isDefault: detail.isDefault as "默认地址" | "普通地址",
         street: detail.street || '无',
       }
       selectedAddress.value.province = detail.province
@@ -341,12 +308,12 @@ const handleSave = async () => {
       city: cityName,
       district: districtName,
       detailAddress: addressForm.value.detailAddress,
-      isDefault: isDefaultSwitch.value ? '默认地址' as const: '普通地址'as const,
+      isDefault: isDefaultSwitch.value ? '默认地址' as const : '普通地址' as const,
       street: addressForm.value.street || '无',
     }
     console.log('发送的地址数据:', addressData)
     let response: any
-    
+
 
     if (editingAddressId.value) {
       // 编辑地址
@@ -430,6 +397,7 @@ const handleReset = () => {
   border-color: #fd9860 !important;
   color: #333;
 }
+
 .layui-input:focus,
 .layui-textarea:focus {
   border-color: #fd9860 !important;
@@ -468,6 +436,7 @@ const handleReset = () => {
   background-color: #fc8747;
   border-color: #fc8747;
 }
+
 .address-form-container {
   margin-top: 1.5rem;
   padding: 1.5rem;
@@ -537,6 +506,7 @@ const handleReset = () => {
 
 :deep(.layui-form-label) {
   width: 87px;
+  padding: 0;
 }
 
 :deep(.el-switch.is-checked .el-switch__core) {

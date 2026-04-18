@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { Method, AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios'
-import { ElMessage, ElMessageBox } from 'element-plus' // 需引入Element组件
+import { ElMessageBox } from 'element-plus' // 需引入Element组件
 const service = axios.create({
   timeout: 60000,
 })
@@ -24,7 +24,7 @@ service.interceptors.request.use(
       if (config.headers) {
         delete config.headers.Authorization
       }
-      console.log('白名单接口，跳过 Token 添加')
+      // console.log('白名单接口，跳过 Token 添加')
     } else {
       console.log('token不存在')
     }
@@ -55,22 +55,23 @@ service.interceptors.response.use(
     //业务失败，处理自定义错误码
     switch (code) {
       case 30001: // 参数错误
-        ElMessage.error(msg)
+        console.log(msg)
+
         break
       case 30002: // 找不到数据
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 30003: // 数据已存在
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 30004: // 操作太快
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 30005: // 无访问权限
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 30006: // 系统紧急开发中
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 30007: // 登录状态失效
         ElMessageBox.confirm('登录已失效，请重新登录', '提示', {
@@ -79,26 +80,27 @@ service.interceptors.response.use(
           type: 'warning',
         }).then(() => {
           localStorage.removeItem('authToken')
+          localStorage.removeItem('userLocation')
           window.location.href = '/login' // 跳登录页
         })
         break
       case 30008: // 用户状态异常
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 30009: // 请勿重复提交
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 20001: // 业务繁忙
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 20002: //付款单id异常
-        ElMessage.error(msg)
+        console.log(msg)
         break
       case 10001: //系统错误
-        ElMessage.error(msg)
+        console.log(msg)
         break
       default: // 其他业务错误
-        ElMessage.error(msg || `业务错误：${code}`)
+        console.log(msg)
     }
     return Promise.reject(new Error(msg))
   },
@@ -111,7 +113,7 @@ service.interceptors.response.use(
       const { status, config } = error.response
       switch (status) {
         case 400:
-          ElMessage.error('请求参数错误（HTTP 400）')
+          // ElMessage.error('请求参数错误（HTTP 400）')
           break
         case 401:
           ElMessageBox.confirm('登录已失效，请重新登录', '提示', {
@@ -120,11 +122,13 @@ service.interceptors.response.use(
             type: 'warning',
           }).then(() => {
             localStorage.removeItem('authToken')
+            localStorage.removeItem('userLocation')
             window.location.href = '/login'
           })
           break
         case 404:
-          ElMessage.error(`请求地址不存在：${config.url}（HTTP 404）`)
+          console.log(`请求地址不存在：${config.url}（HTTP 404）`)
+          // ElMessage.error(`请求地址不存在：${config.url}（HTTP 404）`)
           break
         case 500:
           // 核心修改：判断500错误是否包含“未登录”相关提示
@@ -141,22 +145,24 @@ service.interceptors.response.use(
           //   });
           // } else {
           // 普通500错误：仅提示
-          ElMessage.error('服务器内部错误（HTTP 500）')
+          // ElMessage.error('服务器内部错误（HTTP 500）')
+          console.log('服务器内部错误（HTTP 500）')
           // }
           break
 
         default:
-          ElMessage.error(`网络错误：${status}（HTTP状态码）`)
+          console.log(`网络错误：${status}（HTTP状态码）`)
+        // ElMessage.error(`网络错误：${status}（HTTP状态码）`)
       }
     } else if (error.message.includes('timeout')) {
       // 超时错误
-      ElMessage.error('请求超时啦，请稍后重试')
+      console.log('请求超时啦，请稍后重试')
     } else if (error.message.includes('Network Error')) {
       // 断网等网络连接错误
-      ElMessage.error('网络连接失败，请检查网络')
+      console.log('网络连接失败，请检查网络')
     } else {
       // 其他未知错误
-      ElMessage.error('请求失败，请稍后重试')
+      console.log('请求失败，请稍后重试')
     }
     return Promise.reject(error)
   },

@@ -34,6 +34,9 @@
   --color-text: var(--vt-c-text-light-1);
 
   --section-gap: 160px;
+  
+  /* Element Plus variables */
+  --el-dialog-title-font-size: 14px;
 }
 
 @media (prefers-color-scheme: dark) {

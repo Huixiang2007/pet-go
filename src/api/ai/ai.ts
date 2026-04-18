@@ -7,11 +7,9 @@ export const getAiChat = (memoryId: string, message: string): Promise<Response> 
   const token = localStorage.getItem('authToken')
   // 使用原生 Fetch API
   return fetch(`/server/api/ai/chat/AiChatFlux?${params.toString()}`, {
-    method: 'POST',
+    method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ memoryId, message }),
   })
 }

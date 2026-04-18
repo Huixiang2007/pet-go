@@ -116,12 +116,8 @@
               </div>
 
               <div v-if="orders.length === 0" class="bg-white rounded-xl shadow-sm p-8 text-center">
-                <div class="w-32 h-32 mx-auto mb-4 opacity-30">
-                  <img
-                    src="https://picsum.photos/id/225/200/200"
-                    alt="暂无订单"
-                    class="w-full h-full object-contain"
-                  />
+                <div class="w-32 h-32 mx-auto mb-4 opacity-30 flex items-center justify-center">
+                  <i class="fas fa-clipboard-list text-6xl text-gray-300"></i>
                 </div>
                 <h3 class="text-lg font-medium text-gray-800 mb-2">暂无相关订单</h3>
                 <p class="text-gray-500 mb-6 max-w-md mx-auto">

@@ -54,7 +54,6 @@
             </button>
           </div>
         </div>
-
         <template v-if="isSystemNotice">
           <SystemNoticeChat
             :notices="systemNotices"
@@ -668,6 +667,7 @@ onUnmounted(() => {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #3b82f6;
   border-radius: 3px;

@@ -127,7 +127,7 @@
               <i class="fa fa-ticket text-amber-600 text-2xl mr-3"></i>
               <h2 class="text-xl font-bold text-amber-800">优惠券中心</h2>
             </div>
-            <a href="/promotion" class="text-amber-600 text-sm hover:underline flex items-center">
+            <a href="/coupon" class="text-amber-600 text-sm hover:underline flex items-center">
               查看全部 <i class="fa fa-arrow-right ml-1 text-xs"></i>
             </a>
           </div>
@@ -246,6 +246,92 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <!-- 查看优惠券规则弹窗 -->
+    <div
+      v-if="popupVisible"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 transition-opacity duration-300"
+    >
+      <div
+        class="bg-white rounded-2xl p-6 max-w-md w-full mx-4 shadow-xl transform transition-all duration-300 scale-100"
+      >
+        <!-- 弹窗头部 -->
+        <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+          <h3 class="text-xl font-bold text-amber-800 flex items-center">
+            <i class="fas fa-ticket-alt mr-2 text-amber-600"></i>
+            优惠券使用规则
+          </h3>
+          <button
+            @click="popupVisible = false"
+            class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+            title="关闭"
+          >
+            <i class="fas fa-times text-gray-500"></i>
+          </button>
+        </div>
+
+        <!-- 规则内容 -->
+        <div class="space-y-4 mb-6">
+          <div class="flex items-start">
+            <div
+              class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-medium text-sm mr-3 flex-shrink-0 mt-0.5"
+            >
+              1
+            </div>
+            <p class="text-gray-700">优惠券领取后有效期为7天，请在有效期内使用</p>
+          </div>
+          <div class="flex items-start">
+            <div
+              class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-medium text-sm mr-3 flex-shrink-0 mt-0.5"
+            >
+              2
+            </div>
+            <p class="text-gray-700">每个用户每种优惠券最多领取3张</p>
+          </div>
+          <div class="flex items-start">
+            <div
+              class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-medium text-sm mr-3 flex-shrink-0 mt-0.5"
+            >
+              3
+            </div>
+            <p class="text-gray-700">优惠券不可叠加使用，每次订单只能使用一张</p>
+          </div>
+          <div class="flex items-start">
+            <div
+              class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-medium text-sm mr-3 flex-shrink-0 mt-0.5"
+            >
+              4
+            </div>
+            <p class="text-gray-700">优惠券仅适用于指定店铺和商品类别</p>
+          </div>
+          <div class="flex items-start">
+            <div
+              class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-medium text-sm mr-3 flex-shrink-0 mt-0.5"
+            >
+              5
+            </div>
+            <p class="text-gray-700">优惠券过期后自动失效，不予补发</p>
+          </div>
+          <div class="flex items-start">
+            <div
+              class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-medium text-sm mr-3 flex-shrink-0 mt-0.5"
+            >
+              6
+            </div>
+            <p class="text-gray-700">如有疑问，请联系客服</p>
+          </div>
+        </div>
+
+        <!-- 底部按钮 -->
+        <div class="flex justify-center">
+          <button
+            @click="popupVisible = false"
+            class="px-6 py-2.5 bg-amber-500 text-white rounded-lg transition-all hover:bg-amber-600 focus:ring-2 focus:ring-amber-300 focus:ring-offset-2"
+          >
+            我知道了
+          </button>
         </div>
       </div>
     </div>

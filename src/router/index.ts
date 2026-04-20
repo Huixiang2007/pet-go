@@ -57,6 +57,16 @@ const routes: RouteRecordRaw[] = [
       title: 'PetGo购物车',
     },
   },
+  //优惠卷中心
+    {
+    path: '/coupon',
+    name: 'coupon',
+    component: () => import('@/views/petShop/marketing/CouponDisplay.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'PetGo优惠卷中心',
+    },
+  },
   //订单结算
   {
     path: '/order',

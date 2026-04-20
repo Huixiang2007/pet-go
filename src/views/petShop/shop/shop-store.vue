@@ -118,7 +118,10 @@
               :key="product.id"
               class="product-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl hover:scale-103 transition-all cursor-pointer border border-gray-100"
             >
-              <div class="relative w-full h-48 sm:h-56 overflow-hidden">
+              <div
+                class="relative w-full h-48 sm:h-56 overflow-hidden"
+                @click="navigateToProductDetail(product.id)"
+              >
                 <img
                   :src="product.productMainImage"
                   :alt="product.productName"
@@ -130,7 +133,7 @@
                   >上架</span
                 >
               </div>
-              <div class="p-4">
+              <div class="p-4" @click="navigateToProductDetail(product.id)">
                 <h3 class="font-medium text-gray-800 line-clamp-1">{{ product.productName }}</h3>
                 <p class="text-gray-500 text-xs mt-1 line-clamp-1">
                   {{ product.brandName }} | {{ product.productType }}
@@ -157,6 +160,8 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+const route = useRouter()
 import InfiniteScroll from './components/infiniteScroll.vue'
 import { useRoute } from 'vue-router'
 import { getProductList } from '@/api/pet-shop/product'
@@ -233,22 +238,24 @@ const getProducts = async () => {
       const productList = res.list as unknown as Product[]
       hasmore.value = productList.length === pageSize.value
       isLoading.value = false
-      // 追加数据而不是覆盖
       if (currentPage.value === 1) {
         products.value = productList
       } else {
         products.value = [...products.value, ...productList]
       }
       currentPage.value++
-    } else {
-      ElMessage.error('获取商品列表失败！')
     }
   } catch (err: any) {
     console.log(err)
     ElMessage.error('获取商品列表失败！')
   }
 }
-
+// 跳转函数
+const navigateToProductDetail = (productId: string | number) => {
+  route.push({
+    path: `/product-detail/${productId}`,
+  })
+}
 onMounted(() => {
   getstore()
   getProducts()

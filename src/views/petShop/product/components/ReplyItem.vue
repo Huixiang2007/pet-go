@@ -83,16 +83,22 @@ watch(
   },
   { immediate: true },
 )
-
 const send = async () => {
   if (!content.value?.trim()) return
   try {
-    await replyComment({
+    // 区分直接回复和回复自评论
+    const params: any = {
       commentId: props.commentId,
       content: content.value,
-      parentId: props.reply.id,
-      toUid: props.reply.fromUid,
-    })
+    }
+    const isDirectReply = !props.reply.parentId || !props.reply.toUid
+    if (!isDirectReply) {
+      params.parentId = props.reply.id
+      params.toUid = props.reply.fromUid
+    }
+
+    console.log('回复参数:', params)
+    await replyComment(params)
     content.value = ''
     showInput.value = false
     emit('update:show-child', true)

@@ -319,10 +319,6 @@
               </div>
             </div>
 
-            <div class="mt-3 text-sm text-gray-500">
-              库存：<span class="text-green-600">{{ selectedSku.stock || 999 }}</span> 件
-            </div>
-
             <div
               class="flex flex-col sm:flex-row gap-3 pt-4 pr-[4.5rem] border-t border-gray-100 mt-4"
             >
@@ -677,17 +673,19 @@ const addToCart = async () => {
     ElMessage.error('添加购物车失败，请稍后重试')
   }
 }
-//优惠卷
+//优惠券领取
 const handleClaimCoupon = async (couponId) => {
   try {
     console.log('领取优惠券:', couponId)
     const res = await receiveCoupon(couponId)
     if (res.ok) {
       ElMessage.success('优惠券领取成功！')
+    } else {
+      ElMessage.error(res.msg || '优惠券领取失败')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('领取优惠券失败:', error)
-    ElMessage.error('领取优惠券失败')
+    ElMessage.error(error?.message || '领取失败，请稍后重试')
   }
 }
 

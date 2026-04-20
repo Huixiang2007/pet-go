@@ -142,7 +142,7 @@ const loadShopInfo = async () => {
   loading.value = true
   try {
     const data = await Detail(Number(props.productId))
-    console.log('加载成功', data)
+    console.log('评论加载成功', data)
     itemInfo.value = data || null
   } catch (e) {
     console.error('加载失败', e)
@@ -159,7 +159,7 @@ const loadComment = async () => {
       pageNum: 1,
       pageSize: 100,
     })
-    console.log('加载成功', data)
+    console.log('评论加载成功', data)
 
     commentList.value =
       data.list?.map((item) => ({
@@ -265,8 +265,6 @@ const sendReply = async (comment) => {
     await replyComment({
       commentId: String(comment.id),
       content: comment.replyContent,
-      parentId: '0',
-      toUid: String(comment.userId),
     })
 
     comment.replyContent = ''

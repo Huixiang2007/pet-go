@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-// import AddressSelector from './components/order-pay/AddressSelector.vue'
+import AddressSelector from './components/order-pay/AddressSelector.vue'
 import CouponSelector from './components/order-pay/CouponSelector.vue'
 import OrderSummary from './components/order-pay/OrderSummary.vue'
 import GoodsList from './components/order-pay/GoodsList.vue'
@@ -198,6 +198,7 @@ const loadGoodsFromCart = async () => {
 const loadAddress = async () => {
   try {
     const res = await getAddressList({})
+    console.log('地址接口返回数据:', res)
     if (res.ok) {
       addressList.value = res.data.list.map((item: any) => ({
         id: item.id,
@@ -221,6 +222,7 @@ const jumpToAddressManage = () => {
 // 默认地址
 const loadDefaultAddress = async () => {
   const res = (await getDefaultAddress()) as any
+  console.log('默认地址响应：', res)
   if (res) {
     addressList.value.forEach((i) => (i.isDefault = i.id === res.id))
   }
@@ -246,6 +248,7 @@ const couponsLoading = ref(false)
 const platformCoupons = ref([])
 const shopCoupons = ref([])
 const selectedCouponId = ref('')
+// 加载优惠券
 const loadCoupos = async () => {
   try {
     couponsLoading.value = true
@@ -363,13 +366,14 @@ const confirmOrder = async () => {
     } else {
       ElMessage.error(res.msg || '确认订单失败')
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error(e)
-    ElMessage.error('确认订单异常')
+    ElMessage.error(e.msg || '确认订单失败')
   } finally {
     loading.value = false
   }
 }
+// 支付··
 const handlePay = async () => {
   const type = route.query.type as string
 
@@ -435,7 +439,6 @@ const getUserBalance = async () => {
     ElMessage.error('获取账户余额失败，请稍后重试')
   }
 }
-// const jumpToAddressManage = () => router.push('/persons')
 </script>
 
 <style scoped lang="scss">

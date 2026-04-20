@@ -317,6 +317,61 @@ const handleLoadMore = () => {
 }
 
 // 发送消息
+// const sendMessage = (record: any) => {
+//   let uid = activeShop.value.userId
+//   console.log('发送消息:', uid)
+//   if (!uid) {
+//     uid = extractNumberFromStr(route.query.id as string)
+//   }
+//   const key = `${chatType.value}_${uid}`
+//   if (!chatRecords.value[key]) chatRecords.value[key] = []
+
+//   const newRecord: ChatRecord = {
+//     id: `msg_${record.msgId || Date.now()}`,
+//     type: 'user',
+//     time: new Date(record.sendTime).toLocaleTimeString().slice(0, 5),
+//     isWithdrawn: false,
+//     msgType: record.msgType || 'text',
+//     isGoods: false,
+//     isService: false,
+//     content: '',
+//     isImage: false,
+//     imageUrl: '',
+//   }
+
+//   if (newRecord.msgType === 'text') {
+//     newRecord.content = record.content || ''
+//     newRecord.isImage = !!record.isImage
+//     newRecord.imageUrl = record.imageUrl || ''
+//   } else if (newRecord.msgType === 'image') {
+//     newRecord.content = ''
+//     newRecord.isImage = true
+//     newRecord.imageUrl = record.imageUrl || record.image || ''
+//   } else if (newRecord.msgType === 'product') {
+//     newRecord.isGoods = true
+//     newRecord.goodsInfo = {
+//       id: record.id,
+//       title: record.title || '商品',
+//       currentPrice: record.price || 0,
+//       sales: record.sales || 0,
+//       mainImage: record.mainImage || '',
+//     }
+//   } else if (newRecord.msgType === 'service') {
+//     newRecord.isService = true
+//     newRecord.serviceInfo = {
+//       id: record.msgId,
+//       title: record.title || '寄养服务',
+//       currentPrice: record.servicePrice || record.shopPrice || 0,
+//       mainImage: record.shopMainImage || record.senderAvatar || '',
+//       petTypes: record.petTypes || record.servicePetType || '通用',
+//       serviceDescription: record.serviceDescription || '专业宠物寄养',
+//       sales: record.servicePrice || 0,
+//     }
+//   }
+
+//   chatRecords.value[key].push(newRecord)
+//   scrollToBottom()
+// }
 const sendMessage = (record: any) => {
   let uid = activeShop.value.userId
   console.log('发送消息:', uid)
@@ -349,15 +404,21 @@ const sendMessage = (record: any) => {
     newRecord.imageUrl = record.imageUrl || record.image || ''
   } else if (newRecord.msgType === 'product') {
     newRecord.isGoods = true
+    newRecord.isService = false
+    newRecord.isImage = false
+    newRecord.content = ''
     newRecord.goodsInfo = {
-      id: record.id,
+      id: record.id || record.goodsId,
       title: record.title || '商品',
       currentPrice: record.price || 0,
       sales: record.sales || 0,
       mainImage: record.mainImage || '',
     }
   } else if (newRecord.msgType === 'service') {
+    newRecord.isGoods = false
     newRecord.isService = true
+    newRecord.isImage = false
+    newRecord.content = ''
     newRecord.serviceInfo = {
       id: record.msgId,
       title: record.title || '寄养服务',
@@ -372,7 +433,6 @@ const sendMessage = (record: any) => {
   chatRecords.value[key].push(newRecord)
   scrollToBottom()
 }
-
 // 处理SSE消息
 const handleSSEMessage = (data: any) => {
   try {

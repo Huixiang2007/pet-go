@@ -1,6 +1,6 @@
 <!-- 订单摘要组件 -->
 <template>
-  <div class="shadow-gary-300 rounded-xl pt-6 mt-6">
+  <div class="shadow-gary-300 rounded-xl pt-6 mt-6 mr-4">
     <div class="bg-white rounded-xl p-6 top-24">
       <h2 class="text-lg font-semibold mb-6">订单摘要</h2>
 

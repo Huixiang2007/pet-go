@@ -27,24 +27,43 @@
         <el-form-item label="商品编码" prop="productSn">
           <el-input v-model="editForm.productSn" placeholder="请输入商品编码" />
         </el-form-item>
-<el-form-item label="品牌" prop="brandId">
-  <el-select v-model.number="editForm.brandId" placeholder="请选择品牌">
-    <el-option label="请选择品牌" :value="0" />
-    <el-option v-for="brand in brands" :key="brand.id" :label="brand.name" :value="brand.id" />
-  </el-select>
-</el-form-item>
-        <el-form-item label="父分类" prop="typeParent">
-          <el-select v-model.number="editForm.typeParent" placeholder="请选择父分类" @change="handleParentChange">
-            <el-option label="请选择父分类" :value="0"  />
-          <el-option v-for="type in parentsTypes" :key="type.id" :label="type.name" :value="type.id" />
+        <el-form-item label="品牌" prop="brandId">
+          <el-select v-model.number="editForm.brandId" placeholder="请选择品牌">
+            <el-option label="请选择品牌" :value="0" />
+            <el-option
+              v-for="brand in brands"
+              :key="brand.id"
+              :label="brand.name"
+              :value="brand.id"
+            />
           </el-select>
         </el-form-item>
-<el-form-item label="子分类" prop="typeChild">
-  <el-select v-model.number="editForm.typeChild" placeholder="请选择子分类">
-    <el-option label="请选择子分类" :value="0" />
-    <el-option v-for="category in sonTypes" :key="category.id" :label="category.name" :value="category.id" />
-  </el-select>
-</el-form-item>
+        <el-form-item label="父分类" prop="typeParent">
+          <el-select
+            v-model.number="editForm.typeParent"
+            placeholder="请选择父分类"
+            @change="handleParentChange"
+          >
+            <el-option label="请选择父分类" :value="0" />
+            <el-option
+              v-for="type in parentsTypes"
+              :key="type.id"
+              :label="type.name"
+              :value="type.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="子分类" prop="typeChild">
+          <el-select v-model.number="editForm.typeChild" placeholder="请选择子分类">
+            <el-option label="请选择子分类" :value="0" />
+            <el-option
+              v-for="category in sonTypes"
+              :key="category.id"
+              :label="category.name"
+              :value="category.id"
+            />
+          </el-select>
+        </el-form-item>
       </div>
 
       <!-- 价格与库存 -->
@@ -115,7 +134,7 @@
       </div>
 
       <!-- 商品图片 -->
-        <div class="border-b border-gray-200 pb-4 mb-4">
+      <div class="border-b border-gray-200 pb-4 mb-4">
         <ProductImageUpload
           :mainImage="mainImageUrl"
           :imagesList="detailImages"
@@ -140,7 +159,6 @@ import { ref, reactive, watch, nextTick, onUnmounted, onMounted } from 'vue'
 import { type FormInstance, ElMessage } from 'element-plus'
 import axios from 'axios'
 import ProductImageUpload from './ProductImageUpload.vue'
-
 
 // 品牌和分类接口
 interface Brand {
@@ -229,7 +247,7 @@ const editForm = reactive<EditForm>({
   status: '',
   detail: '',
   warrantyTip: '',
-  mainImage: ''
+  mainImage: '',
 })
 
 // 品牌和分类数据
@@ -247,33 +265,27 @@ const videoUrl = ref('')
 const editRules = reactive({
   productName: [
     { required: true, message: '请输入商品名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '商品名称长度在2-50个字符之间', trigger: 'blur' }
+    { min: 2, max: 50, message: '商品名称长度在2-50个字符之间', trigger: 'blur' },
   ],
   productSn: [
     { required: true, message: '请输入商品货号', trigger: 'blur' },
-    { min: 1, max: 30, message: '商品货号长度在1-30个字符之间', trigger: 'blur' }
+    { min: 1, max: 30, message: '商品货号长度在1-30个字符之间', trigger: 'blur' },
   ],
-  typeParent: [
-    { required: true, message: '请选择父分类', trigger: 'change' }
-  ],
-  typeChild: [
-    { required: true, message: '请选择子分类', trigger: 'change' }
-  ],
+  typeParent: [{ required: true, message: '请选择父分类', trigger: 'change' }],
+  typeChild: [{ required: true, message: '请选择子分类', trigger: 'change' }],
   currentPrice: [
     { required: true, message: '请输入商品价格', trigger: 'blur' },
-    { type: 'number', min: 0.01, message: '商品价格不能小于0.01元', trigger: 'blur' }
+    { type: 'number', min: 0.01, message: '商品价格不能小于0.01元', trigger: 'blur' },
   ],
   stock: [
     { required: true, message: '请输入库存数量', trigger: 'blur' },
-    { type: 'number', min: 0, message: '库存数量不能小于0', trigger: 'blur' }
+    { type: 'number', min: 0, message: '库存数量不能小于0', trigger: 'blur' },
   ],
-  status: [
-    { required: true, message: '请选择商品状态', trigger: 'change' }
-  ],
+  status: [{ required: true, message: '请选择商品状态', trigger: 'change' }],
   detail: [
     { required: true, message: '请输入商品描述', trigger: 'blur' },
-    { min: 1, message: '商品描述不能少于1个字符', trigger: 'blur' }
-  ]
+    { min: 1, message: '商品描述不能少于1个字符', trigger: 'blur' },
+  ],
 })
 
 // 提交编辑
@@ -283,7 +295,7 @@ const submitEdit = () => {
       console.log('表单验证通过')
       console.log('editForm', editForm)
       editForm.mainImage = mainImageUrl.value
-      const imagesStr = detailImages.value.map(img => img.url).join(',')
+      const imagesStr = detailImages.value.map((img) => img.url).join(',')
       const videoUrlStr = videoUrl.value
 
       const submitData = {
@@ -293,7 +305,7 @@ const submitEdit = () => {
         videoUrl: videoUrlStr,
         typeParent: editForm.typeParent,
         typeChild: editForm.typeChild,
-        brandId: editForm.brandId
+        brandId: editForm.brandId,
       }
 
       console.log('最终提交数据：', submitData)
@@ -316,19 +328,23 @@ const handleClose = () => {
 
 // 弹窗状态管理
 const isVisible = ref(props.visible)
-watch(() => props.visible, (newVal) => {
-  isVisible.value = newVal
-  if (newVal) {
-    nextTick(() => {
-      editFormRef.value?.clearValidate()
-      setFormData(props.product)
-    })
-  } else {
-    nextTick(() => {
-      editFormRef.value?.resetFields()
-    })
-  }
-}, { immediate: true })
+watch(
+  () => props.visible,
+  (newVal) => {
+    isVisible.value = newVal
+    if (newVal) {
+      nextTick(() => {
+        editFormRef.value?.clearValidate()
+        setFormData(props.product)
+      })
+    } else {
+      nextTick(() => {
+        editFormRef.value?.resetFields()
+      })
+    }
+  },
+  { immediate: true },
+)
 
 watch(isVisible, (newVal) => {
   emit('update:visible', newVal)
@@ -342,7 +358,7 @@ const setFormData = (product: ProductDetail) => {
   editForm.id = data.id || ''
   editForm.productName = data.productName || ''
   editForm.productSn = data.productSn || ''
-  editForm.brandId = data.brandId || (data.brandName?.id || 0)
+  editForm.brandId = data.brandId || data.brandName?.id || 0
   editForm.typeParent = data.typeParent?.id || 0
   editForm.typeChild = data.typeChild?.id || 0
   editForm.currentPrice = data.currentPrice || (data.price ? Number(data.price) : 0)
@@ -356,15 +372,18 @@ const setFormData = (product: ProductDetail) => {
 
   mainImageUrl.value = data.mainImage || ''
   detailImages.value = Array.isArray(data.images)
-    ? data.images.map(url => ({ name: url.split('/').pop() || '', url, isImage: true }))
-    : (data.imagesList || [])
+    ? data.images.map((url) => ({ name: url.split('/').pop() || '', url, isImage: true }))
+    : data.imagesList || []
   videoUrl.value = data.videoUrl || ''
 }
 
-
-watch(() => props.product.id, () => {
-  setFormData(props.product)
-}, { deep: true })
+watch(
+  () => props.product.id,
+  () => {
+    setFormData(props.product)
+  },
+  { deep: true },
+)
 
 // 获取品牌列表
 const getBrands = () => {
@@ -378,12 +397,12 @@ const getBrands = () => {
     })
     .then((res: any) => {
       if (res.data.code === 0) {
-          const brandsObj = res.data.data;
+        const brandsObj = res.data.data
         console.log('获取品牌成功:', res.data.data)
-          brands.value = Object.entries(brandsObj).map(([id, name]) => ({
+        brands.value = Object.entries(brandsObj).map(([id, name]) => ({
           id: Number(id),
-          name: name as string
-        }));
+          name: name as string,
+        }))
       } else {
         ElMessage.error(res.data.msg)
       }
@@ -406,13 +425,12 @@ const getParentsTypes = () => {
     })
     .then((res: any) => {
       if (res.data.code === 0) {
-        const parentTypeObj = res.data.data;
+        const parentTypeObj = res.data.data
         console.log('获取父分类成功:', res.data.data)
-         parentsTypes.value = Object.entries(parentTypeObj).map(([id, name]) => ({
+        parentsTypes.value = Object.entries(parentTypeObj).map(([id, name]) => ({
           id: Number(id),
-          name: name as string
-        }));
-
+          name: name as string,
+        }))
       } else {
         ElMessage.error(res.data.msg)
       }
@@ -443,11 +461,11 @@ const getSonTypes = () => {
     })
     .then((res: any) => {
       if (res.data.code === 0) {
-          const childTypeObj = res.data.data;
+        const childTypeObj = res.data.data
         console.log('获取子分类成功:', res.data.data)
         sonTypes.value = Object.entries(childTypeObj).map(([id, name]) => ({
           id: Number(id),
-          name: String(name)
+          name: String(name),
         }))
       } else {
         ElMessage.error(res.data.msg)
@@ -464,13 +482,11 @@ const handleParentChange = () => {
   getSonTypes()
 }
 
-
-
 // 组件挂载时加载数据
 onMounted(() => {
   getBrands()
   getParentsTypes()
-  if (props.product.typeParent && props.product.typeParent.id!== 0) {
+  if (props.product.typeParent && props.product.typeParent.id !== 0) {
     editForm.typeParent = props.product.typeParent.id
     getSonTypes()
   }

@@ -5,21 +5,27 @@
       <div class="order-container mx-auto px-4">
         <div class="flex items-center justify-between max-w-3xl mx-auto">
           <div class="flex flex-col items-center">
-            <div class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2">
+            <div
+              class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2"
+            >
               <i class="fa fa-shopping-cart"></i>
             </div>
             <span class="text-sm font-medium text-[#333333]">购物车</span>
           </div>
           <div class="flex-1 h-1 mx-2 bg-[#f3ce48]"></div>
           <div class="flex flex-col items-center">
-            <div class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2">
+            <div
+              class="w-10 h-10 rounded-full bg-[#f3ce48] text-white flex items-center justify-center mb-2"
+            >
               <i class="fa fa-map-marker"></i>
             </div>
             <span class="text-sm font-medium text-[#333333]">确认订单</span>
           </div>
           <div class="flex-1 h-1 mx-2 bg-gray-200"></div>
           <div class="flex flex-col items-center">
-            <div class="w-10 h-10 rounded-full bg-gray-200 text-white flex items-center justify-center mb-2">
+            <div
+              class="w-10 h-10 rounded-full bg-gray-200 text-white flex items-center justify-center mb-2"
+            >
               <i class="fa fa-credit-card"></i>
             </div>
             <span class="text-sm font-medium text-[#333333]">支付</span>
@@ -31,25 +37,51 @@
     <main class="order-container mx-auto px-4 py-8 flex flex-row justify-center">
       <div class="flex flex-col items-between w-[60%]">
         <div class="mr-4">
-          :address-list="addressList" @set-default="setDefaultAddress"
-          @jump-to-address="jumpToAddressManage" />
-          <CouponSelector :coupons="coupons" @select-coupon="selectCoupon" />
+          <AddressSelector
+            :address-list="addressList"
+            @set-default="setDefaultAddress"
+            @jump-to-address="jumpToAddressManage"
+          />
+          <CouponSelector
+            :platform-coupons="platformCoupons"
+            :shop-coupons="shopCoupons"
+            :selected-coupon-id="selectedCouponId"
+            @select-coupon="selectCoupon"
+          />
         </div>
 
-        <OrderSummary :goods="selectedGoods" :shipping-fee="shippingFee" :discount="selectedDiscount"
-          :total-price="totalPrice" @confirm-pay="confirmOrder"
-          @update:agreementAccepted="agreementAccepted = $event" />
+        <OrderSummary
+          :goods="selectedGoods"
+          :shipping-fee="shippingFee"
+          :platform-coupons="platformCoupons"
+          :shop-coupons="shopCoupons"
+          :selected-coupon-id="selectedCouponId"
+          :discount="selectedDiscount"
+          :total-price="totalPrice"
+          @confirm-pay="confirmOrder"
+          @update:agreementAccepted="agreementAccepted = $event"
+        />
       </div>
 
       <div class="w-[40%]">
-        <GoodsList :goods="selectedGoods" @update:goods="updateGoods" @update:remark="orderRemark = $event" />
+        <GoodsList
+          :goods="selectedGoods"
+          @update:goods="updateGoods"
+          @update:remark="orderRemark = $event"
+        />
       </div>
     </main>
 
     <el-loading v-if="loading" fullscreen text="确认订单中..." />
     <!-- 支付弹窗 -->
-    <PayPopup v-model="payDialogVisible" :order-no="orderNo" :calculate-total-price="totalPrice"
-      :user-balance="userBalance" @go-to-recharge="handleGoToRecharge" @pay-success="handlePay" />
+    <PayPopup
+      v-model="payDialogVisible"
+      :order-no="orderNo"
+      :calculate-total-price="totalPrice"
+      :user-balance="userBalance"
+      @go-to-recharge="handleGoToRecharge"
+      @pay-success="handlePay"
+    />
   </div>
 </template>
 
@@ -73,6 +105,7 @@ import {
 import { getProductDetail } from '@/api/pet-shop/product'
 import PayPopup from '@/views/petShop/order/components/order-pay/PayPopup.vue'
 import { getCartItems } from '@/api/pet-shop/order'
+import { getBestCouponOrderList } from '@/api/pet-shop/coupos'
 import router from '@/router/index'
 import { useRoute } from 'vue-router'
 
@@ -101,7 +134,7 @@ onMounted(() => {
 
   if (productId) {
     purchaseType.value = type.value === 'buyNow' ? '立即购买' : '购物车购买'
-    loadGoods(productId, skuId, qty) // 传参进去
+    loadGoods(productId, skuId, qty)
   } else {
     purchaseType.value = type.value === 'buyNow' ? '立即购买' : '购物车购买'
     loadGoodsFromCart()
@@ -127,6 +160,7 @@ const loadGoods = async (id: string, skuId: string, qty: string) => {
           skuId: skuId,
         },
       ]
+      loadCoupos()
     }
   } catch (e) {
     console.error('加载商品失败', e)
@@ -153,6 +187,7 @@ const loadGoodsFromCart = async () => {
         shopName: item.shopName,
       }))
       console.log('处理后购物车商品:', selectedGoods.value)
+      loadCoupos()
     }
   } catch (e) {
     console.error('加载购物车商品失败', e)
@@ -180,30 +215,82 @@ const loadAddress = async () => {
     console.error('加载地址失败:', e)
   }
 }
-
+const jumpToAddressManage = () => {
+  router.push('/persons')
+}
+// 默认地址
 const loadDefaultAddress = async () => {
   const res = (await getDefaultAddress()) as any
   if (res) {
     addressList.value.forEach((i) => (i.isDefault = i.id === res.id))
   }
 }
+const updateDefaultAddress = async (id: string) => {
+  try {
+    const res = await updateDefaultAddress(id)
+    console.log('更新默认地址成功:', res)
+    ElMessage.success('默认地址已更新')
+  } catch (e) {
+    console.error('更新默认地址失败:', e)
+    ElMessage.error('更新默认地址失败')
+  }
+}
+//修改默认地址
+const setDefaultAddress = async (id: number) => {
+  addressList.value.forEach((i) => (i.isDefault = i.id === id))
+  await updateDefaultAddress(id + '')
+  ElMessage.success('默认地址已更新')
+}
 
-// const setDefaultAddress = async (id: number) => {
-//   addressList.value.forEach((i) => (i.isDefault = i.id === id))
-//   await updateDefaultAddress(id + '')
-//   ElMessage.success('默认地址已更新')
-// }
+const couponsLoading = ref(false)
+const platformCoupons = ref([])
+const shopCoupons = ref([])
+const selectedCouponId = ref('')
+const loadCoupos = async () => {
+  try {
+    couponsLoading.value = true
 
-// 优惠券
-const coupons = ref([
-  { id: 1, discount: '满199减30', isSelected: false, validity: '2024-12-31' },
-  { id: 2, discount: '满99减10', isSelected: true, validity: '2024-12-31' },
-])
+    const params = {
+      purchaseType: purchaseType.value,
+      productId: route.query.id || '',
+      skuId: route.query.sku || '',
+      productNum: Number(route.query.qty) || (selectedGoods.value[0]?.quantity ?? 1),
+      cartIds: selectedGoods.value.map((g) => g.id) || [],
+      searchCount: true,
+      sortItemList: [{ isAsc: false, column: 'discount' }],
+      pageNum: 1,
+      pageSize: 10,
+    }
 
-const selectCoupon = (id: number) => {
-  coupons.value.forEach((c) => (c.isSelected = c.id === id))
-  const c = coupons.value.find((v) => v.id === id)
-  selectedDiscount.value = c?.discount.includes('30') ? 30 : 10
+    const res = await getBestCouponOrderList(params)
+    const data = res.data || {}
+
+    platformCoupons.value = data.bestPlatformCoupon ? [data.bestPlatformCoupon] : []
+    if (Array.isArray(data.productBestShopCoupons)) {
+      shopCoupons.value = data.productBestShopCoupons.map((item) => item.bestShopCoupon)
+    } else {
+      shopCoupons.value = []
+    }
+
+    console.log('✅ 平台券（已拆平）：', platformCoupons.value)
+    console.log('✅ 店铺券（已拆平）：', shopCoupons.value)
+  } catch (e) {
+    console.error('加载优惠券失败:', e)
+  } finally {
+    couponsLoading.value = false
+  }
+}
+// 选择优惠券
+const selectedPlatformCouponId = ref('')
+const selectedShopCouponId = ref('')
+
+const selectCoupon = (couponId, type) => {
+  if (type === 'platform') {
+    selectedPlatformCouponId.value = couponId
+  } else if (type === 'shop') {
+    selectedShopCouponId.value = couponId
+  }
+  selectedCouponId.value = couponId
 }
 
 // 总价
@@ -213,6 +300,7 @@ const totalPrice = computed(() => {
 })
 const agreementAccepted = ref(false)
 const updateGoods = (val: any) => (selectedGoods.value = val)
+
 // 确认订单
 let orderNos: string[] = []
 const confirmOrder = async () => {
@@ -233,7 +321,10 @@ const confirmOrder = async () => {
     const baseParams = {
       purchaseType: finalPurchaseType,
       addressId: addr.id + '',
-      couponIds: coupons.value.filter((c) => c.isSelected).map((c) => c.id + ''),
+      couponIds: [
+        selectedPlatformCouponId.value ? [selectedPlatformCouponId.value] : [],
+        selectedShopCouponId.value ? [selectedShopCouponId.value] : [],
+      ].flat(),
       payType: '支付宝',
       orderRemark: orderRemark.value ? orderRemark.value : '',
     }

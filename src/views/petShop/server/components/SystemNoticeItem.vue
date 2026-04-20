@@ -1,6 +1,10 @@
 <template>
   <div
-    class="flex items-center p-4 border-b border-gray-100 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+    class="flex items-center p-4 border-b border-gray-100 cursor-pointer transition-colors"
+    :class="{
+      'bg-gray-50 hover:bg-gray-100': !isActive,
+      'bg-blue-50 border-blue-200 shadow-sm': isActive,
+    }"
     @click="handleNoticeClick"
   >
     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
@@ -23,6 +27,7 @@
 defineProps<{
   latestNotice: { id: string; content: string; time: string } // 最新一条通知
   unreadCount: number
+  isActive: boolean
 }>()
 
 // 点击通知项的事件

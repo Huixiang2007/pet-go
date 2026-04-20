@@ -14,7 +14,6 @@
     ></div>
 
     <main class="mx-auto px-4 sm:px-6 lg:px-[5rem] py-8 relative z-1">
-      <!-- 页面标题（弱化秒杀，突出促销） -->
       <div class="mb-8">
         <h2 class="text-2xl font-bold flex items-center text-amber-800">
           <i class="fa fa-gift text-amber-500 mr-2"></i>
@@ -26,45 +25,65 @@
         <p class="text-amber-700 mt-2">🐾 精选萌宠好物，优惠券+直降双重福利，囤货正当时！</p>
       </div>
 
-      <!-- 全部优惠券（核心模块） -->
+      <!-- 优惠券区域 -->
       <div class="bg-amber-100/70 rounded-2xl p-6 mb-8">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-lg font-bold text-amber-800 flex items-center">
             <i class="fa fa-ticket text-amber-600 mr-2"></i> 全部优惠券
           </h3>
-          <!-- 可加：跳转到秒杀页的入口（如果需要） -->
-          <router-link
-            to="/seckill"
-            class="text-amber-700 text-sm hover:text-amber-800 transition-colors"
-          >
+          <router-link to="/seckill" class="text-amber-700 text-sm hover:text-amber-800">
             去秒杀专区 →
           </router-link>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           <div
-            v-for="coupon in allCouponList"
+            v-for="coupon in paginatedCoupons"
             :key="coupon.id"
-            class="bg-white rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden"
+            class="bg-white rounded-xl p-4 shadow-sm relative overflow-hidden"
           >
-            <div class="absolute left-0 top-0 w-1.5 h-full bg-amber-400"></div>
-            <div class="flex justify-between items-start mb-3">
-              <div>
-                <span class="text-3xl font-bold text-amber-600">¥{{ coupon.amount }}</span>
-                <span class="text-sm text-gray-500 ml-1">{{ coupon.condition }}</span>
-              </div>
-              <i class="fa fa-paw text-amber-400 text-xl"></i>
+            <div class="mb-3">
+              <h4 class="text-base font-semibold text-gray-800 mb-1">{{ coupon.couponName }}</h4>
+              <p class="text-xs text-gray-400 mb-1">
+                适用：{{ coupon.usedToShopName || '全平台' }} /
+                {{ coupon.usedToProductTypeName || '全品类' }}
+              </p>
+              <p class="text-xs text-gray-400">
+                已领：{{ coupon.receiveCount || 0 }} / 上限：{{ coupon.perLimit || 0 }}
+              </p>
             </div>
-            <div class="text-sm text-gray-400 mb-3">有效期至 {{ coupon.expireDate }}</div>
+
             <button
-              class="bg-gradient-to-r from-amber-400 to-yellow-400 text-white text-sm py-2 rounded-lg hover:from-amber-500 hover:to-yellow-500 transition-all"
+              :disabled="!canReceive(coupon)"
+              :class="[
+                canReceive(coupon)
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-500 hover:to-yellow-500'
+                  : 'bg-gray-300 cursor-not-allowed',
+              ]"
+              class="w-full text-white text-sm py-2 rounded-lg transition-all"
+              @click="handleReceiveCoupon(coupon.id)"
             >
-              立即领取
+              {{ getReceiveButtonText(coupon) }}
             </button>
           </div>
         </div>
       </div>
 
-      <!-- 热门促销商品（核心模块） -->
+      <!-- 分页 -->
+      <div class="flex justify-center mt-4" v-if="total > 0">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :total="total"
+          :page-sizes="[6, 9, 12, 15]"
+          background
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handlePageChange"
+          @current-change="handlePageChange"
+        />
+      </div>
+
+      <!-- 热门商品 -->
       <div class="bg-white rounded-2xl shadow-md p-6 border border-amber-100/50">
         <div class="flex items-center justify-between mb-6">
           <h3 class="text-lg font-bold text-amber-800 flex items-center">
@@ -101,7 +120,7 @@
                     >
                   </div>
                   <button
-                    class="bg-amber-500 text-white text-xs px-3 py-1 rounded-lg hover:bg-amber-600 transition-colors"
+                    class="bg-amber-500 text-white text-xs px-3 py-1 rounded-lg hover:bg-amber-600"
                   >
                     加入购物车
                   </button>
@@ -116,45 +135,90 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-// 模拟全部优惠券数据
-const allCouponList = [
-  { id: 1, amount: 50, condition: '满500可用', expireDate: '2023-12-31' },
-  { id: 2, amount: 30, condition: '满300可用', expireDate: '2023-12-31' },
-  { id: 3, name: '无门槛券', amount: 10, condition: '无门槛', expireDate: '2023-12-31' },
-  { id: 4, amount: 20, condition: '满200可用', expireDate: '2023-12-31' },
-  { id: 5, amount: 5, condition: '满50可用', expireDate: '2023-12-31' },
-]
+import { ref, onMounted, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { getReceiveCouponList, receiveCoupon } from '@/api/pet-shop/coupos'
+import { ElMessage } from 'element-plus'
+
+const hotSaleList = ref([])
 const isScrolledPast50 = ref(false)
-const currentCategory = ref('promotion')
+const currentCategory = ref('all')
+const route = useRoute()
+
+const couponList = ref([])
+const currentPage = ref(1)
+const pageSize = ref(6)
+const total = ref(0)
+
+// 分页后数据
+const paginatedCoupons = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return couponList.value.slice(start, end)
+})
 const handleCategoryChange = (newCategory: string) => {
   currentCategory.value = newCategory
 }
-// 模拟热门促销商品
-const hotSaleList = [
-  {
-    id: 1,
-    name: '水族护理全套清洁工具',
-    img: '/img/宠物1.jpg',
-    discountPrice: 89,
-    originalPrice: 129,
+const canReceive = (coupon: any) => {
+  const limitNotReached = (coupon.receiveCount || 0) < (coupon.perLimit || 0)
+  return limitNotReached
+}
+
+// 按钮
+const getReceiveButtonText = (coupon: any) => {
+  if ((coupon.receiveCount || 0) >= (coupon.perLimit || 0)) return '已达领取上限'
+  return '立即领取'
+}
+
+// 加载优惠券
+const loadCoupon = async () => {
+  try {
+    const params = {
+      searchCount: true,
+      pageNum: 1,
+      pageSize: 12,
+      current: 1,
+      sortItemList: [{ isAsc: true, column: 'createTime' }],
+    }
+    const res = await getReceiveCouponList(params)
+    console.log('优惠券列表', res)
+    if (res.ok) {
+      couponList.value = res.data?.list || []
+      total.value = res.data?.total || couponList.value.length
+    }
+  } catch (error) {
+    console.error(error)
+    ElMessage.error('加载失败')
+  }
+}
+
+// 分页切换
+const handlePageChange = () => {}
+
+// 领取
+const handleReceiveCoupon = async (couponId) => {
+  try {
+    const res = await receiveCoupon(couponId)
+    if (res.ok) {
+      ElMessage.success('领取成功')
+      loadCoupon()
+    }
+  } catch (e) {
+    console.error('领取失败', e)
+    ElMessage.error('领取失败')
+  }
+}
+
+onMounted(() => {
+  loadCoupon()
+})
+
+watch(
+  () => route.params.id,
+  () => {
+    loadCoupon()
   },
-  {
-    id: 2,
-    name: '幼宠护理全套洗护套装',
-    img: '/img/宠物2.jpg',
-    discountPrice: 129,
-    originalPrice: 199,
-  },
-  { id: 3, name: '大型犬幼犬奶粉', img: '/img/宠物3.jpg', discountPrice: 159, originalPrice: 229 },
-  {
-    id: 4,
-    name: '幼宠奶粉+营养膏组合',
-    img: '/img/宠物4.jpg',
-    discountPrice: 199,
-    originalPrice: 299,
-  },
-]
+)
 </script>
 
 <style scoped>

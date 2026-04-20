@@ -1,56 +1,98 @@
-            <template>
-              <div class="min-h-screen bg-blue-50 py-8 flex justify-center items-center px-4 sm:px-6 lg:px-8">
-                <div class="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[85vh] flex flex-row overflow-hidden">
-                  <ChatList :chat-type="chatType" :latest-notice="latestSystemNotice" :unread-count="unreadNoticeCount"
-                    :active-shop-id="activeShop?.shopId || 0" :all-shops="allShops" :all-foster-lists="allFosterLists"
-                    @switch-to-system-notice="switchToSystemNotice" @switch-shop="handleSwitchShop"
-                    @save-auto-reply="handleSaveAutoReply" />
+<template>
+  <div class="min-h-screen bg-blue-50 py-8 flex justify-center items-center px-4 sm:px-6 lg:px-8">
+    <div
+      class="bg-white rounded-2xl shadow-xl w-full max-w-7xl h-[85vh] flex flex-row overflow-hidden"
+    >
+      <ChatList
+        :is-system-notice="isSystemNotice"
+        :chat-type="chatType"
+        :latest-notice="latestSystemNotice"
+        :unread-count="unreadNoticeCount"
+        :active-shop-id="activeShop?.shopId || 0"
+        :all-shops="allShops"
+        :all-foster-lists="allFosterLists"
+        @switch-to-system-notice="switchToSystemNotice"
+        @switch-shop="handleSwitchShop"
+        @save-auto-reply="handleSaveAutoReply"
+      />
 
-                  <div class="flex-1 flex flex-col bg-gray-50">
-                    <div class="bg-white border-b border-gray-200 p-2">
-                      <div class="flex rounded-lg overflow-hidden border border-gray-200 w-fit">
-                        <button @click="switchChatType('shop')"
-                          class="px-4 py-1.5 text-sm font-medium transition-colors" :class="chatType === 'shop' && !isSystemNotice
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-white text-gray-700 hover:bg-gray-50'
-                            ">
-                          商家客服
-                        </button>
-                        <button @click="switchChatType('foster')"
-                          class="px-4 py-1.5 text-sm font-medium transition-colors" :class="chatType === 'foster' && !isSystemNotice
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-white text-gray-700 hover:bg-gray-50'
-                            ">
-                          寄养服务
-                        </button>
-                        <button @click="isSystemNotice = true" class="px-4 py-1.5 text-sm font-medium transition-colors"
-                          :class="isSystemNotice
-                              ? 'bg-blue-500 text-white'
-                              : 'bg-white text-gray-700 hover:bg-gray-50'
-                            ">
-                          <i class="fa fa-bell mr-1"></i>系统通知
-                        </button>
-                      </div>
-                    </div>
+      <div class="flex-1 flex flex-col bg-gray-50">
+        <div class="bg-white border-b border-gray-200 p-2">
+          <div class="flex rounded-lg overflow-hidden border border-gray-200 w-fit">
+            <button
+              @click="switchChatType('shop')"
+              class="px-4 py-1.5 text-sm font-medium transition-colors"
+              :class="
+                chatType === 'shop' && !isSystemNotice
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              "
+            >
+              商家客服
+            </button>
+            <button
+              @click="switchChatType('foster')"
+              class="px-4 py-1.5 text-sm font-medium transition-colors"
+              :class="
+                chatType === 'foster' && !isSystemNotice
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              "
+            >
+              寄养服务
+            </button>
+            <button
+              @click="isSystemNotice = true"
+              class="px-4 py-1.5 text-sm font-medium transition-colors"
+              :class="
+                isSystemNotice
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              "
+            >
+              <i class="fa fa-bell mr-1"></i>系统通知
+            </button>
+          </div>
+        </div>
+        <template v-if="isSystemNotice">
+          <SystemNoticeChat
+            :notices="systemNotices"
+            :loading-more="loadingSystemNotices"
+            :has-more="hasMoreSystemNotices"
+            @markRead="handleMarkNoticeRead"
+            @delete="handleDelete"
+            @batchDelete="handleBatchDelete"
+            @loadMore="handleLoadMoreSystemNotices"
+          />
+        </template>
+        <template v-else>
+          <ChatContent
+            ref="chatContainer"
+            :chat-type="chatType"
+            :active-shop="activeShop"
+            :chat-records="chatRecords[`${chatType}_${activeShop.userId}`] || []"
+            @load-more="handleLoadMore"
+          />
+          <MessageInput
+            :key="`${chatType}_${activeShop.userId}`"
+            v-model="message"
+            :chat-type="chatType"
+            :target-user-id="activeShop.userId"
+            :url-id="route.query.id"
+            @send="sendMessage"
+          />
+        </template>
+      </div>
 
-                    <template v-if="isSystemNotice">
-                      <SystemNoticeChat :notices="systemNotices" @markRead="handleMarkNoticeRead" @delete="handleDelete"
-                        @batchDelete="handleBatchDelete" />
-                    </template>
-                    <template v-else>
-                      <ChatContent ref="chatContainer" :chat-type="chatType" :active-shop="activeShop"
-                        :chat-records="chatRecords[`${chatType}_${activeShop.userId}`] || []"
-                        @load-more="handleLoadMore" />
-                      <MessageInput :key="`${chatType}_${activeShop.userId}`" v-model="message" :chat-type="chatType"
-                        :target-user-id="activeShop.userId" :url-id="route.query.id" @send="sendMessage" />
-                    </template>
-                  </div>
-
-                  <SidebarInfo v-if="!isSystemNotice && activeShop.shopId" :active-shop="activeShop"
-                    :chat-type="chatType" @send="() => loadChatRecords(activeShop.userId, chatType)" />
-                </div>
-              </div>
-            </template>
+      <SidebarInfo
+        v-if="!isSystemNotice && activeShop.shopId"
+        :active-shop="activeShop"
+        :chat-type="chatType"
+        @send="() => loadChatRecords(activeShop.userId)"
+      />
+    </div>
+  </div>
+</template>
 
 <script lang="ts" setup>
 import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
@@ -60,7 +102,12 @@ import ChatContent from './components/ChatContent.vue'
 import SystemNoticeChat from './components/SystemNoticeChat.vue'
 import SidebarInfo from './components/SidebarInfo.vue'
 import MessageInput from './components/MessageInput.vue'
-import { systemNotices } from './data/noticeData'
+import {
+  systemNotices,
+  loadingSystemNotices,
+  hasMoreSystemNotices,
+  getSystemNotices,
+} from './data/noticeData'
 import type { ChatRecord } from '@/types/chat'
 import {
   defaultActiveShop,
@@ -137,6 +184,13 @@ watch(
   },
   { immediate: true },
 )
+
+// 加载更多系统通知
+const handleLoadMoreSystemNotices = () => {
+  if (!loadingSystemNotices.value && hasMoreSystemNotices.value) {
+    getSystemNotices(true)
+  }
+}
 
 // 加载聊天记录
 const loadChatRecords = async (userId: number, isLoadMore = false) => {
@@ -528,7 +582,6 @@ onMounted(async () => {
     }
   }
 })
-console.log('切换店铺/寄养:', route.query.id)
 watch(
   () => route.query.id,
   async (newUserId) => {

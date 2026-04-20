@@ -1,7 +1,7 @@
 <template>
     <div class="draggable-container"
         :style="{ position: 'fixed', top: `${position.y}px`, left: `${position.x}px`, ...containerStyle }"
-        @mousedown="handleDragStart" @mouseup="handleDragEnd" @click="handleClick" v-bind="$attrs">
+        @click="handleClick" v-bind="$attrs">
         <slot></slot>
     </div>
 </template>
@@ -38,16 +38,16 @@ const initPosition = () => {
     position.value = { ...props.initialPosition }
 }
 //开始拖拽
-const handleDragStart = (e) => {
+// const handleDragStart = (e) => {
 
-    isDragging.value = true;
+//     isDragging.value = true;
 
 
-    dragOffset.value = {
-        x: e.offsetX,
-        y: e.offsetY,
-    }
-}
+//     dragOffset.value = {
+//         x: e.offsetX,
+//         y: e.offsetY,
+//     }
+// }
 //正在拖拽，同步元素的位置
 const handleDrag = (e) => {
     if (isDragging.value) {
@@ -63,11 +63,11 @@ const handleDrag = (e) => {
     }
 }
 //拖拽结束
-const handleDragEnd = () => {
-    isDragging.value = false;
-    // 直接重置 hasDragged，确保点击事件能够正确判断
-    hasDragged.value = false;
-}
+// const handleDragEnd = () => {
+//     isDragging.value = false;
+//     // 直接重置 hasDragged，确保点击事件能够正确判断
+//     hasDragged.value = false;
+// }
 onMounted(() => {
     initPosition()
     document.addEventListener('mousemove', handleDrag)

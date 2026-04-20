@@ -30,11 +30,13 @@
                 <div class="chat-header">
                     <div class="chat-header-left">
                         <div class="ai-avatar">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                            <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                 class="w-8 h-8">
                                 <path
                                     d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-5-1c-1.1 0-2 .9-2 2v4h4V3H7zm10 0v4h4V3c0-1.1-.9-2-2-2h-2zM7 11H3v10c0 1.1.9 2 2 2h4v-4H7v-8zm10 0v8h4c1.1 0 2-.9 2-2V11h-4zm-4 8h-4v4h4v-4z" />
-                            </svg>
+                            </svg> -->
+                            <img src="@/assets/img/logo.png" alt="这是图标" class="logo" />
+
                         </div>
                         <div class="chat-title">
                             <h3>AI 寄养顾问</h3>
@@ -105,11 +107,13 @@
             <div class="fullscreen-header">
                 <div class="fullscreen-logo">
                     <div class="logo-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                             class="w-10 h-10">
                             <path
                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-                        </svg>
+                        </svg> -->
+                        <img src="@/assets/img/logo.png" alt="这是图标" class="logo" />
+
                     </div>
                     <div class="logo-text">
                         <h1>PetGo AI</h1>
@@ -221,11 +225,13 @@
 
                                 <template v-if="message.sender == 'ai'">
                                     <div class="message-avatar">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                                             class="w-6 h-6">
                                             <path
                                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
-                                        </svg>
+                                        </svg> -->
+                                        <img src="@/assets/img/logo.png" alt="这是图标" class="logo" />
+
                                     </div>
                                     <div v-if="message.isTyping">
                                         <div class="message-bubble typing">
@@ -326,23 +332,13 @@ const dialogPosition = ref({
 const initPosition = () => {
     buttonPosition.value = {
         x: window.innerWidth - 90,
-        y: window.innerHeight - 90
+        y: window.innerHeight - 180
     }
     dialogPosition.value = {
         x: (window.innerWidth - 600) / 2,
         y: (window.innerHeight - 720) / 2
     }
 }
-onMounted(() => {
-    console.log(window.innerWidth)
-    initPosition()
-
-    // 检查登录状态
-    checkLoginStatus()
-
-    // 监听存储变化，以便在登录/登出时更新状态
-    window.addEventListener('storage', checkLoginStatus)
-})
 
 // 检查登录状态
 const checkLoginStatus = () => {
@@ -520,7 +516,15 @@ const scrollToBottom = async () => {
 
 onMounted(() => {
     createNewChat();
+    initPosition()
+
+    // 检查登录状态
+    checkLoginStatus()
+
+    // 监听存储变化，以便在登录/登出时更新状态
+    window.addEventListener('storage', checkLoginStatus)
 });
+
 
 // 发送快捷问题
 const sendQuickQuestion = (question: string) => {
@@ -665,7 +669,7 @@ const sendQuickQuestion = (question: string) => {
             width: 44px;
             height: 44px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+
             display: flex;
             align-items: center;
             justify-content: center;

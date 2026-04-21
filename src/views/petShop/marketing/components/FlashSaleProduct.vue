@@ -53,7 +53,7 @@
         <span>{{ product.shopName }}</span>
         <span class="mx-2">|</span>
         <i class="fa fa-fire text-red-400 mr-1"></i>
-        <span>销量：{{ product.sales }}+</span>
+        <span>销量：{{ product.sales > 9000 ? '9000+' : product.sales }} 件</span>
       </div>
 
       <div

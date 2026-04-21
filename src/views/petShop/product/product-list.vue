@@ -69,7 +69,7 @@
                 <div
                   class="absolute top-3 right-3 bg-[#FF7043] text-white text-xs px-2 py-1 rounded-full"
                 >
-                  销量 {{ product.sales }}
+                  销量 {{ product.sales > 9000 ? '9000+' : product.sales }}
                 </div>
               </div>
 

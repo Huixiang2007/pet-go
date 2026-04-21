@@ -138,7 +138,9 @@
                 <p class="text-gray-500 text-xs mt-1 line-clamp-1">
                   {{ product.brandName }} | {{ product.productType }}
                 </p>
-                <p class="text-xs text-gray-400 mt-1">销量：{{ product.sales }}+</p>
+                <p class="text-xs text-gray-400 mt-1">
+                  销量：{{ product.sales > 9000 ? '9000+' : product.sales }} 件
+                </p>
                 <p class="text-xs text-gray-400 mt-1">库存：{{ product.stockStatus }}</p>
                 <div class="mt-3 flex justify-between items-center">
                   <span class="text-orange-600 font-bold text-lg">¥{{ product.price }}</span>

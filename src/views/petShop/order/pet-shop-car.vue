@@ -85,9 +85,9 @@
               v-for="(item, index) in cartItems"
               :key="item.id"
               :class="[
-                'grid grid-cols-12 py-4 px-6 items-center hover:bg-amber-50/50 transition-colors',
+                'grid grid-cols-12 py-4 px-6 items-center hover:bg-amber-50/50 transition-all duration-300',
                 item.status === '有效' ? 'bg-white' : 'bg-gray-100',
-                item.status !== '有效' ? 'opacity-80' : '',
+                item.status !== '有效' ? 'opacity-80 grayscale' : '',
               ]"
             >
               <div class="col-span-1">
@@ -96,6 +96,7 @@
                   v-model="item.selected"
                   @change="handleSelectItem(item.id, item.selected)"
                   class="rounded text-amber-500 focus:ring-amber-500 w-5 h-5"
+                  :disabled="item.status !== '有效'"
                 />
               </div>
 
@@ -103,7 +104,7 @@
                 <img
                   :src="item.imgUrl"
                   :alt="item.name"
-                  class="w-20 h-20 object-cover rounded-xl mr-4 border-2 border-amber-100"
+                  class="w-20 h-20 object-cover rounded-xl mr-4 border-2 border-amber-100 transition-transform duration-500 hover:scale-105"
                 />
                 <div>
                   <div class="flex justify-between">
@@ -130,7 +131,7 @@
                   <button
                     @click="handleDecrease(index)"
                     class="w-10 h-10 flex items-center justify-center text-amber-700 hover:bg-amber-100 transition-colors text-lg"
-                    :disabled="item.quantity <= 1"
+                    :disabled="item.quantity <= 1 || item.status !== '有效'"
                     :class="{ 'text-amber-300 cursor-not-allowed': item.quantity <= 1 }"
                   >
                     −
@@ -141,10 +142,12 @@
                     class="w-14 h-10 text-center border-x border-amber-200 focus:outline-none focus:border-amber-500 text-gray-800 font-medium"
                     min="1"
                     @blur="handleQuantityBlur(index)"
+                    :disabled="item.status !== '有效'"
                   />
                   <button
                     @click="handleIncrease(index)"
                     class="w-10 h-10 flex items-center justify-center text-amber-700 hover:bg-amber-100 transition-colors text-lg"
+                    :disabled="item.status !== '有效'"
                   >
                     +
                   </button>
@@ -209,9 +212,9 @@
             </div>
             <router-link
               :to="{ path: '/order?type=cart' }"
-              class="bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white px-12 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg font-medium flex items-center gap-2"
-              :disabled="countTotal === 0"
-              :class="{ 'opacity-70 cursor-not-allowed': countTotal === 0 }"
+              class="bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white px-12 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg font-medium flex items-center justify-center gap-2"
+              :disabled="!cartItems.length"
+              :class="{ 'opacity-70 cursor-not-allowed': !cartItems.length }"
             >
               🛒 去结算
             </router-link>
@@ -423,6 +426,7 @@ const handleSelectItem = async (id, selected) => {
     const item = cartItems.value.find((item) => item.id === id)
     if (item) {
       item.selected = selected
+      window.location.reload()
     }
   } catch (e) {
     console.error(e)

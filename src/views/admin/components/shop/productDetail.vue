@@ -16,10 +16,21 @@
       <!-- 商品头部：主图 + 基础信息 -->
       <div class="product-header">
         <div class="product-image-group">
-          <el-image :src="productData?.mainImage" class="main-image" preview-teleported fit="cover" />
+          <el-image
+            :src="productData?.mainImage"
+            class="main-image"
+            preview-teleported
+            fit="cover"
+          />
           <div class="sub-images" v-if="productData?.images">
-            <el-image v-for="(img, idx) in productData?.images.split(',')" :key="idx" :src="img" class="sub-image"
-              preview-teleported fit="cover" />
+            <el-image
+              v-for="(img, idx) in productData?.images.split(',')"
+              :key="idx"
+              :src="img"
+              class="sub-image"
+              preview-teleported
+              fit="cover"
+            />
           </div>
         </div>
         <div class="product-base-info">
@@ -44,23 +55,38 @@
               {{ productData?.status }}
             </el-tag>
             <span class="stock-info">库存：{{ productData?.stock }} 件</span>
-            <span class="sales-info">销量：{{ productData?.sales }} 件</span>
+            <span class="sales-info"
+              >销量：{{ productData?.sales > 9000 ? '9000+' : productData?.sales }} 件</span
+            >
           </div>
         </div>
       </div>
 
       <!-- 商品详细信息 -->
-      <el-descriptions :column="2" border label-style="color:#956b3e; font-weight:500;" content-style="color:#6b5b45;"
-        class="info-desc">
-
+      <el-descriptions
+        :column="2"
+        label-style="color:#956b3e; font-weight:500;"
+        content-style="color:#6b5b45;"
+        class="info-desc"
+      >
         <el-descriptions-item label="商品编号">{{ productData?.productSn }}</el-descriptions-item>
         <el-descriptions-item label="品牌ID">{{ productData?.brandId }}</el-descriptions-item>
         <el-descriptions-item label="类别ID">{{ productData?.typeId }}</el-descriptions-item>
-        <el-descriptions-item label="商品重量">{{ productData?.productWeight|| '-- ' }}g</el-descriptions-item>
-        <el-descriptions-item label="商品评分">{{ productData?.productScore }} 分</el-descriptions-item>
-        <el-descriptions-item label="累计评价">{{ productData?.reviewCount }} 条</el-descriptions-item>
-        <el-descriptions-item label="质保提示">{{ productData?.warrantyTip || '无' }}</el-descriptions-item>
-        <el-descriptions-item label="上架时间">{{ productData?.publishTime || '--' }}</el-descriptions-item>
+        <el-descriptions-item label="商品重量"
+          >{{ productData?.productWeight || '-- ' }}g</el-descriptions-item
+        >
+        <el-descriptions-item label="商品评分"
+          >{{ productData?.productScore }} 分</el-descriptions-item
+        >
+        <el-descriptions-item label="累计评价"
+          >{{ productData?.reviewCount }} 条</el-descriptions-item
+        >
+        <el-descriptions-item label="质保提示">{{
+          productData?.warrantyTip || '无'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="上架时间">{{
+          productData?.publishTime || '--'
+        }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ productData?.createTime }}</el-descriptions-item>
         <el-descriptions-item label="更新时间">{{ productData?.updateTime }}</el-descriptions-item>
         <el-descriptions-item label="视频URL" :span="2">
@@ -126,11 +152,10 @@ const getStatusTagType = (status: string | number) => {
     审核中: 'warning', // 审核中
     封禁: 'danger', // 封禁
     审核通过: 'success', // 审核通过
-    审核不通过: 'danger' // 审核不通过
+    审核不通过: 'danger', // 审核不通过
   }
   return statusMap[status] || 'info'
 }
-
 
 onMounted(() => {
   loadProductDetail()

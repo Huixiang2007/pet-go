@@ -217,7 +217,7 @@
                 <div class="flex items-center text-xs text-gray-400 mb-3">
                   <span>{{ product.shopName }}</span>
                   <span class="mx-2">|</span>
-                  <span>销量：{{ product.sales }}+</span>
+                  <span>销量：{{ product.sales > 9000 ? '9000+' : product.sales }} 件</span>
                 </div>
                 <div class="flex justify-between items-center">
                   <div>
@@ -267,7 +267,6 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 const productsTotal = ref(0)
-
 
 const filters = ref({
   title: '',
@@ -458,7 +457,6 @@ const selectBrand = (brand: string) => {
   filterBrand.value = !!selectedBrands.value
 }
 
-
 const confirmBrands = () => {
   filterBrand.value = !!selectedBrands.value
   showBrandModal.value = false
@@ -479,13 +477,11 @@ const resetRegion = () => {
   filterRegion.value = false
 }
 
-
 const resetBrands = () => {
   selectedBrands.value = ''
   filters.value.brandName = ''
   filterBrand.value = false
 }
-
 
 const confirmRegion = () => {
   filters.value.region = selectedRegion.value
@@ -494,7 +490,6 @@ const confirmRegion = () => {
   resetSearchState()
   SearchProducts()
 }
-
 
 const handleScroll = () => {
   scrollY.value = window.scrollY

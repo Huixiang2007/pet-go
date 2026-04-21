@@ -227,7 +227,7 @@
                 <div class="flex items-center text-xs text-gray-500 mb-4">
                   <span>{{ product.shopName }}</span>
                   <span class="mx-2">|</span>
-                  <span>销量：{{ product.sales }}+</span>
+                  <span>销量：{{ product.sales > 9000 ? '9000+' : product.sales }} 件</span>
                 </div>
 
                 <div class="flex justify-between items-center">

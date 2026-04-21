@@ -20,8 +20,13 @@
       </div>
 
       <!-- 详细信息网格 -->
-      <el-descriptions :column="2" border label-style="color:#956b3e; font-weight:500;" content-style="color:#6b5b45;"
-        class="info-desc">
+      <el-descriptions
+        :column="2"
+        border
+        label-style="color:#956b3e; font-weight:500;"
+        content-style="color:#6b5b45;"
+        class="info-desc"
+      >
         <el-descriptions-item label="联系人">{{ shopData.contactName }}</el-descriptions-item>
         <el-descriptions-item label="联系电话">{{ shopData.contactPhone }}</el-descriptions-item>
         <el-descriptions-item label="邮箱">{{ shopData.contactEmail }}</el-descriptions-item>
@@ -38,7 +43,9 @@
           {{ shopData.openTime }} ~ {{ shopData.closeTime }}
         </el-descriptions-item>
         <el-descriptions-item label="信誉评分">{{ shopData.creditScore }} 分</el-descriptions-item>
-        <el-descriptions-item label="累计销量">{{ shopData.salesCount }}</el-descriptions-item>
+        <el-descriptions-item label="累计销量">{{
+          shopData.salesCount > 9000 ? '9000+' : shopData.salesCount
+        }}</el-descriptions-item>
         <el-descriptions-item label="创建时间">{{ shopData.createTime }}</el-descriptions-item>
         <el-descriptions-item label="更新时间">{{ shopData.updateTime }}</el-descriptions-item>
       </el-descriptions>
@@ -49,7 +56,12 @@
         <div class="cert-images">
           <div class="cert-item">
             <p>营业执照</p>
-            <el-image :src="shopData.businessLicense" class="cert-img" preview-teleported fit="cover" />
+            <el-image
+              :src="shopData.businessLicense"
+              class="cert-img"
+              preview-teleported
+              fit="cover"
+            />
           </div>
           <div class="cert-item">
             <p>身份证正面</p>

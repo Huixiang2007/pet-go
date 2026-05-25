@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { Method, AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios'
 import { ElMessageBox } from 'element-plus' // 需引入Element组件
+import { useUserStore, store } from '@/stores'
 const service = axios.create({
   timeout: 60000,
 })
@@ -11,10 +12,11 @@ const noTokenApiList = [
   '/server/api/user/register', // 注册接口
   '/server/api/user/sendCode', // 发送验证码接口
 ]
-//请求拦截器
+//请求拦截器-在发送请求之前做些什么
 service.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken')
+    const userStore = useUserStore(store)
+    const token = userStore.token
     const isNoTokenApi = noTokenApiList.some((api) => config.url?.includes(api))
     if (token && config.headers && !isNoTokenApi) {
       // 仅非白名单接口加 Token
@@ -43,6 +45,7 @@ type Data<T = any> = {
   level: null
   ok: boolean
 }
+//响应拦截器-在收收数据后做些什么
 service.interceptors.response.use(
   //第一个回调：HTTP状态码为2xx时触发，请求网络层面处理成功，在这个处理业务错误
   (response: AxiosResponse) => {
@@ -79,7 +82,8 @@ service.interceptors.response.use(
           cancelButtonText: '取消',
           type: 'warning',
         }).then(() => {
-          localStorage.removeItem('authToken')
+          const userStore = useUserStore(store)
+          userStore.logout()
           localStorage.removeItem('userLocation')
           window.location.href = '/login' // 跳登录页
         })
@@ -121,7 +125,8 @@ service.interceptors.response.use(
             cancelButtonText: '取消',
             type: 'warning',
           }).then(() => {
-            localStorage.removeItem('authToken')
+            const userStore = useUserStore(store)
+            userStore.logout()
             localStorage.removeItem('userLocation')
             window.location.href = '/login'
           })

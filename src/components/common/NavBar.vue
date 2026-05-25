@@ -17,13 +17,13 @@
     </div>
     <div>
 
-      <el-button else="isLogin" type="warning" plain size="default" class="ml-1" @click="goToPerson">个人中心</el-button>
+      <el-button v-if="hasToken" type="warning" plain size="default" class="ml-1" @click="goToPerson">个人中心</el-button>
 
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import request from '@/utils/request'
 // import { ElMessage } from 'element-plus'
@@ -50,13 +50,7 @@ const navItems = ref<NavItem[]>([
     unicode: '\ue736',
     path: '/shop',
   },
-  // {
-  //   text: '宠行天下',
-  //   color: 'text-[rgb(22,209,22)]',
-  //   bgColor: 'rgb(223,254,223)',
-  //   unicode: '\ue602',
-  //   path: '/travel',
-  // },
+
   {
     text: '我的宠物',
     color: 'rgb(255 35 145)',
@@ -78,13 +72,7 @@ const navItems = ref<NavItem[]>([
     unicode: '\ue655',
     path: '/pet-cart',
   },
-  // {
-  //   text: '旅游足迹',
-  //   color: 'text-[rgb(255,105,180)]',
-  //   bgColor: 'rgb(255,192,203)',
-  //   unicode: '\ue60a',
-  //   path: '/travel-history',
-  // },
+
   {
     text: '我的消息',
     color: 'text-[rgb(156,156,224)]',
@@ -101,14 +89,22 @@ const navItems = ref<NavItem[]>([
   },
 ])
 // 活跃状态管理
-const activeIndex = ref(0)
-const activeBgColor = ref(navItems.value[0]?.bgColor)
+const activeIndex = ref()
+const activeBgColor = ref('')
 const isAnimating = ref(false)
 const router = useRouter()
+const hasToken = ref(!!localStorage.getItem('authToken'))
+// const lastMatchedIndex = ref(-1)
+const hasCheckedFosterStatus = ref(false)
+
 const checkFosterStatus = async () => {
+  if (hasCheckedFosterStatus.value) {
+    return
+  }
+  hasCheckedFosterStatus.value = true
+
   try {
     const res = await request('/server/api/foster/provider/judge', 'GET')
-    console.log(res)
     const hasFoster = res.data
     if (hasFoster) {
       navItems.value[navItems.value.length - 1] = {
@@ -117,11 +113,8 @@ const checkFosterStatus = async () => {
         path: '/foster-manage',
       }
     }
-
   } catch (err) {
-    // ElMessage.error(err)
     console.log(err)
-
   }
 }
 const goToPerson = () => {
@@ -129,7 +122,9 @@ const goToPerson = () => {
 }
 // 设置活跃项
 const setActive = (index: number, bgColor: string) => {
+  console.log(index)
   activeIndex.value = index
+  console.log(activeIndex.value)
   activeBgColor.value = bgColor
   // 触发动画
   isAnimating.value = true
@@ -137,6 +132,7 @@ const setActive = (index: number, bgColor: string) => {
     isAnimating.value = false
   }, 500)
   const currentItem = navItems.value[index]
+  console.log(currentItem)
   if (currentItem) {
     if (currentItem.path) {
       router.push(currentItem.path)
@@ -147,17 +143,77 @@ watch(activeIndex, (newVal) => {
   activeBgColor.value = navItems.value[newVal]?.bgColor
 })
 
-onMounted(() => {
-  // 获取当前路由路径
-  checkFosterStatus().then(() => {
-    const currentPath = router.currentRoute.value.path
-    // 查找当前路由对应的导航项索引
-    const currentIndex = navItems.value.findIndex((item) => item.path === currentPath)
+const routeToNavMap: Record<string, string> = {
+  '/foster-care': '/foster-care',
+  '/foster-detail': '/foster-care',
+  '/foster-book': '/foster-care',
+  '/foster-order': '/foster-care',
+  '/foster-manage': '/foster-manage',
+  '/shop': '/shop',
+  '/products': '/shop',
+  '/product-detail': '/shop',
+  '/coupon': '/shop',
+  '/store': '/shop',
+  '/search': '/shop',
+  '/package-info': '/shop',
+  '/promotion': '/shop',
+  '/add-product': '/shop',
+  '/flash-sale': '/shop',
+  '/analytics': '/shop',
+  '/shop-setting': '/shop',
+  '/seller-item-manager': '/shop',
+  '/coupon-management': '/shop',
+  '/seller-user-manager': '/shop',
+  '/seller-order-manager': '/shop',
+  '/order-list': '/order-list',
+  '/order': '/shop',
+  '/my-pets': '/my-pets',
+  '/add-pet': '/my-pets',
+  '/edit-pet': '/my-pets',
+  '/pet-cart': '/pet-cart',
+  '/customer-service': '/customer-service',
+  '/join-us': '/join-us',
+}
+
+const setActiveIndexByRoute = () => {
+  const currentPath = router.currentRoute.value.path
+
+  let matchedNavPath = ''
+  for (const routePath of Object.keys(routeToNavMap)) {
+    if (currentPath.startsWith(routePath)) {
+      matchedNavPath = routeToNavMap[routePath]
+      break
+    }
+  }
+
+  if (matchedNavPath) {
+    const currentIndex = navItems.value.findIndex((item) => item.path === matchedNavPath)
     if (currentIndex !== -1) {
       activeIndex.value = currentIndex
       activeBgColor.value = navItems.value[currentIndex]!.bgColor
     }
+  }
+}
+
+let routerListener: ReturnType<typeof router.afterEach>
+
+onMounted(() => {
+  checkFosterStatus().then(() => {
+    setActiveIndexByRoute()
   })
+
+  routerListener = router.afterEach(() => {
+    nextTick(() => {
+      // DOM 更新完成后，navItems.value 一定是最新状态
+      setActiveIndexByRoute()
+    })
+  })
+})
+
+onUnmounted(() => {
+  if (routerListener) {
+    routerListener()
+  }
 })
 
 </script>
@@ -218,7 +274,7 @@ onMounted(() => {
   left: 738px !important;
 }
 
-/* 
+/*
 .item.active:nth-child(8) {
   color: rgb(65 65 255) !important;
 }

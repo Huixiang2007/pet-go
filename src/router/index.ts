@@ -409,24 +409,6 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/admin/components/shop/skuAuditDetail.vue'),
             meta: { title: 'sku详情' },
           },
-          {
-            path: 'seckill-manage',
-            name: 'seckillManage',
-            component: () => import('@/views/admin/components/shop/market/SeckillManage.vue'),
-            meta: { title: '秒杀活动管理' },
-          },
-          {
-            path: 'seckill-detail/:id',
-            name: 'seckillDetail',
-            component: () => import('@/views/admin/components/shop/market/SeckillActivityDetail.vue'),
-            meta: { title: '秒杀活动详情' },
-          },
-          {
-            path: 'coupon-manage',
-            name: 'couponManage',
-            component: () => import('@/views/admin/components/shop/market/CouponManage.vue'),
-            meta: { title: '平台优惠券管理' },
-          },
         ],
       },
       //活动管理路由
@@ -493,62 +475,70 @@ const routes: RouteRecordRaw[] = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
+  routes: staticRoutes,
   scrollBehavior() {
-    // 始终滚动到顶部
     return { top: 0 }
   },
 })
-/**
- * 路由导航守卫
- */
-router.beforeEach((to, from, next) => {
-  const requiresAuth = to.meta.requiresAuth ?? false
-  const isLogin = !!localStorage.getItem('authToken')
-  const isAdminRoute = to.path.startsWith('/admin')
 
-  // 如果已登录且访问登录页面，重定向到首页
-  if (isLogin && to.path === '/login') {
-    const userRole = localStorage.getItem('userRole')
-    if (userRole === '管理员') {
-      next('/admin')
-    } else {
-      next('/foster-care')
+router.beforeEach(async (to, from, next) => {
+  // 设置页面标题
+  document.title = (to.meta.title as string) || 'PetGo'
+
+  // 检查是否有 token
+  const hasToken = localStorage.getItem('authToken')
+
+  // 已登录情况
+  if (hasToken) {
+    // 已登录但想进入登录页，跳转到首页
+    if (to.path === '/login') {
+      const userRole = localStorage.getItem('userRole') || '用户'
+      next(userRole === '管理员' ? '/admin' : '/foster-care')
+      return
     }
+
+    // 检查动态路由是否已加载
+    const permissionStore = usePermissionStore(store)
+    if (!permissionStore.isRoutesLoaded) {
+      // 加载动态路由
+      try {
+        const userStore = useUserStore(store)
+        const roles = await userStore.getUserInfo()
+        const accessRoutes = await permissionStore.generateRoutes(roles)
+
+        accessRoutes.forEach((route) => {
+          router.addRoute(route)
+        })
+
+        permissionStore.isRoutesLoaded = true
+        next({ ...to, replace: true })
+        return
+      } catch (error) {
+        console.error('加载路由失败:', error)
+        localStorage.removeItem('authToken')
+        next('/login')
+        return
+      }
+    }
+
+    next()
     return
   }
 
-  if (requiresAuth && !isLogin) {
-    ElMessage.warning('请先登录后再访问')
-    // 跳转到登录页，并记录当前页面路径（登录后可返回）
-    next({
-      path: '/login',
-      query: { redirect: to.fullPath }, // 携带要返回的页面路径
-    })
-  } else if (isAdminRoute && isLogin) {
-    // 如果访问的是管理员页面且已登录，需要进一步验证权限
-    // 获取存储在localStorage中的用户角色信息
-    const userRole = localStorage.getItem('userRole')
-
-    if (userRole === '管理员') {
-      // 是管理员，允许访问
-      next()
-    } else {
-      // 不是管理员，拒绝访问
-      ElMessage.error('请您登录后访问此页面')
-      // 重定向到首页或其他合适页面
-      next('/')
-    }
-  } else {
-    // 已登录/无需登录 → 正常访问
+  // 未登录情况：白名单页面直接放行
+  const whiteList = ['/login', '/register', '/forget', '/protocal', '/404', '/test']
+  if (whiteList.includes(to.path)) {
     next()
-  }
-  if (to.meta.title) {
-    document.title = to.meta.title as string
+    return
   }
 
-  // 已登录 → 允许访问
-  return true
+  // 未登录且不在白名单，跳转到登录页
+  next({
+    path: '/login',
+    query: { redirect: to.fullPath },
+  })
 })
+
+router.afterEach(() => {})
 
 export default router

@@ -2,35 +2,22 @@
   <div class="profile-container" :style="{ backgroundColor: bgColor }">
     <div class="circle-color-picker">
       <!-- 触发层：圆形图标 -->
-      <div
-        class="color-trigger"
-        :style="{ backgroundColor: bgColor }"
-        @click="showPicker = !showPicker"
-      >
+      <div class="color-trigger" :style="{ backgroundColor: bgColor }" @click="showPicker = !showPicker">
         <i class="layui-icon layui-icon-palette"></i>
         <!-- 色彩图标 -->
       </div>
       <!-- 选择器弹窗：点击图标后显示 -->
       <div class="picker-popup" v-show="showPicker">
-        <el-color-picker
-          v-model="bgColor"
-          @change="handleBgColorChange"
-          @close="showPicker = false"
-          size="small"
+        <el-color-picker v-model="bgColor" @change="handleBgColorChange" @close="showPicker = false" size="small"
           :predefine="['#f5f5f5', '#f0f8fb', '#fdf2f8', '#f5fafe', '#faf6ed', '#f8f8f8']"
-          popper-class="custom-color-popper"
-        />
+          popper-class="custom-color-popper" />
       </div>
     </div>
 
     <!-- 顶部用户核心信息 -->
     <header class="profile-header">
-      <PersonalAvatar
-        :avatar="userInfo.avatar"
-        :nickname="userInfo.nickname"
-        :email="userInfo.email"
-        @avatar-change="handleAvatarChange"
-      />
+      <PersonalAvatar :avatar="userInfo.avatar" :nickname="userInfo.nickname" :email="userInfo.email"
+        @avatar-change="handleAvatarChange" />
       <div class="header-actions">
         <button class="layui-btn layui-btn-primary newColor" @click="gotoHome">
           <i class="layui-icon layui-icon-return"></i> 返回首页
@@ -52,28 +39,12 @@
         </div>
         <div class="content-wrapper">
           <!-- 子组件按需渲染 -->
-          <BaseInfo
-            v-if="currentTab === 0"
-            :form-data="formData"
-            :user-info="userInfo"
-            @save="saveBaseInfo"
-            @cancel="cancelEdit"
-          />
-          <RealNameAuth
-            v-if="currentTab === 1"
-            :status="realNameStatus"
-            :info="realNameInfo"
-            @submit="submitRealName"
-            :isRejected="isRealNameRejected"
-            @refresh="getUserInfomation"
-             :loading="isFetching"
-          />
-          <ChangePassword
-            v-if="currentTab === 2"
-            :email="userInfo.email"
-            @change="changePassword"
-            @cancel="cancelWord"
-          />
+          <BaseInfo v-if="currentTab === 0" :form-data="formData" :user-info="userInfo" @save="saveBaseInfo"
+            @cancel="cancelEdit" />
+          <RealNameAuth v-if="currentTab === 1" :status="realNameStatus" :info="realNameInfo" @submit="submitRealName"
+            :isRejected="isRealNameRejected" @refresh="getUserInfomation" :loading="isFetching" />
+          <ChangePassword v-if="currentTab === 2" :email="userInfo.email" @change="changePassword"
+            @cancel="cancelWord" />
           <AddressManager v-if="currentTab === 3" @refresh="getAddressList" />
           <MyWallet v-if="currentTab === 4" @refresh="getUserMoney" :balance='userBalance' />
         </div>
@@ -85,12 +56,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 import { ElMessage, ElColorPicker } from 'element-plus'
 import { getUserInfo, updateUserInfo, uploadAvatar, logout } from '@/api/person/info'
 import { getRealNameInfo, submitRealNameAuth, submitAgain } from '@/api/person/real'
 import { getUserAddresses } from '@/api/person/address'
 import { changePasswords } from '@/api/person/change'
-import {getMoney} from '@/api/person/money'
+import { getMoney } from '@/api/person/money'
 // 导入子组件
 import PersonalAvatar from '@/views/userCenter/components/PersonAvatar.vue'
 import PersonalNav from '@/views/userCenter/components/PersonalNav.vue'
@@ -120,6 +92,7 @@ const navItems = [
 ]
 
 // 全局状态
+const userStore = useUserStore()
 const currentTab = ref(0)
 const userInfo = ref({
   avatar:
@@ -212,7 +185,7 @@ const getUserInfomation = async () => {
   isFetching.value = true
   isLoading.value = true
   try {
-    const userId = localStorage.getItem('userId') || ''
+    const userId = userStore.getUserId()
     if (!userId) {
       window.layui?.layer.msg('用户未登录')
       isLoading.value = false
@@ -247,7 +220,7 @@ const getRealNameStatus = async () => {
   isFetching.value = true
 
   try {
-    const userId = localStorage.getItem('userId') || ''
+    const userId = userStore.getUserId()
     if (!userId) {
       ElMessage.error('用户未登录，请先登录')
       isFetching.value = false
@@ -329,7 +302,7 @@ const getUserMoney = async () => {
   try {
     const response = await getMoney()
     if (response.code === 0) {
-    
+
       userBalance.value = response.data as unknown as number
     }
   } catch (error) {
@@ -340,7 +313,7 @@ const getUserMoney = async () => {
 const getAddressList = async () => {
   console.log('addressPagination:', addressPagination)
   try {
-    const userId = localStorage.getItem('userId') || ''
+    const userId = userStore.getUserId()
     if (!userId) {
       ElMessage.warning('用户未登录或会话已过期，请重新登录')
       addressList.value = []
@@ -403,9 +376,9 @@ const saveBaseInfo = async (formData: any) => {
 // 全局方法：提交实名认证
 const submitRealName = async (realNameForm: any, wasRejected: boolean = false) => {
   try {
-    const userId = localStorage.getItem('userId') || ''
+    const userId = userStore.getUserId()
     const acknowledgedKey = `realname_rejected_acknowledged_${userId}`
-    localStorage.removeItem(acknowledgedKey) // 提交时重置标记
+    localStorage.removeItem(acknowledgedKey) // 提交时重置标记（业务数据，不属于用户认证信息）
 
     // 1. 创建 FormData 对象（用于文件上传）
     const formData = new FormData()

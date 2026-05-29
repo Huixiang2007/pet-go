@@ -84,6 +84,7 @@ import { ElMessage } from 'element-plus'
 import CaptchaLoad from '@/components/common/CaptchaLoad.vue'
 import { loginByAccount, loginByEmail } from '@/api/auth'
 import { useLayuiForm, useRememberPassword } from '@/composables/useLayuiForm'
+import { useUserStore, store } from '@/stores'
 
 
 interface LoginForm {
@@ -105,6 +106,7 @@ const titleLoginChars = '欢迎登录 PetGo'.split('')
 
 const router = useRouter()
 const { saveRemember, clearRemember, getRemembered } = useRememberPassword()
+const userStore = useUserStore(store)
 
 const handleLogin = async (formData: LoginForm) => {
   let response: any
@@ -132,6 +134,9 @@ const handleLogin = async (formData: LoginForm) => {
     localStorage.setItem('userRole', userRole)
     localStorage.setItem('shopId', shopId)
     localStorage.setItem('fosterProviderIds', fosterProviderIds.toString())
+
+    userStore.setToken(token)
+    userStore.setUserInfo({ userId, userRole: [userRole] })
 
     if (formData.remember) {
       saveRemember(formData.loginId, formData.password, isAccount.value ? 'account' : 'email')

@@ -243,7 +243,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: '秒杀活动',
       requiresAuth: true,
-      roles: ['认证用户', '商家', '管理员'],
+      roles: ['管理员'],
       parentPath: '/shop',
     },
   },
@@ -254,7 +254,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: '客服消息',
       requiresAuth: true,
-      roles: ['认证用户', '商家', '管理员'],
+      roles: ['管理员'],
       parentPath: '/customer-service',
     },
   },
@@ -358,6 +358,18 @@ export const asyncRoutes: RouteRecordRaw[] = [
             name: 'shoreProduct',
             component: () => import('@/views/admin/components/shop/shopProduct.vue'),
             meta: { title: '商品管理', roles: ['管理员'], parentPath: '/admin' },
+          },
+          {
+            path: 'seckill-manage',
+            name: 'seckillManage',
+            component: () => import('@/views/admin/components/shop/market/SeckillManage.vue'),
+            meta: { title: '秒杀活动管理', roles: ['管理员'], parentPath: '/admin' },
+          },
+          {
+            path: 'coupon-manage',
+            name: 'couponManage',
+            component: () => import('@/views/admin/components/shop/market/CouponManage.vue'),
+            meta: { title: '平台优惠券管理', roles: ['管理员'], parentPath: '/admin' },
           },
           {
             path: 'sku',

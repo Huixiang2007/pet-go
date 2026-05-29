@@ -409,6 +409,24 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/admin/components/shop/skuAuditDetail.vue'),
             meta: { title: 'sku详情' },
           },
+          {
+            path: 'seckill-manage',
+            name: 'seckillManage',
+            component: () => import('@/views/admin/components/shop/market/SeckillManage.vue'),
+            meta: { title: '秒杀活动管理' },
+          },
+          {
+            path: 'seckill-detail/:id',
+            name: 'seckillDetail',
+            component: () => import('@/views/admin/components/shop/market/SeckillActivityDetail.vue'),
+            meta: { title: '秒杀活动详情' },
+          },
+          {
+            path: 'coupon-manage',
+            name: 'couponManage',
+            component: () => import('@/views/admin/components/shop/market/CouponManage.vue'),
+            meta: { title: '平台优惠券管理' },
+          },
         ],
       },
       //活动管理路由

@@ -48,6 +48,8 @@
         </template>
         <el-menu-item index="/admin/shop/store">商铺管理</el-menu-item>
         <el-menu-item index="/admin/shop/product">商品管理</el-menu-item>
+        <el-menu-item index="/admin/shop/seckill-manage">秒杀活动管理</el-menu-item>
+        <el-menu-item index="/admin/shop/coupon-manage">平台优惠券管理</el-menu-item>
         <el-menu-item index="/admin/shop/sku">Sku管理</el-menu-item>
        
       </el-sub-menu>
@@ -114,6 +116,9 @@ const activeMenu = computed(() =>{
   }
   if (currentPath === '/admin/shop/specific') {
     return '/admin/shop/sku'
+  }
+  if (currentPath.startsWith('/admin/shop/seckill-detail')) {
+    return '/admin/shop/seckill-manage'
   }
   
   // 默认返回当前路径

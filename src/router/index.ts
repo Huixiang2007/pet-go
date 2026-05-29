@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { store, usePermissionStore, useUserStore } from '@/stores'
+import { staticRoutes } from './staticRoutes'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',

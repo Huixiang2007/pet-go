@@ -147,14 +147,25 @@ const marketApi = {
   getCouponList(form: any) {
     return request(`${BASE_URL}/coupon-list`, 'POST', form)
   },
-  getCouponDetail(couponId: string) {
-    return request(`${BASE_URL}/coupon-detail/${couponId}`, 'GET')
-  },
   enableCoupon(couponIds: string[]) {
     return request(`${BASE_URL}/enable-coupon`, 'POST', couponIds)
   },
+  disableCoupon(couponIds: string[]) {
+    return request(`${BASE_URL}/disable-coupon`, 'POST', couponIds)
+  },
+  getCouponDetail(couponId: string) {
+    return request(`${BASE_URL}/coupon-detail/${couponId}`, 'GET')
+  },
   getProductTypes() {
     return request(`${BASE_URL}/product-types`, 'GET')
+  },
+  
+  // 优惠券分配活动
+  addCouponToActivity(form: { activityId: string, couponIds: string[] }) {
+    return request(`${BASE_URL}/add-to-activity`, 'POST', form)
+  },
+  getSeckillCouponActivityAddList() {
+    return request(`${BASE_URL}/activity-coupon-add-list`, 'POST', {})
   }
 }
 

@@ -40,7 +40,4 @@ export const staticRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/enterPet/ProtocalPage.vue'),
     meta: { title: '用户协议' },
   },
-  // 注意：兜底路由 /:pathMatch(.*)* 不能放在这里！
-  // 它必须在动态路由加载完成后再添加，否则会拦截所有动态路由导致白屏。
-  // 兜底路由在 permission.ts 的 generateRoutes 末尾动态添加。
 ]

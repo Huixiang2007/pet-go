@@ -13,12 +13,12 @@
       <!-- 基础信息区域 -->
       <div class="base-info">
         <h2 class="title">
-          {{ fosterDetail.name }} 
-          
+          {{ fosterDetail.name }}
+
           <span class="status-tag" :class="statusClass">{{ statusText }}</span>
           <!-- <span class="decor-icon">🐾</span> -->
         </h2>
-      
+
         <el-row :gutter="20" class="info-row">
           <!-- 左侧基础信息（扩充所有字段） -->
           <el-col :span="16">
@@ -30,7 +30,7 @@
               <el-descriptions-item label="寄养方名称" class="desc-item">
                 {{ fosterDetail.name || '暂无名称' }}
               </el-descriptions-item>
-              
+
               <!-- 第二行：联系人+手机号 -->
               <el-descriptions-item label="联系人姓名" class="desc-item">
                 {{ fosterDetail.contactName || '暂无联系人' }}
@@ -38,7 +38,7 @@
               <el-descriptions-item label="联系电话" class="desc-item">
                 {{ fosterDetail.contactPhone || '暂无联系电话' }}
               </el-descriptions-item>
-              
+
               <!-- 第三行：地址拆分展示 -->
               <el-descriptions-item label="所在省份" class="desc-item">
                 {{ fosterDetail.province || '暂无省份信息' }}
@@ -50,9 +50,9 @@
                 {{ fosterDetail.district || '暂无区县信息' }}
               </el-descriptions-item>
               <el-descriptions-item label="详细地址" class="desc-item">
-                 {{ fosterDetail.detailAddress || '暂无详细地址' }}
+                {{ fosterDetail.detailAddress || '暂无详细地址' }}
               </el-descriptions-item>
-              
+
               <!-- 第四行：宠物类型+描述 -->
               <el-descriptions-item label="可接待宠物类型" class="desc-item">
                 <el-tag v-for="type in (fosterDetail.petTypes || [])" :key="type" size="small" class="pet-tag">
@@ -70,22 +70,10 @@
           <el-col :span="8" v-if="fosterDetail.status === '待审核'">
             <div class="audit-actions">
               <h3>✏️ 审核操作</h3>
-              <el-button 
-                type="primary" 
-                size="large" 
-                class="pass-btn"
-                @click="handleAudit('通过')"
-                :loading="auditing"
-              >
+              <el-button type="primary" size="large" class="pass-btn" @click="handleAudit('通过')" :loading="auditing">
                 ✅ 审核通过
               </el-button>
-              <el-button 
-                type="danger" 
-                size="large" 
-                class="reject-btn"
-                @click="handleAudit('拒绝')"
-                :loading="auditing"
-              >
+              <el-button type="danger" size="large" class="reject-btn" @click="handleAudit('拒绝')" :loading="auditing">
                 ❌ 审核拒绝
               </el-button>
             </div>
@@ -95,25 +83,10 @@
         <!-- 环境照片（单独大区域） -->
         <div class="photos-section" v-if="fosterDetail.environmentPhotos && envPhotosList.length > 0">
           <h3 class="section-title">🖼️ 环境照片</h3>
-          <el-image-viewer
-            v-if="showEnvViewer"
-            :url-list="envPhotosList"
-            @close="showEnvViewer = false"
-          />
+          <el-image-viewer v-if="showEnvViewer" :url-list="envPhotosList" @close="showEnvViewer = false" />
           <div class="photos-grid">
-            <div 
-              class="photo-item" 
-              v-for="(img, index) in envPhotosList" 
-              :key="index"
-              @click="showEnvViewer = true"
-            >
-              <el-image 
-                :src="img" 
-                fit="cover" 
-                :preview-src-list="envPhotosList"
-                alt="环境照片"
-                class="photo-img"
-              />
+            <div class="photo-item" v-for="(img, index) in envPhotosList" :key="index" @click="showEnvViewer = true">
+              <el-image :src="img" fit="cover" :preview-src-list="envPhotosList" alt="环境照片" class="photo-img" lazy />
             </div>
           </div>
         </div>
@@ -125,25 +98,10 @@
         <!-- 资质照片（单独大区域） -->
         <div class="photos-section" v-if="fosterDetail.qualificationPhotos && qualPhotosList.length > 0">
           <h3 class="section-title">📄 资质照片</h3>
-          <el-image-viewer
-            v-if="showQualViewer"
-            :url-list="qualPhotosList"
-            @close="showQualViewer = false"
-          />
+          <el-image-viewer v-if="showQualViewer" :url-list="qualPhotosList" @close="showQualViewer = false" />
           <div class="photos-grid">
-            <div 
-              class="photo-item" 
-              v-for="(img, index) in qualPhotosList" 
-              :key="index"
-              @click="showQualViewer = true"
-            >
-              <el-image 
-                :src="img" 
-                fit="cover" 
-                :preview-src-list="qualPhotosList"
-                alt="资质照片"
-                class="photo-img"
-              />
+            <div class="photo-item" v-for="(img, index) in qualPhotosList" :key="index" @click="showQualViewer = true">
+              <el-image :src="img" fit="cover" :preview-src-list="qualPhotosList" alt="资质照片" class="photo-img" lazy />
             </div>
           </div>
         </div>
@@ -267,7 +225,7 @@ const getDetail = async () => {
     }
     const res = await getFosterDetail(id)
     fosterDetail.value = res.data
-  
+
   } catch (error) {
     console.error('获取寄养方详情失败:', error)
     ElMessage.error('获取寄养方详情失败，请重试')
@@ -295,19 +253,19 @@ const handleAudit = async (action: '通过' | '拒绝') => {
     // 调用审核接口（status字段根据你的后端定义调整，比如'passed'/'rejected'）
     const status = action === '通过' ? 1 : 2
     const res = await checkFosterInfo(id, status)
-    
+
     if (res.code === 0) {
       ElMessage.success(`审核${action}成功`)
       // 刷新详情或返回列表
       getDetail() // 刷新当前详情
-    router.push('/admin/foster')
+      router.push('/admin/foster')
     } else {
       ElMessage.error(res.msg || `审核${action}失败`)
     }
   } catch (error) {
     if (error !== 'cancel') { // 排除用户取消的情况
       console.error(`审核${action}失败:`, error)
-      
+
     }
   } finally {
     auditing.value = false
@@ -328,28 +286,33 @@ onMounted(() => {
   min-height: 100vh;
   font-family: "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", sans-serif;
 }
+
 /* :deep(.activeBread){
   color: #4a3322 !important;
   font-size: 16px;
 } */
-:deep(.el-breadcrumb__inner){
-      font-weight: 900 !important;
-    font-size: 14.5px;
-    color: #5f4b3c !important;
+:deep(.el-breadcrumb__inner) {
+  font-weight: 900 !important;
+  font-size: 14.5px;
+  color: #5f4b3c !important;
 }
+
 /* 面包屑 */
 .breadcrumb {
   margin-bottom: 20px;
 }
+
 :deep(.el-breadcrumb) {
   font-size: 14px;
   color: #4a3322;
 }
+
 :deep(.el-breadcrumb a) {
   font-weight: 450 !important;
   color: #666;
   text-decoration: none;
 }
+
 :deep(.el-breadcrumb a:hover) {
   color: #4a3322;
   font-weight: 950 !important;
@@ -374,6 +337,7 @@ onMounted(() => {
   gap: 12px;
   color: #6f4e37;
 }
+
 .decor-icon {
   font-size: 20px;
 }
@@ -386,16 +350,19 @@ onMounted(() => {
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
 .status-pending {
   background: linear-gradient(120deg, #fff7e6 0%, #fff3cd 100%);
   color: #ff9f1c;
   border: 1px solid #ffe8a3;
 }
+
 .status-passed {
   background: linear-gradient(120deg, #e8f8f5 0%, #d4edda 100%);
   color: #00b42a;
   border: 1px solid #b3e6be;
 }
+
 .status-rejected {
   background: linear-gradient(120deg, #fff2f0 0%, #f8d7da 100%);
   color: #f53f3f;
@@ -406,6 +373,7 @@ onMounted(() => {
 :deep(.el-divider) {
   margin: 15px 0 20px;
 }
+
 .divider-text {
   font-size: 16px;
   color: #917fb3;
@@ -423,6 +391,7 @@ onMounted(() => {
   overflow: hidden;
   border: 1px solid #f0e9f2;
 }
+
 :deep(.el-descriptions__header) {
   background: linear-gradient(120deg, #dbf4ee 0%, #fff8dc 100%);
   color: #6f4e37;
@@ -430,23 +399,28 @@ onMounted(() => {
   padding: 12px 20px;
   border-bottom: 1px solid #f0e9f2;
 }
+
 :deep(.el-descriptions-item__label) {
   background-color: #faf6fb;
   color: #917fb3;
   font-weight: 500;
-  width: 120px; /* 固定标签宽度，排版更整齐 */
+  width: 120px;
+  /* 固定标签宽度，排版更整齐 */
   padding: 15px 20px;
 }
+
 .desc-item {
   padding: 15px 20px;
   color: #555;
   font-size: 14px;
   border-bottom: 1px solid #f9f0fb;
 }
+
 /* 描述字段单独样式（换行展示） */
 .desc-desc {
   line-height: 1.6;
-  white-space: pre-wrap; /* 保留换行 */
+  white-space: pre-wrap;
+  /* 保留换行 */
 }
 
 /* 宠物标签 */
@@ -468,13 +442,16 @@ onMounted(() => {
   text-align: center;
   border: 1px solid #f0e9f2;
 }
+
 .audit-actions h3 {
   margin-bottom: 25px;
   font-size: 16px;
   color: #6f4e37;
   font-weight: 600;
 }
-.pass-btn, .reject-btn {
+
+.pass-btn,
+.reject-btn {
   width: 100%;
   margin-bottom: 15px;
   border-radius: 50px;
@@ -483,18 +460,21 @@ onMounted(() => {
   border: none;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
 :deep(.pass-btn) {
   background: linear-gradient(120deg, #9decba 0%, #22c55e 100%);
 }
+
 :deep(.reject-btn) {
   background: linear-gradient(120deg, #f2acac 0%, #ef4444 100%);
-  margin-left:0px;
+  margin-left: 0px;
 }
 
 /* 照片区域 */
 .photos-section {
   margin-top: 35px;
 }
+
 .no-photo-tip {
   margin-top: 35px;
   text-align: center;
@@ -505,6 +485,7 @@ onMounted(() => {
   border-radius: 15px;
   border: 1px dashed #e8d5f2;
 }
+
 .section-title {
   font-size: 18px;
   font-weight: 600;
@@ -523,6 +504,7 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
 }
+
 .photo-item {
   height: 160px;
   border-radius: 15px;
@@ -532,10 +514,12 @@ onMounted(() => {
   transition: all 0.3s ease;
   border: 2px solid #f0e9f2;
 }
+
 .photo-item:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
+
 .photo-img {
   width: 100%;
   height: 100%;
@@ -546,9 +530,11 @@ onMounted(() => {
   .photos-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
+
   .photo-item {
     height: 120px;
   }
+
   :deep(.el-descriptions-item__label) {
     width: 100px;
   }

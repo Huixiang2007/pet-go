@@ -254,7 +254,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: '客服消息',
       requiresAuth: true,
-      roles: ['管理员'],
+      roles: ['认证用户', '商家'],
       parentPath: '/customer-service',
     },
   },
@@ -265,7 +265,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: '搜索',
       requiresAuth: true,
-      roles: ['认证用户', '商家', '管理员'],
+      roles: ['认证用户', '商家'],
       parentPath: '/shop',
     },
   },
@@ -276,7 +276,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       title: '物流信息',
       requiresAuth: true,
-      roles: ['认证用户', '商家', '管理员'],
+      roles: ['认证用户', '商家'],
       parentPath: '/shop',
     },
   },
@@ -284,7 +284,7 @@ export const asyncRoutes: RouteRecordRaw[] = [
     path: '/promotion',
     name: 'promotionDetail',
     component: () => import('@/views/petShop/shop/PromotionDetail.vue'),
-    meta: { title: '促销活动', roles: ['认证用户', '商家', '管理员'], parentPath: '/shop' },
+    meta: { title: '促销活动', roles: ['认证用户', '商家'], parentPath: '/shop' },
   },
   {
     path: '/admin',

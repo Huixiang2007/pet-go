@@ -95,6 +95,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/stores/user'
 import {
   getUserAddresses,
   getUserAddressDetail,
@@ -137,6 +138,8 @@ interface District extends Area {
 
 // 定义事件（通知父组件刷新）
 const emit = defineEmits(['refresh'])
+// 用户状态管理
+const userStore = useUserStore()
 // 在现有ref定义中添加
 const loading = ref(false)
 // 本地状态
@@ -179,7 +182,7 @@ watch(
 const getAddressList = async () => {
   loading.value = true
   try {
-    const userId = localStorage.getItem('userId') || ''
+    const userId = userStore.getUserId()
     if (!userId) {
       ElMessage.warning('用户未登录！')
       addressList.value = []

@@ -16,6 +16,7 @@ declare module 'vue' {
     ConfirmCode: typeof import('./src/components/common/ConfirmCode.vue')['default']
     DraggableContainer: typeof import('./src/components/common/DraggableContainer.vue')['default']
     EditHistory: typeof import('./src/components/common/EditHistory.vue')['default']
+    ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']

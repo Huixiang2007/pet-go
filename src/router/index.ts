@@ -203,16 +203,33 @@ const routes: RouteRecordRaw[] = [
       title: '欢迎来到宠物商城',
     },
   },
-  // 秒杀
-  {
-    path: '/flash-sale',
-    name: 'FlashSale',
-    component: () => import('@/views/petShop/marketing/flash-sale.vue'),
-    meta: {
-      requiresAuth: true,
-      title: 'PetGo秒杀',
-    },
-  },
+{
+  path: '/flash-sale',
+  name: 'flashSale',
+  component: () => import('@/views/petShop/marketing/flash-sale.vue'),
+  meta: { title: '限时秒杀' }
+},
+{
+  path: '/seller/flash-sale/apply',
+  name: 'sellerFlashSaleApply',
+  component: () => import('@/views/petShop/marketing/seller-flash-sale-apply.vue'),
+  meta: { title: '申请秒杀活动', requiresAuth: true, role: 'seller' }
+},
+{
+  path: '/seller/flash-sale/records',
+  name: 'sellerFlashSaleRecords',
+  component: () => import('@/views/petShop/marketing/seller-flash-sale-records.vue'),
+  meta: { title: '秒杀活动记录', requiresAuth: true, role: 'seller' }
+},
+{
+  path: '/seller/flash-sale/participated',
+  name: 'sellerFlashSaleParticipated',
+  component: () => import('@/views/petShop/marketing/seller-participated-activities.vue'),
+  meta: { title: '已参与秒杀活动', requiresAuth: true, role: 'seller' }
+},
+
+
+
   //消息
   {
     path: '/customer-service',

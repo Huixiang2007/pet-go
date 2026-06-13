@@ -48,7 +48,7 @@
         <img
           src="/img/宠物1.jpg"
           alt="空购物车"
-          class="w-40 h-40 mx-auto mb-6 opacity-70 object-cover rounded-full border-4 border-amber-100"
+          class="w-40 h-40 mx-auto mb-6 opacity-700 object-cover rounded-full border-4 border-amber-100"
         />
         <p class="text-amber-700 mb-8 text-lg">
           您的购物车还是空空的哦～🐱<br />快去挑选心仪的萌宠好物吧～
@@ -213,7 +213,6 @@
             <router-link
               :to="{ path: '/order?type=cart' }"
               class="bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-600 hover:to-yellow-500 text-white px-12 py-3 rounded-full transition-all duration-300 shadow-md hover:shadow-lg font-medium flex items-center justify-center gap-2"
-              :disabled="!cartItems.length"
               :class="{ 'opacity-70 cursor-not-allowed': !cartItems.length }"
             >
               🛒 去结算
@@ -222,6 +221,7 @@
         </div>
       </div>
 
+      <!-- 推荐商品 已修复 -->
       <div v-if="cartItems.length > 0" class="mt-12">
         <div class="flex justify-between items-center mb-8">
           <h3
@@ -233,55 +233,111 @@
             ></span>
           </h3>
         </div>
+
+        <!-- 加载中 -->
         <div
-          v-if="recommendProducts.length === 0"
-          class="text-center py-8 text-amber-700 bg-white rounded-2xl shadow-md p-6 border border-amber-100/50"
+          v-if="loadingRecommend && recommendProducts.length === 0"
+          class="bg-white rounded-2xl p-8 text-center shadow-md"
         >
-          🐱 暂无推荐商品~ 下次再来看看吧～
+          <i class="fa fa-spinner fa-spin text-amber-500 text-3xl"></i>
+          <p class="mt-2 text-amber-700">正在为你推荐好物...</p>
         </div>
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <!-- 暂无商品 -->
+        <div
+          v-else-if="recommendProducts.length === 0"
+          class="bg-white rounded-2xl p-8 text-center text-amber-700 shadow-md"
+        >
+          🐱 暂无推荐商品~
+        </div>
+
+        <!-- 正常展示 + 无限滚动 -->
+        <div v-else class="w-full">
           <div
-            v-for="item in recommendProducts"
-            :key="item.id"
-            class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border border-amber-100/50"
+            v-infinite-scroll="loadMore"
+            :infinite-scroll-disabled="!recHasMore || loadingRecommend"
+            infinite-scroll-distance="650"
+            class="w-full"
           >
-            <div class="relative overflow-hidden rounded-t-2xl">
-              <img
-                :src="item.imgUrl"
-                :alt="item.name"
-                class="w-full h-52 object-cover transition-transform duration-700 hover:scale-110"
-                loading="lazy"
-              />
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <div
-                class="absolute top-3 right-3 bg-amber-100/90 rounded-full px-2 py-1 text-xs text-amber-700 font-medium"
+                v-for="(item, index) in recommendProducts"
+                :key="`rec_${item.id || index}`"
+                class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-amber-100/50 flex flex-col h-full"
               >
-                🐾 热销
+                <!-- 商品图片 -->
+                <div class="relative w-full pt-[75%] bg-amber-50 overflow-hidden rounded-t-2xl">
+                  <img
+                    :src="item.imgUrl"
+                    :alt="item.name"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div class="absolute top-2 right-2">
+                    <div
+                      class="bg-amber-100 text-xs text-amber-700 px-2 py-1 rounded-full font-medium"
+                    >
+                      🐾 热销 {{ item.sales || 0 }} 件
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 商品信息（全部展示） -->
+                <div class="p-4 flex-1 flex flex-col gap-1.5">
+                  <h4 class="font-semibold text-gray-800 text-base line-clamp-2 leading-tight">
+                    {{ item.name }}
+                  </h4>
+
+                  <p class="text-xs text-gray-500 line-clamp-2 min-h-[18px]">
+                    {{ item.subTitle || '暂无描述' }}
+                  </p>
+
+                  <!-- 完整信息展示 -->
+                  <div class="text-xs text-gray-500 space-y-0.5">
+                    <p v-if="item.brandName" class="truncate">🏷️ 品牌：{{ item.brandName }}</p>
+                    <p v-if="item.shopName" class="truncate">🏪 店铺：{{ item.shopName }}</p>
+                    <p v-if="item.city || item.province" class="truncate">
+                      📍 产地：{{ [item.province, item.city].filter(Boolean).join(' · ') }}
+                    </p>
+                  </div>
+
+                  <!-- 服务标签 -->
+                  <p v-if="item.warrantyTip" class="text-xs text-green-600 font-medium">
+                    ✅ {{ item.warrantyTip }}
+                  </p>
+
+                  <!-- 价格 -->
+                  <div class="mt-1.5">
+                    <p class="text-amber-500 font-bold text-lg">¥{{ item.price.toFixed(2) }}</p>
+                  </div>
+
+                  <!-- 按钮 -->
+                  <router-link
+                    :to="'/product-detail/' + item.id"
+                    class="mt-auto block w-full bg-amber-50 text-amber-700 py-2 rounded-xl text-center text-sm font-medium hover:bg-amber-100 transition-colors"
+                  >
+                    查看详情
+                  </router-link>
+                </div>
               </div>
             </div>
-            <div class="p-5">
-              <h4 class="font-medium text-gray-800 line-clamp-1 text-base leading-tight mb-2">
-                {{ item.name }}
-              </h4>
-              <p class="text-amber-500 font-bold mt-1 text-xl">¥{{ item.price.toFixed(2) }}</p>
-              <router-link
-                :to="'/product-detail/' + item.id"
-                class="mt-4 block w-full bg-gradient-to-r from-amber-100 to-yellow-100 hover:from-amber-200 hover:to-yellow-200 text-amber-600 py-2 rounded-xl text-sm font-medium transition-colors text-center flex items-center justify-center gap-1"
-              >
-                👀 查看详情
-              </router-link>
+
+            <!-- 底部加载提示 -->
+            <div class="col-span-full text-center py-6 text-sm text-gray-500">
+              <span v-if="loadingRecommend">加载更多中...</span>
+              <span v-else-if="!recHasMore">— 已加载全部 —</span>
             </div>
           </div>
         </div>
       </div>
     </main>
   </div>
-  <ShopFoot />
 </template>
 
 <script setup lang="ts">
 import type { CartItem } from '../../../types/shop'
 import infiniteScroll from '../shop/components/infiniteScroll.vue'
-import { getRecommendApi } from '../../../api/pet-shop/product'
+import { getCartRecommend } from '../../../api/pet-shop/recommend'
 import {
   getCartItems,
   updateCartItemQuantity,
@@ -301,6 +357,7 @@ const loading = ref(true)
 const cartItems = ref<CartItem[]>([])
 const selectAll = ref(false)
 const recommendProducts = ref<any[]>([])
+const loadingRecommend = ref(false)
 
 const countTotal = ref(0)
 const carttotalPrice = ref(0)
@@ -312,6 +369,7 @@ const discount = computed(() => {
 
 const isLoading = ref(false)
 const hasMore = ref(true)
+
 const CpageNum = ref(1)
 const CpageSize = ref(99)
 
@@ -329,7 +387,6 @@ const totalPrice = async () => {
   try {
     const res = await getCartTotalCountPrice()
     carttotalPrice.value = res.data
-    console.log('总价', res)
   } catch (error) {
     console.error('获取总价失败', error)
   }
@@ -340,7 +397,6 @@ const discountTotalPrice = async () => {
   try {
     const res = await discountTotalCountPrice()
     discountPrice.value = res.data
-    console.log('优惠价', res)
   } catch (error) {
     console.error('获取优惠价失败', error)
   }
@@ -362,7 +418,6 @@ const Cartlist = async (isLoadMore = false) => {
 
     const res = await getCartItems(CpageNum.value, CpageSize.value, '')
     const raw = Array.isArray(res) ? res : []
-    console.log('cartlist响应', res)
     const list = raw.map((item) => ({
       id: item.id || 0,
       name: item.productName || '未知商品',
@@ -393,44 +448,86 @@ const Cartlist = async (isLoadMore = false) => {
   }
 }
 
-// 获取推荐商品
-const recommendProduct = async () => {
-  try {
-    const response = await getRecommendApi(1, 10)
-    console.log('推荐商品响应:', response)
-    let newProducts: any[] = []
-    if (response && response.data && response.data.data && response.data.data.list) {
-      newProducts = response.data.data.list
-    } else if (Array.isArray(response)) {
-      newProducts = response
-    }
+const recPageNum = ref(1)
+const recPageSize = ref(12)
+const recHasMore = ref(true)
 
-    recommendProducts.value = newProducts.map((item: any) => ({
-      id: item.id || 0,
-      name: item.productName || item.name || '未知商品',
-      price: Number(item.price) || 0,
-      imgUrl: item.mainImage || item.imgUrl || '/img/宠物1.jpg',
-    }))
-  } catch (error: any) {
-    console.error('获取推荐商品失败:', error)
-    console.error('获取推荐商品失败详情:', error.response?.data)
-    ElMessage.warning('获取推荐商品失败，使用默认推荐')
-  }
+// 加载更多（给无限滚动用）
+const loadMore = () => {
+  recommendProduct(true)
 }
 
-// 商品选中状态改变
+// 获取推荐商品
+const recommendProduct = async (isLoadMore = false) => {
+  if (loadingRecommend.value || !recHasMore.value) return
+
+  try {
+    loadingRecommend.value = true
+
+    if (!isLoadMore) {
+      recPageNum.value = 1
+      recommendProducts.value = []
+      recHasMore.value = true
+    } else {
+      recPageNum.value++
+    }
+
+    const params = {
+      pageNum: recPageNum.value,
+      pageSize: recPageSize.value,
+      sortItemList: [
+        {
+          isAsc: true,
+          column: 'price',
+        },
+      ],
+    }
+
+    const response = await getCartRecommend(params)
+    console.log('推荐接口返回：', response)
+
+    // 兼容解析
+    const newProducts = response?.data?.list || []
+    console.log('拿到商品列表：', newProducts)
+
+    const mappedProducts = newProducts.map((item: any) => ({
+      id: item.id || 0,
+      name: item.title || item.productName || item.name || '未知商品',
+      price: Number(item.currentPrice) || Number(item.price) || 0,
+      imgUrl: item.mainImage || item.imgUrl || '/img/宠物1.jpg',
+      subTitle: item.subTitle || '',
+      sales: item.sales || 0,
+      shopName: item.shopName || '',
+      warrantyTip: item.warrantyTip || '',
+    }))
+
+    if (isLoadMore) {
+      recommendProducts.value = [...recommendProducts.value, ...mappedProducts]
+    } else {
+      recommendProducts.value = mappedProducts
+    }
+
+    // 是否还有更多
+    recHasMore.value = mappedProducts.length === recPageSize.value
+  } catch (err) {
+    console.error('推荐加载失败', err)
+  } finally {
+    loadingRecommend.value = false
+  }
+} // 商品选中状态改变
 const handleSelectItem = async (id, selected) => {
   try {
-    const res = await updateCartItemSelected(id.toString(), selected ? 1 : 0)
-    console.log('选中状态响应', res)
+    await updateCartItemSelected(id.toString(), selected ? 1 : 0)
     const item = cartItems.value.find((item) => item.id === id)
     if (item) {
       item.selected = selected
-      window.location.reload()
     }
   } catch (e) {
     console.error(e)
     ElMessage.error('更新选中状态失败')
+  } finally {
+    totalPrice()
+    discountTotalPrice()
   }
 }
 
@@ -439,20 +536,19 @@ const handleSelectAllChange = async () => {
   const target = selectAll.value
   try {
     loading.value = true
-    const res = await selectAllCartItems(target ? 1 : 0)
-    console.log('全选响应', res)
+    await selectAllCartItems(target ? 1 : 0)
     cartItems.value.forEach((item) => {
       if (item.status === '有效') {
         item.selected = target
       }
     })
     ElMessage.success(target ? '全选成功' : '取消全选成功')
-    Cartlist()
   } catch (e) {
     console.error(e)
     ElMessage.error(target ? '全选失败' : '取消全选失败')
   } finally {
     loading.value = false
+    Cartlist()
   }
 }
 
@@ -517,7 +613,7 @@ const handleDeleteSingleItem = async (index) => {
 const removeSelectedItems = async () => {
   const selectedIds = cartItems.value
     .filter((item) => item.selected)
-    .map((item) => item.id.toString()) // 强制转字符串
+    .map((item) => item.id.toString())
 
   if (selectedIds.length === 0) {
     ElMessage.warning('请选择要删除的商品')
@@ -526,14 +622,11 @@ const removeSelectedItems = async () => {
 
   try {
     loading.value = true
-    console.log('批量删除请求参数（字符串数组）:', selectedIds)
-    const res = await deleteCartItems(selectedIds)
-
+    await deleteCartItems(selectedIds)
     cartItems.value = cartItems.value.filter((item) => !selectedIds.includes(item.id.toString()))
     ElMessage.success('选中商品删除成功')
-    console.log('批量删除商品响应', res)
   } catch (error) {
-    console.error('批量删除商品失败:', error)
+    console.error('删除选中商品失败:', error)
     ElMessage.error('删除失败，请稍后再试')
   } finally {
     loading.value = false
@@ -558,9 +651,9 @@ const handleClearCart = async () => {
   }
 }
 
-onMounted(() => {
-  Cartlist()
-  recommendProduct()
+onMounted(async () => {
+  await Cartlist()
+  await recommendProduct()
 })
 </script>
 

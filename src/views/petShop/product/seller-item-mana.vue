@@ -147,6 +147,13 @@
                         <el-dropdown-item @click="openSkuManageDialog(scope.row)">
                           SKU管理
                         </el-dropdown-item>
+                        <button
+                          @click="goToFlashSaleApply(scope.row)"
+                          class="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg text-sm hover:from-orange-600 hover:to-orange-700 transition-all shadow-md hover:shadow-lg flex items-center"
+                        >
+                          <i class="fa fa-bolt mr-1.5"></i>
+                          参加活动
+                        </button>
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
@@ -224,6 +231,10 @@ console.log(originalNum > maxSafe)
 
 const openAdd = () => {
   router.push('/add-product')
+}
+const goToFlashSaleApply = (product: TableRow) => {
+  const url = `/seller/flash-sale/apply?productId=${product.id}`
+  window.location.href = url
 }
 
 interface TableRow {

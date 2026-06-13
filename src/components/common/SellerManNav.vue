@@ -67,8 +67,43 @@
         "
       >
         <i class="fa-solid fa-ticket w-5 text-center"></i>
-        <span v-if="isCollapsed">优惠卷管理</span>
+        <span v-if="isCollapsed">优惠券管理</span>
       </router-link>
+
+      <!-- 秒杀活动（带下拉菜单） -->
+      <div class="relative">
+        <button
+          @click="toggleFlashSaleMenu"
+          class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors w-full"
+          :class="
+            isFlashSaleActive ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-100'
+          "
+        >
+          <i class="fa-solid fa-bolt w-5 text-center"></i>
+          <span v-if="isCollapsed">秒杀活动</span>
+
+          <i
+            class="fa-solid fa-chevron-right ml-auto transition-transform"
+            :class="{ 'rotate-90': isFlashSaleMenuOpen }"
+          ></i>
+        </button>
+
+        <!-- 下拉子菜单 -->
+        <div v-show="isFlashSaleMenuOpen && isCollapsed" class="ml-6 mt-1 space-y-1">
+          <router-link
+            to="/seller/flash-sale/records"
+            class="flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-md transition-colors"
+            :class="
+              currentRoute === '/seller/flash-sale/records'
+                ? 'bg-blue-50 text-blue-600'
+                : 'text-gray-500 hover:bg-gray-100'
+            "
+          >
+            <i class="fa-solid fa-file-text w-4 text-center"></i>
+            <span>申请记录</span>
+          </router-link>
+        </div>
+      </div>
 
       <div class="px-4 py-2 mt-4 text-xs text-gray-400 font-medium" v-if="isCollapsed">
         店铺设置
@@ -104,11 +139,23 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 const isCollapsed = ref(true)
 const currentRoute = ref(window.location.pathname)
 const toggleBtn = () => {
   isCollapsed.value = !isCollapsed.value
+}
+
+const isFlashSaleMenuOpen = ref(false)
+
+// 判断秒杀活动相关页面是否激活
+const isFlashSaleActive = computed(() => {
+  return ['/seller/flash-sale/records'].includes(currentRoute.value)
+})
+
+// 切换秒杀活动菜单展开/收起
+const toggleFlashSaleMenu = () => {
+  isFlashSaleMenuOpen.value = !isFlashSaleMenuOpen.value
 }
 </script>
 

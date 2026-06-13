@@ -41,6 +41,9 @@
             <el-dropdown-item @click="handleBack">
               <i class="fas fa-sign-out-alt text-gray-700"></i>退出店铺
             </el-dropdown-item>
+            <el-dropdown-item @click="enterflash">
+              <i class="fas fa-sign-out-alt text-gray-700"></i>申请秒杀活动
+            </el-dropdown-item>
 
             <!-- 开关店操作 -->
             <el-dropdown-item @click="handleShopStatusToggle">
@@ -116,6 +119,11 @@ import { logout, getShopDetail, toggleShopStatus } from '../../api/pet-shop/shop
 import { ref, onMounted } from 'vue'
 
 const router = useRouter()
+// enterflash
+function enterflash() {
+  router.push('/seller/flash-sale/apply')
+  window.scrollTo(0, 0)
+}
 
 type ShopStatus = '正常营业' | '关门大吉' | null
 

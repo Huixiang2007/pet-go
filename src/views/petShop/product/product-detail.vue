@@ -372,19 +372,126 @@
         </div>
       </div>
     </div>
+
+    <!-- ============================================== -->
+    <!--                个性化推荐（猜你喜欢）            -->
+    <!-- ============================================== -->
+    <div class="max-w-7xl mx-auto px-4 mt-16 mb-10">
+      <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2 relative">
+        <i class="fa fa-heart text-orange-400"></i>
+        猜你喜欢
+        <span class="absolute left-0 bottom-0 w-16 h-1 bg-orange-400 rounded-full"></span>
+      </h2>
+
+      <!-- 加载中 -->
+      <div
+        v-if="loadingRec && recProducts.length === 0"
+        class="bg-white rounded-2xl p-10 text-center shadow-sm border border-amber-100/30"
+      >
+        <i class="fa fa-spinner fa-spin text-orange-400 text-2xl"></i>
+        <p class="mt-2 text-gray-500">正在为你推荐好物...</p>
+      </div>
+
+      <!-- 无数据 -->
+      <div
+        v-else-if="recProducts.length === 0"
+        class="bg-white rounded-2xl p-10 text-center text-gray-500 shadow-sm border border-amber-100/30"
+      >
+        <div class="text-amber-400 text-4xl mb-3">🐾</div>
+        <p>暂无推荐商品，换个商品看看吧～</p>
+      </div>
+
+      <!-- 商品列表（无限滚动） -->
+      <div
+        v-else
+        v-infinite-scroll="loadMoreRec"
+        :infinite-scroll-disabled="!recHasMore || loadingRec"
+        infinite-scroll-distance="300"
+        :infinite-scroll-immediate="false"
+        class="w-full"
+      >
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            v-for="(item, index) in recProducts"
+            :key="`rec_${item.id || index}`"
+            class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-amber-100/50 flex flex-col h-full"
+          >
+            <!-- 商品图片（固定比例，防抖动） -->
+            <div class="relative w-full pt-[75%] bg-amber-50 overflow-hidden rounded-t-2xl">
+              <img
+                :src="item.imgUrl"
+                :alt="item.name"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                loading="lazy"
+                style="aspect-ratio: 4/3"
+              />
+              <div class="absolute top-2 right-2">
+                <div
+                  class="bg-orange-100 text-xs text-orange-700 px-2 py-1 rounded-full font-medium"
+                >
+                  🐾 热销 {{ item.sales || 0 }} 件
+                </div>
+              </div>
+            </div>
+
+            <!-- 商品全部信息 -->
+            <div class="p-4 flex-1 flex flex-col gap-1.5">
+              <h3 class="font-semibold text-gray-800 text-base line-clamp-2 leading-tight">
+                {{ item.name }}
+              </h3>
+
+              <p class="text-xs text-gray-500 line-clamp-2 min-h-[18px]">
+                {{ item.subTitle || '暂无商品描述' }}
+              </p>
+
+              <!-- 店铺、品牌信息 -->
+              <div class="text-xs text-gray-500 space-y-0.5">
+                <p v-if="item.shopName" class="truncate">🏪 店铺：{{ item.shopName }}</p>
+                <p v-if="item.brandName" class="truncate">🏷️ 品牌：{{ item.brandName }}</p>
+              </div>
+
+              <!-- 质保标签 -->
+              <p v-if="item.warrantyTip" class="text-xs text-green-600 font-medium mt-1">
+                ✅ {{ item.warrantyTip }}
+              </p>
+
+              <!-- 价格 -->
+              <div class="mt-1.5">
+                <p class="text-orange-500 font-bold text-lg">¥{{ item.price.toFixed(2) }}</p>
+              </div>
+
+              <!-- 查看详情按钮（底部固定） -->
+              <router-link
+                :to="`/product-detail/${item.id}`"
+                class="mt-auto block w-full bg-orange-50 text-orange-700 py-2 rounded-xl text-center text-sm font-medium hover:bg-orange-100 transition-colors"
+              >
+                查看详情
+              </router-link>
+            </div>
+          </div>
+        </div>
+
+        <!-- 加载提示 -->
+        <div class="col-span-full text-center py-6 text-sm text-gray-500">
+          <span v-if="loadingRec">加载更多中...</span>
+          <span v-else-if="!recHasMore">— 已加载全部推荐商品 —</span>
+        </div>
+      </div>
+    </div>
   </main>
 </template>
 
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { useRouter } from 'vue-router'
 import CommentList from './components/CommentList.vue'
 import QuestionUs from './components/QuestionUs.vue'
 import { addCartApi, getProductDetail } from '../../../api/pet-shop/product'
 import { receiveCoupon } from '../../../api/pet-shop/coupos'
+import { getCartRecommend } from '../../../api/pet-shop/recommend'
 import type { ProductDetail, SkuInfo } from '../../../types/shop'
+
 const router = useRouter()
 const shopId = ref('')
 
@@ -757,12 +864,71 @@ const handleClaimCoupon = async (couponId) => {
   }
 }
 
+// ==============================================
+// 商品详情页 → 个性化推荐（猜你喜欢）
+// ==============================================
+const recProducts = ref<any[]>([])
+const loadingRec = ref(false)
+const recPageNum = ref(1)
+const recPageSize = ref(8)
+const recHasMore = ref(true)
+
+// 获取推荐商品
+const fetchRecommend = async () => {
+  if (loadingRec.value || !recHasMore.value) return
+  try {
+    loadingRec.value = true
+    const res = await getCartRecommend({
+      pageNum: recPageNum.value,
+      pageSize: recPageSize.value,
+      sortItemList: [
+        {
+          isAsc: true,
+          column: 'price',
+        },
+      ],
+    })
+    const list = res?.data?.list || []
+    if (list.length === 0) {
+      recHasMore.value = false
+      return
+    }
+    // 数组追加，避免全量替换导致抖动
+    recProducts.value.push(
+      ...list.map((item: any) => ({
+        id: item.id || 0,
+        name: item.title || item.productName || '未知商品',
+        price: Number(item.currentPrice || item.price || 0),
+        imgUrl: item.mainImage || item.imgUrl || '/img/empty.png',
+        subTitle: item.subTitle || '',
+        shopName: item.shopName || '',
+        brandName: item.brandName || '',
+        sales: item.sales || 0,
+        warrantyTip: item.warrantyTip || '正品保障',
+      })),
+    )
+    recHasMore.value = list.length === recPageSize.value
+  } catch (err) {
+    console.error('推荐接口失败', err)
+  } finally {
+    loadingRec.value = false
+  }
+}
+
+// 加载更多
+const loadMoreRec = () => {
+  recPageNum.value++
+  fetchRecommend()
+}
+
 watch(selectedSku, (newSku) => {
   qty.value = Math.min(qty.value, newSku.stock || 999)
 })
 
 onMounted(() => {
   if (id) productDetail()
+  // 进入页面加载推荐商品
+  fetchRecommend()
 })
 </script>
 
@@ -786,5 +952,17 @@ button:disabled {
 }
 .spec-table tr:hover {
   background-color: #f8f9fa;
+}
+
+/* 推荐商品卡片hover动画优化 */
+:deep(.hover\:-translate-y-1) {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* 无限滚动容器样式 */
+:deep(.infinite-scroll-container) {
+  overflow: visible;
 }
 </style>

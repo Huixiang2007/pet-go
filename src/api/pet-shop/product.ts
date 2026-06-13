@@ -178,10 +178,3 @@ export const addCartApi = async (CarData: Record<string, any>) => {
   return response.data;
 }
 
-//商品推荐
-
-export const getRecommendApi = async (pageNum: number, pageSize: number) => {
-  const url = `/server/api/shop/market/recommend/get-recommend?pageNum=${pageNum}&pageSize=${pageSize}`;
-  const response = await request(url, 'GET');
-  return response.data;
-};

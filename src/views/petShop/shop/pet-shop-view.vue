@@ -185,16 +185,62 @@
             </button>
           </div>
         </div>
-
         <div class="products mt-8">
-          <div class="flex justify-between items-center mb-6">
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"
+          >
             <h2 class="text-xl font-bold text-amber-800 flex items-center">
               <i class="fa fa-star text-amber-500 mr-2"></i>热门商品
-
-              <span class="ml-2 text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full"
-                >新品</span
-              >
             </h2>
+
+            <div class="flex flex-wrap gap-3 text-sm">
+              <label class="cursor-pointer">
+                <input
+                  v-model="includeHot"
+                  type="checkbox"
+                  class="hidden"
+                  @change="onFilterChange"
+                />
+                <span
+                  class="inline-block px-4 py-1.5 rounded-full border transition-all duration-200 border-amber-300 text-amber-700 hover:bg-amber-50 checked:bg-amber-500 checked:text-white checked:border-amber-500"
+                  :class="includeHot ? 'bg-amber-500 text-white border-amber-500' : 'bg-white'"
+                >
+                  热销商品
+                </span>
+              </label>
+
+              <label class="cursor-pointer">
+                <input
+                  v-model="includeNew"
+                  type="checkbox"
+                  class="hidden"
+                  @change="onFilterChange"
+                />
+                <span
+                  class="inline-block px-4 py-1.5 rounded-full border transition-all duration-200 border-amber-300 text-amber-700 hover:bg-amber-50"
+                  :class="includeNew ? 'bg-amber-500 text-white border-amber-500' : 'bg-white'"
+                >
+                  新品上市
+                </span>
+              </label>
+
+              <label class="cursor-pointer">
+                <input
+                  v-model="includePersonalized"
+                  type="checkbox"
+                  class="hidden"
+                  @change="onFilterChange"
+                />
+                <span
+                  class="inline-block px-4 py-1.5 rounded-full border transition-all duration-200 border-amber-300 text-amber-700 hover:bg-amber-50"
+                  :class="
+                    includePersonalized ? 'bg-amber-500 text-white border-amber-500' : 'bg-white'
+                  "
+                >
+                  个性化推荐
+                </span>
+              </label>
+            </div>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
@@ -343,10 +389,21 @@ import InfiniteScroll from './components/infiniteScroll.vue'
 import { receiveCoupon, getReceiveCouponList } from '../../../api/pet-shop/coupos'
 import { ElMessage } from 'element-plus'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import axios from 'axios'
+import { getRecommend } from '../../../api/pet-shop/recommend'
 import { useRouter } from 'vue-router'
 console.log('pet-shop-view')
 const router = useRouter()
+const includeHot = ref(true)
+const includeNew = ref(true)
+const includePersonalized = ref(true)
+
+// 筛选切换重置列表
+const onFilterChange = () => {
+  page.value = 1
+  hasmore.value = true
+  products.value = []
+  getProducts()
+}
 
 const currentCategory = ref('all')
 const carouselItems = ref([
@@ -391,36 +448,39 @@ const getReceiveButtonText = (coupon: any) => {
   return '立即领取'
 }
 
-const getProducts = () => {
+const getProducts = async () => {
   if (!isLoading.value && hasmore.value) {
     isLoading.value = true
-    axios
-      .request({
-        url: '/server/api/shop/product/list',
-        method: 'POST',
-        data: {
-          pageNum: 1,
-          pageSize: 12,
-        },
-      })
-      .then((response: any) => {
-        isLoading.value = false
-        console.log(response)
-        console.log(response.data)
-        const newProducts = response.data.data.list
+    try {
+      const params = {
+        pageNum: page.value,
+        pageSize: pageSize.value,
+        current: page.value,
+        searchCount: true,
+        includeHot: includeHot.value,
+        includeNew: includeNew.value,
+        includePersonalized: includePersonalized.value,
+        sortItemList: [{ isAsc: false, column: '223r2' }],
+      }
+      const res = await getRecommend(params)
+      const newProducts = res.data?.list || []
+
+      if (page.value === 1) {
+        products.value = newProducts
+      } else {
         products.value = [...products.value, ...newProducts]
-        if (newProducts.length < pageSize.value) {
-          hasmore.value = false
-          console.log('没有更多数据了')
-        } else {
-          page.value++
-        }
-      })
-      .catch((error) => {
-        isLoading.value = false
-        console.error('获取商品数据失败:', error.response.data)
-        console.error('获取商品数据失败:', error)
-      })
+      }
+
+      if (newProducts.length < pageSize.value) {
+        hasmore.value = false
+      } else {
+        page.value++
+      }
+    } catch (error) {
+      console.error('获取商品数据失败:', error)
+    } finally {
+      isLoading.value = false
+    }
   }
 }
 //优惠卷
@@ -479,7 +539,12 @@ const aiServer = () => {
 
 const handleCategoryChange = (newCategory: string) => {
   currentCategory.value = newCategory
+  page.value = 1
+  hasmore.value = true
+  products.value = []
+  getProducts()
 }
+
 // 轮播图
 const nextSlide = () => {
   currentSlide.value = (currentSlide.value + 1) % carouselItems.value.length

@@ -15,7 +15,7 @@ bash
 
 # 克隆仓库
 
-git clone https://codeup.aliyun.com/6906a8a3876b90de1aac0b9e/pet-go-web.git
+git clone https://github.com/Huixiang2007/pet-go.git
 
 # 进入项目目录
 

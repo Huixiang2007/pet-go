@@ -119,7 +119,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { sendForgetPasswordCode, resetPassword,validateEmailCode } from '@/api/auth'
+import { sendForgetPasswordCode, resetPassword, validateEmailCode, clearResetToken } from '@/api/auth'
 import { ElMessage } from 'element-plus'
 
 declare global {
@@ -253,6 +253,11 @@ const verifyEmail = async () => {
     } else {
       return false
     }
+  } catch (error: any) {
+    // 业务失败（如验证码错误、邮箱未注册）后端会以 200 返回非 0 的 code，被拦截器转成 reject
+    const msg = error?.response?.data?.msg || error?.message || '验证失败，请重试'
+    ElMessage.error(msg)
+    return false
   } finally {
     isVerifying.value = false
   }
@@ -285,17 +290,19 @@ const resetPasswords = async () => {
 
   try {
     const response =await resetPassword({
-      email: formData.value.email,
       password: formData.value.newPassword,
-      code: formData.value.captcha,
+      againPassword: formData.value.confirmPassword,
     })
     if (response.code == 0) {
+      clearResetToken()
       layer.msg('密码重置成功，请登录', { icon: 1 })
       router.push('/login')
     } else {
       ElMessage.error(response.msg || '密码重置失败，请重试')
     }
-  } finally {
+  } catch (error: any) {
+    const msg = error?.response?.data?.msg || error?.message || '密码重置失败，请重试'
+    ElMessage.error(msg)
   }
 }
 

@@ -12,9 +12,18 @@ const noTokenApiList = [
   '/server/api/user/register', // 注册接口
   '/server/api/user/sendCode', // 发送验证码接口
 ]
+// 重置密码流程接口：Authorization 里放的是前端生成的复位token，不能被登录token覆盖或删除
+const resetPwdApiList = [
+  '/server/api/user/codeValidate',
+  '/server/api/user/forgetPassword',
+]
 //请求拦截器-在发送请求之前做些什么
 service.interceptors.request.use(
   (config) => {
+    // 重置密码流程：保留调用方自己带上的 Authorization，不注入登录token
+    if (resetPwdApiList.some((api) => config.url?.includes(api))) {
+      return config
+    }
     const userStore = useUserStore(store)
     const token = userStore.token
     const isNoTokenApi = noTokenApiList.some((api) => config.url?.includes(api))

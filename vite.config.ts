@@ -32,7 +32,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/server': {
-        target: 'http://39.105.134.176:8085',
+        // target: 'http://39.105.134.176:8085', // 线上服务器，已过期停用
+        target: 'http://127.0.0.1:8085', // 本地后端
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/server/, ''),
       },

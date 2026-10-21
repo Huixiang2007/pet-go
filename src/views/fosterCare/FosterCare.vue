@@ -276,7 +276,7 @@ import { ElMessage, ElLoading, } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import AMapLoader from "@amap/amap-jsapi-loader";
 import NavBar from '@/components/common/NavBar.vue';
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request';
 
 declare global {
@@ -288,6 +288,20 @@ declare global {
 }
 
 const router = useRouter();
+const route = useRoute();
+
+const readQueryValue = (value: unknown) => {
+    if (Array.isArray(value)) return value[0]
+    return typeof value === 'string' ? value : ''
+}
+
+const initialFosterTypes = readQueryValue(route.query.types) === 'all'
+    ? ['个人', '机构']
+    : ['个人']
+const requestedRadius = Number(readQueryValue(route.query.radius))
+const initialRadius = Number.isFinite(requestedRadius) && requestedRadius > 0
+    ? String(requestedRadius)
+    : '5'
 
 const goToPerson = () => {
     router.push({ path: '/persons' })
@@ -329,10 +343,10 @@ const scrollContainer = ref<HTMLElement | null>(null)
 
 // 筛选条件
 const filters = reactive({
-    fosterTypes: ["个人"],
+    fosterTypes: [...initialFosterTypes],
     petTypes: [] as string[],
     priceRange: [0, 200] as [number, number],
-    radius: '5', // 默认5公里
+    radius: initialRadius,
 })
 
 // 排序选项
@@ -927,10 +941,10 @@ const parseAddressToLatLng = async (address: string) => {
     // 重置筛选
     const resetFilters = () => {
         searchKeyword.value = ''
-        filters.fosterTypes = ["个人"]
+        filters.fosterTypes = [...initialFosterTypes]
         filters.petTypes = []
         filters.priceRange = [0, 200]
-        filters.radius = '5'
+        filters.radius = initialRadius
         sortOption.value = 'comprehensive'
         // 重置分页状态
         currentPage.value = 1

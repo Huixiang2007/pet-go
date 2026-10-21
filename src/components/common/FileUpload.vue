@@ -121,6 +121,10 @@ const fileInput = ref<HTMLInputElement>()
 // 计算属性
 const isMaxReached = computed(() => fileList.value.length >= props.maxCount)
 
+const clearFiles = () => {
+  fileList.value = []
+}
+
 // 创建隐藏的file input
 const createFileInput = () => {
   if (fileInput.value) return fileInput.value
@@ -205,6 +209,7 @@ onUnmounted(() => {
 })
 defineExpose({
   removeFile,
+  clearFiles,
   fileList,
   isUploading,
   uploadProgress,

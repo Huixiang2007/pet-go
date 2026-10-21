@@ -43,7 +43,9 @@ export const useUpload = (options: {
         return url
       }
     } catch (e) {
-      console.log(e)
+      console.error('文件上传失败:', e)
+      ElMessage.error(e instanceof Error ? e.message : '文件上传失败，请稍后重试')
+      throw e
     } finally {
       isUploading.value = false
     }

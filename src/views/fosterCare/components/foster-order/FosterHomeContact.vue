@@ -31,11 +31,19 @@
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-// import type { FosterHome } from '@/types/foster'
+
+interface FosterHomeContactInfo {
+    id: number
+    name: string
+    avatar?: string
+    address: string
+    phone: string
+}
 
 // Props
 const props = defineProps<{
     modelValue: boolean
+    fosterHome?: FosterHomeContactInfo | null
 }>()
 
 // Emits

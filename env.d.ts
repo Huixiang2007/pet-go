@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+/// <reference types="amap-js-api" />
 interface ImportMetaEnv {
   readonly VITE_BASE_URL: string // 也可以根据你的实际环境变量补充
 }

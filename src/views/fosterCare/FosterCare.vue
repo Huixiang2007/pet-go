@@ -109,18 +109,32 @@
                     <!-- 右侧地图和列表 -->
                     <div class="lg:col-span-3">
                         <div class="cute-card p-4 bg-white mb-6">
-                            <div class="map-container h-96">
+                            <div class="map-container h-96 relative">
+                                <!-- 地图按需加载 -->
+                                <div v-if="!mapRequested"
+                                    class="w-full h-full flex items-center justify-center bg-gray-50">
+                                    <button type="button" class="cute-btn" @click="initMap">
+                                        查看附近地图
+                                    </button>
+                                </div>
                                 <!-- 地图加载失败提示 -->
-                                <div v-if="mapLoadError"
+                                <div v-else-if="mapLoadError"
                                     class="w-full h-full flex items-center justify-center bg-gray-50">
                                     <div class="text-center">
                                         <p class="text-red-500 mb-2">地图加载失败</p>
                                         <p class="text-xs text-gray-400">{{ mapLoadError }}</p>
-                                        <button class="text-xs text-blue-500 mt-2" @click="initMap">重试</button>
+                                        <button type="button" class="text-xs text-blue-500 mt-2" :disabled="mapLoading"
+                                            @click="initMap">
+                                            {{ mapLoading ? '加载中...' : '重试' }}
+                                        </button>
                                     </div>
                                 </div>
                                 <!-- 地图容器 -->
-                                <div id="custom-map-container" ref="mapContainer" v-else></div>
+                                <div v-else id="custom-map-container" ref="mapContainer" class="w-full h-full"></div>
+                                <div v-if="mapLoading"
+                                    class="absolute inset-0 flex items-center justify-center bg-white/80">
+                                    <span class="text-sm text-gray-600">地图加载中...</span>
+                                </div>
                             </div>
                         </div>
 
@@ -135,27 +149,21 @@
                             <h2 class="text-xl font-bold text-blue-500 mb-4">附近的寄养家庭</h2>
 
                             <!-- 无限滚动列表 -->
-                            <div class="infinite-list-wrapper" style="overflow: auto">
-                                <ul v-infinite-scroll="load" class="list" :infinite-scroll-disabled="disabled"
-                                    :infinite-scroll-immediate="false" style="list-style: none; margin: 0; padding: 0;
-                                    display: grid;
-                                    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-                                    gap: 16px;
-                                    margin-bottom: 16px;
-                                    ">
-                                    <li v-for="foster in fosterHomes" :key="foster.id"
-                                        @click="focusOnMarker(foster.lng, foster.lat)"
-                                        class="list-item border border-blue-100 rounded-xl p-4 hover:shadow-md transition-all duration-300 bg-blue-50/30 hover:bg-blue-50/50 cursor-pointer">
-                                        <div style="
-                                          border: 1px solid #e0f0ff;
-                                          border-radius: 16px;
-                                          padding: 16px;
-                                          background-color: rgba(224, 240, 255, 0.15);
-                                           transition: all 0.3s ease;
-                                            cursor: pointer;
-                                           ">
-                                            <div class="flex flex-col">
-
+                            <div class="infinite-list-wrapper virtual-list" ref="listScrollRef"
+                                v-infinite-scroll="load">
+                                <ul class="list virtual-list__inner" :infinite-scroll-disabled="disabled"
+                                    :infinite-scroll-immediate="false"
+                                    :style="{ height: `${rowVirtualizer.getTotalSize()}px` }">
+                                    <li v-for="virtualRow in rowVirtualizer.getVirtualItems()"
+                                        :key="String(virtualRow.key)" :ref="measureVirtualRow"
+                                        :data-index="virtualRow.index" class="virtual-list__row" :style="{
+                                            transform: `translateY(${virtualRow.start}px)`,
+                                        }">
+                                        <div class="virtual-list__grid" :style="{
+                                            gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
+                                        }">
+                                            <article v-for="foster in rows[virtualRow.index] ?? []" :key="foster.id"
+                                                class="list-item" @click="focusOnMarker(foster.lng, foster.lat)">
                                                 <!-- 上面 -->
                                                 <div class="flex">
                                                     <!-- 左侧 -->
@@ -171,7 +179,7 @@
                                                         <div class="flex justify-between items-start">
                                                             <h3 class="font-bold text-lg text-gray-800">{{
                                                                 foster.name
-                                                                }}
+                                                            }}
                                                             </h3>
                                                             <span
                                                                 class="bg-blue-100 text-blue-600 px-2 py-1 rounded-full text-xs">
@@ -184,15 +192,15 @@
                                                                 class="mr-2"></el-rate>
                                                             <span class="text-sm text-gray-600">({{
                                                                 foster.reviewCount
-                                                                }})</span>
+                                                            }})</span>
                                                         </div>
                                                         <p class="text-gray-600 text-sm mt-1 truncate">{{
                                                             foster.address
-                                                            }}
+                                                        }}
                                                         </p>
                                                         <div class="flex justify-between items-center mt-2">
                                                             <span class="text-blue-500 font-bold">{{ foster.price
-                                                                }}元/天</span>
+                                                            }}元/天</span>
                                                             <div class="flex items-center">
                                                                 <span class="text-xs text-gray-500 mr-2"
                                                                     v-if="currentLocation.lat">
@@ -212,12 +220,12 @@
                                                         查看详情
                                                     </button>
                                                 </div>
+                                            </article>
 
 
 
-
-                                            </div>
                                         </div>
+
                                     </li>
                                 </ul>
                                 <div v-if="loading" class="col-span-full text-center py-4">
@@ -271,13 +279,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, nextTick } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick, onUnmounted } from 'vue'
+import type { ComponentPublicInstance } from 'vue'
 import { ElMessage, ElLoading, } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
-import AMapLoader from "@amap/amap-jsapi-loader";
 import NavBar from '@/components/common/NavBar.vue';
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request';
+import { useVirtualizer } from '@tanstack/vue-virtual'
 
 declare global {
     interface Window {
@@ -301,7 +310,11 @@ const initialFosterTypes = readQueryValue(route.query.types) === 'all'
 const requestedRadius = Number(readQueryValue(route.query.radius))
 const initialRadius = Number.isFinite(requestedRadius) && requestedRadius > 0
     ? String(requestedRadius)
-    : '5'
+    : '100'
+const requestedFixture = Number(readQueryValue(route.query.fixture))
+const initialFixture = import.meta.env.DEV && [20, 100, 500].includes(requestedFixture)
+    ? requestedFixture
+    : 0
 
 const goToPerson = () => {
     router.push({ path: '/persons' })
@@ -309,10 +322,24 @@ const goToPerson = () => {
 // 地图相关
 const mapContainer = ref<HTMLElement>()
 let map: any = null
-let markers: any = []
-// let geocoder: any | null = null
 let AMapInstance: any | null = null
+let locationRequestStarted = false
+let pendingLocationReload = false
+const mapRequested = ref(false)
+const mapLoading = ref(false)
 const mapLoadError = ref('')
+const defaultLocation = {
+    lat: 35.2869,
+    lng: 113.9274,
+    address: '默认位置'
+}
+// 用户位置Marker单独保存
+let userMarker: AMap.Marker | null = null;
+// 寄养点Marker
+const fosterMarkerById = new Map<number, AMap.Marker>();
+// 保存构建 Marker 所需数据的摘要，用于判断是否需要更新
+const fosterSignatureById = new Map<number, string>();
+
 
 // 用户家庭住址相关
 const userHomeAddress = ref('')
@@ -383,8 +410,15 @@ interface FosterHome {
     distance: number;
 }
 
-
-
+// 判断 Marker 是否需要更新。坐标、名称和价格都没变时，就复用原 Marker
+const getFosterMarkerSignature = (foster: FosterHome) => {
+    return [
+        foster.lng,
+        foster.lat,
+        foster.name,
+        foster.price,
+    ].join('|')
+}
 
 // 获取用户家庭住址
 const getUserHomeAddress = async () => {
@@ -452,10 +486,7 @@ const selectAddress = (address: any) => {
             map.setZoom(15, true);
         }
 
-        // 初始化请求数据
-        nextTick(() => {
-            load();
-        });
+        reloadListForLocation()
     }
     showAddressSelector.value = false;
     setTimeout(() => {
@@ -518,10 +549,7 @@ const parseAddressToLatLng = async (address: string) => {
                             map.setZoom(15, true);
                         }
 
-                        // 初始化请求数据
-                        nextTick(() => {
-                            load();
-                        });
+                        reloadListForLocation()
 
                     } else {
                         locationError.value = '地址解析失败，无法获取有效位置';
@@ -542,441 +570,642 @@ const parseAddressToLatLng = async (address: string) => {
 
 
 
-    // 初始化地图
+// 初始化地图
+const initMap = async () => {
+    if (map || mapLoading.value) return
 
-    const initMap = () => {
-        if (!mapContainer.value) {
-            mapLoadError.value = '地图容器未找到';
-            return;
-        }
+    mapRequested.value = true
+    mapLoadError.value = ''
+    mapLoading.value = true
 
-        mapLoadError.value = '';
-        const loading = ElLoading.service({ text: '加载地图中...' });
+    // v-else 地图容器需要先渲染，之后才能初始化
+    await nextTick()
+
+    if (!mapContainer.value) {
+        mapLoadError.value = '地图容器未找到'
+        mapLoading.value = false
+        return
+    }
+
+    try {
+        const { default: AMapLoader } = await import('@amap/amap-jsapi-loader')
 
         window._AMapSecurityConfig = {
             securityJsCode: "76efd4e49a820ee84255d33dffeb374f",
         };
 
-        AMapLoader.load({
+        const AMap = await AMapLoader.load({
             key: "f9a61d8c1043186ca29b9675925160ff",
             version: "2.0",
             plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder"],
-        }).then((AMap: any
-        ) => {
-            AMapInstance = AMap;
-            mapInitialized.value = true;
-            map = new AMap.Map("custom-map-container", {
-                viewMode: "3D",
-                zoom: 12,
-                center: [113.9274, 35.2869]
-            });
+        })
 
-            // 添加地图控件
-            map.addControl(new AMap.ToolBar());
-            map.addControl(new AMap.Scale());
+        if (map || !mapContainer.value) return
 
-            // 初始化地理编码器
-            // geocoder = new AMap.Geocoder({ city: "全国" });
-            const infoWindow = new AMap.InfoWindow({
-                //创建信息窗体
-                isCustom: true, //使用自定义窗体
-                content: "<div>HELLO,AMAP!</div>", //信息窗体的内容可以是任意html片段
-                offset: new AMap.Pixel(16, -45),
-            });
-            const onMarkerClick = function (e) {
-                infoWindow.open(map, e.target.getPosition()); //打开信息窗体
-                //e.target就是被点击的Marker
-            };
-            const marker = new AMap.Marker({
-                position: [116.481181, 39.989792],
-            });
-            map.add(marker);
-            marker.on("click", onMarkerClick); //绑定click事件
-            // 地图加载完成后，直接定位到用户当前位置
-            locateUserPosition();
-
-            // ElMessage.success('地图加载成功');
-            loading.close();
-        }).catch((err) => {
-            console.error('地图加载失败:', err);
-            mapLoadError.value = `地图加载失败: ${err.message || '请检查API密钥'}`;
-            loading.close();
+        AMapInstance = AMap;
+        map = new AMap.Map("custom-map-container", {
+            viewMode: "3D",
+            zoom: 12,
+            center: [defaultLocation.lng, defaultLocation.lat]
         });
+        mapInitialized.value = true;
+        if (currentLocation.lat && currentLocation.lng) {
+            map.setCenter([currentLocation.lng, currentLocation.lat], true);
+            map.setZoom(15, true);
+            updateMapMarkers();
+        }
+
+        // 添加地图控件
+        map.addControl(new AMap.ToolBar());
+        map.addControl(new AMap.Scale());
+
+    } catch (error) {
+        const message = error instanceof Error ? error.message : '请检查 API 密钥'
+        console.error('地图加载失败:', error);
+        mapLoadError.value = `地图加载失败: ${message}`;
+    } finally {
+        mapLoading.value = false
+    }
+}
+
+const reloadListForLocation = () => {
+    currentPage.value = 1
+    hasMore.value = true
+
+    if (loading.value) {
+        pendingLocationReload = true
+        return
     }
 
-    // 定位用户当前位置
-    const locateUserPosition = () => {
-        // 检查localStorage中是否有存储的位置信息
-        const storedLocation = localStorage.getItem('userLocation');
+    nextTick(() => {
+        load()
+    })
+}
+
+// 定位用户当前位置
+const locateUserPosition = () => {
+    if (locationRequestStarted) return
+    locationRequestStarted = true
+    // 检查localStorage中是否有存储的位置信息
+    const storedLocation = localStorage.getItem('userLocation');
+    if (storedLocation) {
+        try {
+            const location = JSON.parse(storedLocation);
+            currentLocation.lat = location.lat;
+            currentLocation.lng = location.lng;
+            currentLocation.address = location.address;
+            userHomeAddress.value = location.address;
+
+            // 移动地图中心到存储的位置
+            if (map) {
+                map.setCenter([location.lng, location.lat], true);
+                map.setZoom(15, true);
+            }
+
+            reloadListForLocation()
+
+            console.log('使用存储的位置信息');
+            return;
+        } catch (error) {
+            console.error('解析存储的位置信息失败:', error);
+            // 解析失败，继续执行定位
+        }
+    }
+
+    if (!navigator.geolocation) {
+        ElMessage.error('您的浏览器不支持地理定位');
+        // 如果不支持地理定位，尝试使用用户默认地址
+        getUserHomeAddress();
+        return;
+    }
+
+    ElMessage.info('正在获取您的位置...');
+
+    navigator.geolocation.getCurrentPosition(
+        // 成功回调
+        (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            currentLocation.lat = lat;
+            currentLocation.lng = lng;
+            currentLocation.address = '当前位置'
+            userHomeAddress.value = '当前位置'
+
+            // 地图是否打开不影响列表更新
+            localStorage.setItem('userLocation', JSON.stringify({
+                lat,
+                lng,
+                address: currentLocation.address
+            }))
+            reloadListForLocation()
+
+            if (map) {
+                map.setCenter([lng, lat], true);
+                map.setZoom(15, true);
+                updateMapMarkers()
+            }
+
+            // 地图已加载时再补全详细地址，失败不影响列表
+            if (AMapInstance) {
+                try {
+                    const geocoder = new AMapInstance.Geocoder()
+                    geocoder.getAddress([lng, lat], (status: string, result: any) => {
+                        if (status !== 'complete' || !result.regeocode) return
+
+                        currentLocation.address = result.regeocode.formattedAddress
+                        userHomeAddress.value = result.regeocode.formattedAddress
+                        localStorage.setItem('userLocation', JSON.stringify({
+                            lat,
+                            lng,
+                            address: currentLocation.address
+                        }))
+                    })
+                } catch (error) {
+                    console.error('逆地理编码失败:', error)
+                }
+            }
+
+            ElMessage.success('位置获取成功');
+        },
+        // 失败回调
+        (error) => {
+            // console.error('定位失败:', error);
+            let errorMsg = '位置获取失败';
+
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMsg = '请前往设置中允许请求位置信息';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMsg = '位置信息不可用';
+                    break;
+                case error.TIMEOUT:
+                    errorMsg = '获取位置信息超时';
+                    break;
+            }
+
+            ElMessage.error(errorMsg);
+
+            // 定位失败时，尝试使用用户默认地址
+            getUserHomeAddress();
+        },
+        // 选项
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000,
+        },
+    );
+}
+
+let hasFittedInitialMarkers = false
+// 地图只在第一次有点位时适配范围
+const updateMapMarkers = () => {
+    if (!map) return;
+    syncUserMarker();
+    syncFosterMarkers(fosterHomes.value)
+    if (!hasFittedInitialMarkers && fosterMarkerById.size > 0) {
+        fitMapToMarkers()
+        hasFittedInitialMarkers = true
+    }
+}
+// 封装创建Marker的方法
+const createFosterMarker = (foster: FosterHome) => {
+    const marker = new AMapInstance.Marker({
+        position: [foster.lng, foster.lat],
+        content: renderFosterMarkerContent(foster),
+        offset: new AMapInstance.Pixel(-50, -30),
+        extData: foster,
+    })
+
+    marker.on('click', () => {
+        // 点击后重新获取marker的坐标，避免创建后marker位置更新影响点击后的显示
+        const position = marker.getPosition()
+
+        if (!position) return
+        focusOnMarker(position.getLng(), position.getLat())
+    })
+
+    return marker
+}
+const renderFosterMarkerContent = (foster: FosterHome) => {
+    const element = document.createElement('div')
+
+    element.textContent = foster.name
+    element.style.backgroundColor = '#ff6b8c'
+    element.style.border = '2px solid white'
+    element.style.borderRadius = '20px'
+    element.style.padding = '5px 10px'
+    element.style.color = 'white'
+    element.style.fontSize = '12px'
+    element.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)'
+    element.style.whiteSpace = 'nowrap'
+
+    return element
+}
+// 坐标校验，避免null,NaN,非法的经纬度传给AMap
+const isValidCoordinate = (lng: number, lat: number) => {
+    const isFiniteNumber = (value: number) =>
+        Number.isFinite(value)
+
+    if (!isFiniteNumber(lng) || !isFiniteNumber(lat)) {
+        return false
+    }
+
+    // 排除明显的无效坐标
+    if (lng === 0 && lat === 0) {
+        return false
+    }
+
+    return lng >= -180 && lng <= 180
+        && lat >= -90 && lat <= 90
+}
+// 增删改同步逻辑
+const syncFosterMarkers = (nextHomes: FosterHome[]) => {
+    if (!map) return
+
+    const nextIds = new Set<number>()
+
+    for (const foster of nextHomes) {
+        if (!isValidCoordinate(foster.lng, foster.lat)) continue
+
+        nextIds.add(foster.id)
+        const signature = getFosterMarkerSignature(foster)
+        const existingMarker = fosterMarkerById.get(foster.id)
+
+        // 1. 新增
+        if (!existingMarker) {
+            const marker = createFosterMarker(foster)
+            marker.setMap(map)
+            fosterMarkerById.set(foster.id, marker)
+            fosterSignatureById.set(foster.id, signature)
+            continue
+        }
+
+        // 2. 数据变化时更新
+        if (fosterSignatureById.get(foster.id) !== signature) {
+            existingMarker.setPosition([foster.lng, foster.lat])
+            existingMarker.setContent(renderFosterMarkerContent(foster))
+            existingMarker.setExtData(foster)
+            fosterSignatureById.set(foster.id, signature)
+        }
+    }
+
+    // 3. 删除已不在列表中的 Marker
+    for (const [id, marker] of fosterMarkerById) {
+        if (nextIds.has(id)) continue
+
+        marker.setMap(null)
+        fosterMarkerById.delete(id)
+        fosterSignatureById.delete(id)
+    }
+}
+const renderUserMarkerContent = () => {
+    const element = document.createElement('div')
+
+    element.textContent = '我'
+    element.style.width = '24px'
+    element.style.height = '24px'
+    element.style.display = 'flex'
+    element.style.alignItems = 'center'
+    element.style.justifyContent = 'center'
+    element.style.backgroundColor = '#FF6B6B'
+    element.style.border = '2px solid white'
+    element.style.borderRadius = '50%'
+    element.style.color = 'white'
+    element.style.fontSize = '12px'
+    element.style.boxShadow = '0 2px 6px rgba(0,0,0,0.3)'
+
+    return element
+}
+const syncUserMarker = () => {
+    if (!map) return
+
+    const position: [number, number] = [
+        currentLocation.lng,
+        currentLocation.lat,
+    ]
+
+    if (!userMarker) {
+        userMarker = new AMapInstance.Marker({
+            position,
+            content: renderUserMarkerContent(),
+            offset: new AMapInstance.Pixel(-12, -12),
+        })
+        userMarker.setMap(map)
+        return
+    }
+
+    userMarker.setPosition(position)
+}
+
+const fitMapToMarkers = () => {
+    if (!map || fosterMarkerById.size === 0) return;
+
+    // 收集所有标记的经纬度
+    const bounds = new AMapInstance.Bounds();
+    fosterMarkerById.forEach((marker) => {
+        const position = marker.getPosition()
+
+        if (position) {
+            bounds.extend(position)
+        }
+    });
+
+    // 适配范围（添加padding避免标记贴边）
+    map.setBounds(bounds, false, [20, 20, 20, 20]);
+};
+//聚焦地址
+const focusOnMarker = (lng: number, lat: number) => {
+
+    if (map && lng && lat && !isNaN(lng) && !isNaN(lat)) {
+        map.setCenter([lng, lat]);
+        map.setZoom(16);
+    }
+    scrollToTop();
+}
+// 请求寄养列表
+const load = async () => {
+    console.log('准备请求数据');
+    if (currentLocation.lat === 0 && currentLocation.lng === 0) {
+        ElMessage.warning('请先完成定位后再操作');
+        return;
+    }
+    if (loading.value || !hasMore.value) return;
+    loading.value = true;
+    console.log('requestParams:', requestParams.value)
+
+    try {
+        if (initialFixture) {
+            const response = await fetch(`/fixtures/foster-homes/${initialFixture}.json`, {
+                cache: 'no-store',
+            })
+            if (!response.ok) {
+                throw new Error(`Fixture 加载失败: HTTP ${response.status}`)
+            }
+            const fixtureList = (await response.json()) as FosterHome[]
+            const fixtureHomes = sortFosterHomes(
+                fixtureList.filter((item) => {
+                    return (
+                        filters.fosterTypes.includes(item.type) &&
+                        item.price >= filters.priceRange[0] &&
+                        item.price <= filters.priceRange[1]
+                    )
+                }),
+            )
+            fosterHomes.value = fixtureHomes
+            total.value = fixtureHomes.length
+            hasMore.value = false
+            currentPage.value = 1
+            updateMapMarkers()
+            return
+        }
+
+        const response = await request(
+            '/server/api/foster/provider/listByPage',
+            'POST',
+            requestParams.value,
+        );
+        console.log('查询结果:', response);
+        if (response.code === 0) {
+            let newList = response.data.list || [];
+            newList = newList.filter((item: FosterHome) => {
+                return item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1];
+            });
+            newList = sortFosterHomes(newList);
+            if (currentPage.value === 1) {
+                console.log("是第一页")
+                fosterHomes.value = newList
+            } else {
+                fosterHomes.value = [...fosterHomes.value, ...newList]
+            }
+            total.value = response.data.total;
+
+            // 判断是否还有更多数据
+            hasMore.value = fosterHomes.value.length < response.data.total;
+            if (hasMore.value) {
+                currentPage.value++;
+
+            } else {
+                // ElMessage.info('已加载全部数据');
+            }
+
+            // 更新地图标记
+            updateMapMarkers();
+        } else {
+            ElMessage.error(response.msg || '获取数据失败');
+        }
+    } catch (error) {
+        console.error('请求失败:', error);
+        ElMessage.error('获取寄养列表失败，请稍后重试');
+    } finally {
+        loading.value = false;
+        if (pendingLocationReload) {
+            pendingLocationReload = false
+            nextTick(() => {
+                load()
+            })
+        }
+    }
+}
+//虚拟列表滚动
+const listScrollRef = ref<HTMLElement | null>(null)
+const columnCount = ref(1)
+// 按行虚拟化
+const rows = computed(() => {
+    const result: FosterHome[][] = []
+    const size = columnCount.value
+
+    for (let index = 0; index < fosterHomes.value.length; index += size) {
+        result.push(
+            fosterHomes.value.slice(index, index + size),
+        )
+    }
+
+    return result
+})
+
+// 适配移动端（1列）和桌面端（2列）
+let listResizeObserver: ResizeObserver | null = null
+
+const updateColumnCount = (width: number) => {
+    columnCount.value = width >= 900 ? 2 : 1
+}
+// 创建虚拟器
+const virtualizerOptions = computed(() => ({
+    count: rows.value.length,
+    getScrollElement: () => listScrollRef.value,
+    estimateSize: () => 270,
+    overscan: 3,
+    getItemKey: (index: number) => {
+        return rows.value[index]
+            ?.map((item) => item.id)
+            .join(':') ?? index
+    },
+}))
+const measureVirtualRow = (
+    element: Element | ComponentPublicInstance | null,
+) => {
+    if (element instanceof Element) {
+        rowVirtualizer.value.measureElement(element)
+    }
+}
+const rowVirtualizer = useVirtualizer(virtualizerOptions)
+const resetListScroll = () => {
+    listScrollRef.value?.scrollTo({
+        top: 0,
+        behavior: 'auto',
+    })
+}
+// 搜索处理
+const handleSearch = () => {
+    resetListScroll()
+    currentPage.value = 1; // 重置为第一页
+    hasMore.value = true;
+    load();
+}
+
+// 筛选条件变化
+const handleFilterChange = () => {
+    resetListScroll()
+    currentPage.value = 1;
+    hasMore.value = true;
+    load();
+}
+
+// 半径变化（防抖处理）
+const handleRadiusInput = () => {
+
+    handleRadiusConfirm(); // 防抖后执行请求
+
+};
+const handleRadiusConfirm = () => {
+    resetListScroll()
+    currentPage.value = 1;
+    hasMore.value = true;
+    load();
+};
+// 排序变化
+const handleSortChange = () => {
+    resetListScroll()
+    currentPage.value = 1;
+    hasMore.value = true;
+    load();
+}
+
+// 排序处理函数（根据选中的排序类型排序）
+const sortFosterHomes = (list: FosterHome[]) => {
+    const sortedList = [...list]; // 深拷贝避免修改原数组
+    switch (sortOption.value) {
+        case 'rating': // 评分最高（降序）
+            sortedList.sort((a, b) => b.rating - a.rating);
+            break;
+        case 'price': // 价格最低（升序）
+            sortedList.sort((a, b) => a.price - b.price);
+            break;
+        case 'comprehensive': // 综合排序（默认按id/距离）
+        default:
+            sortedList.sort((a, b) => a.id - b.id); // 或按距离排序：a.distance - b.distance
+            break;
+    }
+    return sortedList;
+};
+
+// 重置筛选
+const resetFilters = () => {
+    searchKeyword.value = ''
+    filters.fosterTypes = [...initialFosterTypes]
+    filters.petTypes = []
+    filters.priceRange = [0, 200]
+    filters.radius = initialRadius
+    sortOption.value = 'comprehensive'
+    // 重置分页状态
+    currentPage.value = 1
+    hasMore.value = true
+    load()
+}
+const scrollToTop = () => {
+    if (scrollContainer.value) {
+        scrollContainer.value.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    } else {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        })
+    }
+}
+// 查看详情
+
+const viewDetails = (foster: FosterHome) => {
+    router.push({ name: 'fosterDetail', params: { id: foster.id } });
+}
+
+// 组件挂载时先加载列表，地图等待用户主动打开
+onMounted(() => {
+    nextTick(() => {
+        let hasValidStoredLocation = false
+        const storedLocation = localStorage.getItem('userLocation')
+
         if (storedLocation) {
             try {
-                const location = JSON.parse(storedLocation);
-                currentLocation.lat = location.lat;
-                currentLocation.lng = location.lng;
-                currentLocation.address = location.address;
-                userHomeAddress.value = location.address;
-
-                // 移动地图中心到存储的位置
-                if (map) {
-                    map.setCenter([location.lng, location.lat], true);
-                    map.setZoom(15, true);
-                }
-
-                // 初始化请求数据
-                nextTick(() => {
-                    load();
-                });
-
-                console.log('使用存储的位置信息');
-                return;
+                const location = JSON.parse(storedLocation)
+                hasValidStoredLocation =
+                    Number.isFinite(location.lat) &&
+                    Number.isFinite(location.lng)
             } catch (error) {
-                console.error('解析存储的位置信息失败:', error);
-                // 解析失败，继续执行定位
+                console.error('解析存储的位置信息失败:', error)
             }
         }
 
-        if (!navigator.geolocation) {
-            ElMessage.error('您的浏览器不支持地理定位');
-            // 如果不支持地理定位，尝试使用用户默认地址
-            getUserHomeAddress();
-            return;
+        if (!hasValidStoredLocation) {
+            Object.assign(currentLocation, defaultLocation)
+            userHomeAddress.value = defaultLocation.address
+            reloadListForLocation()
         }
+        if (!listScrollRef.value) return
 
-        ElMessage.info('正在获取您的位置...');
+        updateColumnCount(listScrollRef.value.clientWidth)
 
-        navigator.geolocation.getCurrentPosition(
-            // 成功回调
-            async (position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
+        listResizeObserver = new ResizeObserver((entries) => {
+            const entry = entries[0]
+            if (!entry) return
 
-                currentLocation.lat = lat;
-                currentLocation.lng = lng;
+            const nextColumnCount =
+                entry.contentRect.width >= 900 ? 2 : 1
 
-                // 使用高德逆地理编码获取地址
-                try {
-                    const geocoder = new AMapInstance.Geocoder();
-                    geocoder.getAddress([lng, lat], (status: string, result: any) => {
-                        if (status === 'complete' && result.regeocode) {
-                            currentLocation.address = result.regeocode.formattedAddress;
-                            userHomeAddress.value = result.regeocode.formattedAddress;
-                        } else {
-                            currentLocation.address = '位置获取成功';
-                            userHomeAddress.value = '位置获取成功';
-                        }
+            if (nextColumnCount === columnCount.value) return
 
-                        // 存储位置信息到localStorage
-                        localStorage.setItem('userLocation', JSON.stringify({
-                            lat: currentLocation.lat,
-                            lng: currentLocation.lng,
-                            address: currentLocation.address
-                        }));
+            columnCount.value = nextColumnCount
 
-                        // 移动地图中心到当前位置，设置合适的缩放级别
-                        map.setCenter([lng, lat], true);
-                        map.setZoom(15, true); // 显示当前位置所在的区域
-
-                        // 初始化请求数据
-                        nextTick(() => {
-                            load();
-                        });
-
-                        ElMessage.success('位置获取成功');
-                    });
-                } catch (error) {
-                    console.error('逆地理编码失败:', error);
-                    currentLocation.address = '位置获取成功';
-                    userHomeAddress.value = '位置获取成功';
-
-                    // 存储位置信息到localStorage
-                    localStorage.setItem('userLocation', JSON.stringify({
-                        lat: currentLocation.lat,
-                        lng: currentLocation.lng,
-                        address: currentLocation.address
-                    }));
-
-                    // 移动地图中心到当前位置
-                    map.setCenter([lng, lat], true);
-                    map.setZoom(15, true);
-
-                    // 初始化请求数据
-                    nextTick(() => {
-                        load();
-                    });
-
-                    ElMessage.success('位置获取成功');
-                }
-            },
-            // 失败回调
-            (error) => {
-                // console.error('定位失败:', error);
-                let errorMsg = '位置获取失败';
-
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMsg = '请前往设置中允许请求位置信息';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMsg = '位置信息不可用';
-                        break;
-                    case error.TIMEOUT:
-                        errorMsg = '获取位置信息超时';
-                        break;
-                }
-
-                ElMessage.error(errorMsg);
-
-                // 定位失败时，尝试使用用户默认地址
-                getUserHomeAddress();
-            },
-            // 选项
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 60000,
-            },
-        );
-    }
-
-
-    // 更新地图标记
-    const updateMapMarkers = () => {
-        if (!map) return;
-
-        // 清除现有标记
-        markers.forEach((marker: any
-
-        ) => marker.remove && marker.remove());
-        markers = [];
-
-        // 添加用户位置标记
-        if (currentLocation.lat && currentLocation.lng && !isNaN(currentLocation.lat) && !isNaN(currentLocation.lng)) {
-            console.log('添加用户位置标记:', currentLocation);
-            const userMarker = new AMapInstance.Marker({
-                position: [currentLocation.lng, currentLocation.lat],
-                content: `
-                <div style="
-                    background: #FF6B6B;
-                    border: 2px solid white;
-                    border-radius: 50%;
-                    width: 24px;
-                    height: 24px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                ">
-                    <span style="color:white;font-size:12px;">📍</span>
-                </div>
-            `,
-                offset: new AMapInstance.Pixel(-12, -12)
-            });
-            userMarker.on('click', () => focusOnMarker(currentLocation.lng, currentLocation.lat));
-            markers.push(userMarker);
-            map.add(userMarker);
-        }
-
-        // 添加寄养家庭标记
-        fosterHomes.value.forEach(foster => {
-            if (!foster.lng || !foster.lat || isNaN(foster.lng) || isNaN(foster.lat)) {
-                console.warn(`寄养家庭 ${foster.name} 经纬度无效，跳过标记`);
-                return;
-            }
-
-
-            const marker = new AMapInstance.Marker({
-                position: [foster.lng, foster.lat],
-                content: `
-                <div style="
-                    background-color:#ff6b8c;
-                    border: 2px solid white;
-                    border-radius: 20px;
-                    padding: 5px 10px;
-                    color: white;
-                    font-size: 12px;
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-                ">
-                    ${foster.name}
-                </div>
-            `,
-                offset: new AMapInstance.Pixel(-50, -30)
-            });
-            marker.on('click', () => focusOnMarker(foster.lng, foster.lat));
-            markers.push(marker);
-            map.add(marker);
-        });
-        fitMapToMarkers();
-    }
-
-    const fitMapToMarkers = () => {
-        if (!map || markers.length === 0) return;
-
-        // 收集所有标记的经纬度
-        const bounds = new AMapInstance.Bounds();
-        markers.forEach((marker: any
-
-        ) => {
-            bounds.extend(marker.getPosition());
-        });
-
-        // 适配范围（添加padding避免标记贴边）
-        map.setBounds(bounds, false, [20, 20, 20, 20]);
-    };
-    //聚焦地址
-    const focusOnMarker = (lng, lat) => {
-
-        if (map && lng && lat && !isNaN(lng) && !isNaN(lat)) {
-            map.setCenter([lng, lat]);
-            map.setZoom(16);
-        }
-        scrollToTop();
-    }
-    // 请求寄养列表
-    const load = async () => {
-        console.log('准备请求数据');
-        if (currentLocation.lat === 0 && currentLocation.lng === 0) {
-            ElMessage.warning('请先完成定位后再操作');
-            return;
-        }
-        if (loading.value || !hasMore.value) return;
-        loading.value = true;
-        console.log('requestParams:', requestParams.value)
-
-        try {
-
-            const response = await request(
-                '/server/api/foster/provider/listByPage',
-                'POST',
-                requestParams.value,
-            );
-            console.log('查询结果:', response);
-            if (response.code === 0) {
-                let newList = response.data.list || [];
-                newList = newList.filter((item: FosterHome) => {
-                    return item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1];
-                });
-                newList = sortFosterHomes(newList);
-                if (currentPage.value === 1) {
-                    console.log("是第一页")
-                    fosterHomes.value = newList
-                } else {
-                    fosterHomes.value = [...fosterHomes.value, ...newList]
-                }
-                total.value = response.data.total;
-
-                // 判断是否还有更多数据
-                hasMore.value = fosterHomes.value.length < response.data.total;
-                if (hasMore.value) {
-                    currentPage.value++;
-
-                } else {
-                    // ElMessage.info('已加载全部数据');
-                }
-
-                // 更新地图标记
-                updateMapMarkers();
-            } else {
-                ElMessage.error(response.msg || '获取数据失败');
-            }
-        } catch (error) {
-            console.error('请求失败:', error);
-            ElMessage.error('获取寄养列表失败，请稍后重试');
-        } finally {
-            loading.value = false;
-        }
-    }
-
-
-
-    // 搜索处理
-    const handleSearch = () => {
-        currentPage.value = 1; // 重置为第一页
-        hasMore.value = true;
-        load();
-    }
-
-    // 筛选条件变化
-    const handleFilterChange = () => {
-        currentPage.value = 1;
-        hasMore.value = true;
-        load();
-    }
-
-    // 半径变化（防抖处理）
-    const handleRadiusInput = () => {
-
-        handleRadiusConfirm(); // 防抖后执行请求
-
-    };
-    const handleRadiusConfirm = () => {
-        currentPage.value = 1;
-        hasMore.value = true;
-        load();
-    };
-    // 排序变化
-    const handleSortChange = () => {
-        currentPage.value = 1;
-        hasMore.value = true;
-        load();
-    }
-
-    // 排序处理函数（根据选中的排序类型排序）
-    const sortFosterHomes = (list: FosterHome[]) => {
-        const sortedList = [...list]; // 深拷贝避免修改原数组
-        switch (sortOption.value) {
-            case 'rating': // 评分最高（降序）
-                sortedList.sort((a, b) => b.rating - a.rating);
-                break;
-            case 'price': // 价格最低（升序）
-                sortedList.sort((a, b) => a.price - b.price);
-                break;
-            case 'comprehensive': // 综合排序（默认按id/距离）
-            default:
-                sortedList.sort((a, b) => a.id - b.id); // 或按距离排序：a.distance - b.distance
-                break;
-        }
-        return sortedList;
-    };
-
-    // 重置筛选
-    const resetFilters = () => {
-        searchKeyword.value = ''
-        filters.fosterTypes = [...initialFosterTypes]
-        filters.petTypes = []
-        filters.priceRange = [0, 200]
-        filters.radius = initialRadius
-        sortOption.value = 'comprehensive'
-        // 重置分页状态
-        currentPage.value = 1
-        hasMore.value = true
-        load()
-    }
-    const scrollToTop = () => {
-        if (scrollContainer.value) {
-            scrollContainer.value.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+            nextTick(() => {
+                rowVirtualizer.value.measure()
+                resetListScroll()
             })
-        } else {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            })
-        }
-    }
-    // 查看详情
+        })
 
-    const viewDetails = (foster: FosterHome) => {
-        router.push({ name: 'fosterDetail', params: { id: foster.id } });
-    }
-
-    // 组件挂载时初始化地图
-    onMounted(() => {
-        nextTick(() => {
-            initMap();
-            // parseAddressToLatLng("河南省郑州市中原区正商花语里");
-        });
+        listResizeObserver.observe(listScrollRef.value)
+        locateUserPosition();
     });
+});
+// 离开页面清理地图和Marker
+onUnmounted(() => {
+    fosterMarkerById.forEach((marker) => marker.setMap(null))
+    fosterMarkerById.clear()
+    fosterSignatureById.clear()
+
+    userMarker?.setMap(null)
+    userMarker = null
+
+    map?.destroy()
+    map = null
+    AMapInstance = null
+    listResizeObserver?.disconnect()
+    listResizeObserver = null
+})
 
 
 </script>
@@ -1252,5 +1481,33 @@ const parseAddressToLatLng = async (address: string) => {
     font-size: 14px;
     font-weight: 500;
     color: #333;
+}
+
+.virtual-list {
+    height: min(70vh, 640px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    contain: strict;
+}
+
+.virtual-list__inner {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.virtual-list__row {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding-bottom: 16px;
+}
+
+.virtual-list__grid {
+    display: grid;
+    gap: 16px;
 }
 </style>

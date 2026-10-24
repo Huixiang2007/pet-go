@@ -1,0 +1,332 @@
+[
+  {
+    "id": 100001,
+    "name": "测试寄养机构-001",
+    "cover": "",
+    "type": "机构",
+    "lat": 35.29317,
+    "lng": 113.920251,
+    "address": "河南省新乡市红旗区测试路1号",
+    "rating": 4,
+    "reviewCount": 5,
+    "price": 122,
+    "petTypes": [
+      "猫",
+      "狗"
+    ],
+    "distance": 1.25
+  },
+  {
+    "id": 100002,
+    "name": "测试寄养家庭-002",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.307436,
+    "lng": 113.898611,
+    "address": "河南省新乡市红旗区测试路2号",
+    "rating": 3.5,
+    "reviewCount": 3,
+    "price": 118,
+    "petTypes": [
+      "狗"
+    ],
+    "distance": 2.61
+  },
+  {
+    "id": 100003,
+    "name": "测试寄养家庭-003",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.341093,
+    "lng": 113.940828,
+    "address": "河南省新乡市红旗区测试路3号",
+    "rating": 3.4,
+    "reviewCount": 3,
+    "price": 161,
+    "petTypes": [
+      "兔",
+      "鸟"
+    ],
+    "distance": 4.43
+  },
+  {
+    "id": 100004,
+    "name": "测试寄养机构-004",
+    "cover": "",
+    "type": "机构",
+    "lat": 35.282302,
+    "lng": 113.915466,
+    "address": "河南省新乡市红旗区测试路4号",
+    "rating": 4.6,
+    "reviewCount": 3,
+    "price": 115,
+    "petTypes": [
+      "鸟"
+    ],
+    "distance": 2.52
+  },
+  {
+    "id": 100005,
+    "name": "测试寄养家庭-005",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.295658,
+    "lng": 113.887161,
+    "address": "河南省新乡市红旗区测试路5号",
+    "rating": 4.8,
+    "reviewCount": 2,
+    "price": 154,
+    "petTypes": [
+      "猫",
+      "狗"
+    ],
+    "distance": 3.69
+  },
+  {
+    "id": 100006,
+    "name": "测试寄养家庭-006",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.304795,
+    "lng": 113.904388,
+    "address": "河南省新乡市红旗区测试路6号",
+    "rating": 3.3,
+    "reviewCount": 1,
+    "price": 119,
+    "petTypes": [
+      "狗"
+    ],
+    "distance": 2.05
+  },
+  {
+    "id": 100007,
+    "name": "测试寄养机构-007",
+    "cover": "",
+    "type": "机构",
+    "lat": 35.264645,
+    "lng": 113.930173,
+    "address": "河南省新乡市红旗区测试路7号",
+    "rating": 4.4,
+    "reviewCount": 1,
+    "price": 73,
+    "petTypes": [
+      "兔",
+      "鸟"
+    ],
+    "distance": 4.28
+  },
+  {
+    "id": 100008,
+    "name": "测试寄养家庭-008",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.301565,
+    "lng": 113.97181,
+    "address": "河南省新乡市红旗区测试路8号",
+    "rating": 4.3,
+    "reviewCount": 5,
+    "price": 143,
+    "petTypes": [
+      "鸟"
+    ],
+    "distance": 4.09
+  },
+  {
+    "id": 100009,
+    "name": "测试寄养家庭-009",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.295751,
+    "lng": 113.925583,
+    "address": "河南省新乡市红旗区测试路9号",
+    "rating": 3.8,
+    "reviewCount": 1,
+    "price": 124,
+    "petTypes": [
+      "猫",
+      "狗"
+    ],
+    "distance": 0.81
+  },
+  {
+    "id": 100010,
+    "name": "测试寄养机构-010",
+    "cover": "",
+    "type": "机构",
+    "lat": 35.316117,
+    "lng": 113.902419,
+    "address": "河南省新乡市红旗区测试路10号",
+    "rating": 3.6,
+    "reviewCount": 4,
+    "price": 91,
+    "petTypes": [
+      "狗"
+    ],
+    "distance": 2.65
+  },
+  {
+    "id": 100011,
+    "name": "测试寄养家庭-011",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.302066,
+    "lng": 113.910132,
+    "address": "河南省新乡市红旗区测试路11号",
+    "rating": 3.7,
+    "reviewCount": 3,
+    "price": 198,
+    "petTypes": [
+      "兔",
+      "鸟"
+    ],
+    "distance": 1.52
+  },
+  {
+    "id": 100012,
+    "name": "测试寄养家庭-012",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.280249,
+    "lng": 113.951337,
+    "address": "河南省新乡市红旗区测试路12号",
+    "rating": 3.6,
+    "reviewCount": 4,
+    "price": 106,
+    "petTypes": [
+      "鸟"
+    ],
+    "distance": 3.37
+  },
+  {
+    "id": 100013,
+    "name": "测试寄养机构-013",
+    "cover": "",
+    "type": "机构",
+    "lat": 35.331625,
+    "lng": 113.937924,
+    "address": "河南省新乡市红旗区测试路13号",
+    "rating": 3.6,
+    "reviewCount": 2,
+    "price": 69,
+    "petTypes": [
+      "猫",
+      "狗"
+    ],
+    "distance": 3.34
+  },
+  {
+    "id": 100014,
+    "name": "测试寄养家庭-014",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.298229,
+    "lng": 113.904235,
+    "address": "河南省新乡市红旗区测试路14号",
+    "rating": 4,
+    "reviewCount": 1,
+    "price": 62,
+    "petTypes": [
+      "狗"
+    ],
+    "distance": 2.12
+  },
+  {
+    "id": 100015,
+    "name": "测试寄养家庭-015",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.296245,
+    "lng": 113.919578,
+    "address": "河南省新乡市红旗区测试路15号",
+    "rating": 4.4,
+    "reviewCount": 1,
+    "price": 141,
+    "petTypes": [
+      "兔",
+      "鸟"
+    ],
+    "distance": 1
+  },
+  {
+    "id": 100016,
+    "name": "测试寄养机构-016",
+    "cover": "",
+    "type": "机构",
+    "lat": 35.298738,
+    "lng": 113.955746,
+    "address": "河南省新乡市红旗区测试路16号",
+    "rating": 3.2,
+    "reviewCount": 3,
+    "price": 52,
+    "petTypes": [
+      "鸟"
+    ],
+    "distance": 2.67
+  },
+  {
+    "id": 100017,
+    "name": "测试寄养家庭-017",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.303188,
+    "lng": 113.886769,
+    "address": "河南省新乡市红旗区测试路17号",
+    "rating": 4.9,
+    "reviewCount": 3,
+    "price": 74,
+    "petTypes": [
+      "猫",
+      "狗"
+    ],
+    "distance": 3.64
+  },
+  {
+    "id": 100018,
+    "name": "测试寄养家庭-018",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.269907,
+    "lng": 113.927202,
+    "address": "河南省新乡市红旗区测试路18号",
+    "rating": 4.4,
+    "reviewCount": 5,
+    "price": 143,
+    "petTypes": [
+      "狗"
+    ],
+    "distance": 3.68
+  },
+  {
+    "id": 100019,
+    "name": "测试寄养机构-019",
+    "cover": "",
+    "type": "机构",
+    "lat": 35.328157,
+    "lng": 113.956907,
+    "address": "河南省新乡市红旗区测试路19号",
+    "rating": 3.5,
+    "reviewCount": 5,
+    "price": 159,
+    "petTypes": [
+      "兔",
+      "鸟"
+    ],
+    "distance": 3.91
+  },
+  {
+    "id": 100020,
+    "name": "测试寄养家庭-020",
+    "cover": "",
+    "type": "个人",
+    "lat": 35.342248,
+    "lng": 113.915143,
+    "address": "河南省新乡市红旗区测试路20号",
+    "rating": 3.9,
+    "reviewCount": 5,
+    "price": 150,
+    "petTypes": [
+      "鸟"
+    ],
+    "distance": 4.5
+  }
+]

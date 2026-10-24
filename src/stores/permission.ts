@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import type { StoreDefinition } from 'pinia'
 import type { RouteRecordRaw } from 'vue-router'
 import { staticRoutes } from '@/router/staticRoutes'
 import { asyncRoutes } from '@/router/asyncRoutes'
@@ -11,7 +12,22 @@ interface PermissionState {
   isRoutesLoaded: boolean
 }
 
-export const usePermissionStore = defineStore('permission', {
+interface PermissionGetters {
+  sidebarRoutes: (state: PermissionState) => RouteRecordRaw[]
+}
+
+interface PermissionActions {
+  setRoutes: (routes: RouteRecordRaw[]) => void
+  generateRoutes: (roles: string[]) => Promise<RouteRecordRaw[]>
+  resetRoutes: () => void
+}
+
+export const usePermissionStore: StoreDefinition<
+  'permission',
+  PermissionState,
+  PermissionGetters,
+  PermissionActions
+> = defineStore('permission', {
   state: (): PermissionState => ({
     routes: [], //完整路由列表
     addRoutes: [], //动态添加的路由

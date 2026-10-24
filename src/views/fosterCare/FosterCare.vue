@@ -149,10 +149,9 @@
                             <h2 class="text-xl font-bold text-blue-500 mb-4">附近的寄养家庭</h2>
 
                             <!-- 无限滚动列表 -->
-                            <div class="infinite-list-wrapper virtual-list" ref="listScrollRef"
-                                v-infinite-scroll="load">
-                                <ul class="list virtual-list__inner" :infinite-scroll-disabled="disabled"
-                                    :infinite-scroll-immediate="false"
+                            <div class="infinite-list-wrapper virtual-list" ref="listScrollRef" v-infinite-scroll="load"
+                                :infinite-scroll-disabled="disabled" :infinite-scroll-immediate="false">
+                                <ul class=" list virtual-list__inner"
                                     :style="{ height: `${rowVirtualizer.getTotalSize()}px` }">
                                     <li v-for="virtualRow in rowVirtualizer.getVirtualItems()"
                                         :key="String(virtualRow.key)" :ref="measureVirtualRow"
@@ -163,7 +162,11 @@
                                             gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))`,
                                         }">
                                             <article v-for="foster in rows[virtualRow.index] ?? []" :key="foster.id"
-                                                class="list-item" @click="focusOnMarker(foster.lng, foster.lat)">
+                                                class="list-item border border-blue-100 rounded-xl p-4
+hover:shadow-md transition-all duration-300
+bg-blue-50/30 hover:bg-blue-50/50 cursor-pointer" @click="selectFoster(foster, 'list')" :class="{
+    'list-item--selected': selectedFosterId === foster.id,
+}">
                                                 <!-- 上面 -->
                                                 <div class="flex">
                                                     <!-- 左侧 -->
@@ -279,7 +282,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, nextTick, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick, onUnmounted, watch } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 import { ElMessage, ElLoading, } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
@@ -299,26 +302,7 @@ declare global {
 const router = useRouter();
 const route = useRoute();
 
-const readQueryValue = (value: unknown) => {
-    if (Array.isArray(value)) return value[0]
-    return typeof value === 'string' ? value : ''
-}
 
-const initialFosterTypes = readQueryValue(route.query.types) === 'all'
-    ? ['个人', '机构']
-    : ['个人']
-const requestedRadius = Number(readQueryValue(route.query.radius))
-const initialRadius = Number.isFinite(requestedRadius) && requestedRadius > 0
-    ? String(requestedRadius)
-    : '100'
-const requestedFixture = Number(readQueryValue(route.query.fixture))
-const initialFixture = import.meta.env.DEV && [20, 100, 500].includes(requestedFixture)
-    ? requestedFixture
-    : 0
-
-const goToPerson = () => {
-    router.push({ path: '/persons' })
-}
 // 地图相关
 const mapContainer = ref<HTMLElement>()
 let map: any = null
@@ -340,6 +324,21 @@ const fosterMarkerById = new Map<number, AMap.Marker>();
 // 保存构建 Marker 所需数据的摘要，用于判断是否需要更新
 const fosterSignatureById = new Map<number, string>();
 
+//统一选中状态
+
+// 当前选中的寄养点
+const selectedFosterId = ref<number | null>(null)
+// 地图还没加载完时，暂存待聚焦坐标
+const pendingMapFocus = ref<{
+    lng: number
+    lat: number
+} | null>(null)
+// 选中点对应的完整数据
+// const selectedFoster = computed(() => {
+//     return fosterHomes.value.find(
+//         (item) => item.id === selectedFosterId.value,
+//     ) ?? null
+// })
 
 // 用户家庭住址相关
 const userHomeAddress = ref('')
@@ -366,8 +365,52 @@ const fosterHomes = ref<FosterHome[]>([])
 //回到顶部
 const showBackToTop = ref(false)
 const scrollContainer = ref<HTMLElement | null>(null)
+//查询参数相关
+const readQueryValue = (value: unknown) => {
+    if (Array.isArray(value)) return value[0]
+    return typeof value === 'string' ? value : ''
+}
 
+const initialFosterTypes = readQueryValue(route.query.types) === 'all'
+    ? ['个人', '机构']
+    : ['个人']
+const requestedRadius = Number(readQueryValue(route.query.radius))
+const initialRadius = Number.isFinite(requestedRadius) && requestedRadius > 0
+    ? String(requestedRadius)
+    : '100'
+const requestedFixture = Number(readQueryValue(route.query.fixture))
+const initialFixture = import.meta.env.DEV && [20, 100, 500].includes(requestedFixture)
+    ? requestedFixture
+    : 0
 
+// 寄养服务数据
+interface FosterHome {
+    id: number;
+    name: string;
+    cover: string;
+    type: '个人' | '机构';
+    lat: number;
+    lng: number;
+    address: string;
+    rating: number;
+    reviewCount: number;
+    price: number;
+    petTypes: string[];
+    distance: number;
+}
+interface GeocodeResult {
+    geocodes: {
+        location: {
+            lat: number;
+            lng: number;
+        };
+        formattedAddress: string;
+    }[];
+    info: string;
+}
+const goToPerson = () => {
+    router.push({ path: '/persons' })
+}
 // 筛选条件
 const filters = reactive({
     fosterTypes: [...initialFosterTypes],
@@ -394,22 +437,6 @@ const requestParams = computed(() => ({
     name: '',
 }));
 
-// 寄养服务数据
-interface FosterHome {
-    id: number;
-    name: string;
-    cover: string;
-    type: '个人' | '机构';
-    lat: number;
-    lng: number;
-    address: string;
-    rating: number;
-    reviewCount: number;
-    price: number;
-    petTypes: string[];
-    distance: number;
-}
-
 // 判断 Marker 是否需要更新。坐标、名称和价格都没变时，就复用原 Marker
 const getFosterMarkerSignature = (foster: FosterHome) => {
     return [
@@ -429,9 +456,8 @@ const getUserHomeAddress = async () => {
             'POST'
         );
         if (response.code === 0) {
-            console.log('获取用户地址响应:', response.data.detailAddress);
             userHomeAddress.value = response.data.detailAddress;
-            console.log(userHomeAddress.value)
+
             // 获取地址后解析经纬度
             if (mapInitialized.value) {
                 await parseAddressToLatLng(userHomeAddress.value);
@@ -448,17 +474,8 @@ const getUserHomeAddress = async () => {
         loading.close();
     }
 }
-interface GeocodeResult {
-    geocodes: {
-        location: {
-            lat: number;
-            lng: number;
-        };
-        formattedAddress: string;
-    }[];
-    info: string;
-}
-// 选择地址
+
+// 定位不准时用户手动选择地址
 const selectAddress = (address: any) => {
     isConfirming.value = true;
 
@@ -605,7 +622,7 @@ const initMap = async () => {
         AMapInstance = AMap;
         map = new AMap.Map("custom-map-container", {
             viewMode: "3D",
-            zoom: 12,
+            zoom: 15,
             center: [defaultLocation.lng, defaultLocation.lat]
         });
         mapInitialized.value = true;
@@ -618,14 +635,22 @@ const initMap = async () => {
         // 添加地图控件
         map.addControl(new AMap.ToolBar());
         map.addControl(new AMap.Scale());
+        if (pendingMapFocus.value) {
+            const target = pendingMapFocus.value
+            pendingMapFocus.value = null
 
+            focusOnMarker(target.lng, target.lat)
+        }
     } catch (error) {
+        pendingMapFocus.value = null
         const message = error instanceof Error ? error.message : '请检查 API 密钥'
         console.error('地图加载失败:', error);
         mapLoadError.value = `地图加载失败: ${message}`;
     } finally {
         mapLoading.value = false
     }
+
+
 }
 
 const reloadListForLocation = () => {
@@ -780,11 +805,11 @@ const createFosterMarker = (foster: FosterHome) => {
     })
 
     marker.on('click', () => {
-        // 点击后重新获取marker的坐标，避免创建后marker位置更新影响点击后的显示
-        const position = marker.getPosition()
+        const latestFoster = marker.getExtData() as FosterHome
 
-        if (!position) return
-        focusOnMarker(position.getLng(), position.getLat())
+        if (!latestFoster) return
+
+        selectFoster(latestFoster, 'marker')
     })
 
     return marker
@@ -879,6 +904,7 @@ const renderUserMarkerContent = () => {
 
     return element
 }
+// 创建用户Marker
 const syncUserMarker = () => {
     if (!map) return
 
@@ -899,7 +925,7 @@ const syncUserMarker = () => {
 
     userMarker.setPosition(position)
 }
-
+// 将Marker添加到地图中
 const fitMapToMarkers = () => {
     if (!map || fosterMarkerById.size === 0) return;
 
@@ -916,7 +942,7 @@ const fitMapToMarkers = () => {
     // 适配范围（添加padding避免标记贴边）
     map.setBounds(bounds, false, [20, 20, 20, 20]);
 };
-//聚焦地址
+//点击Marker,地图聚焦地址
 const focusOnMarker = (lng: number, lat: number) => {
 
     if (map && lng && lat && !isNaN(lng) && !isNaN(lat)) {
@@ -1009,6 +1035,58 @@ const load = async () => {
         }
     }
 }
+type SelectionSource = 'list' | 'marker'
+// 把列表选中和地图聚焦统一到这一个入口,并根据点击来源决定是否滚动虚拟列表
+const selectFoster = async (
+    foster: FosterHome,
+    source: SelectionSource,
+) => {
+    // 检查坐标是否合法
+    if (!isValidCoordinate(foster.lng, foster.lat)) return
+    // 更新统一选中ID,保证点击后卡片立即显示选中样式
+    selectedFosterId.value = foster.id
+
+    // 地图未加载时，先记录待聚焦目标
+    if (!map) {
+        // 用户如果连续点击多个卡片, 只会聚焦最后一个, 避免重复初始化地图
+        pendingMapFocus.value = {
+            lng: foster.lng,
+            lat: foster.lat,
+        }
+
+        await initMap()
+    } else {
+        focusOnMarker(foster.lng, foster.lat)
+    }
+
+    // Marker 点击后，滚动虚拟列表
+    if (source === 'marker') {
+        // 等待Vue完成当前状态更新
+        await nextTick()
+        // 找到寄养点所在的虚拟行
+        const rowIndex = fosterRowIndexById.value.get(foster.id)
+
+        if (rowIndex !== undefined) {
+            rowVirtualizer.value.scrollToIndex(rowIndex, {
+                align: 'center',
+            })
+        }
+    }
+}
+// 建立寄养点到虚拟行索引的映射
+const fosterRowIndexById = computed(() => {
+    const indexById = new Map<number, number>()
+
+    rows.value.forEach((row, rowIndex) => {
+        row.forEach((foster) => {
+            indexById.set(foster.id, rowIndex)
+        })
+    })
+
+    return indexById
+})
+
+
 //虚拟列表滚动
 const listScrollRef = ref<HTMLElement | null>(null)
 const columnCount = ref(1)
@@ -1093,7 +1171,24 @@ const handleSortChange = () => {
     hasMore.value = true;
     load();
 }
+// 当前选中的寄养点，被新一轮搜索或筛选排除后，不能继续保留旧的选中状态和地图聚焦目标
+watch(
+    () => fosterHomes.value.map((item) => item.id),
+    async (ids) => {
+        if (
+            selectedFosterId.value !== null &&
+            !ids.includes(selectedFosterId.value)
+        ) {
+            selectedFosterId.value = null
+            pendingMapFocus.value = null
+        }
+        resetListScroll()
 
+        await nextTick()
+        // 确保虚拟列表使用新的行数据。
+        rowVirtualizer.value.measure()
+    },
+)
 // 排序处理函数（根据选中的排序类型排序）
 const sortFosterHomes = (list: FosterHome[]) => {
     const sortedList = [...list]; // 深拷贝避免修改原数组
@@ -1509,5 +1604,11 @@ onUnmounted(() => {
 .virtual-list__grid {
     display: grid;
     gap: 16px;
+}
+
+.list-item--selected {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgb(74 144 226 / 20%);
+    background-color: #eff8ff;
 }
 </style>

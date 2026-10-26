@@ -323,7 +323,8 @@ let userMarker: AMap.Marker | null = null;
 const fosterMarkerById = new Map<number, AMap.Marker>();
 // 保存构建 Marker 所需数据的摘要，用于判断是否需要更新
 const fosterSignatureById = new Map<number, string>();
-
+// 聚合实例
+let fosterCluster: any = null
 //统一选中状态
 
 // 当前选中的寄养点
@@ -397,6 +398,11 @@ interface FosterHome {
     price: number;
     petTypes: string[];
     distance: number;
+}
+interface FosterClusterPoint {
+    id: number
+    lnglat: [number, number]
+    extData: FosterHome
 }
 interface GeocodeResult {
     geocodes: {
@@ -614,7 +620,7 @@ const initMap = async () => {
         const AMap = await AMapLoader.load({
             key: "f9a61d8c1043186ca29b9675925160ff",
             version: "2.0",
-            plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder"],
+            plugins: ["AMap.Scale", "AMap.ToolBar", "AMap.Geocoder", "AMap.MarkerCluster"],
         })
 
         if (map || !mapContainer.value) return
@@ -790,8 +796,13 @@ const updateMapMarkers = () => {
     if (!map) return;
     syncUserMarker();
     syncFosterMarkers(fosterHomes.value)
-    if (!hasFittedInitialMarkers && fosterMarkerById.size > 0) {
-        fitMapToMarkers()
+    if (
+        !hasFittedInitialMarkers &&
+        fosterHomes.value.some((foster) =>
+            isValidCoordinate(foster.lng, foster.lat),
+        )
+    ) {
+       fitMapToFosterHomes()
         hasFittedInitialMarkers = true
     }
 }
@@ -829,6 +840,177 @@ const renderFosterMarkerContent = (foster: FosterHome) => {
 
     return element
 }
+// 聚合点样式
+const renderClusterMarkerContent = (count: number) => {
+    const element = document.createElement('div')
+    const size = count >= 100 ? 48 : count >= 10 ? 42 : 36
+
+    element.textContent = String(count)
+    element.title = `${count} 个寄养点`
+    element.style.width = `${size}px`
+    element.style.height = `${size}px`
+    element.style.display = 'flex'
+    element.style.alignItems = 'center'
+    element.style.justifyContent = 'center'
+    element.style.backgroundColor = '#ff6b8c'
+    element.style.border = '3px solid white'
+    element.style.borderRadius = '50%'
+    element.style.color = 'white'
+    element.style.fontSize = '14px'
+    element.style.fontWeight = '700'
+    element.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.28)'
+
+    return element
+}
+// 清除聚合点
+const destroyFosterCluster = () => {
+    if (!fosterCluster) return
+
+    if (typeof fosterCluster.setMap === 'function') {
+        fosterCluster.setMap(null)
+    }
+
+    fosterCluster = null
+}
+// 创建聚合点
+const createFosterCluster = (points: FosterClusterPoint[]) => {
+    if (!map || !AMapInstance?.MarkerCluster) return null
+
+    return new AMapInstance.MarkerCluster(map, points, {
+        gridSize: 60,
+        maxZoom: 18,
+
+        renderClusterMarker: (context: any) => {
+            context.marker.setContent(
+                renderClusterMarkerContent(context.count),
+            )
+
+            if (typeof context.marker.setAnchor === 'function') {
+                context.marker.setAnchor('center')
+            }
+        },
+
+        renderMarker: (context: any) => {
+            const foster = context.data?.[0]?.extData as
+                | FosterHome
+                | undefined
+
+            if (!foster) return
+
+            context.marker.setContent(
+                renderFosterMarkerContent(foster),
+            )
+            context.marker.setExtData(foster)
+
+            if (typeof context.marker.setAnchor === 'function') {
+                context.marker.setAnchor('center')
+            }
+
+            context.marker.on('click', () => {
+                selectFoster(foster, 'marker')
+            })
+        },
+    })
+}
+// 聚合层的统一入口，负责创建、更新、销毁和降级
+const syncFosterCluster = (points: FosterClusterPoint[]) => {
+    if (!map || !AMapInstance?.MarkerCluster) {
+        return false
+    }
+
+    // 当前没有寄养点时，直接销毁聚合实例
+    if (points.length === 0) {
+        destroyFosterCluster()
+        return true
+    }
+
+    // 聚合实例已存在且支持 setData 时，优先增量更新
+    if (fosterCluster && typeof fosterCluster.setData === 'function') {
+        try {
+            fosterCluster.setData(points)
+            return true
+        } catch (error) {
+            console.error('更新地图聚合数据失败，准备重建聚合实例:', error)
+            destroyFosterCluster()
+        }
+    }
+
+    // 第一次创建，或当前版本不支持 setData 时重建
+    destroyFosterCluster()
+
+    try {
+        fosterCluster = createFosterCluster(points)
+        return fosterCluster !== null
+    } catch (error) {
+        console.error('创建地图聚合实例失败:', error)
+        fosterCluster = null
+        return false
+    }
+}
+
+// 判断当前需要哪些 Marker → 调用 syncFosterCluster
+const syncFosterMarkers = (nextHomes: FosterHome[]) => {
+    if (!map) return
+
+    const validHomes = nextHomes.filter((foster) =>
+        isValidCoordinate(foster.lng, foster.lat),
+    )
+
+    const clusterPoints: FosterClusterPoint[] = validHomes.map(
+        (foster) => ({
+            id: foster.id,
+            lnglat: [foster.lng, foster.lat],
+            extData: foster,
+        }),
+    )
+
+    const clusterReady = syncFosterCluster(clusterPoints)
+
+    // 聚合正常时不需要再创建一套普通 Marker
+    if (clusterReady) {
+        fosterMarkerById.forEach((marker) => marker.setMap(null))
+        fosterMarkerById.clear()
+        fosterSignatureById.clear()
+        return
+    }
+
+    // 聚合不可用时的降级逻辑
+    const nextIds = new Set<number>()
+    const removedMarkers: AMap.Marker[] = []
+
+    for (const foster of validHomes) {
+        nextIds.add(foster.id)
+
+        const signature = getFosterMarkerSignature(foster)
+        const existingMarker = fosterMarkerById.get(foster.id)
+
+        if (!existingMarker) {
+            const marker = createFosterMarker(foster)
+
+            marker.setMap(map)
+            fosterMarkerById.set(foster.id, marker)
+            fosterSignatureById.set(foster.id, signature)
+            continue
+        }
+
+        if (fosterSignatureById.get(foster.id) !== signature) {
+            existingMarker.setPosition([foster.lng, foster.lat])
+            existingMarker.setContent(renderFosterMarkerContent(foster))
+            existingMarker.setExtData(foster)
+            fosterSignatureById.set(foster.id, signature)
+        }
+    }
+
+    for (const [id, marker] of fosterMarkerById) {
+        if (nextIds.has(id)) continue
+
+        removedMarkers.push(marker)
+        fosterMarkerById.delete(id)
+        fosterSignatureById.delete(id)
+    }
+
+    removedMarkers.forEach((marker) => marker.setMap(null))
+}
 // 坐标校验，避免null,NaN,非法的经纬度传给AMap
 const isValidCoordinate = (lng: number, lat: number) => {
     const isFiniteNumber = (value: number) =>
@@ -845,46 +1027,6 @@ const isValidCoordinate = (lng: number, lat: number) => {
 
     return lng >= -180 && lng <= 180
         && lat >= -90 && lat <= 90
-}
-// 增删改同步逻辑
-const syncFosterMarkers = (nextHomes: FosterHome[]) => {
-    if (!map) return
-
-    const nextIds = new Set<number>()
-
-    for (const foster of nextHomes) {
-        if (!isValidCoordinate(foster.lng, foster.lat)) continue
-
-        nextIds.add(foster.id)
-        const signature = getFosterMarkerSignature(foster)
-        const existingMarker = fosterMarkerById.get(foster.id)
-
-        // 1. 新增
-        if (!existingMarker) {
-            const marker = createFosterMarker(foster)
-            marker.setMap(map)
-            fosterMarkerById.set(foster.id, marker)
-            fosterSignatureById.set(foster.id, signature)
-            continue
-        }
-
-        // 2. 数据变化时更新
-        if (fosterSignatureById.get(foster.id) !== signature) {
-            existingMarker.setPosition([foster.lng, foster.lat])
-            existingMarker.setContent(renderFosterMarkerContent(foster))
-            existingMarker.setExtData(foster)
-            fosterSignatureById.set(foster.id, signature)
-        }
-    }
-
-    // 3. 删除已不在列表中的 Marker
-    for (const [id, marker] of fosterMarkerById) {
-        if (nextIds.has(id)) continue
-
-        marker.setMap(null)
-        fosterMarkerById.delete(id)
-        fosterSignatureById.delete(id)
-    }
 }
 const renderUserMarkerContent = () => {
     const element = document.createElement('div')
@@ -926,22 +1068,38 @@ const syncUserMarker = () => {
     userMarker.setPosition(position)
 }
 // 将Marker添加到地图中
-const fitMapToMarkers = () => {
-    if (!map || fosterMarkerById.size === 0) return;
+const fitMapToFosterHomes = () => {
+    if (!map || !AMapInstance) return
 
-    // 收集所有标记的经纬度
-    const bounds = new AMapInstance.Bounds();
-    fosterMarkerById.forEach((marker) => {
-        const position = marker.getPosition()
+    const validHomes = fosterHomes.value.filter((foster) =>
+        isValidCoordinate(foster.lng, foster.lat),
+    )
 
-        if (position) {
-            bounds.extend(position)
-        }
-    });
+    if (validHomes.length === 0) return
 
-    // 适配范围（添加padding避免标记贴边）
-    map.setBounds(bounds, false, [20, 20, 20, 20]);
-};
+    if (validHomes.length === 1) {
+        const foster = validHomes[0]
+        map.setZoomAndCenter(16, [foster.lng, foster.lat])
+        return
+    }
+
+    const lngList = validHomes.map((foster) => foster.lng)
+    const latList = validHomes.map((foster) => foster.lat)
+
+    const minLng = Math.min(...lngList)
+    const maxLng = Math.max(...lngList)
+    const minLat = Math.min(...latList)
+    const maxLat = Math.max(...latList)
+
+    const bounds = new AMapInstance.Bounds(
+        minLng,
+        minLat,
+        maxLng,
+        maxLat,
+    )
+
+    map.setBounds(bounds, false, [20, 20, 20, 20])
+}
 //点击Marker,地图聚焦地址
 const focusOnMarker = (lng: number, lat: number) => {
 
@@ -1288,6 +1446,7 @@ onMounted(() => {
 });
 // 离开页面清理地图和Marker
 onUnmounted(() => {
+    destroyFosterCluster()
     fosterMarkerById.forEach((marker) => marker.setMap(null))
     fosterMarkerById.clear()
     fosterSignatureById.clear()

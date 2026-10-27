@@ -138,10 +138,23 @@
                             </div>
                         </div>
 
-                        <div class="cute-card p-4 bg-white mb-4" v-if="total > 0">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-600">找到 {{ total }} 个寄养服务</span>
-                                <span class="text-sm text-blue-500">参考位置: {{ currentLocation.address || '未定位' }}</span>
+                        <div class="cute-card p-4 bg-white mb-4" v-if="total > 0 || isClusterGroupActive">
+                            <div class="flex flex-wrap justify-between items-center gap-2">
+                                <span class="text-gray-600">
+                                    {{ isClusterGroupActive
+                                        ? `当前区域找到 ${visibleFosterCount} 个寄养服务`
+                                        : `找到 ${total} 个寄养服务` }}
+                                </span>
+                                <div class="flex items-center gap-3">
+                                    <button v-if="isClusterGroupActive" type="button"
+                                        class="text-sm font-medium text-blue-500 hover:text-blue-600"
+                                        @click="showAllFosterHomes">
+                                        查看全部
+                                    </button>
+                                    <span class="text-sm text-blue-500">
+                                        参考位置: {{ currentLocation.address || '未定位' }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -150,7 +163,8 @@
 
                             <!-- 无限滚动列表 -->
                             <div class="infinite-list-wrapper virtual-list" ref="listScrollRef" v-infinite-scroll="load"
-                                :infinite-scroll-disabled="disabled" :infinite-scroll-immediate="false">
+                                :infinite-scroll-disabled="disabled || isClusterGroupActive"
+                                :infinite-scroll-immediate="false">
                                 <ul class=" list virtual-list__inner"
                                     :style="{ height: `${rowVirtualizer.getTotalSize()}px` }">
                                     <li v-for="virtualRow in rowVirtualizer.getVirtualItems()"
@@ -237,7 +251,8 @@ bg-blue-50/30 hover:bg-blue-50/50 cursor-pointer" @click="selectFoster(foster, '
                                 </div>
 
                                 <!-- 无数据提示 -->
-                                <div v-if="fosterHomes.length === 0 && !loading" class="col-span-full text-center py-8">
+                                <div v-if="visibleFosterHomes.length === 0 && !loading"
+                                    class="col-span-full text-center py-8">
                                     <div class="text-4xl mb-4">🐾</div>
                                     <p class="text-gray-500 text-lg mb-2">没有找到符合条件的寄养家庭</p>
                                     <p class="text-gray-400 text-sm mb-4">尝试调整筛选条件或搜索关键词</p>
@@ -329,6 +344,8 @@ let fosterCluster: any = null
 
 // 当前选中的寄养点
 const selectedFosterId = ref<number | null>(null)
+// 点击聚合点后，列表只显示该聚合组的成员
+const activeClusterFosterIds = ref<Set<number> | null>(null)
 // 地图还没加载完时，暂存待聚焦坐标
 const pendingMapFocus = ref<{
     lng: number
@@ -363,6 +380,21 @@ const loading = ref(false)
 const hasMore = ref(true)
 const disabled = computed(() => loading.value || !hasMore.value)
 const fosterHomes = ref<FosterHome[]>([])
+const isClusterGroupActive = computed(
+    () => activeClusterFosterIds.value !== null,
+)
+const visibleFosterHomes = computed(() => {
+    const clusterIds = activeClusterFosterIds.value
+
+    if (!clusterIds) return fosterHomes.value
+
+    return fosterHomes.value.filter((foster) =>
+        clusterIds.has(foster.id),
+    )
+})
+const visibleFosterCount = computed(
+    () => visibleFosterHomes.value.length,
+)
 //回到顶部
 const showBackToTop = ref(false)
 const scrollContainer = ref<HTMLElement | null>(null)
@@ -802,7 +834,7 @@ const updateMapMarkers = () => {
             isValidCoordinate(foster.lng, foster.lat),
         )
     ) {
-       fitMapToFosterHomes()
+        fitMapToFosterHomes()
         hasFittedInitialMarkers = true
     }
 }
@@ -872,11 +904,41 @@ const destroyFosterCluster = () => {
 
     fosterCluster = null
 }
+
+const getClusterMemberIds = (event: any): number[] => {
+    const clusterData = Array.isArray(event?.clusterData)
+        ? event.clusterData
+        : []
+
+    return clusterData
+        .map((point: any) => Number(point?.extData?.id ?? point?.id))
+        .filter((id: number) => Number.isFinite(id))
+}
+
+const handleClusterClick = (event: any) => {
+    const memberIds = getClusterMemberIds(event)
+
+    // 单个点位由 renderMarker 的点击事件处理，这里只响应真正的聚合组
+    if (memberIds.length <= 1) return
+
+    const memberIdSet = new Set<number>(memberIds)
+    const memberHomes = fosterHomes.value.filter((foster) =>
+        memberIdSet.has(foster.id),
+    )
+
+    if (memberHomes.length === 0) return
+
+    activeClusterFosterIds.value = memberIdSet
+    selectedFosterId.value = null
+    pendingMapFocus.value = null
+    fitMapToFosterHomes(memberHomes)
+}
+
 // 创建聚合点
 const createFosterCluster = (points: FosterClusterPoint[]) => {
     if (!map || !AMapInstance?.MarkerCluster) return null
 
-    return new AMapInstance.MarkerCluster(map, points, {
+    const cluster = new AMapInstance.MarkerCluster(map, points, {
         gridSize: 60,
         maxZoom: 18,
 
@@ -911,6 +973,9 @@ const createFosterCluster = (points: FosterClusterPoint[]) => {
             })
         },
     })
+
+    cluster.on('click', handleClusterClick)
+    return cluster
 }
 // 聚合层的统一入口，负责创建、更新、销毁和降级
 const syncFosterCluster = (points: FosterClusterPoint[]) => {
@@ -1068,10 +1133,10 @@ const syncUserMarker = () => {
     userMarker.setPosition(position)
 }
 // 将Marker添加到地图中
-const fitMapToFosterHomes = () => {
+const fitMapToFosterHomes = (homes: FosterHome[] = fosterHomes.value) => {
     if (!map || !AMapInstance) return
 
-    const validHomes = fosterHomes.value.filter((foster) =>
+    const validHomes = homes.filter((foster) =>
         isValidCoordinate(foster.lng, foster.lat),
     )
 
@@ -1253,9 +1318,9 @@ const rows = computed(() => {
     const result: FosterHome[][] = []
     const size = columnCount.value
 
-    for (let index = 0; index < fosterHomes.value.length; index += size) {
+    for (let index = 0; index < visibleFosterHomes.value.length; index += size) {
         result.push(
-            fosterHomes.value.slice(index, index + size),
+            visibleFosterHomes.value.slice(index, index + size),
         )
     }
 
@@ -1294,8 +1359,22 @@ const resetListScroll = () => {
         behavior: 'auto',
     })
 }
+const clearActiveCluster = () => {
+    activeClusterFosterIds.value = null
+}
+
+const showAllFosterHomes = async () => {
+    clearActiveCluster()
+    fitMapToFosterHomes()
+
+    await nextTick()
+    resetListScroll()
+    rowVirtualizer.value.measure()
+}
+
 // 搜索处理
 const handleSearch = () => {
+    clearActiveCluster()
     resetListScroll()
     currentPage.value = 1; // 重置为第一页
     hasMore.value = true;
@@ -1304,6 +1383,7 @@ const handleSearch = () => {
 
 // 筛选条件变化
 const handleFilterChange = () => {
+    clearActiveCluster()
     resetListScroll()
     currentPage.value = 1;
     hasMore.value = true;
@@ -1317,6 +1397,7 @@ const handleRadiusInput = () => {
 
 };
 const handleRadiusConfirm = () => {
+    clearActiveCluster()
     resetListScroll()
     currentPage.value = 1;
     hasMore.value = true;
@@ -1324,6 +1405,7 @@ const handleRadiusConfirm = () => {
 };
 // 排序变化
 const handleSortChange = () => {
+    clearActiveCluster()
     resetListScroll()
     currentPage.value = 1;
     hasMore.value = true;
@@ -1331,7 +1413,7 @@ const handleSortChange = () => {
 }
 // 当前选中的寄养点，被新一轮搜索或筛选排除后，不能继续保留旧的选中状态和地图聚焦目标
 watch(
-    () => fosterHomes.value.map((item) => item.id),
+    () => visibleFosterHomes.value.map((item) => item.id),
     async (ids) => {
         if (
             selectedFosterId.value !== null &&
@@ -1367,6 +1449,7 @@ const sortFosterHomes = (list: FosterHome[]) => {
 
 // 重置筛选
 const resetFilters = () => {
+    clearActiveCluster()
     searchKeyword.value = ''
     filters.fosterTypes = [...initialFosterTypes]
     filters.petTypes = []
